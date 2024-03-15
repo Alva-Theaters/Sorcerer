@@ -1,16 +1,12 @@
 Hello there, human! 
 
-This is a Blender 4 add-on called Alva Sorcerer. Sorcerer is primarily intended for theatrical lighting designers who wish to separate the art from the technicals. All public-facing Alva software is designed with the artist in mind, not the technician. As a result, every UI decision only has one goal to satisfy: does this make it easier or harder to get the artistic vision to the stage? This is measured by the Coefficient of Design Drag (DDC). 
+This is a Blender 4 add-on called Alva Sorcerer. Sorcerer is primarily intended for theatrical lighting artists who wish to separate the art from the technicals. Sorcerer provides node-based light design, sequence-based light design, 3D-object-based lighting effects, and an animation renderer to existing lighting consoles without replacing the existing console. In addition to real-time output, it produces deliverables the console can play back by itself during the final show. Sorcerer is not DMX software. It is instead an OSC remote-control software. While most Sorcerer features are universal, some features are currently only for ETC Eos family consoles. Explicit, comprehensive support for grandMA 3, Hog, and MagicQ is coming. 
 
-To provide the lowest possible DDC, Sorcerer deleted the concept of selecting lights. In all other lighting control softwares and consoles at the amateur through professional level, the user must select a light or group before manipulating a parameter to an original value. To change any parameter to any new value on any light, the user must complete two steps: select, then manipulate. The user is only allowed one controller and that controller may only control one selection in one way at one time. The first step in drastically reducing DDG is identifying the most fundamental, repetitive principles introducing drag. The principle is this: the amount of time needed to make any new change is doubled 70% of the time because the user must select before manipulating to an original, unstored value. Why don't consoles provide multiple controllers? Why not a controller for each group? Simple. Clutter. Efficiency.
+Alva Sorcerer is considered an External Multimedia Animation Renderer. "External" because it does not directly control anything, but only remote-controls existing hardware control systems. "Multimedia" because it also produces 3D audio object deliverables and will soon also produce deliverables for PTZ camera systems. "Animation" because it creates a direct link between technical theatre and the animation suite behemoth that is Blender. "Renderer" because its primary purpose is to produce deliverables to be executed on show day by dedicated, performance-rated show control hardware (in much the same way that video editing software produces deliverables to be executed by movie theaters without the movie theater needing the video editing software). Sorcerer is the only known tool of its kind.
 
-Software designed with only the artist in mind does not see providing the artist instantaneous access to control as clutter or as inneffective use of space. However, to provide instantaneous access to many controls at once, a User Interface (UI) must not overwhelm the user with information, and a UI must strive to fill the screen with as little irrelevant pixels as possible, Irrelevant Pixel Count Index (IPCI). For this reason, a button that can serve its purpose without increasing DDC being drawn with 20 pixels by 20 pixels may not be programmed to be drawn with 21 pixels by 21 pixels. Because Sorcerer is designed exclusively for a personal computer, not as console software/firmware, 100% of useless pixels encounter the chopping block.
+Alva Sorcerer is 3D animation but in real life, for technical theatre.
 
-Alva Theaters believes that the user is the best judge of what controllers are needed at what times and on what screens. That is why Sorcerer uses node-based controllers. Node-based controllers can be placed by the user anywhere on screen and resized as if they are physical, tangible objects on a desk that can be brushed aside, repositioned, put into a folder, colored, labeled, and collapsed at the will of the user. Individual parameters can toggled on and off for individual nodes. There are nodes that control groups, other nodes that control those nodes, armies of those nodes can be collapsed into node groups, those node groups then can be duplicated, and there are nodes that can control specific nodes within the node group while the node group is collapsed into a small rectangle. All links between nodes are made visually with noodle connectors. In addition to normal group controller nodes, there are mixer nodes with their own heirarchies. These nodes mix multiple versions of the same parameter type across a group. Each version of the parameter is instantly accessible to the user whenever the node is on screen. 
-
-
-
-To use this software, you must download and install a recent version of Blender from blender.org. Currently, the exact url to go to is:
+To use this software, you must download and install a recent version of Blender from blender.org. Currently, the exact URL to go to is:
 
 https://www.blender.org/download/
 
@@ -22,6 +18,36 @@ Warning: For optimal performance and reliability during live shows, it's advised
 
 If installing Sorcerer did not work as expected and you can’t figure out what’s going on, Googling it may help (type in keywords for general Blender add-on installation problems). If that doesn’t work, contact Alva Theaters at help@alvatheaters.com.
 
-Once you have Sorcerer installed, navigate either to 3D view, Video Editing, the Shader Editor, or the Sorcerer Nodes view. 
+Once you have Sorcerer installed, navigate either to 3D view, Video Editing, the Shader Editor, or the Sorcerer Nodes view. Warning: the dedicated Sorcerer Nodes view is not compatible with node groups, so use the Shader Editor is you wish to utilize node groups.
 
 Now, follow intuition, tooltips, and the demo videos/streams on Alva Theaters’ YouTube channel to figure out what to do with the software. If none of that helps, either contact Alva by email at help@alvatheaters.com, by phone at (855) 512-2700, or, maybe you’ll be forced to read the documentation. It is our goal however to create software that is so intuitive that it doesn’t need documentation/instructions. If you feel the need to vent about something you think is needlessly confusing and/or dumb, send us an email at thisisdumb@alvatheaters.com. You can also ask our Not a Dumb Chatbot.
+
+Core Feature Sets of Sorcerer:
+
+•	“Orb” assistant that rapidly automates many repetitive tasks on Eos
+•	Most static menu panels can be hidden and accessed instead as popups
+•	Rapidly create flash effects with the sequencer and link to nodes
+•	Unlimited number of group controllers in node editor
+•	Animate 3D objects over the lighting plot in 3D view for 3D-object-based effects
+•	Directly link pan/tilt of movers to 3D audio objects and create deliverables
+•	Create “qmeo” deliverables after animating complex effects
+•	Fully patch Eos consoles using Sorcerer’s UI style
+•	Mix multiple parameter choices across groups with mixer nodes
+•	Sequencer automatically creates events in the Eos event list based on strips
+•	Use your own Python code to control lights or 3D audio objects
+•	“School mode” password-protects key settings that students/volunteers shouldn’t touch
+
+
+Core Relevant Blender Feature Sets:
+
+•	Rapidly create 3D lighting plot with Blender’s UI before patching
+•	Create exorbitantly complex show files with node layering/grouping
+•	Asset manager can connect nodes directly to marketplaces and internet
+•	Advanced animation tools like Graph Editor, NLA Editor, and Dope Sheet
+•	Blender’s .blend file management
+•	Blender’s highly customizable UI themes and keymap
+•	Performance capture for moving lights using motion tracking
+•	Blender’s sophisticated curve, modifier, constraint, and physics tools
+•	Many other tools within Blender that have been under continuous, iterative evolution for 3 decades
+
+![image](https://github.com/Alva-Theaters/Sorcerer/assets/162933818/f6c71775-6ac2-4982-889e-4b6c8e5bea04)
