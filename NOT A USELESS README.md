@@ -49,5 +49,3 @@ Core Relevant Blender Feature Sets:
 •	Performance capture for moving lights using motion tracking
 •	Blender’s sophisticated curve, modifier, constraint, and physics tools
 •	Many other tools within Blender that have been under continuous, iterative evolution for 3 decades
-
-![image](https://github.com/Alva-Theaters/Sorcerer/assets/162933818/f6c71775-6ac2-4982-889e-4b6c8e5bea04)
