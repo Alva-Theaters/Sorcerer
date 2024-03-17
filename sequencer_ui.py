@@ -24,6 +24,9 @@
 '''
 
 
+## Double hashtag indicates notes for future development requiring some level of attention
+
+
 import bpy
 import socket
 import os
@@ -98,7 +101,7 @@ class AlvaConsolePanel(bpy.types.Panel):
     bl_idname = "ALVA_PT_console_panel"
     bl_space_type = 'SEQUENCE_EDITOR'
     bl_region_type = 'UI'
-    bl_category = 'Alva Sequencer'
+    bl_category = 'Alva Sorcerer'
 
     def draw(self, context):
         layout = self.layout
@@ -592,9 +595,6 @@ class AlvaConsolePanel(bpy.types.Panel):
                     row = box.row(align=True)
                     row.operator("my.record_preset", text="Store Preset", icon='NLA_PUSHDOWN')
                     row.operator("my.load_preset", text="Load Preset", icon='FILE_PARENT')
-                    row.alert = 1
-                    row.operator("my.osc_help_button", text="Help")
-                    row.alert= 0
                     row = box.separator()
                     box = column.box()  
                     row = box.row()
@@ -630,15 +630,17 @@ class AlvaConsolePanel(bpy.types.Panel):
                         row = box.row()
                         row.label(text="to use this feature without pain and swearing.")
                         row = box.row(align=True)
-                        row.label(text="Look for Blender 2.79 tutorials online or ask")
+                        row.label(text="Look for Blender tutorials online or ask")
                         row = box.row()
                         row.label(text="Alva Theaters for help if needed.")
                         row = box.row(align=True)
                         row.label(text="Alva Theaters help email: help@alvatheaters.com")
-                    box = column.box()  
+                        row = box.row(align=True)
+                        row.label(text="For venting frustration: thisisdumb@alvatheaters.com")
+                    box = column.box()
                     row = box.row()
                     row.prop(scene, "bake_panel_toggle", icon="TRIA_DOWN" if scene.bake_panel_toggle else "TRIA_RIGHT", icon_only=True, emboss=False)
-                    row.label(text="Bake Animation to Cues", icon='PACKAGE')
+                    row.label(text="Create Qmeo", icon='FILE_MOVIE')
                     if scene.bake_panel_toggle:
                         row = box.row(align=True)
                         row.operator("my.delete_animation_cue_list_operator", text="", icon='CANCEL')
@@ -648,7 +650,7 @@ class AlvaConsolePanel(bpy.types.Panel):
                         row.operator("my.stop_animation_clock_operator", text="", icon='PAUSE')
                         row.prop(active_strip, "animation_event_list_number", text="Event List")
                         row = box.row()
-                        row.operator("my.bake_fcurves_to_cues_operator", text="Bake Animation to Cues", icon_value=orb.icon_id)
+                        row.operator("my.bake_fcurves_to_cues_operator", text="Create Qmeo", icon_value=orb.icon_id)
                         row = box.row()
                         row.operator("my.rerecord_cues_operator", text="Re-record Cues", icon_value=orb.icon_id)
                         box.separator()
@@ -714,7 +716,7 @@ class AlvaVideoPanel(bpy.types.Panel):
     bl_idname = "ALVA_PT_video_panel"
     bl_space_type = 'SEQUENCE_EDITOR'
     bl_region_type = 'UI'
-    bl_category = 'Alva Sequencer'
+    bl_category = 'Alva Sorcerer'
 
     def draw(self, context):
         if context.scene:
@@ -728,7 +730,7 @@ class AlvaAudioPanel(bpy.types.Panel):
     bl_idname = "ALVA_PT_audio_panel"
     bl_space_type = 'SEQUENCE_EDITOR'
     bl_region_type = 'UI'
-    bl_category = 'Alva Sequencer'
+    bl_category = 'Alva Sorcerer'
 
     def draw(self, context):
         if context.scene:
@@ -780,6 +782,7 @@ class AlvaAudioPanel(bpy.types.Panel):
                             box = layout.box()
                             row = box.row()
                             row.label(text="Volume Monitor (Read-only)")
+                            counter = 0
                             for strip in sequence_editor.sequences:
                                 if strip.type == 'SOUND':
                                     if hasattr(strip, "selected_speaker") and strip.selected_speaker is not None:
@@ -787,6 +790,10 @@ class AlvaAudioPanel(bpy.types.Panel):
                                         row = box.row()
                                         row.enabled = False  # Use False instead of 0 for clarity
                                         row.prop(strip, "dummy_volume", text=f"{label} Volume", slider=True)
+                                        counter += 1
+                            if counter == 0:
+                                row = box.row()
+                                row.label(text="No participating speaker strips found.")
                             box.separator()
                             row = box.row()
                             row.label(text="OSC address for audio mixer:")
@@ -809,7 +816,7 @@ class TrackingPanel(bpy.types.Panel):
     bl_idname = "ALVA_PT_tracking_panel"
     bl_space_type = 'SEQUENCE_EDITOR'
     bl_region_type = 'UI'
-    bl_category = 'Alva Sequencer'
+    bl_category = 'Alva Sorcerer'
 
     def draw(self, context):
         layout = self.layout
@@ -997,6 +1004,14 @@ class ButtonsPanel(bpy.types.Panel):
         #flow.alignment = 'LEFT'
         flow.scale_y = 2
         
+        
+        flow.operator("my.add_macro", icon='REC', text="Macro" if region_width > 200 else "")
+        flow.operator("my.add_cue", icon='PLAY', text="Cue" if region_width > 200 else "")
+        flow.operator("my.add_flash", icon='LIGHT_SUN', text="Flash" if region_width > 200 else "")
+        flow.operator("my.add_animation", icon='IPO_BEZIER', text="Animation" if region_width > 200 else "")
+        if bpy.context.scene.triggers_enabled:
+            flow.operator("my.add_trigger", icon='SETTINGS', text="Trigger" if region_width > 200 else "")
+        flow.separator()
         flow.operator("seq.render_strips_operator", icon_value=orb.icon_id, text="Render" if region_width > 200 else "")
         flow.operator("my.add_strip_operator", icon='ADD', text="Add Strip" if region_width > 200 else "", emboss=True)
         flow.operator("my.go_to_cue_out_operator", icon='GHOST_ENABLED', text="Cue 0" if region_width > 200 else "")
@@ -1029,7 +1044,7 @@ class SettingsPanel(bpy.types.Panel):
     bl_idname = "ALVA_PT_settings_panel"
     bl_space_type = 'SEQUENCE_EDITOR'
     bl_region_type = 'UI'
-    bl_category = 'Alva Sequencer'
+    bl_category = 'Alva Sorcerer'
 
     def draw(self, context):
         if context.scene:
@@ -1223,8 +1238,8 @@ def register():
     
     pcoll = bpy.utils.previews.new()
     preview_collections["main"] = pcoll
-    icons_dir = "/Users/easystreetphotography1/Downloads"
-    pcoll.load("orb", os.path.join(icons_dir, "alva_orb.png"), 'IMAGE')
+    addon_dir = os.path.dirname(__file__)
+    pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
         
         
 def unregister():
