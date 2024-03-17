@@ -3111,7 +3111,6 @@ class RecordEffectPresetOperator(bpy.types.Operator):
         for node_tree in bpy.data.node_groups:
             if node_tree.bl_idname == 'AlvaNodeTree' or node_tree.bl_idname == 'ShaderNodeTree':
                 for node in node_tree.nodes:
-                    print(self.node_name, node.name)
                     if node.bl_idname == "flash_type" and node.name == self.node_name:
                         active_node = node
                         break
@@ -3178,7 +3177,6 @@ class RecordDownEffectPresetOperator(bpy.types.Operator):
         for node_tree in bpy.data.node_groups:
             if node_tree.bl_idname == 'AlvaNodeTree' or node_tree.bl_idname == 'ShaderNodeTree':
                 for node in node_tree.nodes:
-                    print(self.node_name, node.name)
                     if node.bl_idname == "flash_type" and node.name == self.node_name:
                         active_node = node
                         break
