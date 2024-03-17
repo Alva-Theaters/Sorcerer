@@ -24,6 +24,9 @@
 '''
 
 
+## Double hashtag indicates notes for future development requiring some level of attention
+
+
 import bpy
 from bpy.props import *
 import time
@@ -227,7 +230,6 @@ def update_light_positions(self, context):
                 send_osc_string(address, ip_address, port, f"Group {self.int_array_group_index} Enter, + {argument} Enter Enter")
                 send_osc_string(address, ip_address, port, f"Group {self.int_array_group_index} Enter, + {argument} Enter Enter")
                 send_osc_string(address, ip_address, port, f"Group {self.int_array_group_index} Enter, + {argument} Enter Enter")
-                print(f"Group {self.int_array_group_index} Enter, + {argument}")
                 time.sleep(.5)
                 send_osc_string(address, ip_address, port, "Patch Enter")
                 send_osc_string(address, ip_address, port, "Patch Enter")
@@ -239,7 +241,7 @@ class SceneProperties(bpy.types.PropertyGroup):
         default="/eos/newcmd", description="Write in the address your console uses to denote a command line entry through OSC")
         
     str_channel_template: StringProperty(
-        default="Channel *", description="Add any syntax needed to specify channel and use * for channel number")
+        default="Chan *", description="Add any syntax needed to specify channel and use * for channel number")
         
     str_group_template: StringProperty(
         default="Group *", description="Add any syntax needed to specify group and use * for group number")
@@ -337,10 +339,10 @@ class SceneProperties(bpy.types.PropertyGroup):
         default=False, description="Tells updaters when and when not to send their own osc")
         
     is_democratic: BoolProperty(
-        default=True, description="This is a democracy. When different controllers try to change the same channel parameter, their Influence parameter gives them votes in a weighted average")
+        default=False, description="This is a democracy. When different controllers try to change the same channel parameter, their Influence parameter gives them votes in a weighted average")
     
     is_not_democratic: BoolProperty(
-        default=False, description="This isn't a democracy anymore. When different controllers try to change the same channel parameter, the strongest completely erases everyone else's opinion")
+        default=True, description="This isn't a democracy anymore. When different controllers try to change the same channel parameter, the strongest completely erases everyone else's opinion")
 
     is_baking: BoolProperty(default=False, description="Alva is currently baking")
     
