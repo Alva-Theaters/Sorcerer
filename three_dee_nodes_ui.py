@@ -1054,6 +1054,9 @@ class FlashNode(bpy.types.Node):
         return
     
     def draw_buttons(self, context, layout):
+        pcoll = preview_collections["main"]
+        orb = pcoll["orb"]
+      
         layout.prop(self, "flash_motif_names_enum", text="", icon='SEQ_SEQUENCER')
         column = layout.column()
         row = column.row(align=True)
@@ -1061,11 +1064,11 @@ class FlashNode(bpy.types.Node):
         op = row.operator("node.flash_preset_search_operator", text="", icon='VIEWZOOM')
         op.node_name = self.name
         row.prop(self, "int_up_preset_assignment", text="Up Preset:")
-        op = row.operator("node.record_effect_preset_operator", text="", icon='VIEW_PAN')
+        op = row.operator("node.record_effect_preset_operator", text="", icon_value=orb.icon_id)
         op.node_name = self.name
         row = column.row(align=True)
         row.prop(self, "int_down_preset_assignment", text="Down Preset:")
-        op = row.operator("node.record_down_effect_preset_operator", text="", icon='VIEW_PAN')
+        op = row.operator("node.record_down_effect_preset_operator", text="", icon_value=orb.icon_id)
         op.node_name = self.name
         
         world = context.scene.world
@@ -1103,6 +1106,9 @@ class NodeSettingsPanel(bpy.types.Panel):
     bl_category = 'Alva Sorcerer'
     
     def draw(self, context):
+        pcoll = preview_collections["main"]
+        orb = pcoll["orb"]
+      
         layout = self.layout
         scene = context.scene
         column = layout.column(align=True)
