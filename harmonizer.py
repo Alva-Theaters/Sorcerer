@@ -2191,7 +2191,7 @@ class MixerNode(bpy.types.Node):
 
     str_selected_group: bpy.props.EnumProperty(
         name="Selected Group",
-        description="Choose a group",
+        description="Choose a group to control. Create these groups with the Patch function on the N tab in node editor, with USITT ASCII import in the same area, or create/modify them in Properties -> World -> SORCERER: Group Channel Blocks (full screen).",
         items=group_objects,
         update=group_info_updater_mixer
     )
@@ -2564,7 +2564,7 @@ class GroupControllerNode(bpy.types.Node):
     # Selected group and color profile enumerators.
     str_selected_light: EnumProperty(
         name="Selected Light",
-        description="Choose a light object",
+        description="Choose a group to control. Create these groups with the Patch function on the N tab in node editor, with USITT ASCII import in the same area, or create/modify them in Properties -> World -> SORCERER: Group Channel Blocks (full screen).",
         items=lamp_objects,
         update=group_info_updater
     )
