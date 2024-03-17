@@ -105,7 +105,7 @@ def get_cone_items(self, context):
 
 
 def school_mode_password_updater(self, context):
-    if self.school_mode_password in ["Halayna Hutchins", "halayana hutchins", "halyana hutchins", "halayana huchins", "halayna huchins", "halayna hutchins", "Halayna hutchins", "halayna Hutchins"]:
+    if self.school_mode_password in ["Halyna Hutchins", "Halayna Hutchins", "halayna hutchins", "halyna hutchins", "halayana huchins", "halayna huchins", "halayna hutchins", "Halayna hutchins", "halayna Hutchins"]:
         self.school_mode_enabled = not self.school_mode_enabled
         self.school_mode_password = ""
 
