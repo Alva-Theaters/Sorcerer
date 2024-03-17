@@ -327,10 +327,10 @@ class SceneProperties(bpy.types.PropertyGroup):
     int_osc_port: IntProperty(min=0, max=65535, description="On the console, Displays > Setup > System Settings > Show Control > OSC > (enable OSC RX and make the port number there on the left match the one in this field in Alva. OSC TX = transmit and OSC RX = receive. We want receive", default=8000)
     string_osc_receive_port: IntProperty(min=0, max=65535)
     
-    str_record_cue: StringProperty(default="Record Cue # Time $ Enter Enter", description="Write command line syntax for recording cue # with duration $. # and $ are filled in by Alva as cue number and duration, respectively")
-    str_create_all_events: StringProperty(default="Event 1 / 1 Thru # Enter", description="Write command line syntax to initialize all events. Alva will replace # with the final event number based on the sequencer's end frame")
+    str_record_cue: StringProperty(default="Record Cue # Time $ Enter Enter", description="Write command line syntax for recording cue # with duration $. # and $ are filled in by Orb as cue number and duration, respectively")
+    str_create_all_events: StringProperty(default="Event 1 / 1 Thru # Enter", description="Write command line syntax to initialize all events. Orb will replace # with the final event number based on the sequencer's end frame")
     str_setup_event: StringProperty(default="Event 1 / # Time $ Show_Control_Action Cue # Enter", description="Write command line syntax to setup each event. # is frame/cue and $ is timecode")
-    str_bake_info: StringProperty(default="Bake Animation to Cues")
+    str_bake_info: StringProperty(default="Bake Animation to Cues (to Qmeo)")
     str_event_bake_info: StringProperty(default="Just Events") 
     str_cue_bake_info: StringProperty(default="Just Cues") 
     selected_text_block_name: StringProperty()
