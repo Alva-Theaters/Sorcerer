@@ -24,10 +24,23 @@
 '''
 
 
+## Double hashtag indicates notes for future development requiring some level of attention
+
+
 import bpy
 from bpy.types import Operator, Menu
 import os
 import bpy.utils.previews
+import inspect
+
+
+# Purpose of this throughout the codebase is to proactively identify possible pre-bugs and to help diagnose bugs.
+def sorcerer_assert_unreachable(*args):
+    caller_frame = inspect.currentframe().f_back
+    caller_file = caller_frame.f_code.co_filename
+    caller_line = caller_frame.f_lineno
+    message = "Error found at {}:{}\nCode marked as unreachable has been executed. Please report bug to Alva Theaters.".format(caller_file, caller_line)
+    print(message)
 
 
 preview_collections = {}
@@ -729,7 +742,7 @@ class ModalStripController(Operator):
     
     def invoke(self, context, event):
         wm = context.window_manager
-        return wm.invoke_props_dialog(self, width=500)
+        return wm.invoke_props_dialog(self, width=300)
     
     def draw(self, context):   
         scene = context.scene
@@ -1258,37 +1271,39 @@ class ModalStripController(Operator):
                         row = box.row()
                         row.label(text="to use this feature without pain and swearing.")
                         row = box.row(align=True)
-                        row.label(text="Look for Blender 2.79 tutorials online or ask")
+                        row.label(text="Look for Blender tutorials online or ask")
                         row = box.row()
                         row.label(text="Alva Theaters for help if needed.")
                         row = box.row(align=True)
                         row.label(text="Alva Theaters help email: help@alvatheaters.com")
+                        row = box.row(align=True)
+                        row.label(text="For venting frustration: thisisdumb@alvatheaters.com")
                     box = column.box()  
                     row = box.row()
                     row.prop(scene, "bake_panel_toggle", icon="TRIA_DOWN" if scene.bake_panel_toggle else "TRIA_RIGHT", icon_only=True, emboss=False)
-                    row.label(text="Bake Animation to Cues", icon='PACKAGE')
+                    row.label(text="Create a Qmeo", icon='FILE_MOVIE')
                     if scene.bake_panel_toggle:
                         row = box.row(align=True)
                         row.operator("my.delete_animation_cue_list_operator", text="", icon='CANCEL')
                         row.prop(active_strip, "animation_cue_list_number", text="Cue List")
-                        row = box.row(align=True)
+                        #row = box.row(align=True)
                         row.operator("my.delete_animation_event_list_operator", text="", icon='CANCEL')
-                        row.operator("my.stop_animation_clock_operator", text="", icon='PAUSE')
+                        #row.operator("my.stop_animation_clock_operator", text="", icon='PAUSE')
                         row.prop(active_strip, "animation_event_list_number", text="Event List")
-                        row = box.row()
-                        row.operator("my.bake_fcurves_to_cues_operator", text="Bake Animation to Cues", icon_value=orb.icon_id)
-                        row = box.row()
-                        row.operator("my.rerecord_cues_operator", text="Re-record Cues", icon_value=orb.icon_id)
-                        box.separator()
+                        #row = box.row()
+                        row.operator("my.bake_fcurves_to_cues_operator", text="", icon_value=orb.icon_id)
+                        #row = box.row()
+                        row.operator("my.rerecord_cues_operator", text="", icon_value=orb.icon_id)
+                        #box.separator()
                         row = box.row()
                         row.prop(active_strip, "execute_animation_on_cue_number", text='"Enable" Cue #')
-                        row = box.row()
+                        #row = box.row()
                         row.prop(active_strip, "execute_animation_with_macro_number", text="With Macro #")
                         row.operator("my.execute_animation_on_cue_operator", icon_value=orb.icon_id)
-                        box.separator()
+                        #box.separator()
                         row = box.row()
                         row.prop(active_strip, "disable_animation_on_cue_number", text='"Disable" Cue #')
-                        row = box.row()
+                        #row = box.row()
                         row.prop(active_strip, "disable_animation_with_macro_number", text="With Macro #")
                         row.operator("my.disable_animation_on_cue_operator", icon_value=orb.icon_id)
                         box.separator()
@@ -1301,21 +1316,21 @@ class ModalStripController(Operator):
                     box.separator()
                     row = box.row()
                     split = row.split(factor=0.25)
-                    split.label(text="Trigger Prefix:")
+                    split.label(text="Address:")
                     split.prop(active_strip, "trigger_prefix", text="")
                     row = box.separator()
                     row = box.row()
                     split = row.split(factor=0.35)
-                    split.label(text="Strip Start Argument:")
+                    split.label(text="Start Argument:")
                     split.prop(active_strip, "osc_trigger", text="")
                     row = box.row()
                     split = row.split(factor=0.35)
-                    split.label(text="Strip End Argument:")
+                    split.label(text="End Argument:")
                     split.prop(active_strip, "osc_trigger_end", text="")
                     row = box.row()
                     box = column.box()
                     row = box.row()
-                    row.label(text="Add offset friends below:")
+                    row.label(text='Add offsets. "(1-10), (20-11)" for example.')
                     row = box.row()
                     row.prop(active_strip, "friend_list", text="")
                     
@@ -1350,7 +1365,7 @@ class ModalStripFormatter(Operator):
     
     def invoke(self, context, event):
         wm = context.window_manager
-        return wm.invoke_props_dialog(self, width=300)
+        return wm.invoke_props_dialog(self, width=200)
         
     def draw(self, context):
         layout = self.layout
@@ -1710,21 +1725,21 @@ class ModalNodeSettings(Operator):
         print(scene.school_mode_enabled)
         
         if not scene.school_mode_enabled:
-            row = column.row()
-            row.label(text="Harmonizer Settings:")
-            
-            row = column.row()
-            if scene.is_democratic:
-                row.alert = 1
-            row.operator("my.democratic_operator", text="Democratic", icon='HEART')
-            row.alert = 0
-            if scene.is_not_democratic:
-                row.alert = 1
-            row.operator("my.non_democratic_operator", text="Non-democratic", icon='ORPHAN_DATA')
-            row.alert = 0
-            
-            column.separator()
-            column.separator()
+#            row = column.row()
+#            row.label(text="Harmonizer Settings:")
+#            
+#            row = column.row()
+#            if scene.is_democratic:
+#                row.alert = 1
+#            row.operator("my.democratic_operator", text="Democratic", icon='HEART')
+#            row.alert = 0
+#            if scene.is_not_democratic:
+#                row.alert = 1
+#            row.operator("my.non_democratic_operator", text="Non-democratic", icon='ORPHAN_DATA')
+#            row.alert = 0
+#            
+#            column.separator()
+#            column.separator()
             
             box = column.box()
             row = box.row()
@@ -1918,11 +1933,10 @@ class ModalNodeFormatter(Operator):
         space = context.space_data.edit_tree.nodes
         active_node = None 
 
-        # Check if there's an active node in the current node tree
         if hasattr(context.space_data, 'edit_tree') and context.space_data.edit_tree is not None:
             active_node = context.space_data.edit_tree.nodes.active
 
-            if active_node and (active_node.bl_idname == "group_controller_type" or active_node.bl_idname == "group_controller_driver_type" or active_node.bl_idname == "master_type"):
+            if active_node and (active_node.bl_idname == "group_controller_type" or active_node.bl_idname == "group_driver_type" or active_node.bl_idname == "master_type"):
                 row.prop(active_node, "strobe_is_on", text="Strobe", slider=True)
                 row.prop(active_node, "color_is_on", text="Color", slider=True)
                 
@@ -1947,6 +1961,30 @@ class ModalNodeFormatter(Operator):
                     row.prop(active_node, "influence", text="Influence")
                     
                     column.separator()
+                    
+            elif active_node and active_node.bl_idname == "mixer_type" or active_node.bl_idname == "mixer_driver_type":
+                row = layout.row(align=True)
+                row.prop(active_node, "str_selected_group", text="")
+                row = layout.row(align=True)
+                row.prop(active_node, "parameters_enum", text="")
+                if active_node.parameters_enum == 'option_color':
+                    row.prop(active_node, "color_profile_enum", text="")
+  
+                if active_node.parameters_enum != None:
+                    row = layout.row()
+                    row.prop(active_node, "show_middle", text="Show Middle", slider=True)
+                    
+                    if not active_node.show_middle:
+                        row.prop(active_node, "every_other", text="Every Other", slider=True)
+                        
+                row = layout.row()
+                row.prop(active_node, "collapse_most", text="Collapse most")
+            
+        row = layout.row()
+        row.prop(active_node, "label", text="Label")
+        row = layout.row()
+        row.prop(active_node, "use_custom_color", text="", icon='HIDE_ON' if not active_node.use_custom_color else 'HIDE_OFF')
+        row.prop(active_node, "color", text="")
         
         
 addon_keymaps = []
@@ -2065,8 +2103,8 @@ def register():
     # Custom icon stuff
     pcoll = bpy.utils.previews.new()
     preview_collections["main"] = pcoll
-    icons_dir = "/Users/easystreetphotography1/Downloads"
-    pcoll.load("orb", os.path.join(icons_dir, "alva_orb.png"), 'IMAGE')
+    addon_dir = os.path.dirname(__file__)
+    pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
     
     
 def unregister():
