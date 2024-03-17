@@ -24,6 +24,9 @@
 '''
 
 
+## Double hashtag indicates notes for future development requiring some level of attention
+
+
 import bpy
 import bpy_extras
 import socket
@@ -37,6 +40,12 @@ from functools import partial
 from bpy.types import PropertyGroup
 from bpy.props import StringProperty
 from _bpy import context as _context
+
+
+max_zoom = 1000
+min_zoom = -1000
+max_iris = 1000
+min_iris = -1000
 
 
 def send_osc_string(osc_addr, addr, port, string):
@@ -60,6 +69,136 @@ def send_osc_string(osc_addr, addr, port, string):
         traceback.print_exc()
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+
+def osc_zoom_update(self, context):
+    scene = context.scene
+    if context.screen:
+        
+        if not context.scene.is_armed_osc:
+            return
+        
+        if not hasattr(self, "my_settings") or self.my_settings.motif_type_enum != 'option_animation':
+            return
+        
+        if self.mute:
+            return
+        
+        if scene.frame_current > self.frame_final_end:
+            return
+        
+        if scene.frame_current < self.frame_start:
+            return
+        
+        zoom_prefix = self.zoom_prefix
+        osc_zoom = self.osc_zoom
+        ip_address = context.scene.scene_props.str_osc_ip_address
+        port = context.scene.scene_props.int_osc_port
+        
+        osc_zoom_str = str(osc_zoom)
+        send_osc_string(zoom_prefix, ip_address, port, osc_zoom_str)
+        
+        
+def osc_iris_update(self, context):
+    scene = context.scene
+    if context.screen:
+        
+        if not context.scene.is_armed_osc:
+            return
+        
+        if not hasattr(self, "my_settings") or self.my_settings.motif_type_enum != 'option_animation':
+            return
+        
+        if self.mute:
+            return
+        
+        if scene.frame_current > self.frame_final_end:
+            return
+        
+        if scene.frame_current < self.frame_start:
+            return
+        
+        iris_prefix = self.iris_prefix
+        osc_iris = self.osc_iris
+        ip_address = context.scene.scene_props.str_osc_ip_address
+        port = context.scene.scene_props.int_osc_port
+        
+        osc_iris_str = str(osc_iris)
+        send_osc_string(iris_prefix, ip_address, port, osc_iris_str)
+        
+        
+def start_macro_update(self, context):
+    active_strip = context.scene.sequence_editor.active_strip
+    ip_address = context.scene.scene_props.str_osc_ip_address
+    port = context.scene.scene_props.int_osc_port
+    
+    self.start_frame_macro_text = self.start_frame_macro_text_gui
+    
+    frame_rate = bpy.context.scene.render.fps / bpy.context.scene.render.fps_base
+    strip_length_in_seconds_total = active_strip.frame_final_duration / frame_rate
+    
+    # Convert total seconds to minutes and fractional seconds format.
+    minutes = int(strip_length_in_seconds_total // 60)
+    seconds = strip_length_in_seconds_total % 60
+    duration = "{:02d}:{:04.1f}".format(minutes, seconds)  
+    
+    formatted_command = update_macro_command(self.start_frame_macro_text, duration)
+    self.start_frame_macro_text = formatted_command
+
+  
+def end_macro_update(self, context):
+    active_strip = context.scene.sequence_editor.active_strip
+    ip_address = context.scene.scene_props.str_osc_ip_address
+    port = context.scene.scene_props.int_osc_port
+    
+    self.end_frame_macro_text = self.end_frame_macro_text_gui
+    
+    frame_rate = bpy.context.scene.render.fps / bpy.context.scene.render.fps_base
+    strip_length_in_seconds_total = active_strip.frame_final_duration / frame_rate
+    
+    # Convert total seconds to minutes and fractional seconds format.
+    minutes = int(strip_length_in_seconds_total // 60)
+    seconds = strip_length_in_seconds_total % 60
+    duration = "{:02d}:{:04.1f}".format(minutes, seconds)  
+    
+    formatted_command = update_macro_command(self.end_frame_macro_text, duration)
+    self.end_frame_macro_text = formatted_command
+    
+    
+def update_macro_command(command, duration):
+    if '*' in command:
+        command = command.replace('*', 'Sneak Time ' + str(duration))
+
+    commands_to_replace = [
+        'go to cue',
+        'stop effect',
+        'go to cue 0',
+        'intensity palette',
+        'color palette',
+        'focus palette',
+        'beam palette'
+    ]
+
+    for cmd in commands_to_replace:
+        if cmd in command:
+            command = command.replace(cmd, cmd.replace(' ', '_'))
+
+    if not command.strip().endswith('Enter'):
+        command += ' Enter'
+
+    return command 
+
+
+# For flash end macro.
+def calculate_bias_offseter(bias, frame_rate, strip_length_in_frames):
+    if bias == 0:
+        return strip_length_in_frames / 2
+    elif bias < 0:
+        proportion_of_first_half = (49 + bias) / 49
+        return round(strip_length_in_frames * proportion_of_first_half * 0.5)
+    else:
+        proportion_of_second_half = bias / 49
+        return round(strip_length_in_frames * (0.5 + proportion_of_second_half * 0.5))
 
 
 def get_frame_rate(scene):
@@ -2458,7 +2597,7 @@ class StartFrameJumpOperator(bpy.types.Operator):
     bl_label = "Jump to Start Frame"
     
     def execute(self, context):
-        bpy.context.scene.frame_current = bpy.context.scene.sequence_editor.active_strip.frame_start
+        bpy.context.scene.frame_current = int(bpy.context.scene.sequence_editor.active_strip.frame_start)
         return {'FINISHED'}
     
     
@@ -2467,7 +2606,7 @@ class EndFrameJumpOperator(bpy.types.Operator):
     bl_label = "Jump to End Frame"
     
     def execute(self, context):
-        bpy.context.scene.frame_current = bpy.context.scene.sequence_editor.active_strip.frame_final_end
+        bpy.context.scene.frame_current = int(bpy.context.scene.sequence_editor.active_strip.frame_final_end)
         return {'FINISHED'}
 
 
@@ -2786,8 +2925,8 @@ def create_motif_strip(context, motif_type_enum):
 
 class AddMacroOperator(bpy.types.Operator):
     bl_idname = "my.add_macro"
-    bl_label = "M"
-    bl_description = "Add Macro Motif"
+    bl_label = "Macro"
+    bl_description = "Add macro strip. Type in macro syntax you know letter by letter and type * for strip length"
     
     def execute(self, context):
         return create_motif_strip(context, "option_eos_macro")
@@ -2795,8 +2934,8 @@ class AddMacroOperator(bpy.types.Operator):
         
 class AddCueOperator(bpy.types.Operator):
     bl_idname = "my.add_cue"
-    bl_label = "C"
-    bl_description = "Add Cue Motif"
+    bl_label = "Cue"
+    bl_description = "Add cue strip. Strip length will become the cues fade in time"
     
     def execute(self, context):
         return create_motif_strip(context, "option_eos_cue")
@@ -2804,8 +2943,8 @@ class AddCueOperator(bpy.types.Operator):
     
 class AddFlashOperator(bpy.types.Operator):
     bl_idname = "my.add_flash"
-    bl_label = "F"
-    bl_description = "Add Flash Motif"
+    bl_label = "Flash"
+    bl_description = "Add flash strip. Flash strips are really fast for making lights flash up then down with no effort"
     
     def execute(self, context):
         return create_motif_strip(context, "option_eos_flash")
@@ -2813,8 +2952,8 @@ class AddFlashOperator(bpy.types.Operator):
     
 class AddAnimationOperator(bpy.types.Operator):
     bl_idname = "my.add_animation"
-    bl_label = "A"
-    bl_description = "Add Animation Motif"
+    bl_label = "Animation"
+    bl_description = "Add animation strip. Use Blender's sophisticated animation tools such as Graph Editor, Dope Sheet, Motion Tracking, and NLA Editor to create effects that are impossible to create anywhere else. Then, output a qmeo deliverable to the console for local playback"
     
     def execute(self, context):
         return create_motif_strip(context, "option_animation")
@@ -2822,8 +2961,8 @@ class AddAnimationOperator(bpy.types.Operator):
     
 class AddTriggerOperator(bpy.types.Operator):
     bl_idname = "my.add_trigger"
-    bl_label = "T"
-    bl_description = "Add Trigger Motif"
+    bl_label = "Trigger"
+    bl_description = "Add trigger strip. Use this to send arbitrary OSC strings on start and end frame with fully custom address/argument. Or, experiment with creating advanced offset effects with plain english"
     
     def execute(self, context):
         return create_motif_strip(context, "option_trigger")
@@ -2940,8 +3079,8 @@ class SequencerOperator(bpy.types.Operator):
 
 class GoToCueOutOperator(bpy.types.Operator):
     bl_idname = "my.go_to_cue_out_operator"
-    bl_label = "Goto Cue Out"
-    bl_description = "Presses GotoCue Out on the console."
+    bl_label = "Ghost out"
+    bl_description = "Presses Go_to Cue Out on the console"
     
     def execute(self, context):
         ip_address = context.scene.scene_props.str_osc_ip_address
@@ -3173,7 +3312,7 @@ class StopAnimationClockOperator(bpy.types.Operator):
 class BakeFCurvesToCuesOperator(bpy.types.Operator):
     bl_idname = "my.bake_fcurves_to_cues_operator"
     bl_label = "Bake F-curves To Cues"
-    bl_description = "Orb will create all stuff on the lighting console needed to playback the animation with Alva External shut off. Alva External will become unresponsive until operation is completed. It may take a long time to complete" 
+    bl_description = "Orb will create a qmeo. A qmeo is like a video, only each frame is a lighting cue. Use it to store complex animation data on the lighting console" 
 
     def frame_to_timecode(self, frame, fps=None):
         """Convert frame number to timecode format."""
@@ -3286,7 +3425,7 @@ class BakeFCurvesToCuesOperator(bpy.types.Operator):
 class RerecordCuesOperator(bpy.types.Operator):
     bl_idname = "my.rerecord_cues_operator"
     bl_label = "Re-record Cues"
-    bl_description = "Orb will re-record the cues. Use this instead of the Bake button if you already used the Bake button, updated the animation without changing its length, and just want to re-record the existing cues. This is far shorter" 
+    bl_description = "Orb will re-record the cues. Use this instead of the left button if you already used that button, updated the animation without changing its length, and just want to re-record the existing cues. This is far shorter" 
     
     def execute(self, context):
         scene = context.scene
@@ -3491,9 +3630,8 @@ $$Software Version 3.2.2 Build 25  Fixture Library 3.2.0.75, 26.Apr.2023
                 break
             
         bpy.context.space_data.text = text_block
-        default_filepath = bpy.path.abspath("//Generated Show File.txt")
-        bpy.ops.text.save_as({'area': area}, filepath=default_filepath)
-        self.report({'INFO'}, "File saved successfully!")
+
+        self.report({'INFO'}, "ASCII created successfully!")
         
         return {'FINISHED'}
     
@@ -4417,7 +4555,8 @@ class GelOneGroupsOperator(bpy.types.Operator):
             self.layout.prop(context.scene, "cyc_three_light_groups", text="Gel 3")
             self.layout.prop(context.scene, "cyc_four_light_groups", text="Gel 4")
             
-            
+
+## What on earth is this here for??? 
 class WM_OT_ShowMessage(bpy.types.Operator):
     bl_idname = "wm.show_message"
     bl_label = "Message"
@@ -4491,8 +4630,6 @@ classes = (
     KeyframeZoomOperator,
     KeyframeIrisOperator,
     ReplaceOperator,
-#    OSCHelpOperator,
-#    OSCHelpPopup,
     GenerateStripsOperator,
     AddColorStripOperator,
     ClockZeroOperator,
@@ -4630,8 +4767,24 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
         
+    # Shift+G keymap for Ghost Out
+    wm = bpy.context.window_manager
+    kc = wm.keyconfigs.addon
+    if kc:
+        km = kc.keymaps.new(name='Window', space_type='EMPTY')
+        kmi = km.keymap_items.new(GoToCueOutOperator.bl_idname, 'G', 'PRESS', shift=True)
+        
         
 def unregister():
+    wm = bpy.context.window_manager
+    kc = wm.keyconfigs.addon
+    if kc:
+        km = kc.keymaps['Window']
+        for kmi in km.keymap_items:
+            if kmi.idname == GoToCueOutOperator.bl_idname:
+                km.keymap_items.remove(kmi)
+                break
+            
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
         
