@@ -3109,7 +3109,7 @@ class RecordEffectPresetOperator(bpy.types.Operator):
     def execute(self, context):
         active_node = None
         for node_tree in bpy.data.node_groups:
-            if node_tree.bl_idname == 'AlvaNodeTree':
+            if node_tree.bl_idname == 'AlvaNodeTree' or node_tree.bl_idname == 'ShaderNodeTree':
                 for node in node_tree.nodes:
                     print(self.node_name, node.name)
                     if node.bl_idname == "flash_type" and node.name == self.node_name:
@@ -3155,7 +3155,7 @@ class RecordEffectPresetOperator(bpy.types.Operator):
         send_osc_string(address, ip_address, port, argument)
         
         for node_tree in bpy.data.node_groups:
-            if node_tree.bl_idname == 'AlvaNodeTree':
+            if node_tree.bl_idname == 'AlvaNodeTree' or node_tree.bl_idname == 'ShaderNodeTree':
                 for node in node_tree.nodes:
                     if node.bl_idname == "flash_type":
                         node.flash_motif_names_enum = node.flash_motif_names_enum
@@ -3176,7 +3176,7 @@ class RecordDownEffectPresetOperator(bpy.types.Operator):
     def execute(self, context):
         active_node = None
         for node_tree in bpy.data.node_groups:
-            if node_tree.bl_idname == 'AlvaNodeTree':
+            if node_tree.bl_idname == 'AlvaNodeTree' or node_tree.bl_idname == 'ShaderNodeTree':
                 for node in node_tree.nodes:
                     print(self.node_name, node.name)
                     if node.bl_idname == "flash_type" and node.name == self.node_name:
@@ -3222,7 +3222,7 @@ class RecordDownEffectPresetOperator(bpy.types.Operator):
         send_osc_string(address, ip_address, port, argument)
             
         for node_tree in bpy.data.node_groups:
-            if node_tree.bl_idname == 'AlvaNodeTree':
+            if node_tree.bl_idname == 'AlvaNodeTree' or node_tree.bl_idname == 'ShaderNodeTree':
                 for node in node_tree.nodes:
                     if node.bl_idname == "flash_type":
                         node.flash_motif_names_enum = node.flash_motif_names_enum
