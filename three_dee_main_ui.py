@@ -24,6 +24,9 @@
 '''
 
 
+## Double hashtag indicates notes for future development requiring some level of attention
+
+
 import bpy
 from bpy.types import Operator, Menu
 import os
@@ -146,10 +149,10 @@ class LightArrayPanel(bpy.types.Panel):
             col.prop(scene.scene_props, "gobo_id_is_on", text="Gobo", slider=True)
             
             pcoll = preview_collections["main"]
-            my_icon = pcoll["my_icon"]
+            orb = pcoll["orb"]
             
             box.separator()
-            box.operator("array.patch_group_operator", text="Patch Group", icon_value=my_icon.icon_id)
+            box.operator("array.patch_group_operator", text="Patch Group", icon_value=orb.icon_id)
 
             box.separator()
             
@@ -556,7 +559,7 @@ class ModalChannelControllerPanel(Operator):
           
             
 class GroupsPanel(bpy.types.Panel):
-    bl_label = "Group/Channel Blocks"
+    bl_label = "SORCERER: Group/Channel Blocks (Full Screen)"
     bl_idname = "ALVA_PT_groups_panel"
     bl_space_type = "PROPERTIES"
     bl_region_type = 'WINDOW'
@@ -569,7 +572,7 @@ class GroupsPanel(bpy.types.Panel):
         column = layout.column(align=True)
         
         row = column.row()  
-        row.label(text="These do not need to match console groups. This tells Alva if controllers conflict with each other. Alva will usually send individualize commands to channels even when you use Group Controller nodes (for effects purposes). Packets will not exceed 50 commands each. It fails near 135 commands per packet.")    
+        row.label(text="These do not need to match console groups. This tells Alva if controllers conflict with each other. Alva will usually send individualized commands to channels even when you use Group Controller nodes (for effects purposes). Packets will not exceed 50 commands each. It fails near 135 commands per packet.")    
         
         column.separator()
         
@@ -643,7 +646,7 @@ class GroupsPanel(bpy.types.Panel):
                    
               
 class ParameterComboPanel(bpy.types.Panel):
-    bl_label = "Parameter Combo"
+    bl_label = "SORCERER: Parameter Combo (Full Screen)"
     bl_idname = "ALVA_PT_parameter_combo_panel"
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -757,7 +760,7 @@ class ParameterComboPanel(bpy.types.Panel):
 
  
 class GroupSettingsPanel(bpy.types.Panel):
-    bl_label = "Group Settings"
+    bl_label = "SORCERER: Group Settings (Full Screen)"
     bl_idname = "ALVA_PT_group_settings_panel"
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -974,8 +977,8 @@ def register():
         
     pcoll = bpy.utils.previews.new()
     preview_collections["main"] = pcoll
-    icons_dir = "/Users/easystreetphotography1/Downloads"
-    pcoll.load("my_icon", os.path.join(icons_dir, "alva_orb.png"), 'IMAGE')
+    addon_dir = os.path.dirname(__file__)
+    pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
     
     
 
