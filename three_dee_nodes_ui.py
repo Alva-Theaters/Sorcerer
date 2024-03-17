@@ -24,12 +24,26 @@
 '''
 
 
+## Double hashtag indicates notes for future development requiring some level of attention
+
+
 import bpy
 import socket
 from bpy.types import Operator, Menu, NodeSocket
 from bpy.props import *
 import os
 import bpy.utils.previews
+from nodeitems_utils import NodeCategory, NodeItem, register_node_categories, unregister_node_categories
+import inspect
+
+
+# Purpose of this throughout the codebase is to proactively identify possible pre-bugs and to help diagnose bugs.
+def sorcerer_assert_unreachable(*args):
+    caller_frame = inspect.currentframe().f_back
+    caller_file = caller_frame.f_code.co_filename
+    caller_line = caller_frame.f_lineno
+    message = "Error found at {}:{}\nCode marked as unreachable has been executed. Please report bug to Alva Theaters.".format(caller_file, caller_line)
+    print(message)
 
 
 preview_collections = {}
@@ -66,14 +80,18 @@ class CustomButtonPropertyGroup(bpy.types.PropertyGroup):
     
 class OvenNode(bpy.types.Node):
     bl_idname = 'oven_type'
-    bl_label = 'Oven Node'
-    bl_icon = 'OUTLINER_OB_CAMERA'
+    bl_label = 'Qmeo Node'
+    bl_icon = 'FILE_MOVIE'
     bl_width_default = 500
+    bl_description="Create Qmeos to store complex animation data directly on the console. Qmeos are like videos, but each frame is a lighting cue"
 
     def init(self, context):
         return
 
     def draw_buttons(self, context, layout):
+        pcoll = preview_collections["main"]
+        orb = pcoll["orb"]
+        
         scene = context.scene.scene_props
         column = layout.column(align=True)  
         
@@ -118,7 +136,7 @@ class OvenNode(bpy.types.Node):
         row = split.column()
         if scene.is_baking:
             row.alert = 1
-        row.operator("my.bake_animation_operator", text=scene.str_bake_info, icon='VIEW_PAN')
+        row.operator("my.bake_animation_operator", text=scene.str_bake_info, icon_value=orb.icon_id)
         row.alert = 0
         split = column.split(factor=.5)
         row = split.column()
@@ -127,7 +145,7 @@ class OvenNode(bpy.types.Node):
         
         if scene.is_cue_baking:
             row.alert = 1
-        row.operator("my.just_cues_operator", text=scene.str_cue_bake_info, icon='VIEW_PAN')
+        row.operator("my.just_cues_operator", text=scene.str_cue_bake_info, icon_value=orb.icon_id)
         row.alert = 0
         
         row = split.column()
@@ -136,7 +154,7 @@ class OvenNode(bpy.types.Node):
         
         if scene.is_event_baking:
             row.alert = 1
-        row.operator("my.just_events_operator", text=scene.str_event_bake_info, icon='VIEW_PAN')
+        row.operator("my.just_events_operator", text=scene.str_event_bake_info, icon_value=orb.icon_id)
         row.alert = 0
         
         column.separator()
@@ -160,6 +178,7 @@ class SettingsNode(bpy.types.Node):
     bl_label = 'Settings Node'
     bl_icon = 'PREFERENCES'
     bl_width_default = 400
+    bl_description="Sorcerer node settings"
 
     def init(self, context):
         return
@@ -169,21 +188,22 @@ class SettingsNode(bpy.types.Node):
         column = layout.column(align=True)
         
         if not scene.school_mode_enabled:
-            row = column.row()
-            row.label(text="Harmonizer Settings:")
-            
-            row = column.row()
-            if scene.is_democratic:
-                row.alert = 1
-            row.operator("my.democratic_operator", text="Democratic", icon='HEART')
-            row.alert = 0
-            if scene.is_not_democratic:
-                row.alert = 1
-            row.operator("my.non_democratic_operator", text="Non-democratic", icon='ORPHAN_DATA')
-            row.alert = 0
-            
-            column.separator()
-            column.separator()
+## Simply do not have the time to fix democratic mode. Color and influencers both have isssues in democratic mode.
+#            row = column.row()
+#            row.label(text="Harmonizer Settings:")
+#            
+#            row = column.row()
+#            if scene.is_democratic:
+#                row.alert = 1
+#            row.operator("my.democratic_operator", text="Democratic", icon='HEART')
+#            row.alert = 0
+#            if scene.is_not_democratic:
+#                row.alert = 1
+#            row.operator("my.non_democratic_operator", text="Non-democratic", icon='ORPHAN_DATA')
+#            row.alert = 0
+#            
+#            column.separator()
+#            column.separator()
             
             box = column.box()
             row = box.row()
@@ -359,6 +379,7 @@ class PresetsNode(bpy.types.Node):
     bl_label = 'Presets Node'
     bl_icon = 'LIGHTPROBE_GRID'
     bl_width_default = 1200
+    bl_description="Record and recall console presets"
     
     color_argument_template: bpy.props.StringProperty(default="Group # Color_Palette $ Enter")
     preset_argument_template: bpy.props.StringProperty(default="Group # Color_Palette $ Enter")
@@ -599,6 +620,7 @@ class IntensitiesNode(bpy.types.Node):
     bl_label = 'Intensities Node'
     bl_icon = 'OUTLINER_OB_LIGHT'
     bl_width_default = 600
+    bl_description="Adjust all intensities of group controller nodes on this level"
 
     def init(self, context):
         return
@@ -616,49 +638,8 @@ class IntensitiesNode(bpy.types.Node):
 
             for controller in node_tree.nodes:
                 if controller.bl_idname == 'group_controller_type':
-                    if scene.scene_props.show_presets:
-                        row = column.row(align=True)
-                        
-                        row.operator("my.enable_record", text="", icon='REC')
-                        row.operator("my.color_one", text="", icon='COLORSET_01_VEC')
-                        row.operator("my.color_two", text="", icon='COLORSET_02_VEC')
-                        row.operator("my.color_three", text="", icon='COLORSET_03_VEC')
-                        row.operator("my.color_four", text="", icon='COLORSET_04_VEC')
-                        row.operator("my.color_five", text="", icon='COLORSET_05_VEC')
-                        row.operator("my.color_six", text="", icon='COLORSET_06_VEC')
-                        row.operator("my.color_seven", text="", icon='COLORSET_07_VEC')
-                        row.operator("my.color_eight", text="", icon='COLORSET_08_VEC')
-                        row.operator("my.color_nine", text="", icon='COLORSET_09_VEC')
-                        row.operator("my.color_ten", text="", icon='COLORSET_11_VEC')
-                        row.operator("my.color_eleven", text="", icon='COLORSET_12_VEC')
-                        row.operator("my.color_twelve", text="", icon='COLORSET_13_VEC')
-                        row.operator("my.color_thirteen", text="", icon='COLORSET_14_VEC')
-                        row.operator("my.color_fourteen", text="", icon='COLORSET_15_VEC')
-
-                        row.operator("my.f_one", text="", icon='EVENT_F1')
-                        row.operator("my.f_two", text="", icon='EVENT_F2')
-                        row.operator("my.f_three", text="", icon='EVENT_F3')
-                        row.operator("my.f_four", text="", icon='EVENT_F4')
-                        row.operator("my.f_five", text="", icon='EVENT_F5')
-                        row.operator("my.f_six", text="", icon='EVENT_F6')
-                        row.operator("my.f_seven", text="", icon='EVENT_F7')
-                        row.operator("my.f_eight", text="", icon='EVENT_F8')
-                        row.operator("my.f_nine", text="", icon='EVENT_F9')
-                        row.operator("my.f_ten", text="", icon='EVENT_F10')
-                        row.operator("my.f_eleven", text="", icon='EVENT_F11')
-                        row.operator("my.f_twelve", text="", icon='EVENT_F12')
-                    
-                    row = column.row(align=True)
-                    
+                    row = column.row(align=True)        
                     row.prop(controller, "float_intensity", slider=True, text=controller.str_group_label)
-                    
-                if scene.show_presets:
-                    column.separator()
-                    column.separator()
-                    column.separator()
-                
-        row = column.row()
-        row.prop(scene, "show_presets", text = "Show Presets Buttons", slider = True)
         
         
 class ColorsNode(bpy.types.Node):
@@ -666,6 +647,7 @@ class ColorsNode(bpy.types.Node):
     bl_label = 'Colors Node'
     bl_icon = 'COLOR'
     bl_width_default = 1200
+    bl_description="Adjust all colors of group controller nodes on this level"
 
     def init(self, context):
         return
@@ -705,41 +687,24 @@ class ColorsNode(bpy.types.Node):
                 row = column.row()
                 row.prop(scene.scene_props, "color_is_preset_mode", text = "Show Presets Buttons", slider = True)
                     
-        if not scene.color_is_preset_mode:
+        else:
             displayed_count = 0
-            if scene.color_is_expanded:
-                row = column.row(align=True)
-                world = scene.world
+            row = column.row(align=True)
+            world = scene.world
 
-                if world is not None and world.node_tree:
-                    node_tree = world.node_tree
+            if world is not None and world.node_tree:
+                node_tree = world.node_tree
 
-                    for controller in node_tree.nodes:
-                        if controller.bl_idname == 'group_controller_type':
-                            if not controller.no_color_mixing and not controller.fixture_is_conventional:
-                                if displayed_count % 3 == 0 and displayed_count != 0:
-                                    row = column.row(align=True)
-                                row.template_color_picker(controller, "float_vec_color")
-                                row.label(text=controller.str_group_label)
-                                displayed_count += 1                       
-                    
-            if not scene.color_is_expanded:
-                row = column.row(align=True)
-                world = scene.world
+                flow = column.grid_flow(columns=4, align=True)
 
-                if world is not None and world.node_tree:
-                    node_tree = world.node_tree
-
-                    for controller in node_tree.nodes:
-                        if controller.bl_idname == 'group_controller_type':
-                            if not controller.no_color_mixing and not controller.fixture_is_conventional:
-                                if displayed_count % 3 == 0 and displayed_count != 0:
-                                    column.separator()
-                                    column.separator()
-                                    row = column.row(align=True)
-                                row.prop(controller, "float_vec_color", text="")
-                                row.label(text=controller.str_group_label)
-                                displayed_count += 1
+                displayed_count = 0
+                for controller in node_tree.nodes:
+                    if controller.bl_idname == 'group_controller_type':
+                        if controller.color_is_on:
+                            box = flow.box()
+                            box.template_color_picker(controller, "float_vec_color", value_slider=False, lock_luminosity=False, cubic=True)
+                            box.label(text=controller.str_group_label)
+                            displayed_count += 1                     
                               
             row = column.row()
             row.prop(scene.scene_props, "color_is_preset_mode", text = "Show Presets Buttons", slider = True)
@@ -751,6 +716,7 @@ class StrobesNode(bpy.types.Node):
     bl_label = 'Strobes Node'
     bl_icon = 'OUTLINER_DATA_LIGHTPROBE'
     bl_width_default = 400
+    bl_description="Adjust all strobes of group controller nodes on this level"
 
     def init(self, context):
         return
@@ -776,6 +742,7 @@ class ZoomsNode(bpy.types.Node):
     bl_label = 'Zooms Node'
     bl_icon = 'LINCURVE'
     bl_width_default = 400
+    bl_description="Adjust all zooms of group controller nodes on this level"
 
     def init(self, context):
         return
@@ -802,6 +769,7 @@ class EdgesNode(bpy.types.Node):
     bl_label = 'Edges Node'
     bl_icon = 'SELECT_SET'
     bl_width_default = 400
+    bl_description="Adjust all edges of group controller nodes on this level"
 
     def init(self, context):
         return
@@ -828,6 +796,7 @@ class PanTiltNode(bpy.types.Node):
     bl_label = 'FOH Pan/Tilt'
     bl_icon = 'ORIENTATION_GIMBAL'
     bl_width_default = 400
+    bl_description="Intuitive pan/tilt controller only for FOH, forward-facing fixtures"
 
     pan_tilt_channel: bpy.props.IntProperty(default=1, description="Channel for pan/tilt graph. Think of the circle as a helix or as an infinite staircase. Pan-around is when you fall down to go forward an inch or jump up to go forward an inch. The circle below is a helix with 150% the surface area of a circle. Only use this for front-facing FOH/catwalk movers")
     pan_is_inverted: bpy.props.BoolProperty(default = True)
@@ -845,7 +814,7 @@ class PanTiltNode(bpy.types.Node):
         active_object = None
         
         for obj in bpy.data.objects:
-            if obj.type == 'LIGHT' and obj.name == channel_string:
+            if obj.type == 'MESH' and obj.name == channel_string:
                 active_object = obj
                 break
         
@@ -898,7 +867,9 @@ class PanTiltNode(bpy.types.Node):
                         row.label(text = "Will soon pan-around!")
                         row.alert = 0
                         
-        else: row.label(text="No light selected.")
+        else: 
+            row.label(text="No light selected.")
+            row.prop(self, "pan_tilt_channel", text="Channel:")
             
             
 class ConsoleButtonsNode(bpy.types.Node):
@@ -906,6 +877,7 @@ class ConsoleButtonsNode(bpy.types.Node):
     bl_label = 'Console Buttons Node'
     bl_icon = 'DESKTOP'
     bl_width_default = 400
+    bl_description="Create console buttons with custom OSC syntax"
 
     custom_buttons: bpy.props.CollectionProperty(type=CustomButtonPropertyGroup)
     active_button_index: bpy.props.IntProperty()
@@ -1047,6 +1019,7 @@ class FlashNode(bpy.types.Node):
     bl_label = 'Flash Node'
     bl_icon = 'LIGHT_SUN'
     bl_width_default = 190
+    bl_description="Autofill the Flash Up and Flash Down fields of flash strips in Sequencer with node settings and noodle links. Intended primarily for pose-based choreography"
     
     def get_motif_name_items(self, context):
         unique_names = set()
@@ -1123,7 +1096,7 @@ class FlashNode(bpy.types.Node):
         
         
 class NodeSettingsPanel(bpy.types.Panel):
-    bl_label = "Controller Toggles"
+    bl_label = "Node Formatter"
     bl_idname = "NODE_PT_controller_toggles"
     bl_space_type = 'NODE_EDITOR'
     bl_region_type = 'UI'
@@ -1136,14 +1109,14 @@ class NodeSettingsPanel(bpy.types.Panel):
         row = column.row()
         space = context.space_data.edit_tree.nodes
         active_node = None 
-        
+
         if hasattr(context.space_data, 'edit_tree') and context.space_data.edit_tree is not None:
             active_node = context.space_data.edit_tree.nodes.active
 
-            if active_node and (active_node.bl_idname == "group_controller_type" or active_node.bl_idname == "group_controller_driver_type" or active_node.bl_idname == "master_type"):
+            if active_node and (active_node.bl_idname == "group_controller_type" or active_node.bl_idname == "group_driver_type" or active_node.bl_idname == "master_type"):
                 row.prop(active_node, "strobe_is_on", text="Strobe", slider=True)
                 row.prop(active_node, "color_is_on", text="Color", slider=True)
-                   
+                
                 row = column.row()
                 row.prop(active_node, "pan_tilt_is_on", text="Pan/Tilt", slider=True)
                 
@@ -1165,21 +1138,48 @@ class NodeSettingsPanel(bpy.types.Panel):
                     row.prop(active_node, "influence", text="Influence")
                     
                     column.separator()
-
+                    
+            elif active_node and active_node.bl_idname == "mixer_type" or active_node.bl_idname == "mixer_driver_type":
+                row = layout.row(align=True)
+                row.prop(active_node, "str_selected_group", text="")
+                row = layout.row(align=True)
+                row.prop(active_node, "parameters_enum", text="")
+                if active_node.parameters_enum == 'option_color':
+                    row.prop(active_node, "color_profile_enum", text="")
+  
+                if active_node.parameters_enum != None:
+                    row = layout.row()
+                    row.prop(active_node, "show_middle", text="Show Middle", slider=True)
+                    
+                    if not active_node.show_middle:
+                        row.prop(active_node, "every_other", text="Every Other", slider=True)
+                        
+                row = layout.row()
+                row.prop(active_node, "collapse_most", text="Collapse most")
+            
+        row = layout.row()
+        row.prop(active_node, "label", text="Label")
+        row = layout.row()
+        row.prop(active_node, "use_custom_color", text="", icon='HIDE_ON' if not active_node.use_custom_color else 'HIDE_OFF')
+        row.prop(active_node, "color", text="")
+            
 
 def draw_alva_node_menu(self, layout):
+    pcoll = preview_collections["main"]
+    orb = pcoll["orb"]
+    
     layout = self.layout
-    layout.label(text="Primary Nodes")
+    layout.label(text="Primary Nodes", icon_value=orb.icon_id)
     layout.operator("node.add_group_controller_node", text="Group Controller", icon='STICKY_UVS_LOC')
     layout.operator("node.add_mixer_node", text="Mixer", icon='OPTIONS')
     layout.operator("node.add_mixer_driver_node", text="Mixer Driver", icon='DECORATE_DRIVER')
-    layout.operator("node.add_group_driver_node", text="Group Controller Driver", icon='DECORATE_DRIVER')
+    layout.operator("node.add_group_driver_node", text="Group Driver", icon='DECORATE_DRIVER')
     layout.operator("node.add_master_node", text="Master", icon='DECORATE_DRIVER')
-    layout.operator("node.add_flash_node", text="Add Flash", icon='LIGHT_SUN')
+    layout.operator("node.add_flash_node", text="Flash", icon='LIGHT_SUN')
     
     layout.separator()
     
-    layout.label(text="Single-parameter Nodes")
+    layout.label(text="Single-parameter Nodes", icon_value=orb.icon_id)
     layout.operator("node.add_intensities_node", text="Intensities", icon='OUTLINER_OB_LIGHT')
     layout.operator("node.add_colors_node", text="Colors", icon='COLOR')
     layout.operator("node.add_strobes_node", text="Strobes", icon='OUTLINER_DATA_LIGHTPROBE')
@@ -1188,12 +1188,46 @@ def draw_alva_node_menu(self, layout):
     
     layout.separator()
     
-    layout.label(text="Specialty Nodes")
+    layout.label(text="Specialty Nodes", icon_value=orb.icon_id)
     layout.operator("node.add_oven_node", text="Renderer", icon='OUTLINER_OB_CAMERA')
     layout.operator("node.add_settings_node", text="Settings", icon='PREFERENCES')
     layout.operator("node.add_console_buttons_node", text="Console Buttons", icon='DESKTOP')
     layout.operator("node.add_presets_node", text="Presets", icon='LIGHTPROBE_GRID')
     layout.operator("node.add_pan_tilt_node", text="Pan/Tilt", icon='ORIENTATION_GIMBAL')
+    
+    
+    
+class AlvaSorcererNodeCategory(NodeCategory):
+    @classmethod
+    def poll(cls, context):
+        return context.space_data.tree_type == 'ShaderNodeTree'
+    
+    
+node_items = [
+    NodeItem("group_controller_type"),
+    NodeItem("group_driver_type"),
+    NodeItem("mixer_type"),
+    NodeItem("mixer_driver_type"),
+    NodeItem("master_type"),
+    NodeItem("flash_type"),
+
+    NodeItem("intensities_type"),
+    NodeItem("colors_type"),
+    NodeItem("strobes_type"),
+    NodeItem("zooms_type"),
+    NodeItem("edges_type"),
+    
+    NodeItem("oven_type"),
+    NodeItem("node_settings_type"),
+    NodeItem("console_buttons_type"),
+    NodeItem("presets_type"),
+    NodeItem("pan_tilt_type"),
+]
+
+
+categories = [
+    AlvaSorcererNodeCategory("SORCERER_NODES", "Alva Sorcerer", items=node_items),
+]
     
 
 class NodesToolbar(bpy.types.Panel):
@@ -1241,13 +1275,15 @@ classes = (
 
 
 def register():
+    register_node_categories("SORCERER_NODES", categories)
+    
     for cls in classes:
         bpy.utils.register_class(cls)
     
     pcoll = bpy.utils.previews.new()
     preview_collections["main"] = pcoll
-    icons_dir = "/Users/easystreetphotography1/Downloads"
-    pcoll.load("orb", os.path.join(icons_dir, "alva_orb.png"), 'IMAGE')
+    addon_dir = os.path.dirname(__file__)
+    pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
     
     bpy.types.NODE_HT_header.append(draw_arm_nodes)
     bpy.types.NODE_MT_add.append(draw_alva_node_menu)
@@ -1263,6 +1299,8 @@ def unregister():
 
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
+        
+    unregister_node_categories("SORCERER_NODES")
         
         
 # For development purposes only.
