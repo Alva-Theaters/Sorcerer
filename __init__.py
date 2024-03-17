@@ -42,7 +42,7 @@ from .hotkeys_popups import register as hotkeys_popups_register, unregister as h
 bl_info = {
     "name": "Alva Sorcerer",
     "author": "Alva Theaters",
-    "location": "Nodes/View3D/Sequencer", 
+    "location": "ShaderEditor/View3D/Sequencer", 
     "version": (1, 0),
     "blender": (4, 0, 2),
     "description": "3D animation but in real life, for theatrical light design/audio.",
