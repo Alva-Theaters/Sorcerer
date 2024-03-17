@@ -2811,7 +2811,7 @@ class CopyEndFrameOperator(bpy.types.Operator):
 class CopyAboveToSelectedOperator(bpy.types.Operator):
     bl_idname = "my.copy_above_to_selected"
     bl_label = "Copy to Selected"
-    bl_description = "Copy the Alva External data of the active strip to all the other selected strips"
+    bl_description = "Copy some properties of the active strip to all the other selected strips"
 
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
