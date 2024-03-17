@@ -24,6 +24,9 @@
 '''
 
 
+## Double hashtag indicates notes for future development requiring some level of attention
+
+
 import bpy
 import bpy_extras
 import socket
@@ -90,6 +93,15 @@ def frame_to_timecode(self, frame, fps=None):
     return "{:02}:{:02}:{:02}:{:02}".format(hours, minutes, seconds, frames)
 
 
+def find_relevant_clock(scene):
+    for strip in scene.sequence_editor.sequences:
+        if (strip.type == 'SOUND' and 
+            not strip.mute and 
+            getattr(strip, 'song_timecode_clock_number', 0) != 0 and
+            strip.frame_start <= scene.frame_current < strip.frame_final_end):
+            return strip
+
+
 def find_available_channel(sequence_editor, start_frame, end_frame, start_channel=1):
     current_channel = start_channel
 
@@ -126,7 +138,7 @@ def get_light_rotation_degrees(light_name):
 
         return x_rot_deg, y_rot_deg
     else:
-        print("Light object named", light_name,"not found or is not a lamp.")
+        print("It appears as though", light_name,"has left the chat.")
         return None, None
 
 
@@ -511,6 +523,9 @@ def osc_pan_update(self, context):
             
             tilt_value, pan_value = get_light_rotation_degrees(light_name)
             
+            if tilt_value == None or pan_value == None:
+                return
+            
             pan = round(pan_value, 1)
             pan = str(pan)
             
@@ -549,6 +564,9 @@ def osc_tilt_update(self, context):
             light_name = str(self.selected_light)
             
             tilt_value, pan_value = get_light_rotation_degrees(light_name)
+            
+            if tilt_value == None or pan_value == None:
+                return
 
             tilt = round(tilt_value, 1)
             tilt = str(tilt)
@@ -617,6 +635,7 @@ def osc_iris_update(self, context):
 class RenderStripsOperator(bpy.types.Operator):
     bl_idname = "seq.render_strips_operator"
     bl_label = "Render Strips"
+    bl_description = "Orb will create timecode events for every Macro, Cue, and Flash strip on the relevant sound strip's event list. Shortcut is Shift+Spacebar"
 
     @classmethod
     def poll(cls, context):
@@ -634,7 +653,10 @@ class RenderStripsOperator(bpy.types.Operator):
 
         commands = []
         event_strip = find_relevant_clock(context.scene)
+        if event_strip == None:
+            return {'CANCELLED'}
         event_list = event_strip.song_timecode_clock_number
+
         i = 1
         for action_map, description in all_maps:
             for frame in action_map:
@@ -667,7 +689,6 @@ class RenderStripsOperator(bpy.types.Operator):
                 argument == ""
         
         if argument != "":
-            print(argument)
             send_osc_string("/eos/newcmd", ip_address, port, argument)
             
         send_osc_string("/eos/key/live", ip_address, port, "1")
@@ -675,15 +696,6 @@ class RenderStripsOperator(bpy.types.Operator):
         snapshot = str(context.scene.orb_finish_snapshot)
         send_osc_string("/eos/newcmd", ip_address, port, f"Snapshot {snapshot} Enter")
         return{'FINISHED'}
-            
-    
-def find_relevant_clock(scene):
-    for strip in scene.sequence_editor.sequences:
-        if (strip.type == 'SOUND' and 
-            not strip.mute and 
-            getattr(strip, 'song_timecode_clock_number', 0) != 0 and
-            strip.frame_start <= scene.frame_current < strip.frame_final_end):
-            return strip
 
 
 # Defines lists of strips with relevant enumerator and checkbox choices.
@@ -2432,7 +2444,7 @@ def register():
     bpy.types.SoundSequence.song_bpm_channel = bpy.props.IntProperty(name="", min=1, max=32, description='Use this to choose which channel to place the new strips on')
     bpy.types.SoundSequence.beats_per_measure = bpy.props.IntProperty(name="", min=1, max=16, description='Use this to determine how many beats are in each measure. In a time signature like 3/4, this would be the top number 3')
     
-    bpy.types.ColorSequence.motif_name = bpy.props.StringProperty(default="")
+    bpy.types.ColorSequence.motif_name = bpy.props.StringProperty(default="", description="Use this to link cues together that should act as one. They must have the same name here and have the link button turned on so that it is red for them to automatically update each other. Not everything will necessarily be updated.")
     bpy.types.ColorSequence.strip_length_proxy = bpy.props.IntProperty(name="", min=-9999, max=1000000)
         
     bpy.types.Scene.prefix_panel_toggle = bpy.props.BoolProperty(
@@ -2449,9 +2461,9 @@ def register():
     bpy.types.ColorSequence.tilt_prefix = bpy.props.StringProperty(name="Tilt Prefix:", default="/eos/*/param/tilt", description='Type in the prefix, aka address, needed by your console to control tilt. For ETC Eos, it is "/eos/chan/1/param/tilt" to control tilt on channel 1. The second half of the OSC message is the argument, represented to the right. If your console does not want the value to be in the argument by itself, contact Alva Theaters')
     bpy.types.ColorSequence.zoom_prefix = bpy.props.StringProperty(name="Zoom Prefix:", default="/eos/*/param/zoom", description='If using ETC Eos, type in r for "Rotate", z for "Zoom", st for "Shutter Strobe", r2 for "Rotate wheel 2", and many more variations', update=custom_zoom_prefix_updater)
     bpy.types.ColorSequence.iris_prefix = bpy.props.StringProperty(name="Iris Prefix:", default="/eos/*/param/iris", description='If using ETC Eos, type in r for "Rotate", z for "Zoom", st for "Shutter Strobe", r2 for "Rotate wheel 2", and many more variations', update=custom_iris_prefix_updater)
-    bpy.types.ColorSequence.flash_input = bpy.props.StringProperty(name="", description="Type in what feels natural as a request for a flash up. It's the software's job to read your mind", update=flash_input_updater)
+    bpy.types.ColorSequence.flash_input = bpy.props.StringProperty(name="", description="Type in what feels natural as a request for a flash up. It IS the software's job to read your mind", update=flash_input_updater)
     
-    bpy.types.ColorSequence.flash_down_input = bpy.props.StringProperty(name="", description="Type in wthe second half of the flash, which tells Alva what to do to flash down since ETC doesn't give us a way to restore to Background outside the effects editor", update=flash_down_input_updater)
+    bpy.types.ColorSequence.flash_down_input = bpy.props.StringProperty(name="", description="Type in the second half of the flash, which tells Sorcerer what to do to flash back down", update=flash_down_input_updater)
     bpy.types.ColorSequence.flash_input_background = bpy.props.StringProperty(name="",)
     bpy.types.ColorSequence.flash_down_input_background = bpy.props.StringProperty(name="",)
     bpy.types.ColorSequence.start_flash_macro_number = bpy.props.IntProperty(name="", min=0, max=99999, description="This is the macro number on the console that Alva will use to fire the beginning of the flash", update=flash_motif_property_updater)
@@ -2623,18 +2635,20 @@ def register():
     bpy.types.SoundSequence.selected_empty = bpy.props.PointerProperty(
         type=bpy.types.Object,
         poll=empty_objects_poll,
-        name="Selected Empty"
+        name="Selected Empty",
+        description='You are supposed to link this audio object strip to an "empty" object over in 3D view'
     )
     bpy.types.SoundSequence.selected_speaker = bpy.props.PointerProperty(
         type=bpy.types.Object,
         poll=speaker_objects_poll,
-        name="Selected Speaker"
+        name="Selected Speaker",
+        description='You are supposed to link this speaker strip to a "speaker" object over in 3D view'
     )
     bpy.types.SoundSequence.speaker_sensitivity = bpy.props.FloatProperty(name="Sensitivity", description="Sensitivity of speaker", default=.5, min=0, max=1)
-    bpy.types.SoundSequence.audio_object_activated = bpy.props.BoolProperty(default=False, name="Activate Audio Object", description="Activate renderer for this audio object. Leaving this on when not needed may introduce lag.")
+    bpy.types.SoundSequence.audio_object_activated = bpy.props.BoolProperty(default=False, name="Activate Audio Object", description="Activate renderer for this audio object. Leaving this on when not needed may introduce lag")
     bpy.types.SoundSequence.dummy_volume = bpy.props.FloatProperty(default=0, name="Dummy Volume", min=0, max=1)
     bpy.types.SoundSequence.audio_object_size = bpy.props.FloatProperty(default=1, name="Dummy Volume", min=0, max=20)
-    bpy.types.SoundSequence.int_mixer_channel = bpy.props.IntProperty(default=1, name="Channel/fader number on mixer", min=1, max=9999)
+    bpy.types.SoundSequence.int_mixer_channel = bpy.props.IntProperty(default=1, name="Channel/fader number on mixer", min=1, max=9999, description='This is for the OSC real-time monitor below. This is talking about the fader on the audio mixer. It will be replace "#" in the OSC templates below')
 
     bpy.types.Scene.audio_osc_address = bpy.props.StringProperty(default="", description="Type # for channel/fader/ouput number and $ for value, to be autofilled in background by Sorcerer. Use this for realtime feedback during design, then bake/export to Qlab. Set up the mixer as if these are IEM's")
     bpy.types.Scene.audio_osc_argument = bpy.props.StringProperty(default="", description="Type # for channel/fader/ouput number and $ for value, to be autofilled in background by Sorcerer. Use this for realtime feedback during design, then bake/export to Qlab. Set up the mixer as if these are IEM's")
@@ -2662,14 +2676,14 @@ def register():
     wm = bpy.context.window_manager
     km = wm.keyconfigs.addon.keymaps.new(name='Sequencer', space_type='SEQUENCE_EDITOR')
     kmi = km.keymap_items.new(SimpleCommandLine.bl_idname, 'C', 'PRESS')
-    kmi = km.keymap_items.new(RenderStripsOperator.bl_idname, 'R', 'PRESS')
+    kmi = km.keymap_items.new(RenderStripsOperator.bl_idname, 'SPACE', 'PRESS', shift=True)
     bpy.types.Scene.command_line_label = bpy.props.StringProperty(default="Cmd Line: ")
     
     # Custom icon stuff
     pcoll = bpy.utils.previews.new()
     preview_collections["main"] = pcoll
-    icons_dir = "/Users/easystreetphotography1/Downloads"
-    pcoll.load("orb", os.path.join(icons_dir, "alva_orb.png"), 'IMAGE')
+    addon_dir = os.path.dirname(__file__)
+    pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
 
 
 def unregister():
@@ -2766,7 +2780,7 @@ def unregister():
     del bpy.types.ColorSequence.end_flash_macro_number
     del bpy.types.ColorSequence.start_flash_macro_number
     del bpy.types.ColorSequence.flash_down_input_background
-    del bpy.types.ColorSequence.flash_input_background  # Note: This appears twice in the register section.
+    del bpy.types.ColorSequence.flash_input_background
     del bpy.types.ColorSequence.flash_down_input
     del bpy.types.ColorSequence.flash_input_background
     del bpy.types.ColorSequence.flash_input
