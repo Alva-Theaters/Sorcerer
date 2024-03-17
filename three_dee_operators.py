@@ -24,6 +24,9 @@
 '''
 
 
+## Double hashtag indicates notes for future development requiring some level of attention
+
+
 import bpy
 import socket
 import time
@@ -34,6 +37,16 @@ import math
 from bpy.types import PropertyGroup
 from bpy.props import StringProperty
 from bpy.types import Operator, Menu
+import inspect
+
+
+# Purpose of this throughout the codebase is to proactively identify possible pre-bugs and to help diagnose bugs.
+def sorcerer_assert_unreachable(*args):
+    caller_frame = inspect.currentframe().f_back
+    caller_file = caller_frame.f_code.co_filename
+    caller_line = caller_frame.f_lineno
+    message = "Error found at {}:{}\nCode marked as unreachable has been executed. Please report bug to Alva Theaters.".format(caller_file, caller_line)
+    print(message)
 
 
 def send_osc_string(osc_addr, addr, port, string):
@@ -271,7 +284,6 @@ class PatchGroupOperator(bpy.types.Operator):
                 new_controller.label = new_controller.str_group_label
                         
         return {'FINISHED'}
-
 
 
 class RemoveGroupOperator(bpy.types.Operator):
@@ -1872,7 +1884,7 @@ class SendUSITTASCIITo3DOperator(bpy.types.Operator):
         
         # Now, create, position, and orient Blender lights based on ascii data.
         for channel_number, position in channel_positions:
-            bpy.ops.object.light_add(type='SPOT', location=position)
+            bpy.ops.mesh.primitive_cone_add(location=position)
             light_object = bpy.context.active_object
             light_object.name = str(channel_number)
 
@@ -2062,7 +2074,7 @@ class NonDemocraticOperator(bpy.types.Operator):
 class BakeAnimationOperator(bpy.types.Operator):
     bl_idname = "my.bake_animation_operator"
     bl_label = ""
-    bl_description = "Use the above syntax templates to programmatically bake Alva's animation data onto console cues to be fired from an event list"
+    bl_description = "This allows you to create qmeos on the lighting console, or lighting videos made up of moving cues, not moving pictures. Use the syntax templates to programmatically bake Sorcerer's animation data onto console cues to be fired from an event list"
   
     def frame_to_timecode(self, frame, fps=None):
         """Convert frame number to timecode format."""
@@ -2089,8 +2101,8 @@ class BakeAnimationOperator(bpy.types.Operator):
         start_frame = scene.frame_start
         end_frame = scene.frame_end 
         
-        scene.is_baking = True
-        scene.str_bake_info = "Baking Cues! Escape to Cancel."
+        scene.scene_props.is_baking = True
+        scene.scene_props.str_bake_info = "Making a Qmeo! Escape to Cancel."
          
         ip_address = context.scene.scene_props.str_osc_ip_address
         port = context.scene.scene_props.int_osc_port
@@ -2108,7 +2120,7 @@ class BakeAnimationOperator(bpy.types.Operator):
         
         rounded_remaining = round(percentage_remaining)
         
-        scene.str_bake_info = "Baking Cues! Escape to Cancel. " + str(rounded_remaining) + "% Complete"
+        scene.scene_props.str_bake_info = "Making a Qmeo! Escape to Cancel. " + str(rounded_remaining) + "% Complete"
         
         # Create all events to help with organization.
         argument = scene.scene_props.str_create_all_events.replace("#", str(end_frame))
@@ -2143,7 +2155,7 @@ class BakeAnimationOperator(bpy.types.Operator):
             
             percentage_remaining += percentage_steps
             rounded_remaining = round(percentage_remaining)
-            scene.str_bake_info = "Baking Cues! Escape to Cancel. " + str(rounded_remaining) + "% Complete"
+            scene.scene_props.str_bake_info = "Making a Qmeo! Escape to Cancel. " + str(rounded_remaining) + "% Complete"
             time.sleep(.1)
         
         time.sleep(.5)
@@ -2152,9 +2164,9 @@ class BakeAnimationOperator(bpy.types.Operator):
         send_osc_string("/eos/newcmd", ip_address, port, f"Snapshot {snapshot} Enter")
             
         # Restore everything
-        scene.str_bake_info = "Bake Animation to Cues"
+        scene.scene_props.str_bake_info = "Create Qmeo"
         self.report({'INFO'}, "Orb complete.")
-        scene.is_baking = False
+        scene.scene_props.is_baking = False
         
         return {'FINISHED'}
     
@@ -2167,8 +2179,8 @@ class JustCuesOperator(bpy.types.Operator):
     def execute(self, context):
         scene = bpy.context.scene
         
-        scene.is_cue_baking = True
-        scene.str_cue_bake_info = "Baking Cues! Escape to Cancel."
+        scene.scene_props.is_cue_baking = True
+        scene.scene_props.str_cue_bake_info = "Making a Qmeo! Escape to Cancel."
         
         frame_rate = get_frame_rate(scene)
         start_frame = scene.frame_start
@@ -2191,7 +2203,7 @@ class JustCuesOperator(bpy.types.Operator):
         
         rounded_remaining = round(percentage_remaining)
         
-        scene.str_cue_bake_info = "Baking Cues! Escape to Cancel. " + str(rounded_remaining) + "% Complete"
+        scene.scene_props.str_cue_bake_info = "Making a Qmeo! Escape to Cancel. " + str(rounded_remaining) + "% Complete"
 
         # Iterate through the frames and perform operations.
         for frame in frames:
@@ -2208,7 +2220,7 @@ class JustCuesOperator(bpy.types.Operator):
             
             percentage_remaining += percentage_steps
             rounded_remaining = round(percentage_remaining)
-            scene.str_cue_bake_info = "Baking Cues! Escape to Cancel. " + str(rounded_remaining) + "% Complete"
+            scene.scene_props.str_cue_bake_info = "Making a Qmeo! Escape to Cancel. " + str(rounded_remaining) + "% Complete"
             time.sleep(.1)
             
         scene.scene_props.str_cue_bake_info = "Just Cues"
@@ -2253,7 +2265,7 @@ class JustEventsOperator(bpy.types.Operator):
         end_frame = scene.frame_end 
         
         scene.scene_props.is_event_baking = True
-        scene.scene_props.str_event_bake_info = "Baking Events! Escape to Cancel."
+        scene.scene_props.str_event_bake_info = "Making a Qmeo! Escape to Cancel."
          
         ip_address = context.scene.scene_props.str_osc_ip_address
         port = context.scene.scene_props.int_osc_port
@@ -2271,10 +2283,10 @@ class JustEventsOperator(bpy.types.Operator):
         
         rounded_remaining = round(percentage_remaining)
         
-        scene.str_event_bake_info = "Baking Events! Escape to Cancel. " + str(rounded_remaining) + "% Complete"
+        scene.scene_props.str_event_bake_info = "Making a Qmeo! Escape to Cancel. " + str(rounded_remaining) + "% Complete"
               
         # Create all events to help with organization.
-        argument = scene.str_create_all_events.replace("#", str(end_frame))
+        argument = scene.scene_props.str_create_all_events.replace("#", str(end_frame))
 
         send_osc_string(address, ip_address, port, argument)
         time.sleep(.3)
@@ -2408,31 +2420,52 @@ class HomeGroupButton(bpy.types.Operator):
     node_name: bpy.props.StringProperty()
 
     def execute(self, context):
-        world = context.scene.world
+        node_tree = context.scene.world.node_tree
+
+        if context.space_data.path:
+            group_node = context.space_data.path[-1].node_tree
+            if group_node:
+                node_tree = group_node
+
+        node = node_tree.nodes.get(self.node_name)
         
-        if world and world.node_tree:
-            node = world.node_tree.nodes.get(self.node_name)
-            if node:
-                node.float_intensity = 0
-                if node.strobe_is_on:
-                    node.float_strobe = 0
-                if node.color_is_on:
-                    node.float_vec_color = (1, 1, 1)
-                if node.pan_tilt_is_on:
-                    node.float_pan = 0
-                    node.float_tilt = 0
-                if node.zoom_is_on:
-                    node.float_zoom = 0
-                if node.iris_is_on:
-                    node.float_iris = 100
-                if node.edge_is_on:
-                    node.float_edge = 0
-                if node.diffusion_is_on:
-                    node.float_diffusion = 0
-                if node.gobo_id_is_on:
-                    node.int_gobo_id = 1
-                    node.float_gobo_speed = 0
-                    node.int_prism = 0
+        if node and (node.bl_idname == 'group_controller_type' or node.bl_idname == 'group_driver_type' or node.bl_idname == 'master_type'):
+            node.float_intensity = 0
+            if node.strobe_is_on:
+                node.float_strobe = 0
+            if node.color_is_on:
+                node.float_vec_color = (1, 1, 1)
+            if node.pan_tilt_is_on:
+                node.float_pan = 0
+                node.float_tilt = 0
+            if node.zoom_is_on:
+                node.float_zoom = 0
+            if node.iris_is_on:
+                node.float_iris = 100
+            if node.edge_is_on:
+                node.float_edge = 0
+            if node.diffusion_is_on:
+                node.float_diffusion = 0
+            if node.gobo_id_is_on:
+                node.int_gobo_id = 1
+                node.float_gobo_speed = 0
+                node.int_prism = 0
+        elif node.bl_idname == 'mixer_type' or node.bl_idname == 'mixer_driver_type':
+            if node.parameters_enum == 'option_intensity':
+                node.float_intensity_one_checker = .05
+                node.float_intensity_one = 0
+            elif node.parameters_enum == 'option_color':
+                node.float_vec_color_one_checker = (.05, .05, .05)
+                node.float_vec_color_one = (1, 1, 1)
+                node.float_vec_color_two_checker = (.05, .05, .05)
+                node.float_vec_color_two = (1, 1, 1)
+                node.float_vec_color_three_checker = (.05, .05, .05)
+                node.float_vec_color_three = (1, 1, 1)
+            elif node.parameters_enum == 'option_pan_tilt':
+                node.float_pan_one_checker = .05
+                node.float_pan_one = 0
+            else: sorcerer_assert_unreachable()
+        else: sorcerer_assert_unreachable()
                         
         return {'FINISHED'}
         
@@ -2466,44 +2499,62 @@ class UpdateGroupButton(bpy.types.Operator):
     node_name: bpy.props.StringProperty()
 
     def execute(self, context):
-        world = context.scene.world
+        node_tree = context.scene.world.node_tree
+
+        if context.space_data.path:
+            group_node = context.space_data.path[-1].node_tree
+            if group_node:
+                node_tree = group_node
+
+        node = node_tree.nodes.get(self.node_name)
         
-        if world and world.node_tree:
-            node = world.node_tree.nodes.get(self.node_name)
-            if node:
-                node.float_intensity_checker = .1
-                node.float_intensity = node.float_intensity
-                if node.strobe_is_on:
-                    node.float_strobe_checker = .1
-                    node.float_strobe = node.float_strobe
-                if node.color_is_on:
-                    node.float_vec_color_checker = (.1, .1, .1)
-                    node.float_vec_color = node.float_vec_color
-                if node.pan_tilt_is_on:
-                    node.float_pan_checker = -500
-                    node.float_pan = node.float_pan
-                    node.float_tilt_checker = -500
-                    node.float_tilt = node.float_tilt
-                if node.zoom_is_on:
-                    node.float_zoom_checker = .1
-                    node.float_zoom = node.float_zoom
-                if node.iris_is_on:
-                    node.float_iris_checker = .1
-                    node.float_iris = node.float_iris
-                if node.edge_is_on:
-                    node.float_edge_checker = .1
-                    node.float_edge = node.float_edge
-                if node.diffusion_is_on:
-                    node.float_diffusion_checker = .1
-                    node.float_diffusion = node.float_diffusion
-                if node.gobo_id_is_on:
-                    node.gobo_id_checker = 11
-                    node.int_gobo_id = node.int_gobo_id
-                    node.float_speed_checker = -1000
-                    node.float_gobo_speed = node.float_gobo_speed
-                    node.int_prism_checker = -1
-                    node.int_prism = node.int_prism
-            
+        if node and (node.bl_idname == 'group_controller_type' or node.bl_idname == 'group_driver_type' or node.bl_idname == 'master_type'):
+            node.float_intensity_checker = .05
+            print(node.float_intensity_checker)
+            node.float_intensity = node.float_intensity
+            if node.strobe_is_on:
+                node.float_strobe_checker = .05
+                node.float_strobe = node.float_strobe
+            if node.color_is_on:
+                node.float_vec_color_checker = (.05, .05, .05)
+                node.float_vec_color = node.float_vec_color
+            if node.pan_tilt_is_on:
+                node.float_pan_checker = -500
+                node.float_pan = node.float_pan
+                node.float_tilt_checker = -500
+                node.float_tilt = node.float_tilt
+            if node.zoom_is_on:
+                node.float_zoom_checker = .05
+                node.float_zoom = node.float_zoom
+            if node.iris_is_on:
+                node.float_iris_checker = .05
+                node.float_iris = node.float_iris
+            if node.edge_is_on:
+                node.float_edge_checker = .05
+                node.float_edge = node.float_edge
+            if node.diffusion_is_on:
+                node.float_diffusion_checker = .05
+                node.float_diffusion = node.float_diffusion
+            if node.gobo_id_is_on:
+                node.gobo_id_checker = 30
+                node.int_gobo_id = node.int_gobo_id
+                node.float_speed_checker = -1000
+                node.float_gobo_speed = node.float_gobo_speed
+                node.int_prism_checker = 2
+                node.int_prism = node.int_prism
+        elif node.bl_idname == 'mixer_type' or node.bl_idname == 'mixer_driver_type':
+            if node.parameters_enum == 'option_intensity':
+                node.float_intensity_one_checker = .05
+                node.float_intensity_one = node.float_intensity_one
+            elif node.parameters_enum == 'option_color':
+                node.float_vec_color_one_checker = (.05, .05, .05)
+                node.float_vec_color_one = node.float_vec_color_one
+            elif node.parameters_enum == 'option_pan_tilt':
+                node.float_vec_color_one_checker = (.05, .05, .05)
+                node.float_vec_color_one = node.float_vec_color_one
+            else: sorcerer_assert_unreachable()
+        else: sorcerer_assert_unreachable()
+                
         return {'FINISHED'}
        
     
@@ -2532,6 +2583,7 @@ class UpdateChannelButton(bpy.types.Operator):
 class AddConsoleButtonsNode(bpy.types.Operator):
     bl_idname = "node.add_console_buttons_node"
     bl_label = "Add Console Buttons"
+    bl_description="Adjust all intensities of group controller nodes on this level"
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -2544,6 +2596,7 @@ class AddConsoleButtonsNode(bpy.types.Operator):
 class AddOvenNode(bpy.types.Operator):
     bl_idname = "node.add_oven_node"
     bl_label = "Add Oven"
+    bl_description="Create qmeos to store complex animation data directly on the console. Qmeos are like videos, but each frame is a lighting cue"
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -2556,6 +2609,7 @@ class AddOvenNode(bpy.types.Operator):
 class AddSettingsNode(bpy.types.Operator):
     bl_idname = "node.add_settings_node"
     bl_label = "Add Settings"
+    bl_description="Sorcerer node settings"
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -2568,6 +2622,7 @@ class AddSettingsNode(bpy.types.Operator):
 class AddIntensitiesNode(bpy.types.Operator):
     bl_idname = "node.add_intensities_node"
     bl_label = "Add Intensities"
+    bl_description="Adjust all intensities of group controller nodes on this level"
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -2575,11 +2630,17 @@ class AddIntensitiesNode(bpy.types.Operator):
         my_node.location = (100, 100)
         
         return {'FINISHED'}
+    
+    def invoke(self, context, event):
+        self.execute(context)
+        bpy.ops.node.translate_attach_remove_on_cancel('INVOKE_DEFAULT', node='NEW')
+        return {'FINISHED'}
         
     
 class AddPresetsNode(bpy.types.Operator):
     bl_idname = "node.add_presets_node"
     bl_label = "Add Presets"
+    bl_description="Record and recall console presets"
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -2592,6 +2653,7 @@ class AddPresetsNode(bpy.types.Operator):
 class AddColorsNode(bpy.types.Operator):
     bl_idname = "node.add_colors_node"
     bl_label = "Add Colors"
+    bl_description="Adjust all colors of group controller nodes on this level"
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -2604,6 +2666,7 @@ class AddColorsNode(bpy.types.Operator):
 class AddStrobesNode(bpy.types.Operator):
     bl_idname = "node.add_strobes_node"
     bl_label = "Add Strobes"
+    bl_description="Adjust all strobes of group controller nodes on this level"
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -2616,6 +2679,7 @@ class AddStrobesNode(bpy.types.Operator):
 class AddZoomsNode(bpy.types.Operator):
     bl_idname = "node.add_zooms_node"
     bl_label = "Add Zooms"
+    bl_description="Adjust all zooms of group controller nodes on this level"
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -2628,6 +2692,7 @@ class AddZoomsNode(bpy.types.Operator):
 class AddEdgesNode(bpy.types.Operator):
     bl_idname = "node.add_edges_node"
     bl_label = "Add Edges"
+    bl_description="Adjust all edges of group controller nodes on this level"
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -2640,6 +2705,7 @@ class AddEdgesNode(bpy.types.Operator):
 class AddPanTiltNode(bpy.types.Operator):
     bl_idname = "node.add_pan_tilt_node"
     bl_label = "Add Pan/Tilt controller for FOH-hung mover"
+    bl_description="Intuitive pan/tilt controller only for FOH, forward-facing fixtures"
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -2652,6 +2718,7 @@ class AddPanTiltNode(bpy.types.Operator):
 class AddGroupControllerNode(bpy.types.Operator):
     bl_idname = "node.add_group_controller_node"
     bl_label = "Control a group defined in Properties"
+    bl_description="Control a group defined in Properties"
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -2664,6 +2731,7 @@ class AddGroupControllerNode(bpy.types.Operator):
 class AddMixerNode(bpy.types.Operator):
     bl_idname = "node.add_mixer_node"
     bl_label = "Mix 3 different parameter choices across a group"
+    bl_description="Mix 3 different parameter choices accross a group"
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -2676,6 +2744,7 @@ class AddMixerNode(bpy.types.Operator):
 class AddMixerDriverNode(bpy.types.Operator):
     bl_idname = "node.add_mixer_driver_node"
     bl_label = "Mix 3 different parameter choices across multiple groups"
+    bl_description="Mix 3 different parameter choices across multiple groups"
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -2687,7 +2756,8 @@ class AddMixerDriverNode(bpy.types.Operator):
     
 class AddMasterNode(bpy.types.Operator):
     bl_idname = "node.add_master_node"
-    bl_label = "Commandeer Collapsed Node Groups"
+    bl_label = "Commandeer collapsed Node Groups"
+    bl_description="Commandeer collapsed Node Groups"
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -2700,6 +2770,7 @@ class AddMasterNode(bpy.types.Operator):
 class AddGroupDriverNode(bpy.types.Operator):
     bl_idname = "node.add_group_driver_node"
     bl_label = "Control multiple groups at once"
+    bl_description="Control multiple groups at once"
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -2712,6 +2783,7 @@ class AddGroupDriverNode(bpy.types.Operator):
 class AddFlashNode(bpy.types.Operator):
     bl_idname = "node.add_flash_node"
     bl_label = "Connect to flash strips in the sequencer"
+    bl_description="Autofill the Flash Up and Flash Down fields of flash strips in Sequencer with node settings and noodle links. Intended primarily for pose-based choreography"
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -2724,7 +2796,7 @@ class AddFlashNode(bpy.types.Operator):
 class KeyframeStrobePopupOperator(bpy.types.Operator):
     bl_idname = "popup.keyframe_strobe_popup_operator"
     bl_label = "Keyframe Strobe"
-    bl_description = "Keyframe the 'float_strobe' property of a node"
+    bl_description = "Keyframe the strobe property of a node"
 
     node_name: bpy.props.StringProperty()
 
@@ -3030,7 +3102,7 @@ class CustomButton(bpy.types.Operator):
 class RecordEffectPresetOperator(bpy.types.Operator):
     bl_idname = "node.record_effect_preset_operator"
     bl_label = "Record"
-    bl_description = "The orb will record the node's group into the preset above onto the console using the argument template below"
+    bl_description = "Orb will record the node's group into the preset above onto the console using the argument template below"
 
     node_name: StringProperty(default="")
 
@@ -3097,7 +3169,7 @@ class RecordEffectPresetOperator(bpy.types.Operator):
 class RecordDownEffectPresetOperator(bpy.types.Operator):
     bl_idname = "node.record_down_effect_preset_operator"
     bl_label = "Record"
-    bl_description = "The orb will record the node's group into the preset above onto the console using the argument template below"
+    bl_description = "Orb will record the node's group into the preset above onto the console using the argument template below"
 
     node_name: StringProperty(default="")
 
