@@ -1748,6 +1748,9 @@ class BuildFlashMacrosOperator(bpy.types.Operator):
         down = "1"
         up = "0"
         enter_arg = "Enter"
+
+        active_strip.flash_input = active_strip.flash_input
+        active_strip.flash_down_input = active_strip.flash_down_input
         
         if bpy.context.scene.is_armed_turbo == False:
             # Update console in cases this does something bad, so user can exit out reload file to restore
