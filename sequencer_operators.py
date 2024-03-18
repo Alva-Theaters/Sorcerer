@@ -3722,8 +3722,8 @@ def send_cue_builder_group_command(id, group_type, recording, context):
     
 class FocusOneOperator(bpy.types.Operator):
     bl_idname = "my.focus_one"
-    bl_label = "Focus Palette 1"
-    bl_description = "Set to Preset 1, possibly for general look."
+    bl_label = "Preset 1"
+    bl_description = "Set to preset one, possibly for general look."
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3733,8 +3733,8 @@ class FocusOneOperator(bpy.types.Operator):
     
 class FocusTwoOperator(bpy.types.Operator):
     bl_idname = "my.focus_two"
-    bl_label = "Focus Palette 2"
-    bl_description = "Set to Preset 2, possibly for side lighting."
+    bl_label = "Preset 2"
+    bl_description = "Set to preset two, possibly for side lighting."
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3744,8 +3744,8 @@ class FocusTwoOperator(bpy.types.Operator):
     
 class FocusThreeOperator(bpy.types.Operator):
     bl_idname = "my.focus_three"
-    bl_label = "Focus Palette 3"
-    bl_description = "Set to Preset 3, possibly for paramount lighting."
+    bl_label = "Preset 3"
+    bl_description = "Set to preset three, possibly for paramount lighting."
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3755,8 +3755,8 @@ class FocusThreeOperator(bpy.types.Operator):
     
 class FocusFourOperator(bpy.types.Operator):
     bl_idname = "my.focus_four"
-    bl_label = "Focus Palette 4"
-    bl_description = "Set to Preset 4, possibly for McCandless lighting."
+    bl_label = "Preset 4"
+    bl_description = "Set to preset four, possibly for McCandless lighting."
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3766,8 +3766,8 @@ class FocusFourOperator(bpy.types.Operator):
     
 class FocusRimOneOperator(bpy.types.Operator):
     bl_idname = "my.focus_rim_one"
-    bl_label = "Focus Palette 1"
-    bl_description = "Set to Preset 1, possibly for wide wash"
+    bl_label = "Preset 1"
+    bl_description = "Set to preset one, possibly for wide wash"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3777,8 +3777,8 @@ class FocusRimOneOperator(bpy.types.Operator):
     
 class FocusRimTwoOperator(bpy.types.Operator):
     bl_idname = "my.focus_rim_two"
-    bl_label = "Focus Palette 2"
-    bl_description = "Set to Preset 2, SR wash"
+    bl_label = "Preset 2"
+    bl_description = "Set to preset two, possibly for SR wash"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3788,8 +3788,8 @@ class FocusRimTwoOperator(bpy.types.Operator):
     
 class FocusRimThreeOperator(bpy.types.Operator):
     bl_idname = "my.focus_rim_three"
-    bl_label = "Focus Palette 3"
-    bl_description = "Set to Preset 3, possibly for SL wash"
+    bl_label = "Preset 3"
+    bl_description = "Set to preset three, possibly for SL wash"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3799,8 +3799,8 @@ class FocusRimThreeOperator(bpy.types.Operator):
     
 class FocusRimFourOperator(bpy.types.Operator):
     bl_idname = "my.focus_rim_four"
-    bl_label = "Focus Palette 4"
-    bl_description = "Set to Preset 4, possibly for CS"
+    bl_label = "Preset 4"
+    bl_description = "Set to preset four, possibly for CS"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3810,8 +3810,8 @@ class FocusRimFourOperator(bpy.types.Operator):
     
 class FocusFillOneOperator(bpy.types.Operator):
     bl_idname = "my.focus_fill_one"
-    bl_label = "Focus Palette 1"
-    bl_description = "Set to focus palette one"
+    bl_label = "Preset 1"
+    bl_description = "Set to preset one"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3821,8 +3821,8 @@ class FocusFillOneOperator(bpy.types.Operator):
     
 class FocusFillTwoOperator(bpy.types.Operator):
     bl_idname = "my.focus_fill_two"
-    bl_label = "Focus Palette 2"
-    bl_description = "Set to focus palette two"
+    bl_label = "Preset 2"
+    bl_description = "Set to preset two"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3832,8 +3832,8 @@ class FocusFillTwoOperator(bpy.types.Operator):
     
 class FocusFillThreeOperator(bpy.types.Operator):
     bl_idname = "my.focus_fill_three"
-    bl_label = "Focus Palette 3"
-    bl_description = "Set to focus palette three"
+    bl_label = "Preset 3"
+    bl_description = "Set to preset three"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3843,8 +3843,8 @@ class FocusFillThreeOperator(bpy.types.Operator):
     
 class FocusFillFourOperator(bpy.types.Operator):
     bl_idname = "my.focus_fill_four"
-    bl_label = "Focus Palette 4"
-    bl_description = "Set to focus palette four"
+    bl_label = "Preset 4"
+    bl_description = "Set to preset four"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3854,8 +3854,8 @@ class FocusFillFourOperator(bpy.types.Operator):
     
 class FocusTextureOneOperator(bpy.types.Operator):
     bl_idname = "my.focus_texture_one"
-    bl_label = "Focus Palette 1"
-    bl_description = "Set to Preset 1"
+    bl_label = "Preset 1"
+    bl_description = "Set to preset one"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3866,7 +3866,7 @@ class FocusTextureOneOperator(bpy.types.Operator):
 class FocusTextureTwoOperator(bpy.types.Operator):
     bl_idname = "my.focus_texture_two"
     bl_label = "Preset 2"
-    bl_description = "Set to Preset 2"
+    bl_description = "Set to preset two"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3877,7 +3877,7 @@ class FocusTextureTwoOperator(bpy.types.Operator):
 class FocusTextureThreeOperator(bpy.types.Operator):
     bl_idname = "my.focus_texture_three"
     bl_label = "Preset 3"
-    bl_description = "Set to Preset 3"
+    bl_description = "Set to preset three"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3888,7 +3888,7 @@ class FocusTextureThreeOperator(bpy.types.Operator):
 class FocusTextureFourOperator(bpy.types.Operator):
     bl_idname = "my.focus_texture_four"
     bl_label = "Preset 4"
-    bl_description = "Set to Preset 4"
+    bl_description = "Set to preset four"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3898,8 +3898,8 @@ class FocusTextureFourOperator(bpy.types.Operator):
     
 class FocusTextureFiveOperator(bpy.types.Operator):
     bl_idname = "my.focus_texture_five"
-    bl_label = "Focus Palette 5"
-    bl_description = "Set to Preset 5"
+    bl_label = "Preset 5"
+    bl_description = "Set to preset five"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3910,7 +3910,7 @@ class FocusTextureFiveOperator(bpy.types.Operator):
 class FocusTextureSixOperator(bpy.types.Operator):
     bl_idname = "my.focus_texture_six"
     bl_label = "Preset 6"
-    bl_description = "Set to Preset 6"
+    bl_description = "Set to preset six"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3921,7 +3921,7 @@ class FocusTextureSixOperator(bpy.types.Operator):
 class FocusTextureSevenOperator(bpy.types.Operator):
     bl_idname = "my.focus_texture_seven"
     bl_label = "Preset 7"
-    bl_description = "Set to Preset 7"
+    bl_description = "Set to preset seven"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3932,7 +3932,7 @@ class FocusTextureSevenOperator(bpy.types.Operator):
 class FocusTextureEightOperator(bpy.types.Operator):
     bl_idname = "my.focus_texture_eight"
     bl_label = "Preset 8"
-    bl_description = "Set to Preset 8"
+    bl_description = "Set to preset eight"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3942,8 +3942,8 @@ class FocusTextureEightOperator(bpy.types.Operator):
     
 class FocusBandOneOperator(bpy.types.Operator):
     bl_idname = "my.focus_band_one"
-    bl_label = "Focus Palette 1"
-    bl_description = "Set to focus palette one"
+    bl_label = "Preset 1"
+    bl_description = "Set to preset one"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3953,8 +3953,8 @@ class FocusBandOneOperator(bpy.types.Operator):
     
 class FocusBandTwoOperator(bpy.types.Operator):
     bl_idname = "my.focus_band_two"
-    bl_label = "Focus Palette 2"
-    bl_description = "Set to focus palette two"
+    bl_label = "Preset 2"
+    bl_description = "Set to preset two"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3964,8 +3964,8 @@ class FocusBandTwoOperator(bpy.types.Operator):
     
 class FocusBandThreeOperator(bpy.types.Operator):
     bl_idname = "my.focus_band_three"
-    bl_label = "Focus Palette 3"
-    bl_description = "Set to focus palette three"
+    bl_label = "Preset 3"
+    bl_description = "Set to preset three"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3975,8 +3975,8 @@ class FocusBandThreeOperator(bpy.types.Operator):
     
 class FocusBandFourOperator(bpy.types.Operator):
     bl_idname = "my.focus_band_four"
-    bl_label = "Focus Palette 4"
-    bl_description = "Set to focus palette four"
+    bl_label = "Preset 4"
+    bl_description = "Set to preset four"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3987,7 +3987,7 @@ class FocusBandFourOperator(bpy.types.Operator):
 class FocusBandFiveOperator(bpy.types.Operator):
     bl_idname = "my.focus_band_five"
     bl_label = "Preset 5"
-    bl_description = "Set to Preset 5"
+    bl_description = "Set to preset five"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3998,7 +3998,7 @@ class FocusBandFiveOperator(bpy.types.Operator):
 class FocusBandSixOperator(bpy.types.Operator):
     bl_idname = "my.focus_band_six"
     bl_label = "Preset 6"
-    bl_description = "Set to Preset 6"
+    bl_description = "Set to preset six"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -4009,7 +4009,7 @@ class FocusBandSixOperator(bpy.types.Operator):
 class FocusBandSevenOperator(bpy.types.Operator):
     bl_idname = "my.focus_band_seven"
     bl_label = "Preset 7"
-    bl_description = "Set to Preset 7"
+    bl_description = "Set to preset seven"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -4020,7 +4020,7 @@ class FocusBandSevenOperator(bpy.types.Operator):
 class FocusBandEightOperator(bpy.types.Operator):
     bl_idname = "my.focus_band_eight"
     bl_label = "Preset 8"
-    bl_description = "Set to Preset 8"
+    bl_description = "Set to preset eight"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -4030,8 +4030,8 @@ class FocusBandEightOperator(bpy.types.Operator):
     
 class FocusAccentOneOperator(bpy.types.Operator):
     bl_idname = "my.focus_accent_one"
-    bl_label = "Focus Palette 1"
-    bl_description = "Set to focus palette one"
+    bl_label = "Preset 1"
+    bl_description = "Set to preset one"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -4041,8 +4041,8 @@ class FocusAccentOneOperator(bpy.types.Operator):
     
 class FocusAccentTwoOperator(bpy.types.Operator):
     bl_idname = "my.focus_accent_two"
-    bl_label = "Focus Palette 2"
-    bl_description = "Set to focus palette two"
+    bl_label = "Preset 2"
+    bl_description = "Set to preset two"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -4052,8 +4052,8 @@ class FocusAccentTwoOperator(bpy.types.Operator):
     
 class FocusAccentThreeOperator(bpy.types.Operator):
     bl_idname = "my.focus_accent_three"
-    bl_label = "Focus Palette 3"
-    bl_description = "Set to focus palette three"
+    bl_label = "Preset 3"
+    bl_description = "Set to preset three"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -4063,8 +4063,8 @@ class FocusAccentThreeOperator(bpy.types.Operator):
     
 class FocusAccentFourOperator(bpy.types.Operator):
     bl_idname = "my.focus_accent_four"
-    bl_label = "Focus Palette 4"
-    bl_description = "Set to focus palette four"
+    bl_label = "Preset 4"
+    bl_description = "Set to preset four"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -4074,8 +4074,8 @@ class FocusAccentFourOperator(bpy.types.Operator):
     
 class FocusAccentFiveOperator(bpy.types.Operator):
     bl_idname = "my.focus_accent_five"
-    bl_label = "Focus Palette 5"
-    bl_description = "Set to Preset 5"
+    bl_label = "Preset 5"
+    bl_description = "Set to preset five"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -4086,7 +4086,7 @@ class FocusAccentFiveOperator(bpy.types.Operator):
 class FocusAccentSixOperator(bpy.types.Operator):
     bl_idname = "my.focus_accent_six"
     bl_label = "Preset 6"
-    bl_description = "Set to Preset 6"
+    bl_description = "Set to preset six"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -4097,7 +4097,7 @@ class FocusAccentSixOperator(bpy.types.Operator):
 class FocusAccentSevenOperator(bpy.types.Operator):
     bl_idname = "my.focus_accent_seven"
     bl_label = "Preset 7"
-    bl_description = "Set to Preset 7"
+    bl_description = "Set to preset seven"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -4108,7 +4108,7 @@ class FocusAccentSevenOperator(bpy.types.Operator):
 class FocusAccentEightOperator(bpy.types.Operator):
     bl_idname = "my.focus_accent_eight"
     bl_label = "Preset 8"
-    bl_description = "Set to Preset 8"
+    bl_description = "Set to preset eight"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -4118,8 +4118,8 @@ class FocusAccentEightOperator(bpy.types.Operator):
     
 class FocusCycOneOperator(bpy.types.Operator):
     bl_idname = "my.focus_cyc_one"
-    bl_label = "Focus Palette 1"
-    bl_description = "Set to focus palette one"
+    bl_label = "Preset 1"
+    bl_description = "Set to preset one"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -4129,8 +4129,8 @@ class FocusCycOneOperator(bpy.types.Operator):
     
 class FocusCycTwoOperator(bpy.types.Operator):
     bl_idname = "my.focus_cyc_two"
-    bl_label = "Focus Palette 2"
-    bl_description = "Set to focus palette two"
+    bl_label = "Preset 2"
+    bl_description = "Set to preset two"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -4140,8 +4140,8 @@ class FocusCycTwoOperator(bpy.types.Operator):
     
 class FocusCycThreeOperator(bpy.types.Operator):
     bl_idname = "my.focus_cyc_three"
-    bl_label = "Focus Palette 3"
-    bl_description = "Set to focus palette three"
+    bl_label = "Preset 3"
+    bl_description = "Set to preset three"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -4151,8 +4151,8 @@ class FocusCycThreeOperator(bpy.types.Operator):
     
 class FocusCycFourOperator(bpy.types.Operator):
     bl_idname = "my.focus_cyc_four"
-    bl_label = "Focus Palette 4"
-    bl_description = "Set to focus palette four"
+    bl_label = "Preset 4"
+    bl_description = "Set to preset four"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -4162,8 +4162,8 @@ class FocusCycFourOperator(bpy.types.Operator):
     
 class FocusCycFiveOperator(bpy.types.Operator):
     bl_idname = "my.focus_cyc_five"
-    bl_label = "Focus Palette 5"
-    bl_description = "Set to Preset 5"
+    bl_label = "Preset 5"
+    bl_description = "Set to preset five"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -4174,7 +4174,7 @@ class FocusCycFiveOperator(bpy.types.Operator):
 class FocusCycSixOperator(bpy.types.Operator):
     bl_idname = "my.focus_cyc_six"
     bl_label = "Preset 6"
-    bl_description = "Set to Preset 6"
+    bl_description = "Set to preset six"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -4185,7 +4185,7 @@ class FocusCycSixOperator(bpy.types.Operator):
 class FocusCycSevenOperator(bpy.types.Operator):
     bl_idname = "my.focus_cyc_seven"
     bl_label = "Preset 7"
-    bl_description = "Set to Preset 7"
+    bl_description = "Set to preset seven"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -4196,7 +4196,7 @@ class FocusCycSevenOperator(bpy.types.Operator):
 class FocusCycEightOperator(bpy.types.Operator):
     bl_idname = "my.focus_cyc_eight"
     bl_label = "Preset 8"
-    bl_description = "Set to Preset 8"
+    bl_description = "Set to preset eight"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -4206,8 +4206,8 @@ class FocusCycEightOperator(bpy.types.Operator):
     
 class FocusEnergyOneOperator(bpy.types.Operator):
     bl_idname = "my.focus_energy_one"
-    bl_label = "Focus Palette 1"
-    bl_description = "Set to Effect 1"
+    bl_label = "Effect 1"
+    bl_description = "Set to effect one"
     
     def execute(self, context):
         scene = context.scene
@@ -4228,8 +4228,8 @@ class FocusEnergyOneOperator(bpy.types.Operator):
     
 class FocusEnergyTwoOperator(bpy.types.Operator):
     bl_idname = "my.focus_energy_two"
-    bl_label = "Focus Palette 2"
-    bl_description = "Set to Effect 2"
+    bl_label = "Effect 2"
+    bl_description = "Set to effect two"
     
     def execute(self, context):
         scene = context.scene
@@ -4250,8 +4250,8 @@ class FocusEnergyTwoOperator(bpy.types.Operator):
     
 class FocusEnergyThreeOperator(bpy.types.Operator):
     bl_idname = "my.focus_energy_three"
-    bl_label = "Focus Palette 3"
-    bl_description = "Set to Effect 3"
+    bl_label = "Effect 3"
+    bl_description = "Set to effect three"
     
     def execute(self, context):
         scene = context.scene
@@ -4272,8 +4272,8 @@ class FocusEnergyThreeOperator(bpy.types.Operator):
     
 class FocusEnergyFourOperator(bpy.types.Operator):
     bl_idname = "my.focus_energy_four"
-    bl_label = "Focus Palette 4"
-    bl_description = "Set to Effect 4"
+    bl_label = "Effect 4"
+    bl_description = "Set to effect four"
     
     def execute(self, context):
         scene = context.scene
@@ -4294,8 +4294,8 @@ class FocusEnergyFourOperator(bpy.types.Operator):
 
 class FocusEnergyFiveOperator(bpy.types.Operator):
     bl_idname = "my.focus_energy_five"
-    bl_label = "Focus Palette 5"
-    bl_description = "Set to Effect 5"
+    bl_label = "Effect 5"
+    bl_description = "Set to effect five"
     
     def execute(self, context):
         scene = context.scene
@@ -4316,8 +4316,8 @@ class FocusEnergyFiveOperator(bpy.types.Operator):
     
 class FocusEnergySixOperator(bpy.types.Operator):
     bl_idname = "my.focus_energy_six"
-    bl_label = "Preset 6"
-    bl_description = "Set to Effect 6"
+    bl_label = "Effect 6"
+    bl_description = "Set to effect six"
     
     def execute(self, context):
         scene = context.scene
@@ -4338,7 +4338,7 @@ class FocusEnergySixOperator(bpy.types.Operator):
     
 class StopEffectOperator(bpy.types.Operator):
     bl_idname = "my.stop_effect"
-    bl_label = "Stop Effect"
+    bl_label = ""
     bl_description = "Stop effect"
     
     def execute(self, context):
