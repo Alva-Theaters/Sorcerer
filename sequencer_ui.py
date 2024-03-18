@@ -1163,7 +1163,7 @@ class SettingsPanel(bpy.types.Panel):
             row.label(text="Automatically adjust house lights on play/stop:")
             box = column.box()
             row = box.row()
-            row.label(text="House Prefix: ")
+            row.label(text="House OSC Address: ")
             row = box.row()
             row.prop(scene, "house_prefix", text="")
             box.separator()
