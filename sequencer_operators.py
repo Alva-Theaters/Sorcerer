@@ -3663,7 +3663,7 @@ class ImportUsittAsciiOperator(bpy.types.Operator):
 class UpdateBuilderOperator(bpy.types.Operator):
     bl_idname = "my.update_builder"
     bl_label = "Update builder"
-    bl_description = "Send all builder settings to console."
+    bl_description = "Send all builder settings to console"
     
     def execute(self, context):
         scene = context.scene
@@ -3689,7 +3689,7 @@ class UpdateBuilderOperator(bpy.types.Operator):
 class RecordCueOperator(bpy.types.Operator):
     bl_idname = "my.record_cue"
     bl_label = "Record cue"
-    bl_description = "Record the cue on the console as is."
+    bl_description = "Record the cue on the console as is"
     
     def execute(self, context):
         scene = context.scene
@@ -3723,7 +3723,7 @@ def send_cue_builder_group_command(id, group_type, recording, context):
 class FocusOneOperator(bpy.types.Operator):
     bl_idname = "my.focus_one"
     bl_label = "Preset 1"
-    bl_description = "Set to preset one, possibly for general look."
+    bl_description = "Set to preset one, possibly for general look"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3734,7 +3734,7 @@ class FocusOneOperator(bpy.types.Operator):
 class FocusTwoOperator(bpy.types.Operator):
     bl_idname = "my.focus_two"
     bl_label = "Preset 2"
-    bl_description = "Set to preset two, possibly for side lighting."
+    bl_description = "Set to preset two, possibly for side lighting"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3745,7 +3745,7 @@ class FocusTwoOperator(bpy.types.Operator):
 class FocusThreeOperator(bpy.types.Operator):
     bl_idname = "my.focus_three"
     bl_label = "Preset 3"
-    bl_description = "Set to preset three, possibly for paramount lighting."
+    bl_description = "Set to preset three, possibly for paramount lighting"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
@@ -3756,7 +3756,7 @@ class FocusThreeOperator(bpy.types.Operator):
 class FocusFourOperator(bpy.types.Operator):
     bl_idname = "my.focus_four"
     bl_label = "Preset 4"
-    bl_description = "Set to preset four, possibly for McCandless lighting."
+    bl_description = "Set to preset four, possibly for McCandless lighting"
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
