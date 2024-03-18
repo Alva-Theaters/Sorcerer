@@ -272,7 +272,7 @@ class PlaybackMonitor:
     @persistent
     def on_scrub_detected(self, current_frame):
         scene = bpy.context.scene
-        if scene.sync_timecode:
+        if scene.sync_timecode and self.is_playing_back:
             relevant_sound_strip = None
             current_frame = scene.frame_current
             current_frame = current_frame + scene.timecode_expected_lag
@@ -292,7 +292,7 @@ class PlaybackMonitor:
                 clock = relevant_sound_strip.song_timecode_clock_number
                 ip_address = scene.scene_props.str_osc_ip_address
                 port = scene.scene_props.int_osc_port
-                send_osc_string("/eos/newcmd", ip_address, port, f"Event {clock} / Internal Time {timecode} Enter")
+                send_osc_string("/eos/newcmd", ip_address, port, f"Event {clock} / Internal Time {timecode} Enter, Event {clock} / Internal Enable Enter"")
                
     @persistent           
     def playback_start_handler(self, scene, depsgraph):
