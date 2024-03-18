@@ -2310,7 +2310,7 @@ def render_volume(speaker, empty, sensitivity, object_size, int_mixer_channel):
         send_osc_string(address, ip_address, port, argument)
     return volume
 
-
+@persistent
 def render_audio_objects(scene):
     if not hasattr(scene, "sequence_editor") or not scene.sequence_editor:
         return
