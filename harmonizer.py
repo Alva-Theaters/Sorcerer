@@ -1974,7 +1974,7 @@ def publish_changes_handler(scene):
         '''CPVIA stands for channel, parameter, value, influence, and argument'''
 
         # Ensure consistent channel numbers.
-        change_requests = [(int(c), p, v, i, a) for c, p, v, i, a in change_requests]
+        change_requests = [(int(round(float(c))), p, v, i, a) for c, p, v, i, a in change_requests]
         
         highest_requests = {}
         harmonized_requests = []
