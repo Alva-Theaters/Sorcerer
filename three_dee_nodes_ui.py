@@ -795,7 +795,7 @@ class PanTiltNode(bpy.types.Node):
     bl_idname = 'pan_tilt_type'
     bl_label = 'FOH Pan/Tilt'
     bl_icon = 'ORIENTATION_GIMBAL'
-    bl_width_default = 400
+    bl_width_default = 150
     bl_description="Intuitive pan/tilt controller only for FOH, forward-facing fixtures"
 
     pan_tilt_channel: bpy.props.IntProperty(default=1, description="Channel for pan/tilt graph. Think of the circle as a helix or as an infinite staircase. Pan-around is when you fall down to go forward an inch or jump up to go forward an inch. The circle below is a helix with 150% the surface area of a circle. Only use this for front-facing FOH/catwalk movers")
