@@ -670,32 +670,30 @@ class RenderStripsOperator(bpy.types.Operator):
                     
         ip_address = context.scene.scene_props.str_osc_ip_address
         port = context.scene.scene_props.int_osc_port
-        send_osc_string("/eos/key/blind", ip_address, port, "1")
-        send_osc_string("/eos/key/blind", ip_address, port, "0")
-        time.sleep(.1)
-        send_osc_string("/eos/newcmd", ip_address, port, f"Delete Event {event_list} / Enter Enter")
-        time.sleep(.1)
-        send_osc_string("/eos/newcmd", ip_address, port, f"Event {event_list} / Enter Enter")
-        time.sleep(.1)
-        argument = ""
-        counter = 0
-        for command in commands:
-            argument = ", ".join(commands)
-            counter += 1
-            
-            if counter > 49:
-                send_osc_string("/eos/newcmd", ip_address, port, argument)
-                counter = 0
-                argument == ""
+        self.send_osc_command("/eos/key/blind", ip_address, port, "1")
+        self.send_osc_command("/eos/key/blind", ip_address, port, "0")
         
-        if argument != "":
-            send_osc_string("/eos/newcmd", ip_address, port, argument)
-            
-        send_osc_string("/eos/key/live", ip_address, port, "1")
-        send_osc_string("/eos/key/live", ip_address, port, "0")
+        self.send_osc_command("/eos/newcmd", ip_address, port, f"Delete Event {event_list} / Enter Enter")
+        self.send_osc_command("/eos/newcmd", ip_address, port, f"Event {event_list} / Enter Enter")
+        
+        for i in range(0, len(commands), 50):
+            batch = commands[i:i+50]
+            argument = ", ".join(batch)
+            self.send_osc_command("/eos/newcmd", ip_address, port, argument)
+
+        self.send_osc_command("/eos/key/live", ip_address, port, "1")
+        self.send_osc_command("/eos/key/live", ip_address, port, "0")
         snapshot = str(context.scene.orb_finish_snapshot)
-        send_osc_string("/eos/newcmd", ip_address, port, f"Snapshot {snapshot} Enter")
+        self.send_osc_command("/eos/newcmd", ip_address, port, f"Snapshot {snapshot} Enter")
         return{'FINISHED'}
+
+    def send_osc_command(self, address, ip, port, command):
+        try:
+            send_osc_string(address, ip, port, command)
+            time.sleep(0.1)
+        except Exception as e:
+            self.report({'ERROR'}, f"Failed to send OSC command: {e}")
+            return {'CANCELLED'}
 
 
 # Defines lists of strips with relevant enumerator and checkbox choices.
