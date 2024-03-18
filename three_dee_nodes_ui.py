@@ -381,10 +381,10 @@ class PresetsNode(bpy.types.Node):
     bl_width_default = 1200
     bl_description="Record and recall console presets"
     
-    color_argument_template: bpy.props.StringProperty(default="Group # Color_Palette $ Enter")
-    preset_argument_template: bpy.props.StringProperty(default="Group # Color_Palette $ Enter")
-    record_color_argument_template: bpy.props.StringProperty(default="Group # Record Color_Palette $ Enter")
-    record_preset_argument_template: bpy.props.StringProperty(default="Group # Record Color_Palette $ Enter")
+    color_argument_template: bpy.props.StringProperty(default="Group # Color_Palette $ Enter", description="Write the OSC syntax your console expects for recalling color palettes. Insert # for group number and $ for color palette number.")
+    preset_argument_template: bpy.props.StringProperty(default="Group # Preset $ Enter", description="Write the OSC syntax your console expects for recalling presets. Insert # for group number and $ for color palette number.")
+    record_color_argument_template: bpy.props.StringProperty(default="Group # Record Color_Palette $ Enter", description="Write the OSC syntax your console expects for recording color palettes. Insert # for group number and $ for color palette number.")
+    record_preset_argument_template: bpy.props.StringProperty(default="Group # Record Preset $ Enter", description="Write the OSC syntax your console expects for recording presets. Insert # for group number and $ for color palette number.")
 
     expand_settings: bpy.props.BoolProperty(default=False, description="Settings")
     is_recording: bpy.props.BoolProperty(default=False, description="Recording")
