@@ -897,13 +897,7 @@ class TrackingPanel(bpy.types.Panel):
                     row = column.row(align=True)
                     row.operator("my.cut_operator", text="Cut")
                     row = column.row(align=True)
-                    row.operator("my.add_media_operator", text="Add Media")
-                    row = column.row(align=True)
                     row.operator("my.assign_to_channel_operator", text="Assign to Channel")
-                    row = column.row(align=True)
-                    row.operator("my.set_start_frame_operator", text="Set Start Frame")
-                    row = column.row(align=True)
-                    row.operator("my.set_end_frame_operator", text="Set End Frame")
                 row = column.row(align=True)
                 row.prop(scene, "i_know_the_shortcuts", text="I know the shortcuts.")
                 selected_color_strips = []
