@@ -3167,6 +3167,7 @@ class RecordDownEffectPresetOperator(bpy.types.Operator):
     bl_description = "Orb will record the node's group into the preset above onto the console using the argument template below"
 
     node_name: StringProperty(default="")
+    node_group_name: StringProperty(default="")
 
     def execute(self, context):
       active_node = None
