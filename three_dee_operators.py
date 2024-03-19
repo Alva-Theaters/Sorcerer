@@ -3109,36 +3109,39 @@ class RecordEffectPresetOperator(bpy.types.Operator):
     def execute(self, context):
         active_node = None
         for node_tree in bpy.data.node_groups:
+            print(f"Node tree name: {node_tree.bl_idname}")
             if node_tree.bl_idname == 'AlvaNodeTree' or node_tree.bl_idname == 'ShaderNodeTree':
                 for node in node_tree.nodes:
                     if node.bl_idname == "flash_type" and node.name == self.node_name:
                         active_node = node
                         break
-                    
-        groups_list = []
-        for input_socket in active_node.inputs:
-            if input_socket.bl_idname == 'FlashUpType':
-                for link in input_socket.links:
-                    connected_node = link.from_socket.node
-                    if connected_node.bl_idname == "group_controller_type":
-                        groups_list.append(connected_node.str_selected_light)
-                    elif connected_node.bl_idname == "group_driver_type":
-                        for output_socket in connected_node.outputs:
-                            if output_socket.bl_idname == 'GroupOutputType':
-                                for link in output_socket.links:
-                                    driven_node = link.to_socket.node
-                                    if driven_node.bl_idname == "group_controller_type":
-                                        groups_list.append(driven_node.str_selected_light)
-                    elif connected_node.bl_idname == "mixer_type":
-                        down_groups_list.append(connected_node.str_selected_light)               
-                    elif connected_node.bl_idname == "mixer_driver_type":
-                        for output_socket in connected_node.outputs:
-                            if output_socket.bl_idname == 'MixerOutputType':
-                                for link in output_socket.links:
-                                    driven_node = link.to_socket.node
-                                    if driven_node.bl_idname == "mixer_type":
-                                        groups_list.append(driven_node.str_selected_group)
-    
+                      
+        if active_node:         
+          groups_list = []
+          for input_socket in active_node.inputs:
+              if input_socket.bl_idname == 'FlashUpType':
+                  for link in input_socket.links:
+                      connected_node = link.from_socket.node
+                      if connected_node.bl_idname == "group_controller_type":
+                          groups_list.append(connected_node.str_selected_light)
+                      elif connected_node.bl_idname == "group_driver_type":
+                          for output_socket in connected_node.outputs:
+                              if output_socket.bl_idname == 'GroupOutputType':
+                                  for link in output_socket.links:
+                                      driven_node = link.to_socket.node
+                                      if driven_node.bl_idname == "group_controller_type":
+                                          groups_list.append(driven_node.str_selected_light)
+                      elif connected_node.bl_idname == "mixer_type":
+                          down_groups_list.append(connected_node.str_selected_light)               
+                      elif connected_node.bl_idname == "mixer_driver_type":
+                          for output_socket in connected_node.outputs:
+                              if output_socket.bl_idname == 'MixerOutputType':
+                                  for link in output_socket.links:
+                                      driven_node = link.to_socket.node
+                                      if driven_node.bl_idname == "mixer_type":
+                                          groups_list.append(driven_node.str_selected_group)
+        else: return {'FINISHED'}
+      
         scene = context.scene
         node = context.active_node
         group_numbers = ' + Group '.join(groups_list)
