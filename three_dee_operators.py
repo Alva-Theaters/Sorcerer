@@ -3195,30 +3195,30 @@ class RecordDownEffectPresetOperator(bpy.types.Operator):
                                     if driven_node.bl_idname == "mixer_type":
                                         groups_list.append(driven_node.str_selected_group)
          
-          scene = context.scene
-          node = context.active_node
-          group_numbers = ' + Group '.join(groups_list)
-          preset_number = active_node.int_down_preset_assignment
-          argument_template = scene.scene_props.str_preset_assignment_argument
-          
-          argument = argument_template.replace("#", str(group_numbers))
-          argument = argument.replace("$", str(preset_number))
-          ip_address = scene.scene_props.str_osc_ip_address
-          port = scene.scene_props.int_osc_port
-          address = scene.scene_props.str_command_line_address
-          
-          send_osc_string(address, ip_address, port, argument)
-              
-          for node_tree in bpy.data.node_groups:
-              if node_tree.bl_idname == 'AlvaNodeTree' or node_tree.bl_idname == 'ShaderNodeTree':
-                  for node in node_tree.nodes:
-                      if node.bl_idname == "flash_type":
-                          node.flash_motif_names_enum = node.flash_motif_names_enum
-                          
-          snapshot = str(context.scene.orb_finish_snapshot)
-          send_osc_string("/eos/newcmd", ip_address, port, f"Snapshot {snapshot} Enter")
-                          
-          return {'FINISHED'}
+        scene = context.scene
+        node = context.active_node
+        group_numbers = ' + Group '.join(groups_list)
+        preset_number = active_node.int_down_preset_assignment
+        argument_template = scene.scene_props.str_preset_assignment_argument
+        
+        argument = argument_template.replace("#", str(group_numbers))
+        argument = argument.replace("$", str(preset_number))
+        ip_address = scene.scene_props.str_osc_ip_address
+        port = scene.scene_props.int_osc_port
+        address = scene.scene_props.str_command_line_address
+        
+        send_osc_string(address, ip_address, port, argument)
+            
+        for node_tree in bpy.data.node_groups:
+            if node_tree.bl_idname == 'AlvaNodeTree' or node_tree.bl_idname == 'ShaderNodeTree':
+                for node in node_tree.nodes:
+                    if node.bl_idname == "flash_type":
+                        node.flash_motif_names_enum = node.flash_motif_names_enum
+                        
+        snapshot = str(context.scene.orb_finish_snapshot)
+        send_osc_string("/eos/newcmd", ip_address, port, f"Snapshot {snapshot} Enter")
+                        
+        return {'FINISHED'}
     
     
 def find_node_by_name(node_name):
