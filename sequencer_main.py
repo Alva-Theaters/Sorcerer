@@ -2356,6 +2356,11 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 
 def register(): 
+    # Custom icon stuff
+    pcoll = bpy.utils.previews.new()
+    preview_collections["main"] = pcoll
+    addon_dir = os.path.dirname(__file__)
+    pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
     bpy.types.Scene.livemap_label = bpy.props.StringProperty(name="Livemap Label", default="Livemap Cue:")
     
     bpy.utils.register_class(MySettings)
@@ -2678,15 +2683,8 @@ def register():
     kmi = km.keymap_items.new(RenderStripsOperator.bl_idname, 'SPACE', 'PRESS', shift=True)
     bpy.types.Scene.command_line_label = bpy.props.StringProperty(default="Cmd Line: ")
     
-    # Custom icon stuff
-    pcoll = bpy.utils.previews.new()
-    preview_collections["main"] = pcoll
-    addon_dir = os.path.dirname(__file__)
-    pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
-
 
 def unregister():
-    bpy.utils.previews.remove(preview_collections["main"])
     wm = bpy.context.window_manager
     km = wm.keyconfigs.addon.keymaps['Sequencer']
     wm.keyconfigs.addon.keymaps.remove(km)
@@ -2841,6 +2839,7 @@ def unregister():
     del bpy.types.Sequence.my_settings
     bpy.utils.unregister_class(RenderStripsOperator)
     del bpy.types.Scene.livemap_label
+    bpy.utils.previews.remove(preview_collections["main"])
 
 
 # For development purposes only.
