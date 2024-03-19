@@ -2250,10 +2250,11 @@ class MyMotifs(bpy.types.PropertyGroup):
 def draw_func(self, context):
     pcoll = preview_collections["main"]
     orb = pcoll["orb"]
+   
     scene = _context.scene
     layout = self.layout
     row = layout.row()
-    row.operator("seq.show_sequencer_settings", text='', icon_value=orb.icon_id, emboss=False)
+    row.operator("seq.show_sequencer_settings", text="", icon_value=orb.icon_id, emboss=False)
     row.label(text=scene.livemap_label)
     row = layout.row()
     row.alert = context.scene.is_armed_osc
