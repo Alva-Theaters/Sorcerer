@@ -3107,16 +3107,9 @@ class RecordEffectPresetOperator(bpy.types.Operator):
     node_name: StringProperty(default="")
 
     def execute(self, context):
-        active_node = None
-        for node_tree in bpy.data.node_groups:
-            print(f"Node tree name: {node_tree.bl_idname}")
-            if node_tree.bl_idname == 'AlvaNodeTree' or node_tree.bl_idname == 'ShaderNodeTree':
-                for node in node_tree.nodes:
-                    if node.bl_idname == "flash_type" and node.name == self.node_name:
-                        active_node = node
-                        break
-                      
-        if active_node:         
+      active_node = None
+      active_node = bpy.data.node_groups[self.node_group_name].nodes.get(self.node_name)
+      if active_node:      
           groups_list = []
           for input_socket in active_node.inputs:
               if input_socket.bl_idname == 'FlashUpType':
@@ -3176,14 +3169,9 @@ class RecordDownEffectPresetOperator(bpy.types.Operator):
     node_name: StringProperty(default="")
 
     def execute(self, context):
-        active_node = None
-        for node_tree in bpy.data.node_groups:
-            if node_tree.bl_idname == 'AlvaNodeTree' or node_tree.bl_idname == 'ShaderNodeTree':
-                for node in node_tree.nodes:
-                    if node.bl_idname == "flash_type" and node.name == self.node_name:
-                        active_node = node
-                        break
-                    
+      active_node = None
+      active_node = bpy.data.node_groups[self.node_group_name].nodes.get(self.node_name)
+      if active_node:       
         groups_list = []
         for input_socket in active_node.inputs:
             if input_socket.bl_idname == 'FlashDownType':
