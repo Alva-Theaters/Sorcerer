@@ -774,7 +774,8 @@ def group_driver_intensity_updater(self, context):
     if self.float_intensity != self.float_intensity_checker:
         for output_socket in self.outputs:
             for link in output_socket.links:
-                connected_node = link.to_socket.node
+              connected_node = link.to_socket.node
+              if hasattr(connected_node, "float_intensity_checker"):
                 connected_node.float_intensity_checker = .02
                 connected_node.float_intensity = self.float_intensity
         
@@ -878,7 +879,8 @@ def group_driver_color_updater(self, context):
     if self.float_vec_color != self.float_vec_color_checker:
         for output_socket in self.outputs:
             for link in output_socket.links:
-                connected_node = link.to_socket.node
+              connected_node = link.to_socket.node
+              if hasattr(connected_node, "float_intensity_checker"):
                 connected_node.float_vec_color = (.05, .05, .05)
                 connected_node.float_vec_color = self.float_vec_color
                 
@@ -968,7 +970,8 @@ def group_driver_pan_updater(self, context):
     if self.float_pan != self.float_pan_checker:
         for output_socket in self.outputs:
             for link in output_socket.links:
-                connected_node = link.to_socket.node
+              connected_node = link.to_socket.node
+              if hasattr(connected_node, "float_intensity_checker"):
                 connected_node.float_pan_checker = .05
                 connected_node.float_pan = self.float_pan
         
@@ -1077,7 +1080,8 @@ def group_driver_tilt_updater(self, context):
     if self.float_tilt != self.float_tilt_checker:
         for output_socket in self.outputs:
             for link in output_socket.links:
-                connected_node = link.to_socket.node
+              connected_node = link.to_socket.node
+              if hasattr(connected_node, "float_intensity_checker"):
                 connected_node.float_tilt_checker = .05
                 connected_node.float_tilt = self.float_tilt
         
@@ -1249,7 +1253,8 @@ def group_driver_diffusion_updater(self, context):
     if self.float_diffusion != self.float_diffusion_checker:
         for output_socket in self.outputs:
             for link in output_socket.links:
-                connected_node = link.to_socket.node
+              connected_node = link.to_socket.node
+              if hasattr(connected_node, "float_intensity_checker"):
                 connected_node.float_diffusion_checker = .05
                 connected_node.float_diffusion = self.float_diffusion
         
@@ -1309,7 +1314,8 @@ def group_driver_strobe_updater(self, context):
     if self.float_strobe != self.float_strobe_checker:
         for output_socket in self.outputs:
             for link in output_socket.links:
-                connected_node = link.to_socket.node
+              connected_node = link.to_socket.node
+              if hasattr(connected_node, "float_intensity_checker"):
                 connected_node.float_diffusion_checker = .05
                 connected_node.float_strobe = self.float_strobe
         
@@ -1376,7 +1382,8 @@ def group_driver_zoom_updater(self, context):
     if self.float_zoom != self.float_zoom_checker:
         for output_socket in self.outputs:
             for link in output_socket.links:
-                connected_node = link.to_socket.node
+              connected_node = link.to_socket.node
+              if hasattr(connected_node, "float_intensity_checker"):
                 connected_node.float_zoom_checker = .05
                 connected_node.float_zoom = self.float_zoom
         
@@ -1436,7 +1443,8 @@ def group_driver_iris_updater(self, context):
     if self.float_iris != self.float_iris_checker:
         for output_socket in self.outputs:
             for link in output_socket.links:
-                connected_node = link.to_socket.node
+              connected_node = link.to_socket.node
+              if hasattr(connected_node, "float_intensity_checker"):
                 connected_node.float_iris_checker = .05
                 connected_node.float_iris = self.float_iris
         
@@ -1490,7 +1498,8 @@ def group_driver_edge_updater(self, context):
     if self.float_edge != self.float_edge_checker:
         for output_socket in self.outputs:
             for link in output_socket.links:
-                connected_node = link.to_socket.node
+              connected_node = link.to_socket.node
+              if hasattr(connected_node, "float_intensity_checker"):
                 connected_node.float_edge_checker = .05
                 connected_node.float_edge = self.float_edge
         
@@ -1554,8 +1563,9 @@ def group_driver_speed_updater(self, context):
         for output_socket in self.outputs:
             for link in output_socket.links:
                 connected_node = link.to_socket.node
-                connected_node.float_speed_checker = .05
-                connected_node.float_gobo_speed = self.float_gobo_speed
+                if hasattr(connected_node, "float_intensity_checker"):
+                  connected_node.float_speed_checker = .05
+                  connected_node.float_gobo_speed = self.float_gobo_speed
         
         self.float_speed_checker = self.float_gobo_speed
         
@@ -1614,7 +1624,8 @@ def group_driver_gobo_id_updater(self, context):
     if self.int_gobo_id != self.gobo_id_checker:
         for output_socket in self.outputs:
             for link in output_socket.links:
-                connected_node = link.to_socket.node
+              connected_node = link.to_socket.node
+              if hasattr(connected_node, "float_intensity_checker"):
                 connected_node.int_gobo_id_checker = 30
                 connected_node.int_gobo_id = self.int_gobo_id
         
@@ -1666,7 +1677,8 @@ def group_driver_prism_updater(self, context):
     if self.int_prism != self.prism_checker:
         for output_socket in self.outputs:
             for link in output_socket.links:
-                connected_node = link.to_socket.node
+              connected_node = link.to_socket.node
+              if hasattr(connected_node, "float_intensity_checker"):
                 conneted_node.int_prism_checker = 2
                 connected_node.int_prism = self.int_prism
         
