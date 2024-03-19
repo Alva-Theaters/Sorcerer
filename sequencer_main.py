@@ -2839,7 +2839,6 @@ def unregister():
     bpy.utils.unregister_class(MyMotifs)
     del bpy.types.Sequence.my_settings
     bpy.utils.unregister_class(RenderStripsOperator)
-    bpy.utils.unregister_class(MySettings)
     del bpy.types.Scene.livemap_label
 
 
