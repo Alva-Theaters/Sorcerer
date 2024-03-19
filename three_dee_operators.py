@@ -3133,7 +3133,6 @@ class RecordEffectPresetOperator(bpy.types.Operator):
                                       driven_node = link.to_socket.node
                                       if driven_node.bl_idname == "mixer_type":
                                           groups_list.append(driven_node.str_selected_group)
-       else: return {'FINISHED'}
       
         scene = context.scene
         node = context.active_node
@@ -3195,7 +3194,6 @@ class RecordDownEffectPresetOperator(bpy.types.Operator):
                                     driven_node = link.to_socket.node
                                     if driven_node.bl_idname == "mixer_type":
                                         groups_list.append(driven_node.str_selected_group)
-       else: return {'FINISHED'}
          
         scene = context.scene
         node = context.active_node
