@@ -1063,10 +1063,10 @@ class FlashNode(bpy.types.Node):
         row.prop(self, "show_effect_preset_settings", icon='PREFERENCES', emboss=True, icon_only=True)
         op = row.operator("node.flash_preset_search_operator", text="", icon='VIEWZOOM')
         op.node_name = self.name
-        op.node_group_name = self.id_data.name
         row.prop(self, "int_up_preset_assignment", text="Up Preset:")
         op = row.operator("node.record_effect_preset_operator", text="", icon_value=orb.icon_id)
         op.node_name = self.name
+        op.node_group_name = self.id_data.name
         row = column.row(align=True)
         row.prop(self, "int_down_preset_assignment", text="Down Preset:")
         op = row.operator("node.record_down_effect_preset_operator", text="", icon_value=orb.icon_id)
