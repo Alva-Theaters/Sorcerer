@@ -542,14 +542,16 @@ class SceneProperties(bpy.types.PropertyGroup):
     selected_array_name: StringProperty(default="", description="Select an array modifier in 3D view that represents a group of light fixtures")
 
     # Activaters for patch system.
-    color_is_on: bpy.props.BoolProperty(default=False, description="Color is enabled when checked")
-    diffusion_is_on: bpy.props.BoolProperty(default=False, description="Diffusion is enabled when checked")
-    strobe_is_on: bpy.props.BoolProperty(default=False, description="Strobe is enabled when checked")
-    zoom_is_on: bpy.props.BoolProperty(default=False, description="Zoom is enabled when checked")
-    iris_is_on: bpy.props.BoolProperty(default=False, description="Iris is enabled when checked")
-    edge_is_on: bpy.props.BoolProperty(default=False, description="Edge is enabled when checked")
-    gobo_id_is_on: bpy.props.BoolProperty(default=False, description="Gobo ID is enabled when checked")
-    pan_tilt_is_on: bpy.props.BoolProperty(default=False, description="Pan/Tilt is enabled when checked")
+    color_is_on: BoolProperty(default=False, description="Color is enabled when checked")
+    diffusion_is_on: BoolProperty(default=False, description="Diffusion is enabled when checked")
+    strobe_is_on: BoolProperty(default=False, description="Strobe is enabled when checked")
+    zoom_is_on: BoolProperty(default=False, description="Zoom is enabled when checked")
+    iris_is_on: BoolProperty(default=False, description="Iris is enabled when checked")
+    edge_is_on: BoolProperty(default=False, description="Edge is enabled when checked")
+    gobo_id_is_on: BoolProperty(default=False, description="Gobo ID is enabled when checked")
+    pan_tilt_is_on: BoolProperty(default=False, description="Pan/Tilt is enabled when checked")
+
+    channel_controller_is_active: BoolProperty(default=False, description="This allows the channel updaters to know whether to consider selected objects or not")
 
 
 def register():
