@@ -808,7 +808,13 @@ def channel_intensity_updater(self, context):
     if self.float_intensity != self.float_intensity_checker:
         effect_type = None
         
-        universal_updater(self, context, 1, round(self.float_intensity), self.influence, effect_type)       
+        universal_updater(self, context, 1, round(self.float_intensity), self.influence, effect_type) 
+        
+        if context.scene.scene_props.channel_controller_is_active:
+            for obj in context.selected_objects:
+                if hasattr(obj, "float_intensity"):
+                    universal_updater(obj.name, context, 1, round(self.float_intensity), self.influence, effect_type)
+                      
         self.float_intensity_checker = self.float_intensity
         
         
@@ -872,6 +878,12 @@ def channel_color_updater(self, context):
     if self.float_vec_color != self.float_vec_color_checker:
         name = self.name
         universal_color_updater(self, self.float_vec_color, name, context)
+        
+        if context.scene.scene_props.channel_controller_is_active:
+            for obj in context.selected_objects:
+                if hasattr(obj, "float_vec_color"):
+                    universal_color_updater(self, self.float_vec_color, obj.name, context)
+                      
         self.float_vec_color_checker = self.float_vec_color
         
 
@@ -999,7 +1011,7 @@ def master_pan_updater(self, context):
         
         self.float_pan_checker = self.float_pan
         
-        
+        n
 def channel_pan_updater(self, context):
     if self.float_pan != self.float_pan_checker:
         effect_type = None
@@ -1014,6 +1026,12 @@ def channel_pan_updater(self, context):
         mapped_value = (normalized_value * (pan_max - pan_min)) + pan_min
         
         universal_updater(self, context, 2, round(mapped_value), self.influence, effect_type)  
+        
+        if context.scene.scene_props.channel_controller_is_active:
+            for obj in context.selected_objects:
+                if hasattr(obj, "float_pan"):
+                    universal_updater(obj.name, context, 2, round(mapped_value), self.influence, effect_type)
+        
         self.float_pan_checker = self.float_pan
         
         
@@ -1124,6 +1142,12 @@ def channel_tilt_updater(self, context):
         mapped_value = (normalized_value * (tilt_max - tilt_min)) + tilt_min
         
         universal_updater(self, context, 3, round(mapped_value), self.influence, effect_type) 
+        
+        if context.scene.scene_props.channel_controller_is_active:
+            for obj in context.selected_objects:
+                if hasattr(obj, "float_tilt"):
+                    universal_updater(obj.name, context, 3, round(mapped_value), self.influence, effect_type)
+        
         self.float_tilt_checker = self.float_tilt
 
 
@@ -1288,6 +1312,12 @@ def channel_diffusion_updater(self, context):
         effect_type = None
         
         universal_updater(self, context, 4, round(self.float_diffusion), self.influence, effect_type) 
+        
+        if context.scene.scene_props.channel_controller_is_active:
+            for obj in context.selected_objects:
+                if hasattr(obj, "float_diffusion"):
+                    universal_updater(obj.name, context, 4, round(self.float_diffusion), self.influence, effect_type)
+        
         self.float_diffusion_checker = self.float_diffusion
         
         
@@ -1423,6 +1453,12 @@ def channel_zoom_updater(self, context):
         zoom_value = ((self.float_zoom / 100.0) * (zoom_max - zoom_min)) + zoom_min
         
         universal_updater(self, context, 6, round(zoom_value), self.influence, effect_type)
+        
+        if context.scene.scene_props.channel_controller_is_active:
+            for obj in context.selected_objects:
+                if hasattr(obj, "float_zoom"):
+                    universal_updater(obj.name, context, 6, round(self.float_zoom), self.influence, effect_type)
+              
         self.float_zoom_checker = self.float_zoom
         
         
@@ -1478,6 +1514,12 @@ def channel_iris_updater(self, context):
         effect_type = None
         
         universal_updater(self, context, 7, round(self.float_iris), self.influence, effect_type)
+        
+        if context.scene.scene_props.channel_controller_is_active:
+            for obj in context.selected_objects:
+                if hasattr(obj, "float_iris"):
+                    universal_updater(obj.name, context, 7, round(self.float_iris), self.influence, effect_type)
+
         self.float_iris_checker = self.float_iris
         
         
@@ -1533,6 +1575,12 @@ def channel_edge_updater(self, context):
         effect_type = None
         
         universal_updater(self, context, 8, round(self.float_edge), self.influence, effect_type)
+        
+        if context.scene.scene_props.channel_controller_is_active:
+            for obj in context.selected_objects:
+                if hasattr(obj, "float_edge"):
+                    universal_updater(obj.name, context, 8, round(self.float_edge), self.influence, effect_type)
+        
         self.float_edge_checker = self.float_edge
         
         
@@ -1659,6 +1707,12 @@ def channel_gobo_id_updater(self, context):
         effect_type = None
         
         universal_updater(self, context, 10, round(self.int_gobo_id), self.influence, effect_type)
+        
+        if context.scene.scene_props.channel_controller_is_active:
+            for obj in context.selected_objects:
+                if hasattr(obj, "int_gobo_id"):
+                    universal_updater(obj, context, 10, round(self.int_gobo_id), self.influence, effect_type)
+        
         self.gobo_id_checker = self.int_gobo_id
         
         
@@ -2078,20 +2132,20 @@ class AlvaNodeTree(bpy.types.NodeTree):
     bl_icon = 'NODETREE'
 
 
-class AlvaNodeCategory(NodeCategory):
-    @classmethod
-    def poll(cls, context):
-        return context.space_data.tree_type == 'AlvaNodeTree'
-    
+#class AlvaNodeCategory(NodeCategory):
+#    @classmethod
+#    def poll(cls, context):
+#        return context.space_data.tree_type == 'AlvaNodeTree'
+#    
 # This is for side enum in built-in add menu.
-alva_node_categories = [
-    AlvaNodeCategory("ALVA_NODES", "Sorcerer Nodes", items=[
-        NodeItem("mixer_type"),
-        NodeItem("mixer_driver_type"),
-        NodeItem("group_controller_type"),
-        NodeItem("group_driver_type"),
-    ]),
-]
+#alva_node_categories = [
+#    AlvaNodeCategory("ALVA_NODES", "Sorcerer Nodes", items=[
+#        NodeItem("mixer_type"),
+#        NodeItem("mixer_driver_type"),
+#        NodeItem("group_controller_type"),
+#        NodeItem("group_driver_type"),
+#    ]),
+#]
     
 
 class MixerInputSocket(NodeSocket):
