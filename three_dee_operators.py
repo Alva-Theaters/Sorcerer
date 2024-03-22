@@ -183,6 +183,7 @@ class PatchGroupOperator(bpy.types.Operator):
                     position_y = round(chan.location.y / .3048)
                     position_z = round(chan.location.z / .3048)
                     
+                    # Rotate by 180 degrees (pi in radians) since cone facing up is the same as a light facing down.
                     orientation_x = round(math.degrees(chan.rotation_euler.x + math.pi))
                     orientation_y = round(math.degrees(chan.rotation_euler.y))
                     orientation_z = round(math.degrees(chan.rotation_euler.z))
@@ -1891,8 +1892,8 @@ class SendUSITTASCIITo3DOperator(bpy.types.Operator):
             # Find the orientation for the current channel.
             orientation = next((orient for chan, orient in channel_orientations if chan == channel_number), None)
             if orientation:
-                # Blender uses radians, so convert the orientation from degrees to radians.
-                orientation_radians = tuple(math.radians(o) for o in orientation)
+                # Add π radians (180 degrees) to the x-component to correct for the cone's upward facing direction.
+                orientation_radians = (math.radians(orientation[0]) + math.pi, math.radians(orientation[1]), math.radians(orientation[2]))
                 light_object.rotation_euler = orientation_radians
                 
         if not channel_positions:
@@ -3104,61 +3105,94 @@ class RecordEffectPresetOperator(bpy.types.Operator):
     bl_label = "Record"
     bl_description = "Orb will record the node's group into the preset above onto the console using the argument template below"
 
-    node_name: StringProperty(default="")
-    node_group_name: StringProperty(default="")
+    node_tree_name: bpy.props.StringProperty()  # Property to hold the node tree name
+    node_name: bpy.props.StringProperty()  # Property to hold the node name
 
     def execute(self, context):
-      active_node = None
-      active_node = bpy.data.node_groups[self.node_group_name].nodes.get(self.node_name)
-      if active_node:      
-          groups_list = []
-          for input_socket in active_node.inputs:
-              if input_socket.bl_idname == 'FlashUpType':
-                  for link in input_socket.links:
-                      connected_node = link.from_socket.node
-                      if connected_node.bl_idname == "group_controller_type":
-                          groups_list.append(connected_node.str_selected_light)
-                      elif connected_node.bl_idname == "group_driver_type":
-                          for output_socket in connected_node.outputs:
-                              if output_socket.bl_idname == 'GroupOutputType':
-                                  for link in output_socket.links:
-                                      driven_node = link.to_socket.node
-                                      if driven_node.bl_idname == "group_controller_type":
-                                          groups_list.append(driven_node.str_selected_light)
-                      elif connected_node.bl_idname == "mixer_type":
-                          down_groups_list.append(connected_node.str_selected_light)               
-                      elif connected_node.bl_idname == "mixer_driver_type":
-                          for output_socket in connected_node.outputs:
-                              if output_socket.bl_idname == 'MixerOutputType':
-                                  for link in output_socket.links:
-                                      driven_node = link.to_socket.node
-                                      if driven_node.bl_idname == "mixer_type":
-                                          groups_list.append(driven_node.str_selected_group)
-      
-          scene = context.scene
-          node = context.active_node
-          group_numbers = ' + Group '.join(groups_list)
-          preset_number = active_node.int_up_preset_assignment
-          argument_template = scene.scene_props.str_preset_assignment_argument
+        node_tree = bpy.data.node_groups.get(self.node_tree_name)
+        if not node_tree:
+            for world in bpy.data.worlds:
+                if world.node_tree and world.node_tree.name == self.node_tree_name:
+                    node_tree = world.node_tree
+                    if not node_tree:
+                        self.report({'ERROR'}, f"Node tree '{self.node_tree_name}' not found.")
+                        return {'CANCELLED'}
+
+        active_node = node_tree.nodes.get(self.node_name)
+        if not active_node:
+            self.report({'ERROR'}, f"Node '{self.node_name}' not found in '{self.node_tree_name}'.")
+            return {'CANCELLED'}
+        
+        if active_node:      
+            groups_list = []
+            for input_socket in active_node.inputs:
+                if input_socket.bl_idname == 'FlashUpType':
+                    for link in input_socket.links:
+                        connected_node = link.from_socket.node
+                        if connected_node.bl_idname == "group_controller_type":
+                            groups_list.append(connected_node.str_selected_light)
+                        elif connected_node.bl_idname == "group_driver_type":
+                            for output_socket in connected_node.outputs:
+                                if output_socket.bl_idname == 'GroupOutputType':
+                                    for link in output_socket.links:
+                                        driven_node = link.to_socket.node
+                                        if driven_node.bl_idname == "group_controller_type":
+                                            groups_list.append(driven_node.str_selected_light)
+                        elif connected_node.bl_idname == "mixer_type":
+                            down_groups_list.append(connected_node.str_selected_light)               
+                        elif connected_node.bl_idname == "mixer_driver_type":
+                            for output_socket in connected_node.outputs:
+                                if output_socket.bl_idname == 'MixerOutputType':
+                                    for link in output_socket.links:
+                                        driven_node = link.to_socket.node
+                                        if driven_node.bl_idname == "mixer_type":
+                                            groups_list.append(driven_node.str_selected_group)
+                        elif connected_node.bl_idname == 'ShaderNodeGroup':
+                            group_node_tree = connected_node.node_tree
+                            for node in group_node_tree.nodes:
+                                if node.type == 'GROUP_OUTPUT':
+                                    for socket in node.inputs:
+                                        if socket.name == "Flash":
+                                            for inner_link in socket.links:
+                                                interior_connected_node = inner_link.from_node
+                                                if interior_connected_node.bl_idname == 'group_controller_type':
+                                                    groups_list.append(interior_connected_node.str_selected_light)
+                                                elif interior_connected_node.bl_idname == "group_driver_type":
+                                                    for output_socket in interior_connected_node.outputs:
+                                                        if output_socket.bl_idname == 'GroupOutputType':
+                                                            for link in output_socket.links:
+                                                                driven_node = link.to_socket.node
+                                                                if driven_node.bl_idname == "group_controller_type":
+                                                                    groups_list.append(driven_node.str_selected_light)
+                                                    
+        scene = context.scene
+        node = context.active_node
+        group_numbers = ' + Group '.join(groups_list)
+        preset_number = active_node.int_up_preset_assignment
+        argument_template = scene.scene_props.str_preset_assignment_argument
           
-          argument = argument_template.replace("#", str(group_numbers))
-          argument = argument.replace("$", str(preset_number))
-          ip_address = scene.scene_props.str_osc_ip_address
-          port = scene.scene_props.int_osc_port
-          address = scene.scene_props.str_command_line_address
+        argument = argument_template.replace("#", str(group_numbers))
+        argument = argument.replace("$", str(preset_number))
+        ip_address = scene.scene_props.str_osc_ip_address
+        port = scene.scene_props.int_osc_port
+        address = scene.scene_props.str_command_line_address
           
-          send_osc_string(address, ip_address, port, argument)
+        send_osc_string(address, ip_address, port, argument)
           
-          for node_tree in bpy.data.node_groups:
-              if node_tree.bl_idname == 'AlvaNodeTree' or node_tree.bl_idname == 'ShaderNodeTree':
-                  for node in node_tree.nodes:
-                      if node.bl_idname == "flash_type":
-                          node.flash_motif_names_enum = node.flash_motif_names_enum
+        for node_tree in bpy.data.node_groups:
+            if node_tree.bl_idname == 'AlvaNodeTree':
+                for node in node_tree.nodes:
+                    if node.bl_idname == "flash_type" and node.flash_motif_names_enum != "":
+                        node.flash_motif_names_enum = node.flash_motif_names_enum
+            if node_tree.bl_idname == 'ShaderNodeTree':
+                for node in world.node_tree.nodes:
+                    if node.bl_idname == "flash_type" and node.flash_motif_names_enum != "":
+                        node.flash_motif_names_enum = node.flash_motif_names_enum
                           
-          snapshot = str(context.scene.orb_finish_snapshot)
-          send_osc_string("/eos/newcmd", ip_address, port, f"Snapshot {snapshot} Enter")
+        snapshot = str(context.scene.orb_finish_snapshot)
+        send_osc_string("/eos/newcmd", ip_address, port, f"Snapshot {snapshot} Enter")
                           
-          return {'FINISHED'}
+        return {'FINISHED'}
     
     
 class RecordDownEffectPresetOperator(bpy.types.Operator):
@@ -3166,60 +3200,93 @@ class RecordDownEffectPresetOperator(bpy.types.Operator):
     bl_label = "Record"
     bl_description = "Orb will record the node's group into the preset above onto the console using the argument template below"
 
-    node_name: StringProperty(default="")
-    node_group_name: StringProperty(default="")
+    node_tree_name: bpy.props.StringProperty()  # Property to hold the node tree name
+    node_name: bpy.props.StringProperty()  # Property to hold the node name
 
     def execute(self, context):
-      active_node = None
-      active_node = bpy.data.node_groups[self.node_group_name].nodes.get(self.node_name)
-      if active_node:       
-        groups_list = []
-        for input_socket in active_node.inputs:
-            if input_socket.bl_idname == 'FlashDownType':
-                for link in input_socket.links:
-                    connected_node = link.from_socket.node
-                    if connected_node.bl_idname == "group_controller_type":
-                        groups_list.append(connected_node.str_selected_light)
-                    elif connected_node.bl_idname == "group_driver_type":
-                        for output_socket in connected_node.outputs:
-                            if output_socket.bl_idname == 'GroupOutputType':
-                                for link in output_socket.links:
-                                    driven_node = link.to_socket.node
-                                    if driven_node.bl_idname == "group_controller_type":
-                                        groups_list.append(driven_node.str_selected_light)
-                    elif connected_node.bl_idname == "mixer_type":
-                        down_groups_list.append(connected_node.str_selected_light)               
-                    elif connected_node.bl_idname == "mixer_driver_type":
-                        for output_socket in connected_node.outputs:
-                            if output_socket.bl_idname == 'MixerOutputType':
-                                for link in output_socket.links:
-                                    driven_node = link.to_socket.node
-                                    if driven_node.bl_idname == "mixer_type":
-                                        groups_list.append(driven_node.str_selected_group)
-         
+        node_tree = bpy.data.node_groups.get(self.node_tree_name)
+        if not node_tree:
+            for world in bpy.data.worlds:
+                if world.node_tree and world.node_tree.name == self.node_tree_name:
+                    node_tree = world.node_tree
+                    if not node_tree:
+                        self.report({'ERROR'}, f"Node tree '{self.node_tree_name}' not found.")
+                        return {'CANCELLED'}
+
+        active_node = node_tree.nodes.get(self.node_name)
+        if not active_node:
+            self.report({'ERROR'}, f"Node '{self.node_name}' not found in '{self.node_tree_name}'.")
+            return {'CANCELLED'}
+        
+        if active_node:
+            groups_list = []
+            for input_socket in active_node.inputs:
+                if input_socket.bl_idname == 'FlashDownType':
+                    for link in input_socket.links:
+                        connected_node = link.from_socket.node
+                        if connected_node.bl_idname == "group_controller_type":
+                            groups_list.append(connected_node.str_selected_light)
+                        elif connected_node.bl_idname == "group_driver_type":
+                            for output_socket in connected_node.outputs:
+                                if output_socket.bl_idname == 'GroupOutputType':
+                                    for link in output_socket.links:
+                                        driven_node = link.to_socket.node
+                                        if driven_node.bl_idname == "group_controller_type":
+                                            groups_list.append(driven_node.str_selected_light)
+                        elif connected_node.bl_idname == "mixer_type":
+                            down_groups_list.append(connected_node.str_selected_light)               
+                        elif connected_node.bl_idname == "mixer_driver_type":
+                            for output_socket in connected_node.outputs:
+                                if output_socket.bl_idname == 'MixerOutputType':
+                                    for link in output_socket.links:
+                                        driven_node = link.to_socket.node
+                                        if driven_node.bl_idname == "mixer_type":
+                                            groups_list.append(driven_node.str_selected_group)
+                        elif connected_node.bl_idname == 'ShaderNodeGroup':
+                            group_node_tree = connected_node.node_tree
+                            for node in group_node_tree.nodes:
+                                if node.type == 'GROUP_OUTPUT':
+                                    for socket in node.inputs:
+                                        if socket.name == "Flash":
+                                            for inner_link in socket.links:
+                                                interior_connected_node = inner_link.from_node
+                                                if interior_connected_node.bl_idname == 'group_controller_type':
+                                                    groups_list.append(interior_connected_node.str_selected_light)
+                                                elif interior_connected_node.bl_idname == "group_driver_type":
+                                                    for output_socket in interior_connected_node.outputs:
+                                                        if output_socket.bl_idname == 'GroupOutputType':
+                                                            for link in output_socket.links:
+                                                                driven_node = link.to_socket.node
+                                                                if driven_node.bl_idname == "group_controller_type":
+                                                                    groups_list.append(driven_node.str_selected_light)
+                                                    
         scene = context.scene
         node = context.active_node
         group_numbers = ' + Group '.join(groups_list)
         preset_number = active_node.int_down_preset_assignment
         argument_template = scene.scene_props.str_preset_assignment_argument
-        
+          
         argument = argument_template.replace("#", str(group_numbers))
         argument = argument.replace("$", str(preset_number))
         ip_address = scene.scene_props.str_osc_ip_address
         port = scene.scene_props.int_osc_port
         address = scene.scene_props.str_command_line_address
-        
+          
         send_osc_string(address, ip_address, port, argument)
-            
+          
         for node_tree in bpy.data.node_groups:
-            if node_tree.bl_idname == 'AlvaNodeTree' or node_tree.bl_idname == 'ShaderNodeTree':
+            if node_tree.bl_idname == 'AlvaNodeTree':
                 for node in node_tree.nodes:
-                    if node.bl_idname == "flash_type":
+                    if node.bl_idname == "flash_type" and node.flash_motif_names_enum != "":
                         node.flash_motif_names_enum = node.flash_motif_names_enum
-                        
+            if node_tree.bl_idname == 'ShaderNodeTree':
+                for node in world.node_tree.nodes:
+                    if node.bl_idname == "flash_type" and node.flash_motif_names_enum != "":
+                        node.flash_motif_names_enum = node.flash_motif_names_enum
+                          
         snapshot = str(context.scene.orb_finish_snapshot)
         send_osc_string("/eos/newcmd", ip_address, port, f"Snapshot {snapshot} Enter")
-                        
+                          
         return {'FINISHED'}
     
     
