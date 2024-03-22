@@ -423,8 +423,14 @@ class ModalChannelControllerPanel(Operator):
         return {'FINISHED'}
     
     def invoke(self, context, event):
+        context.scene.scene_props.channel_controller_is_active = True
         wm = context.window_manager
         return wm.invoke_props_dialog(self, width=500)
+    
+    def __del__(self):
+        if bpy.context:
+            bpy.context.scene.scene_props.channel_controller_is_active = False
+        print("Modal operator exited.")
     
     def draw(self, context):
         layout = self.layout
