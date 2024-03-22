@@ -982,8 +982,25 @@ def flash_node_updater(self, context):
                             for link in output_socket.links:
                                 driven_node = link.to_socket.node
                                 if driven_node.bl_idname == "mixer_type":
-                                    down_groups_list.append(driven_node.str_selected_group)
-                    
+                                    up_groups_list.append(driven_node.str_selected_group)
+                elif connected_node.bl_idname == 'ShaderNodeGroup':
+                    group_node_tree = connected_node.node_tree
+                    for node in group_node_tree.nodes:
+                        if node.type == 'GROUP_OUTPUT':
+                            for socket in node.inputs:
+                                if socket.name == "Flash":
+                                    for inner_link in socket.links:
+                                        interior_connected_node = inner_link.from_node
+                                        if interior_connected_node.bl_idname == 'group_controller_type':
+                                            up_groups_list.append(interior_connected_node.str_selected_light)
+                                        elif interior_connected_node.bl_idname == "group_driver_type":
+                                            for output_socket in interior_connected_node.outputs:
+                                                if output_socket.bl_idname == 'GroupOutputType':
+                                                    for link in output_socket.links:
+                                                        driven_node = link.to_socket.node
+                                                        if driven_node.bl_idname == "group_controller_type":
+                                                            up_groups_list.append(driven_node.str_selected_light)
+                                            
         elif isinstance(input_socket, FlashDownSocket):
             for link in input_socket.links:
                 connected_node = link.from_socket.node
@@ -1005,6 +1022,23 @@ def flash_node_updater(self, context):
                                 driven_node = link.to_socket.node
                                 if driven_node.bl_idname == "mixer_type":
                                     down_groups_list.append(driven_node.str_selected_group)
+                elif connected_node.bl_idname == 'ShaderNodeGroup':
+                    group_node_tree = connected_node.node_tree
+                    for node in group_node_tree.nodes:
+                        if node.type == 'GROUP_OUTPUT':
+                            for socket in node.inputs:
+                                if socket.name == "Flash":
+                                    for inner_link in socket.links:
+                                        interior_connected_node = inner_link.from_node
+                                        if interior_connected_node.bl_idname == 'group_controller_type':
+                                            down_groups_list.append(interior_connected_node.str_selected_light)
+                                        elif interior_connected_node.bl_idname == "group_driver_type":
+                                            for output_socket in interior_connected_node.outputs:
+                                                if output_socket.bl_idname == 'GroupOutputType':
+                                                    for link in output_socket.links:
+                                                        driven_node = link.to_socket.node
+                                                        if driven_node.bl_idname == "group_controller_type":
+                                                            down_groups_list.append(driven_node.str_selected_light)
     
     for strip in context.scene.sequence_editor.sequences_all:
         if strip.my_settings.motif_type_enum == "option_eos_flash" and strip.motif_name == self.flash_motif_names_enum and strip.flash_using_nodes:
@@ -1056,7 +1090,9 @@ class FlashNode(bpy.types.Node):
     def draw_buttons(self, context, layout):
         pcoll = preview_collections["main"]
         orb = pcoll["orb"]
-      
+        
+        node_tree = context.space_data.node_tree
+        
         layout.prop(self, "flash_motif_names_enum", text="", icon='SEQ_SEQUENCER')
         column = layout.column()
         row = column.row(align=True)
@@ -1066,12 +1102,12 @@ class FlashNode(bpy.types.Node):
         row.prop(self, "int_up_preset_assignment", text="Up Preset:")
         op = row.operator("node.record_effect_preset_operator", text="", icon_value=orb.icon_id)
         op.node_name = self.name
-        op.node_group_name = self.id_data.name
+        op.node_tree_name = node_tree.name
         row = column.row(align=True)
         row.prop(self, "int_down_preset_assignment", text="Down Preset:")
         op = row.operator("node.record_down_effect_preset_operator", text="", icon_value=orb.icon_id)
         op.node_name = self.name
-        op.node_group_name = self.id_data.name
+        op.node_tree_name = node_tree.name
         
         world = context.scene.world
         conflict = False
@@ -1083,6 +1119,10 @@ class FlashNode(bpy.types.Node):
                 if controller.bl_idname == 'flash_type' and controller.name != self.name and controller.int_up_preset_assignment == self.int_up_preset_assignment:
                     conflict = True
                     conflict_node_name = str(controller.label)
+                    if conflict_node_name == "":
+                        conflict_node_name = str(controller.name)
+                        if conflict_node_name == "":
+                            conflict_node_name = "Another"
                     break
                 
         if conflict:
@@ -1107,7 +1147,17 @@ class NodeSettingsPanel(bpy.types.Panel):
     bl_region_type = 'UI'
     bl_category = 'Alva Sorcerer'
     
+    @classmethod
+    def poll(cls, context): ## Need to add a ton more of these.
+        return hasattr(context.space_data, 'edit_tree') and context.space_data.edit_tree and context.space_data.edit_tree.nodes.active
+    
     def draw(self, context):
+        DrawSettingsNode.draw_buttons(context, self.layout)
+
+
+class DrawSettingsNode:
+    @staticmethod
+    def draw_buttons(context, layout):
         pcoll = preview_collections["main"]
         orb = pcoll["orb"]
       
@@ -1117,53 +1167,51 @@ class NodeSettingsPanel(bpy.types.Panel):
         row = column.row()
         space = context.space_data.edit_tree.nodes
         active_node = None 
+        active_node = context.space_data.edit_tree.nodes.active
 
-        if hasattr(context.space_data, 'edit_tree') and context.space_data.edit_tree is not None:
-            active_node = context.space_data.edit_tree.nodes.active
-
-            if active_node and (active_node.bl_idname == "group_controller_type" or active_node.bl_idname == "group_driver_type" or active_node.bl_idname == "master_type"):
-                row.prop(active_node, "strobe_is_on", text="Strobe", slider=True)
-                row.prop(active_node, "color_is_on", text="Color", slider=True)
-                
+        if active_node and (active_node.bl_idname == "group_controller_type" or active_node.bl_idname == "group_driver_type" or active_node.bl_idname == "master_type"):
+            row.prop(active_node, "strobe_is_on", text="Strobe", slider=True)
+            row.prop(active_node, "color_is_on", text="Color", slider=True)
+            
+            row = column.row()
+            row.prop(active_node, "pan_tilt_is_on", text="Pan/Tilt", slider=True)
+            
+            row = column.row()
+            row.prop(active_node, "zoom_is_on", text="Zoom", slider=True)
+            row.prop(active_node, "iris_is_on", text="Iris", slider=True)
+            
+            row = column.row()
+            row.prop(active_node, "edge_is_on", text="Edge", slider=True)
+            row.prop(active_node, "diffusion_is_on", text="Diffusion", slider=True)
+            
+            row = column.row()
+            row.prop(active_node, "gobo_id_is_on", text="Gobo", slider=True)
+            
+            column.separator()
+            
+            if active_node.bl_idname == "group_controller_type":
                 row = column.row()
-                row.prop(active_node, "pan_tilt_is_on", text="Pan/Tilt", slider=True)
-                
-                row = column.row()
-                row.prop(active_node, "zoom_is_on", text="Zoom", slider=True)
-                row.prop(active_node, "iris_is_on", text="Iris", slider=True)
-                
-                row = column.row()
-                row.prop(active_node, "edge_is_on", text="Edge", slider=True)
-                row.prop(active_node, "diffusion_is_on", text="Diffusion", slider=True)
-                
-                row = column.row()
-                row.prop(active_node, "gobo_id_is_on", text="Gobo", slider=True)
+                row.prop(active_node, "influence", text="Influence")
                 
                 column.separator()
                 
-                if active_node.bl_idname == "group_controller_type":
-                    row = column.row()
-                    row.prop(active_node, "influence", text="Influence")
-                    
-                    column.separator()
-                    
-            elif active_node and active_node.bl_idname == "mixer_type" or active_node.bl_idname == "mixer_driver_type":
-                row = layout.row(align=True)
-                row.prop(active_node, "str_selected_group", text="")
-                row = layout.row(align=True)
-                row.prop(active_node, "parameters_enum", text="")
-                if active_node.parameters_enum == 'option_color':
-                    row.prop(active_node, "color_profile_enum", text="")
+        elif active_node and active_node.bl_idname == "mixer_type" or active_node.bl_idname == "mixer_driver_type":
+            row = layout.row(align=True)
+            row.prop(active_node, "str_selected_group", text="")
+            row = layout.row(align=True)
+            row.prop(active_node, "parameters_enum", text="")
+            if active_node.parameters_enum == 'option_color':
+                row.prop(active_node, "color_profile_enum", text="")
   
-                if active_node.parameters_enum != None:
-                    row = layout.row()
-                    row.prop(active_node, "show_middle", text="Show Middle", slider=True)
-                    
-                    if not active_node.show_middle:
-                        row.prop(active_node, "every_other", text="Every Other", slider=True)
-                        
+            if active_node.parameters_enum != None:
                 row = layout.row()
-                row.prop(active_node, "collapse_most", text="Collapse most")
+                row.prop(active_node, "show_middle", text="Show Middle", slider=True)
+                
+                if not active_node.show_middle:
+                    row.prop(active_node, "every_other", text="Every Other", slider=True)
+                    
+            row = layout.row()
+            row.prop(active_node, "collapse_most", text="Collapse most")
             
         row = layout.row()
         row.prop(active_node, "label", text="Label")
@@ -1208,33 +1256,34 @@ def draw_alva_node_menu(self, layout):
 class AlvaSorcererNodeCategory(NodeCategory):
     @classmethod
     def poll(cls, context):
-        return context.space_data.tree_type == 'ShaderNodeTree'
-    
-    
-node_items = [
-    NodeItem("group_controller_type"),
-    NodeItem("group_driver_type"),
-    NodeItem("mixer_type"),
-    NodeItem("mixer_driver_type"),
-    NodeItem("master_type"),
-    NodeItem("flash_type"),
-
-    NodeItem("intensities_type"),
-    NodeItem("colors_type"),
-    NodeItem("strobes_type"),
-    NodeItem("zooms_type"),
-    NodeItem("edges_type"),
-    
-    NodeItem("oven_type"),
-    NodeItem("node_settings_type"),
-    NodeItem("console_buttons_type"),
-    NodeItem("presets_type"),
-    NodeItem("pan_tilt_type"),
-]
+        return (context.space_data.tree_type == 'ShaderNodeTree' or 
+                context.space_data.tree_type == 'AlvaNodeTree')
 
 
 categories = [
-    AlvaSorcererNodeCategory("SORCERER_NODES", "Alva Sorcerer", items=node_items),
+    AlvaSorcererNodeCategory('PRIMARYNODES', "Primary Nodes", items=[
+        NodeItem("group_controller_type"),
+        NodeItem("group_driver_type"),
+        NodeItem("mixer_type"),
+        NodeItem("mixer_driver_type"),
+        NodeItem("master_type"),
+        NodeItem("flash_type"),
+    ]),
+
+    AlvaSorcererNodeCategory('SINGLEPARAMNODES', "Single-parameter Nodes", items=[
+        NodeItem("intensities_type"),
+        NodeItem("colors_type"),
+        NodeItem("strobes_type"),
+        NodeItem("zooms_type"),
+        NodeItem("edges_type"),
+    ]),
+    AlvaSorcererNodeCategory('SPECIALTYNODES', "Specialty Nodes", items=[
+        NodeItem("oven_type"),
+        NodeItem("node_settings_type"),
+        NodeItem("console_buttons_type"),
+        NodeItem("presets_type"),
+        NodeItem("pan_tilt_type"),
+    ]),
 ]
     
 
@@ -1278,7 +1327,7 @@ classes = (
     FlashNode,
     FlashUpSocket,
     FlashDownSocket,
-    NodesToolbar
+    NodesToolbar,
 )
 
 
