@@ -1006,6 +1006,3 @@ def unregister():
 # For development purposes only.
 if __name__ == "__main__":
     register()
-
-
-            
