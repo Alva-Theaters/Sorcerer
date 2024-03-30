@@ -919,6 +919,10 @@ def master_color_updater(self, context):
                                             if hasattr(connected_node, 'float_vec_color'):
                                                 connected_node.float_vec_color_checker = (.05, .05, .05)
                                                 connected_node.float_vec_color = self.float_vec_color
+                                              
+                    elif hasattr(group_node, "float_vec_color_checker"):
+                      group_node.float_vec_color_checker = (.05, .05, .05)
+                      group_node.float_vec_color = self.float_vec_color
         
         self.float_vec_color_checker = self.float_vec_color
         
@@ -1012,10 +1016,14 @@ def master_pan_updater(self, context):
                                             if hasattr(connected_node, 'float_pan'):
                                                 connected_node.float_pan_checker = .05
                                                 connected_node.float_pan = self.float_pan
+                                              
+                    elif hasattr(group_node, "float_pan_checker"):
+                      group_node.float_pan_checker = .02
+                      group_node.float_pan = self.float_pan
         
         self.float_pan_checker = self.float_pan
         
-        n
+        
 def channel_pan_updater(self, context):
     if self.float_pan != self.float_pan_checker:
         effect_type = None
@@ -1128,7 +1136,11 @@ def master_tilt_updater(self, context):
                                             if hasattr(connected_node, 'float_tilt'):
                                                 connected_node.float_tilt_checker = .05
                                                 connected_node.float_tilt = self.float_tilt
-        
+                                              
+                    elif hasattr(group_node, "float_tilt_checker"):
+                      group_node.float_tilt_checker = .02
+                      group_node.float_tilt = self.float_tilt
+      
         self.float_tilt_checker = self.float_tilt
         
         
