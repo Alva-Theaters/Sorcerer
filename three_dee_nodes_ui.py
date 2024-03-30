@@ -1151,12 +1151,6 @@ class NodeSettingsPanel(bpy.types.Panel):
     def poll(cls, context): ## Need to add a ton more of these.
         return hasattr(context.space_data, 'edit_tree') and context.space_data.edit_tree and context.space_data.edit_tree.nodes.active
     
-    def draw(self, context):
-        DrawSettingsNode.draw_buttons(context, self.layout)
-
-
-class DrawSettingsNode:
-    @staticmethod
     def draw_buttons(context, layout):
         pcoll = preview_collections["main"]
         orb = pcoll["orb"]
