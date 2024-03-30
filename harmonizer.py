@@ -2605,7 +2605,7 @@ class GroupControllerNode(bpy.types.Node):
     bl_idname = 'group_controller_type'
     bl_label = 'Group Controller Node'
     bl_icon = 'STICKY_UVS_LOC'
-    bl_width_default = 200
+    bl_width_default = 300
     
     # Assigned by group_info_updater on str_selected_light property.
     str_group_id: StringProperty(default="1")
