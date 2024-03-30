@@ -800,6 +800,10 @@ def master_intensity_updater(self, context):
                                             if hasattr(connected_node, 'float_intensity'):
                                                 connected_node.float_intensity_checker = .02
                                                 connected_node.float_intensity = self.float_intensity
+                    
+                    elif hasattr(group_node, "float_intensity_checker"):
+                      group_node.float_intensity_checker = .02
+                      group_node.float_intensity = self.float_intensity
         
         self.float_intensity_checker = self.float_intensity
 
