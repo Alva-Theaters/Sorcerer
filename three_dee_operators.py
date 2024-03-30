@@ -175,7 +175,7 @@ class PatchGroupOperator(bpy.types.Operator):
                     
                     chan.name = str(scene.scene_props.int_array_start_channel)
                     current_universe, current_address = addresses_list[i]
-                    #Make sure there wasn't a conflict that automatically changed it to 1.001 or something.
+                    # Make sure there wasn't a conflict that automatically changed it to 1.001 or something.
                     if chan.name != str(scene.scene_props.int_array_start_channel):
                         self.report({'ERROR'}, "Object naming is incorrect, must be integer only.")
                     
@@ -1781,7 +1781,7 @@ class SendUSITTASCIITo3DOperator(bpy.types.Operator):
                 capabilities = group_capabilities[group_number]
 
                 new_controller.strobe_is_on = 'Strobe' in capabilities or '204' in capabilities
-                new_controller.color_is_on = 'Red' in capabilities or '12' in capabilities
+                new_controller.color_is_on = 'Red' in capabilities or '12' in capabilities or '11' in capabilities
                 new_controller.pan_tilt_is_on = '2' in capabilities or '3' in capabilities
                 new_controller.diffusion_is_on = 'Diffusion' in capabilities or '76' in capabilities
                 new_controller.intensity_is_on = 'Intensity' in capabilities or '1' in capabilities
