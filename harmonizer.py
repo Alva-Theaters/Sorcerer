@@ -3162,8 +3162,8 @@ def register():
     bpy.types.Object.float_pan = bpy.props.FloatProperty(
         name="Pan",
         default=0.0,
-        min=-270,
-        max=270.0,
+        min=-100,
+        max=100,
         description="Pan value",
         options={'ANIMATABLE'},
         update=channel_pan_updater
@@ -3171,8 +3171,8 @@ def register():
     bpy.types.Object.float_tilt = bpy.props.FloatProperty(
         name="Tilt",
         default=0.0,
-        min=-135.0,
-        max=135.0,
+        min=-100,
+        max=100,
         description="Tilt value",
         options={'ANIMATABLE'},
         update=channel_tilt_updater
