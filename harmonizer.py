@@ -3294,9 +3294,10 @@ def register():
 
     bpy.app.handlers.depsgraph_update_pre.append(influencer_deps_updater)
     bpy.app.handlers.frame_change_pre.append(influencer_deps_updater)
-    
-    bpy.app.handlers.frame_change_pre.append(load_changes_handler)
-    bpy.app.handlers.frame_change_post.append(publish_changes_handler)
+
+    # Commenting this out until harmonizer is replaced with harmonizer_two per spam issue
+    #bpy.app.handlers.frame_change_pre.append(load_changes_handler)
+    #bpy.app.handlers.frame_change_post.append(publish_changes_handler)
 
     
 def unregister():
