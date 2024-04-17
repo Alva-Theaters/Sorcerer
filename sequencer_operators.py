@@ -2113,30 +2113,28 @@ class ViewGraphOperator(bpy.types.Operator):
     bl_idname = "my.view_graph"
     bl_label = ""
     bl_description = "Before clicking this, open up a Blender graph editor elsewhere. Then, pressing this button will automatically zoom that viewer to the selected keyframes. Graphs gives you access to f-curves, aka the candy store you didn't know existed"
-    
+
     def execute(self, context):
+        # Search for an existing Graph Editor
         graph_editor = None
         for area in bpy.context.screen.areas:
             if area.type == 'GRAPH_EDITOR':
                 graph_editor = area
                 break
-                
-        if graph_editor:
-            for region in graph_editor.regions:
-                if region.type == 'WINDOW':
-                    override = {
-                        'area': graph_editor,
-                        'region': region,
-                        'screen': context.screen,
-                        'scene': context.scene,
-                    }
-                    bpy.ops.graph.view_selected(override)
-                    return {'FINISHED'}
-        else:
-            self.report({'ERROR'}, "No graph editor found. Please open a graph editor window.")
+
+        if not graph_editor:
+            self.report({'ERROR'}, "No Graph Editor found. Please open a Graph Editor window.")
             return {'CANCELLED'}
-        
-        return {'FINISHED'}
+
+        # Prepare the context override for the Graph Editor
+        for region in graph_editor.regions:
+            if region.type == 'WINDOW':
+                with bpy.context.temp_override(area=graph_editor, region=region):
+                    bpy.ops.graph.view_all()
+                return {'FINISHED'}
+
+        self.report({'ERROR'}, "No suitable region found in the Graph Editor.")
+        return {'CANCELLED'}
     
     
 class KeyframeIntensityOperator(bpy.types.Operator):
