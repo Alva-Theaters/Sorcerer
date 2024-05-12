@@ -15,9 +15,8 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const { owner, repo } = context.repo;
             const issueNumber = context.payload.issue.number;
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
 
             const labelsToAdd = ['triage'];
 
@@ -27,4 +26,3 @@ jobs:
               issue_number: issueNumber,
               labels: labelsToAdd
             });
-
