@@ -12,16 +12,18 @@ jobs:
       - name: Add "Needs Triage" label to new issue
         uses: actions/github-script@v5
         with:
+          node-version: '20'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { owner, repo } = context.repo;
-            const issueNumber = context.issue.number;
+            const { owner, repo, issue } = context.payload;
+            const issueNumber = issue.number;
 
-            const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+            const octokit = context.octokit;
 
-            octokit.issues.addLabels({
+            octokit.rest.issues.addLabels({
               owner,
               repo,
               issue_number: issueNumber,
               labels: ['needs triage']
             });
+
