@@ -1,0 +1,27 @@
+name: Auto Label New Issues
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  add-label:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Add "Needs Triage" label to new issue
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const issueNumber = context.issue.number;
+
+            const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+
+            octokit.issues.addLabels({
+              owner,
+              repo,
+              issue_number: issueNumber,
+              labels: ['needs triage']
+            });
