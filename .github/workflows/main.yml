@@ -10,19 +10,9 @@ jobs:
     permissions:
       issues: write
     steps:
-      - name: Add "Needs Triage" label to new/reopened issue
-        uses: actions/github-script@v5
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const { owner, repo } = context.repo;
-            const issueNumber = context.payload.issue.number;
-
-            const labelsToAdd = ['triage'];
-
-            await github.issues.addLabels({
-              owner,
-              repo,
-              issue_number: issueNumber,
-              labels: labelsToAdd
-            });
+      - run: gh issue edit "$NUMBER" --add-label "$LABELS"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number }}
+          LABELS: needs triage
