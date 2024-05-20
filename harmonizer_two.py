@@ -31,7 +31,6 @@ complete. It will replace the entire existing harmonizer.py.
 =====================================================================
 '''
 
-
 ## Double hashtag indicates notes for future development requiring some level of attention
 
 
@@ -51,6 +50,7 @@ from bpy.app.handlers import persistent
 import mathutils
 from functools import partial
 import inspect
+import numpy as np
 
 change_requests = []
 stored_channels = set()
@@ -66,10 +66,14 @@ parameter_mapping = {
     "diffusion": "float_diffusion",
     "edge": "float_edge",
     "gobo_id": "int_gobo_id",
-    "gobo_speed": "int_gobo_speed",
+    "gobo_speed": "float_gobo_speed",
     "prism": "int_prism",
     "pan_tilt": "float_vec_pan_tilt_graph"
 }
+
+# This stores the channel list for each set piece, group controller, strip, etc.
+class ChannelListPropertyGroup(PropertyGroup):
+    value: IntProperty()
 
 
 # Purpose of this throughout the codebase is to proactively identify possible pre-bugs and to help diagnose bugs.
@@ -115,6 +119,29 @@ def get_frame_rate(scene):
     fps_base = scene.render.fps_base
     frame_rate = fps / fps_base
     return frame_rate
+
+
+def parse_channels(input_string):
+    formatted_input = re.sub(r'(\d)-(\d)', r'\1 - \2', input_string)
+    tokens = re.split(r'[,\s]+', formatted_input)
+    
+    channels = []
+    
+    i = 0
+    while i < len(tokens):
+        token = tokens[i]
+        
+        if token in ("through", "thru", "-", "tthru", "throu", "--", "por") and i > 0 and i < len(tokens) - 1:
+            start = int(tokens[i-1])
+            end = int(tokens[i+1])
+            step = 1 if start < end else -1
+            channels.extend(range(start, end + step, step))  # Changed to extend for simplicity.
+            i += 2  # Skip the next token because we've already processed it.
+        elif token.isdigit():
+            channels.append(int(token))
+        i += 1
+    
+    return channels
 
 
 def get_light_rotation_degrees(light_name):
@@ -257,15 +284,22 @@ def group_info_updater(self, context):
         
         self.str_group_id = str(group_id)
         self.str_group_label = group_data.get('label', '')
-        self.list_group_channels = group_data.get('channels', [])
+        channels_list = group_data.get('channels', []) 
+        self.list_group_channels.clear()
+        for chan in channels_list:
+            item = self.list_group_channels.add()
+            item.value = chan
         
     else: 
         group_id = str(group_id)
         if group_id in group_data_dict:
             group_data = group_data_dict[group_id]
             self.str_group_id = str(group_id) 
-            self.str_group_label = group_data.get('label', '')  
-            self.list_group_channels = group_data.get('channels', [])
+            channels_list = group_data.get('channels', []) 
+            self.list_group_channels.clear()
+            for chan in channels_list:
+                item = self.list_group_channels.add()
+                item.value = chan
             
         else:
             self.str_group_id = ""
@@ -290,7 +324,10 @@ def group_info_updater_mixer(self, context):
         self.str_group_id = group_id_str 
         self.str_group_label = group_data.get('label', '')
         channels_list = group_data.get('channels', [])
-        self.list_group_channels = group_data.get('channels', [])
+        self.list_group_channels.clear()
+        for chan in channels_list:
+            item = self.list_group_channels.add()
+            item.value = chan
         
     else:
         self.str_group_id = ""
@@ -307,6 +344,15 @@ def group_info_updater_mixer(self, context):
         elif self.parameters_enum == 'option_pan_tilt':
             self.label=f"Group {self.str_group_id}: {self.str_group_label} Pan/Tilt Mixer"
             
+            
+def manual_fixture_selection_updater(self, context):
+    if self.str_manual_fixture_selection != "":
+            channels_list = parse_channels(self.str_manual_fixture_selection)
+            self.list_group_channels.clear()
+            for chan in channels_list:
+                item = self.list_group_channels.add()
+                item.value = chan
+        
             
 def color_profiles(self, context):
     items = [
@@ -582,9 +628,16 @@ class HarmonizerPublisher(HarmonizerBase):
                 # 
         else: print("Invalid cpvia request found in Sorcerer's send_osc_now.")
         
+        
     def format_channel_and_value(self, c, v):
+        """
+        This function formats the channel and value numbers as string and then formats them
+        in a way the console will understand (by adding a 0 in front of numbers 1-9.)
+        """
         c = str(c[0])
         v = str(int(v[0]))
+        if len(v) == 1:
+            v = f"0{v}"
 
         return c, v
         
@@ -615,16 +668,13 @@ class HarmonizerPublisher(HarmonizerBase):
         else: raise ValueError("Invalid cpvia request found in Sorcerer's form_osc.")
             
             
-class HarmonizerFinders(HarmonizerBase):
+class HarmonizerFinders(HarmonizerBase): ## This must cater to individual fixtures
     def find_my_argument_template(self, parent, p, type):
         if bpy.context.scene.scene_props.console_type_enum == "option_eos":
             if type not in ["Influencer", "Brush"]:
-                if p == "intensity":
-                    return bpy.context.scene.scene_props.str_intensity_argument
-                elif p == "pan":
-                    return bpy.context.scene.scene_props.str_pan_argument
-                elif p == "tilt":
-                    return bpy.context.scene.scene_props.str_tilt_argument
+                return getattr(bpy.context.scene.scene_props, f"str_{p}_argument")
+            else:
+                return getattr(bpy.context.scene.scene_props, f"str_relative_{p}_argument")
     
     
     def find_my_influence(self, parent):
@@ -669,17 +719,14 @@ class HarmonizerFinders(HarmonizerBase):
                 if hasattr(parent, "object_identities_enum"):
                     return parent.object_identities_enum
                 else: sorcerer_assert_unreachable()
-            
-        if hasattr(parent, 'bl_idname'):   
-            controller_types = {
-            'group_controller_type': "group",
-            'mixer_type': "mixer",
-            'pan_tilt_type': "pan_tilt",
-            }
-            print(f"{parent}'s type is: {parent.type}")
-            
-            return controller_types.get(parent.bl_idname, None)
-            
+            elif parent.type == 'COLOR':  # Color strip
+                return "strip"
+            elif parent.type == 'CUSTOM':  
+                controller_types = {
+                'group_controller_type': "group",
+                'mixer_type': "mixer",
+                }
+                return controller_types.get(parent.bl_idname, None)
         else: 
             sorcerer_assert_unreachable()
         
@@ -700,7 +747,6 @@ class HarmonizerFinders(HarmonizerBase):
         """
         try:
             controller_type = self.find_my_controller_type(parent)  # Should return a string.
-            print(f"Controller type is: {controller_type}")
             if controller_type is None:
                 raise ValueError(f"Could not find controller type of {self.name}'s {p}.")
         except ValueError as e:
@@ -737,19 +783,18 @@ class HarmonizerFinders(HarmonizerBase):
                 print(f"Error in finding {parent.name}'s value: {e}")
             c = new_channels + channels_to_restore
             v = add_values + restore_values
-            return c, v
+            return c, v, controller_type
         
         elif controller_type == "Fixture":
-            value = self.find_my_value(parent, p)  # Should return an integer as list.
-            if not isinstance(value, list):
-                raise ValueError(f"Error in finding channel {parent.name}'s values.")
-            return [parent.int_object_channel_index], value, controller_type
+            value = self.find_my_value(parent, p, type)
+            return [parent.int_object_channel_index], [value], controller_type
         
-        elif controller_type == "group":
+        elif controller_type in  ["group", "strip", "Set Piece"]:
             try: 
-                c, v = parent.find_my_group_values(parent, p)  # Should return two lists.
+                c, v = self.find_my_group_values(parent, p)  # Should return two lists.
+                print(c, v)
                 if not isinstance(c, list) or not isinstance(v, list):
-                    raise ValueError(f"Error in mixing group controller {parent.name}'s values.")
+                    raise ValueError(f"Error in finding group controller {parent.name}'s values.")
                 return c, v, controller_type
             except ValueError as e:
                 print(f"Unexpected error in finding group {parent.name}'s values: {e}")
@@ -767,18 +812,6 @@ class HarmonizerFinders(HarmonizerBase):
                 print(f"Unexpected error in finding mixer {parent.name}'s values: {e}")
             except Exception as e:
                 print(f"Error in finding mixer {parent.name}'s values: {e}")
-        
-        elif controller_type == "pan_tilt":
-            try: 
-                mapper = HarmonizerMapper()
-                c, v = mapper.map_my_pan_tilt_values(parent, p)  # Should return two lists.
-                if not isinstance(c, list) or not isinstance(v, list):
-                    raise ValueError(f"Error in mapping pan_tilt controller {parent.name}'s values.")
-                return c, v, controller_type
-            except ValueError as e:
-                print(f"Unexpected error in finding pan/tilt graph {parent.name}'s values: {e}")
-            except Exception as e:
-                print(f"Error in finding pan/tilt graph {parent.name}'s values: {e}")
                     
         else: sorcerer_assert_unreachable()
         
@@ -803,99 +836,103 @@ class HarmonizerFinders(HarmonizerBase):
 
 
     """Recieves a bpy object mesh (parent), and parameter, and returns integers in a [list]
-       This is for objects."""
-    def find_my_value(self, parent, p):
+       This is for single fixtures."""
+    def find_my_value(self, parent, p, type):
         # Use effects to mix up values inside a group, or simply return a single integer
         attribute_name = parameter_mapping.get(p)
         if attribute_name:
-            value = getattr(parent, attribute_name)
-            if p in ["pan", "tilt", "zoom", "gobo_speed"]:
+            unmapped_value = getattr(parent, attribute_name)
+            if p in ["pan", "tilt", "zoom", "gobo_speed", "pan_tilt"]:
                 mapping = HarmonizerMappers()
-                if p == "pan":
-                    value = mapping.map_object_pan(parent, value)
-                elif p == "tilt":
-                    value = mapping.map_object_tilt(parent, value)
-                elif p == "zoom":
-                    value = mapping.map_object_zoom(parent, value)
-                elif p == "gobo_speed":
-                    value = mapping.map_object_gobo_speed(parent, value)
-            return [value]
+                try: 
+                    value = mapping.map_value(parent, p, unmapped_value)
+                    return value
+                except AttributeError:
+                    print("Error in find_my_value when attempting to call map_value.")
+            return unmapped_value
         else:
-            return []
+            return None
 
 
     """Recieves a bpy object mesh (parent), and parameter, and returns two lists for channels list (c) and values list (v)"""
-    def find_my_group_values(parent, p):
+    def find_my_group_values(self, parent, p):
         # Use effects to mix up values inside a group, or simply return a simple value
         channels = []
         values = []
         
         attribute_name = parameter_mapping.get(p)
-        
-        if attribute_name:
+        print(f"ITEMS: {parent.list_group_channels.items()}")
+        if attribute_name:  # Find and map value
             new_value = getattr(parent, attribute_name)
             values.append(new_value)
-        
-        try:
-            channels = parent.list_group_channels
-            if not isinstance(channels, list):
-                raise ValueError(f"Error in finding group's channels.")
-        except AttributeError:
-            print("list_group_channels attribute not found for group.")
+            if p in ["pan", "tilt", "zoom", "gobo_speed", "pan_tilt"]:
+                mapping = HarmonizerMappers()
+                try: 
+                    value = mapping.map_value(parent, p, new_value)
+                except AttributeError:
+                    print("Error in find_my_value when attempting to call map_value.")
+            else: value = new_value
             
-        return channels, values
+        for chan in parent.list_group_channels:
+            channels.append(chan.value)
+             
+        return channels, [value]
 
         
         
 """This should house all logic for mapping sliders and other inputs to fixture-appropriate values"""
-class HarmonizerMappers(HarmonizerBase):
+class HarmonizerMappers(HarmonizerBase): 
+    """
+    Finds the relevant min/max values for a specified parameter p
     
-    def map_pan_tilt_graph(parent, v):
+    Arguments:
+        parent: The parent object/node/strip
+        p: The property type, should be pan, tilt, zoom, gobo_speed, or pan_tilt only
         
-        return mapped_value
-        
-    
-    def map_group_pan(parent, context, v):
-        
-        return mapped_value
-        
-        
-    def map_group_tilt(parent, context, v):
-        
-        return mapped_value
-        
-        
-    def map_group_zoom(parent, context, v):
-        
-        return mapped_value
-        
-    
-    def map_group_gobo_speed(parent, context, v):
-        
-        return mapped_value
-        
-        
-    def map_object_pan(parent, context, v):
-        
-        return mapped_value
-        
-        
-    def map_object_tilt(parent, context, v):
-        
-        return mapped_value
-        
-        
-    def map_object_zoom(parent, context, v):
-        
-        return mapped_value
-        
-    
-    def map_object_gobo_speed(parent, context, v):
-        
-        return mapped_value
-        
-        
-    
+    Returns:
+        min_value, max_value: 2 integers
+    """
+    def find_my_min_max(self, parent, p):  
+        try:
+            min_value = getattr(parent, f"{p}_min")
+            max_value = getattr(parent, f"{p}_max")
+            return min_value, max_value
+        except AttributeError as e:
+            print(f"Error in find_my_min_max: {e}")
+            return None, None
+
+         
+    def map_value(self, parent, p, unmapped_value):
+        min_val, max_val = self.find_my_min_max(parent, p)
+
+        if p in ["pan", "tilt", "zoom", "gobo_speed"]:
+            if min_val <= 0 and max_val >= 0:
+                # Normalizing around zero
+                if unmapped_value == 0:
+                    mapped_value = 0
+                elif unmapped_value > 0:
+                    normalized_value = unmapped_value / 100
+                    mapped_value = normalized_value * max_val
+                else:
+                    normalized_value = unmapped_value / 100
+                    mapped_value = normalized_value * abs(min_val)
+            else:
+                # Non-symmetrical range
+                range_val = max_val - min_val
+                # Map the slider value from -100 to 100 to the min_val to max_val range
+                if unmapped_value >= 0:
+                    normalized_value = unmapped_value / 100
+                    mapped_value = normalized_value * (max_val - min_val) + min_val
+                else:
+                    normalized_value = (unmapped_value + 100) / 200
+                    mapped_value = (normalized_value * (max_val - min_val)) + min_val
+
+            return mapped_value
+        elif p == "pan_tilt":
+            # Insert code for pan/tilt graph mapping here
+            return mapped_value
+        else:
+            raise ValueError("Unknown parameter type")
     
     
 """This should house all logic for mixing values with the mixers"""   
@@ -904,18 +941,43 @@ class HarmonizerMixer(HarmonizerBase):
     """Recieves a bpy object mesh, parent, and returns two lists for channels list (c) and values list (v)"""    
     def mix_my_values(self, parent, p):
         try:
-            channels = parent.list_group_channels
-            if not isinstance(channels, list):
-                raise ValueError(f"Error in finding mixer's channels.")
+            channels_list = parent.list_group_channels
         except AttributeError:
             print("list_group_channels attribute not found for mixer.")
-       
-        sorted_channels = sorted(channels)
-        mixed_values = []
+            return [], []
+        
+        try:
+            values_list = parent.parameters
+        except AttributeError:
+            print("parameters attribute not found for mixer.")
+            return [], []
+        
+        channels = [item.value for item in channels_list]
+        if p == "color":
+            p = "vec_color"
+        parameter_name = f"float_{p}"
+        
+        values = [getattr(choice, parameter_name) for choice in values_list]
 
-        # Need to start on the new mixer system with basically limitless number of choices and all parameter types.
+        # Ensure channels and values are sorted together by channels
+        sorted_channels_values = sorted(zip(channels, values))
+        sorted_channels, sorted_values = zip(*sorted_channels_values)
+        
+        print(f"Input: {sorted_channels}, {sorted_values}")
+        
+        # Create the mixed values by interpolating between the sorted values for each channel
+        if len(sorted_channels) == 1:
+            # If there is only one channel, return its value for all channels
+            mixed_values = [sorted_values[0]] * len(channels)
+        else:
+            # Interpolate values across the sorted channels
+            interpolation_points = np.linspace(sorted_channels[0], sorted_channels[-1], len(channels))
+            mixed_values = np.interp(interpolation_points, sorted_channels, sorted_values)
+        
+        print(f"Output: {channels}, {mixed_values}")
+        
+        return list(channels), list(mixed_values)
 
-        return channels, values
     
 
 def find_node_by_name(node_name):
@@ -986,8 +1048,16 @@ def universal_updater(self, context, property_name, find_function):
             raise ValueError(f"Influence and argument template are required for {p}.")
           
         publisher = HarmonizerPublisher()
-            
-        publisher.send_cpvia(c, p, v, i, a)  # No return value.
+          
+        if len(c) > 1 and len(v) == 1:  # This is for a group
+            for chan in c:
+                publisher.send_cpvia([chan], p, v, i, a)
+        elif len(c) > 1 and len(v) != 1:  # This is for a mixer
+            for chan, value in zip(c, v):
+                publisher.send_cpvia([chan], p, [value], i, a)
+          
+        else:
+            publisher.send_cpvia(c, p, v, i, a)  # No return value.
 
     except ValueError as e:
         print(f"Error in updating {p}: {e}")
@@ -1137,7 +1207,7 @@ class GroupControllerNode(bpy.types.Node):
     
     # Assigned by group_info_updater on str_selected_light property.
     str_group_id: StringProperty(default="1")
-    list_group_channels: StringProperty(default="")
+    list_group_channels: CollectionProperty(type=ChannelListPropertyGroup)
     str_group_label: StringProperty(default="")
     
     # OSC argument templates for properties specific to the fixture type, not scene. For example, strobe, not intensity.
@@ -1172,7 +1242,8 @@ class GroupControllerNode(bpy.types.Node):
     )
     str_manual_fixture_selection: StringProperty(
         name="Selected Lights",
-        description="Instead of the group selector to the left, simply type in what you wish to control here"
+        description="Instead of the group selector to the left, simply type in what you wish to control here",
+        update=manual_fixture_selection_updater
     )
     color_profile_enum: EnumProperty(
         name="Color Profile",
@@ -1230,12 +1301,14 @@ class GroupControllerNode(bpy.types.Node):
             layout.separator()
 
         row = layout.row(align=True)
-        ## Use of row.alert logic here is probably redundant per existing Blender UI rules.
-        if not self.str_selected_light:
-            row.alert = 1
-        row.prop(self, "str_selected_light", text="", icon_only=True, icon='LIGHT')
-        row.alert = 0
+        if self.str_manual_fixture_selection == "":
+            if not self.str_selected_light:
+                row.alert = 1
+            row.prop(self, "str_selected_light", text="", icon_only=False, icon='LIGHT')
+            row.alert = 0
+        row.prop(self, "str_manual_fixture_selection", text="")
         
+        row = layout.row(align=True)
         # Must send identity info to some operators since buttons can be pressed on non-active nodes.
         op_home = row.operator("node.home_group", icon='HOME', text="")
         op_home.node_name = self.name
@@ -1249,7 +1322,7 @@ class GroupControllerNode(bpy.types.Node):
             row_one = row.column(align=True)
             row_one.scale_x = 1
             op = row_one.operator("my.view_strobe_props", icon='OUTLINER_OB_LIGHTPROBE', text="")
-            op.node_name = self.name
+            op.space_type = "node_editor"
     
         if self.color_is_on:
             sub = row.column(align=True)
@@ -1264,14 +1337,14 @@ class GroupControllerNode(bpy.types.Node):
         if self.pan_tilt_is_on:
             row = layout.row(align=True)
             op = row.operator("my.view_pan_tilt_props", icon='ORIENTATION_GIMBAL', text="")
-            op.node_name = self.name
+            op.space_type = "node_editor"
             row.prop(self, "float_pan", text="Pan", slider=True)
             row.prop(self, "float_tilt", text="Tilt", slider=True)
         
         if self.zoom_is_on or self.iris_is_on:
             row = layout.row(align=True)
             op = row.operator("my.view_zoom_iris_props", text="", icon='LINCURVE')
-            op.node_name = self.name
+            op.space_type = "node_editor"
             
             if self.zoom_is_on:
                 row.prop(self, "float_zoom", slider=True, text="Zoom:")
@@ -1281,7 +1354,7 @@ class GroupControllerNode(bpy.types.Node):
         if self.edge_is_on or self.diffusion_is_on:
             row = layout.row(align=True)
             op = row.operator("my.view_edge_diffusion_props", text="", icon='SELECT_SET')
-            op.node_name = self.name
+            op.space_type = "node_editor"
             
             if self.edge_is_on:
                 row.prop(self, "float_edge", slider=True, text="Edge:")
@@ -1291,7 +1364,7 @@ class GroupControllerNode(bpy.types.Node):
         if self.gobo_id_is_on:
             row = layout.row(align=True)
             op = row.operator("my.view_gobo_props", text="", icon='POINTCLOUD_DATA')
-            op.node_name = self.name
+            op.space_type = "node_editor"
             
             row.prop(self, "int_gobo_id", text="Gobo:")
             row.prop(self, "float_gobo_speed", slider=True, text="Speed:")
@@ -1344,7 +1417,7 @@ class MixerNode(bpy.types.Node):
     parameters: CollectionProperty(type=MixerParameters)
     
     str_group_id: StringProperty(default="1")
-    list_group_channels: StringProperty(default="")
+    list_group_channels: CollectionProperty(type=ChannelListPropertyGroup)
     str_group_label: StringProperty(default="")
     
     collapse_most: BoolProperty(default=False)
@@ -1374,7 +1447,8 @@ class MixerNode(bpy.types.Node):
     )
     str_manual_fixture_selection: StringProperty(
         name="Selected Lights",
-        description="Instead of the group selector to the left, simply type in what you wish to control here"
+        description="Instead of the group selector to the left, simply type in what you wish to control here",
+        update=manual_fixture_selection_updater
     )
     influence: IntProperty(default=1, min=1, max=10, description="How many votes this controller has when there are conflicts", options={'ANIMATABLE'})
 
@@ -1468,6 +1542,7 @@ class LightingModifier(bpy.types.PropertyGroup):
 # REGISTRATION
 ###################
 classes = (
+    ChannelListPropertyGroup,
     MixerInputSocket,
     MixerOutputSocket,
     MasterOutputSocket,
@@ -1479,11 +1554,13 @@ classes = (
     GroupControllerNode,
     MixerParameters,
     MixerNode,
-    LightingModifier,
+    LightingModifier
 )
 
     
 def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
     
     ##################################################################################
     '''Registering the object props directly on object to preserve self-association'''
@@ -1551,6 +1628,12 @@ def register():
         description="Choose an identity for the object",
         items=object_identities,
     )
+    
+    # Assigned by group_info_updater on str_selected_light property.
+    bpy.types.Object.str_group_id = StringProperty(default="1")
+    bpy.types.Object.list_group_channels = CollectionProperty(type=ChannelListPropertyGroup)
+    bpy.types.Object.str_group_label = StringProperty(default="")
+    
     bpy.types.Object.float_intensity = FloatProperty(
         name="Intensity",
         default=0.0,
@@ -1678,6 +1761,39 @@ def register():
         update=prism_updater
     )
     
+    bpy.types.Object.pan_min = IntProperty(
+        default=-270, 
+        description="Minimum value for pan"
+    )
+    bpy.types.Object.pan_max = IntProperty(
+        default=270, 
+        description="Maximum value for pan"
+    )
+    bpy.types.Object.tilt_min = IntProperty(
+        default=-135, 
+        description="Minimum value for tilt"
+    )
+    bpy.types.Object.tilt_max = IntProperty(
+        default=135, 
+        description="Maximum value for tilt"
+    )
+    bpy.types.Object.zoom_min = IntProperty(
+        default=1, 
+        description="Minimum value for zoom"
+    )
+    bpy.types.Object.zoom_max = IntProperty(
+        default=100, 
+        description="Maximum value for zoom"
+    )
+    bpy.types.Object.gobo_speed_min = IntProperty(
+        default=-200, 
+        description="Minimum value for speed"
+    )
+    bpy.types.Object.gobo_speed_max = IntProperty(
+        default=200, 
+        description="Maximum value for speed"
+    )
+    
     
 
 
@@ -1721,7 +1837,8 @@ def register():
     bpy.types.Object.mute = BoolProperty(default=False, description="Mute this object's OSC output")
     bpy.types.Object.str_manual_fixture_selection = StringProperty(
         name="Selected Light",
-        description="Instead of the group selector to the left, simply type in what you wish to control here"
+        description="Instead of the group selector to the left, simply type in what you wish to control here",
+        update=manual_fixture_selection_updater
     )
     bpy.types.Object.str_call_fixtures_command = StringProperty(
         name="Call Fixtures Command",
@@ -1743,7 +1860,8 @@ def register():
     # For animation strips in sequencer
     bpy.types.ColorSequence.str_manual_fixture_selection = StringProperty(
         name="Selected Lights",
-        description="Instead of the group selector to the left, simply type in what you wish to control here"
+        description="Instead of the group selector to the left, simply type in what you wish to control here",
+        update=manual_fixture_selection_updater
     )
     bpy.types.ColorSequence.str_selected_light = EnumProperty(
         name="Selected Group",
@@ -1751,6 +1869,17 @@ def register():
         items=lamp_objects,
         update=group_info_updater
     )
+    bpy.types.ColorSequence.color_profile_enum = EnumProperty(
+        name="Color Profile",
+        description="Choose a color profile for the group",
+        items=color_profiles,
+    )
+
+    # Assigned by group_info_updater on str_selected_light property.
+    bpy.types.ColorSequence.str_group_id =  StringProperty(default="1")
+    bpy.types.ColorSequence.list_group_channels = CollectionProperty(type=ChannelListPropertyGroup)
+    bpy.types.ColorSequence.str_group_label = StringProperty(default="")
+    
     bpy.types.ColorSequence.influence = IntProperty(default=1, min=1, max=10, description="How many votes this controller has when there are conflicts", options={'ANIMATABLE'})
     bpy.types.ColorSequence.float_intensity = FloatProperty(default=0, min=0, max=100, description="Intensity value", options={'ANIMATABLE'}, update=intensity_updater)
     bpy.types.ColorSequence.float_vec_color = FloatVectorProperty(
@@ -1773,6 +1902,39 @@ def register():
     bpy.types.ColorSequence.int_gobo_id = IntProperty(default=1, min=0, max=20, description="Gobo selection", options={'ANIMATABLE'}, update=gobo_id_updater)
     bpy.types.ColorSequence.float_gobo_speed = FloatProperty(default=0, min=-100, max=100, description="Rotation of individual gobo speed", options={'ANIMATABLE'}, update=gobo_speed_updater)
     bpy.types.ColorSequence.int_prism = IntProperty(default=0, min=0, max=1, description="Prism value. 1 is on, 0 is off", options={'ANIMATABLE'}, update=prism_updater)
+    
+    bpy.types.ColorSequence.pan_min = IntProperty(
+        default=-270, 
+        description="Minimum value for pan"
+    )
+    bpy.types.ColorSequence.pan_max = IntProperty(
+        default=270, 
+        description="Maximum value for pan"
+    )
+    bpy.types.ColorSequence.tilt_min = IntProperty(
+        default=-135, 
+        description="Minimum value for tilt"
+    )
+    bpy.types.ColorSequence.tilt_max = IntProperty(
+        default=135, 
+        description="Maximum value for tilt"
+    )
+    bpy.types.ColorSequence.zoom_min = IntProperty(
+        default=1, 
+        description="Minimum value for zoom"
+    )
+    bpy.types.ColorSequence.zoom_max = IntProperty(
+        default=100, 
+        description="Maximum value for zoom"
+    )
+    bpy.types.ColorSequence.speed_min = IntProperty(
+        default=-200, 
+        description="Minimum value for speed"
+    )
+    bpy.types.ColorSequence.speed_max = IntProperty(
+        default=200, 
+        description="Maximum value for speed"
+    )
     
     bpy.types.ColorSequence.influence_is_on = BoolProperty(default=False, description="Influence is enabled when checked")
     bpy.types.ColorSequence.intensity_is_on = BoolProperty(default=False, description="Intensity is enabled when checked")
@@ -1821,9 +1983,6 @@ def register():
     bpy.types.ColorSequence.float_flash_zoom_down = FloatProperty(default=0, min=0, max=100, description="Zoom value", update=zoom_updater)
     bpy.types.ColorSequence.float_flash_iris_down = FloatProperty(default=0, min=0, max=100, description="Iris value", update=iris_updater)
     bpy.types.ColorSequence.int_flash_gobo_id_down = IntProperty(default=1, min=0, max=20, description="Gobo selection", update=gobo_id_updater)
-    
-    for cls in classes:
-        bpy.utils.register_class(cls)
         
     bpy.types.Scene.lighting_modifiers = CollectionProperty(type=LightingModifier)
     bpy.types.Scene.active_modifier_index = IntProperty(default=-1)
