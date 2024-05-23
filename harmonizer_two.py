@@ -24,13 +24,6 @@
 '''
 
 
-'''
-=====================================================================
-This is the third major iteration of the harmonizer. It is not yet
-complete. It will replace the entire existing harmonizer.py.
-=====================================================================
-'''
-
 ## Double hashtag indicates notes for future development requiring some level of attention
 
 
@@ -51,6 +44,13 @@ import mathutils
 from functools import partial
 import inspect
 import numpy as np
+import logging
+    
+    
+logging.basicConfig(
+    level=logging.ERROR,
+    format='%(asctime)s - %(levelname)s - %(module)s - line %(lineno)d - %(message)s'
+)
 
 change_requests = []
 stored_channels = set()
@@ -379,194 +379,6 @@ def object_identities(self, context):
     
     return items
 
-        
-###################
-# COLOR CONVERTERS
-###################
-def calculate_closeness(rgb_input, target_rgb, sensitivity=1.0):
-    diff = sum(abs(input_c - target_c) for input_c, target_c in zip(rgb_input, target_rgb))
-    normalized_diff = diff / (300 * sensitivity)
-    closeness_score = max(0, min(1, 1 - normalized_diff))
-    return closeness_score
-
-
-def rgb_converter(scene, red, green, blue):
-    return red, green, blue
-    
-        
-def rgba_converter(scene, red, green, blue):
-    # Calculate the influence of red and the lack of green on the amber component.
-    red_influence = red / 100
-    green_deficit = 1 - abs(green - 50) / 50
-    amber_similarity = red_influence * green_deficit
-    white_similarity = min(red, green, blue) / 100
-    
-    if amber_similarity > white_similarity:
-        amber = round(amber_similarity * 100)
-    else:
-        amber = round(75 * white_similarity)
-        
-    return red, green, blue, amber
-
-    
-def rgbw_converter(scene, red, green, blue):
-    white_similarity = min(red, green, blue) / 100
-    white_peak = 75 + (25 * white_similarity)  # Peaks at 100 for pure white.
-
-    white = round(white_peak * white_similarity)
-    
-    return red, green, blue, white
-
-
-def rgbaw_converter(scene, red, green, blue, amber_sensitivity=1.0, white_sensitivity=1.0):
-    # Define pure color values for comparison
-    pure_colors = {
-        'amber': (100, 50, 0),
-        'white': (100, 100, 100),
-        'red': (100, 0, 0),
-        'green': (0, 100, 0),
-        'blue': (0, 0, 100)
-    }
-    
-    # Calculate closeness scores for each target color, specifying sensitivity where needed.
-    scores = {}
-    for color, rgb in pure_colors.items():
-        if color == 'amber':
-            scores[color] = calculate_closeness((red, green, blue), rgb, amber_sensitivity)
-        elif color == 'white':
-            scores[color] = calculate_closeness((red, green, blue), rgb, white_sensitivity)
-        else:
-            scores[color] = calculate_closeness((red, green, blue), rgb)
-            
-    amber = round(scores['amber'] * 100)
-    white = round(scores['white'] * 100)
-
-    return red, green, blue, amber, white
-
-
-def rgbl_converter(scene, red, green, blue):
-    lime = 0
-    
-    # Lime peaks at 100 for yellow (100, 100, 0) and white (100, 100, 100).
-    if red == 100 and green == 100:
-        lime = 100
-    # For other combinations, calculate lime based on the lesser of red and green, but only if blue is not dominant.
-    elif blue < red and blue < green:
-        lime = round((min(red, green) / 100) * 100)
-    
-    return red, green, blue, lime
-
-
-def rgbam_converter(scene, red, green, blue):
-    # Handle exact targets with conditional logic.
-    if (red, green, blue) == (0, 0, 0):  # Black
-        amber, mint = 0, 0
-    elif (red, green, blue) == (100, 0, 0):  # Pure Red
-        amber, mint = 0, 0
-    elif (red, green, blue) == (0, 100, 0):  # Pure Green
-        amber, mint = 0, 0
-    elif (red, green, blue) == (0, 0, 100):  # Pure Blue
-        amber, mint = 0, 0
-    elif (red, green, blue) == (100, 100, 100):  # White
-        amber, mint = 100, 100
-    elif (red, green, blue) == (58, 100, 14):  # Specific Mint Peak
-        amber, mint = 0, 100
-    elif (red, green, blue) == (100, 50, 0):  # Specific Amber Peak
-        amber, mint = 100, 0
-    else:
-        proximity_to_white = min(red, green, blue) / 100
-        amber = round(100 * proximity_to_white)
-        mint = round(100 * proximity_to_white)
-        
-        # Adjust for proximity to the specific mint peak color.
-        if green == 100 and red > 0 and blue > 0:
-            mint_peak_proximity = min(red / 58, blue / 14)
-            mint = round(100 * mint_peak_proximity)
-    
-    return red, green, blue, amber, mint
-
-
-def cmy_converter(scene, red, green, blue):
-    # Define a tolerance for near-maximum RGB values to treat them as 1.
-    tolerance = 0.01
-    red_scaled = red / 100.0
-    green_scaled = green / 100.0
-    blue_scaled = blue / 100.0
-
-    # Apply the tolerance to treat near-maximum values as 1.
-    cyan = int((1 - min(red_scaled + tolerance, 1)) * 100)
-    magenta = int((1 - min(green_scaled + tolerance, 1)) * 100)
-    yellow = int((1 - min(blue_scaled + tolerance, 1)) * 100)
-
-    return cyan, magenta, yellow
-
-
-###################
-# MIXER LOGIC
-###################
-def interpolate(value_start, value_end, steps):
-    return [value_start + x * (value_end - value_start) / (steps - 1) for x in range(steps)]
-
-
-def calculate_mixed_values(channel_list, mode, value_one, value_two, value_three):
-    if isinstance(channel_list, str):
-        channel_list = [int(chan.strip()) for chan in channel_list.split(',') if chan.strip().isdigit()]
-    
-    elif all(isinstance(chan, bpy.types.Object) for chan in channel_list):
-        channel_list = sorted(channel_list, key=lambda obj: obj.name)
-        channel_list = [obj.name for obj in channel_list]
-    else:
-        channel_list = sorted(channel_list)
-   
-    sorted_channels = sorted(channel_list)
-    mixed_values = []
-
-    if value_two is None and mode == "alternate":
-        # Alternating between value_one and value_three for each channel.
-        for counter, chan in enumerate(sorted_channels, start=1):
-            chan_value = value_three if counter % 2 == 0 else value_one
-            mixed_values.append((chan, chan_value))
-
-    elif value_two is None:
-        # Interpolating between value_one and value_three for the channel list.
-        num_channels = len(sorted_channels)
-        for index, chan in enumerate(sorted_channels):
-            ratio = index / (num_channels - 1) if num_channels > 1 else 0
-            chan_value = ((1 - ratio) * value_one + ratio * value_three)
-            mixed_values.append((chan, chan_value))
-
-    else:
-            num_channels = len(sorted_channels)
-            mid_index = num_channels // 2
-
-            for index, chan in enumerate(sorted_channels):
-                if num_channels % 2 == 1:  # If odd number of channels.
-                    if index == mid_index:
-                        chan_value = value_two
-                    elif index < mid_index:
-                        # Interpolate between value_one and value_two.
-                        ratio = index / mid_index
-                        chan_value = (1 - ratio) * value_one + ratio * value_two
-                    else:
-                        # Interpolate between value_two and value_three.
-                        ratio = (index - mid_index) / mid_index
-                        chan_value = (1 - ratio) * value_two + ratio * value_three
-                else:  # If even number of channels, treat the two middle indices as value_two.
-                    if index == mid_index or index == mid_index - 1:
-                        chan_value = value_two
-                    elif index < mid_index:
-                        # Interpolate between value_one and value_two.
-                        ratio = index / (mid_index - 1)
-                        chan_value = (1 - ratio) * value_one + ratio * value_two
-                    else:
-                        # Interpolate between value_two and value_three.
-                        ratio = (index - mid_index) / (mid_index - 1)
-                        chan_value = (1 - ratio) * value_two + ratio * value_three
-
-                mixed_values.append((chan, chan_value))
-
-    return mixed_values
-
 
 class HarmonizerBase:
     INFLUENCER = 'influencer'
@@ -579,6 +391,74 @@ class HarmonizerBase:
 class HarmonizerPublisher(HarmonizerBase):
     def __init__(self):
         self.change_requests = []
+          
+        
+    def format_channel_and_value(self, c, v):
+        """
+        This function formats the channel and value numbers as string and then formats them
+        in a way the console will understand (by adding a 0 in front of numbers 1-9.)
+        """
+        c = str(c)
+        v = str(int(v))
+        if len(v) == 1:
+            v = f"0{v}"
+
+        return c, v
+    
+    
+    def format_channel(self, c):
+        c = str(c)
+
+        return c
+    
+
+    def format_value(self, v):
+        """
+        This function formats the channel and value numbers as string and then formats them
+        in a way the console will understand (by adding a 0 in front of numbers 1-9.)
+        """
+        v = str(int(v))
+        if len(v) == 1:
+            v = f"0{v}"
+        return v
+        
+        
+    def form_osc(self, c, p, v, i, a):
+        """
+        This function converts cpvia into (address, argument) tuples.
+
+        Parameters:
+        cpvia: channel, parameter, value, influence, argument template.
+
+        Returns:
+        messages: A list of (address, argument) tuples.
+        """
+        address = bpy.context.scene.scene_props.str_command_line_address
+
+        color_profiles = {
+            "option_rgb": ["$1", "$2", "$3"],
+            "option_cmy": ["$1", "$2", "$3"],
+            "option_rgbw": ["$1", "$2", "$3", "$4"],
+            "option_rgba": ["$1", "$2", "$3", "$4"],
+            "option_rgbl": ["$1", "$2", "$3", "$4"],
+            "option_rgbaw": ["$1", "$2", "$3", "$4", "$5"],
+            "option_rgbam": ["$1", "$2", "$3", "$4", "$5"]
+        }
+        if p not in color_profiles:
+            c, v = self.format_channel_and_value(c, v)
+            address = address.replace("#", c).replace("$", v)
+            argument = a.replace("#", c).replace("$", v)
+        else:
+            formatted_values = [self.format_value(val) for val in v]
+
+            c = self.format_channel(c)
+            argument = a.replace("#", c)
+            
+            for i, fv in enumerate(formatted_values):
+                argument = argument.replace(color_profiles[p][i], str(fv))
+
+        return address, argument
+    
     
     def send_cpvia(self, c, p, v, i, a):
         """
@@ -589,299 +469,16 @@ class HarmonizerPublisher(HarmonizerBase):
 
         This function does not return a value.
         """
-        if c and p and v and i and a:
-            self.add_change_request(c, p, v, i, a) if bpy.context.scene.scene_props.is_playing else self.send_osc_now(c, p, v, i, a)
-        else: print("Invalid cpvia request found in Sorcerer.")
-         
-    def add_change_request(self, c, p, v, i, a):
-        """
-        This function creates a change request that will later be harmonized with against other change requests.
-
-        Parameters:
-        cpvia: channel, parameter, value, influence, argument template.
-
-        This function does not return a value. It appends a change request to change_requests.
-        """
-        if c and p and v and i and a:
-            self.change_requests.append(c, p, v, i, a)
-        else: print("Invalid cpvia request found in Sorcerer's add_change_request.")
-          
-    def send_osc_now(self, c, p, v, i, a):
-        """
-        This function creates a list of (address, argument) tuples, each tuple to be separately passed to the send_osc() function.
-
-        Parameters:
-        cpvia: channel, parameter, value, influence, argument template.
-
-        This function does not return a value.
-        """
-        if c and p and v and i and a:
-            try: 
-                address, argument = self.form_osc(c, p, v, i, a)  # Should return 2 strings
-                if not isinstance(address, str) or not isinstance(argument, str):
-                    raise ValueError("Invalid address and argument.")
-            except ValueError as e:
-                print(f"Error in finding address or argument: {e}")
-            except Exception as e:
-                print(f"Unexpected error in finding address or argument: {e}")
-            send_osc(address, argument)
-                # 
-        else: print("Invalid cpvia request found in Sorcerer's send_osc_now.")
-        
-        
-    def format_channel_and_value(self, c, v):
-        """
-        This function formats the channel and value numbers as string and then formats them
-        in a way the console will understand (by adding a 0 in front of numbers 1-9.)
-        """
-        c = str(c[0])
-        v = str(int(v[0]))
-        if len(v) == 1:
-            v = f"0{v}"
-
-        return c, v
-        
-        
-    def form_osc(self, c, p, v, i, a):
-        """
-        This function converts cpvia into (address, argument) tuples
-
-        Parameters:
-        cpvia: channel, parameter, value, influence, argument template.
-
-        Returns:
-        messages: A list of (address, argument) tuples.
-        """  
-        if c and p and v and i and a:
-            try:
-                address = bpy.context.scene.scene_props.str_command_line_address
-                if not address or not isinstance(address, str):
-                    raise ValueError("Invalid address template.")
-            except ValueError as e:
-                print(f"Error in address template: {e}")
-            except Exception as e:
-                print(f"Unexpected error in address template: {e}")
-            c, v = self.format_channel_and_value(c, v)
-            address = address.replace("#", c).replace("$", v)
-            argument = a.replace("#", c).replace("$", v)
-            return address, argument
-        else: raise ValueError("Invalid cpvia request found in Sorcerer's form_osc.")
-            
-            
-class HarmonizerFinders(HarmonizerBase): ## This must cater to individual fixtures
-    def find_my_argument_template(self, parent, p, type):
-        if bpy.context.scene.scene_props.console_type_enum == "option_eos":
-            if type not in ["Influencer", "Brush"]:
-                return getattr(bpy.context.scene.scene_props, f"str_{p}_argument")
-            else:
-                return getattr(bpy.context.scene.scene_props, f"str_relative_{p}_argument")
-    
-    
-    def find_my_influence(self, parent):
-        return parent.influence
-    
-    
-    def find_my_properties(self, parent, p, type):
-        """
-        Finds the influence and the argument templates using self.
-        
-        Returns:
-        This function returns influence (i) as an integer and argument (a) as a string.
-        """  
-        try:
-            i = self.find_my_influence(parent)  # Should return an integer.
-            if not isinstance(i, int):
-                raise ValueError("Influence must be an integer.")
-            a = self.find_my_argument_template(parent, p, type)  # Should return a string.
-            if not isinstance(a, str):
-                raise ValueError("Argument template must be a string.")     
-            return i, a
-        
-        except ValueError as e:
-            print(f"Error in finding influence or template: {e}")
-
-        except Exception as e:
-            print(f"Unexpected error in finding influence or template: {e}")
-            
-            
-    def find_my_controller_type(self, parent):
-        """
-        Function called by find_my_channels_and_[parameter values] functions to find controller type.
-
-        Parameters:
-        parent: The object from which this function is called. Should only be a mesh or known node type.
-        
-        Returns:
-        type: The controller type in string, to be used to determine how to find channel list.
-        """    
-        if hasattr(parent, "type"):
-            if parent.type == 'MESH':
-                if hasattr(parent, "object_identities_enum"):
-                    return parent.object_identities_enum
-                else: sorcerer_assert_unreachable()
-            elif parent.type == 'COLOR':  # Color strip
-                return "strip"
-            elif parent.type == 'CUSTOM':  
-                controller_types = {
-                'group_controller_type': "group",
-                'mixer_type': "mixer",
-                }
-                return controller_types.get(parent.bl_idname, None)
-        else: 
-            sorcerer_assert_unreachable()
-        
-        
-    def find_my_channels_and_values(self, parent, p):
-        """
-        Intensity updater function called from universal_updater that returns 2 lists for channels and values,
-        as well as the controller type for use when building the osc argument
-
-        Parameters:
-        self: The object from which this function is called.
-        p: Parameter.
-        
-        Returns:
-        c: Channel list
-        v: Values list
-        type: Controller type
-        """
-        try:
-            controller_type = self.find_my_controller_type(parent)  # Should return a string.
-            if controller_type is None:
-                raise ValueError(f"Could not find controller type of {self.name}'s {p}.")
-        except ValueError as e:
-            print(f"Error in finding controller type for {p}: {e}")
-            return None, None
-        except Exception as e:
-            print(f"Unexpected error in finding controller type for {p}: {e}")
-            return None, None
-        
-        if controller_type in ["Influencer", "Brush"]:
-            try:  # Find channels.
-                current_channels = parent.find_influencer_current_channels(parent)  # Should return a list.
-                if not isinstance(current_channels, list):
-                    raise ValueError(f"Error in finding influencer {parent.name}'s new channels.")
-                channels_to_restore, channels_to_add = find_influencer_channels_to_change(parent, current_channels)  # Should return a list
-                if not isinstance(channels_to_restore, list) or not isinstance(channels_to_add, list):
-                    raise ValueError(f"Error in finding influencer {parent.name}'s channels to restore or add.")
-            except ValueError as e:
-                print(f"Error in updating {p}: {e}")
-                return None, None
-            except Exception as e:
-                print(f"Unexpected error in updating {p}: {e}")
-                return None, None
-            try:  # Find intensities.
-                add_value = parent.find_my_value(parent, p)  # Should return a list with just one [integer].
-                if not isinstance(add_value, list):
-                    raise ValueError(f"Error in finding influencer {parent.name}'s new values.")
-                restore_values = parent.find_my_restore_values(parent, p)
-                if not isinstance(restore_values, list):
-                    raise ValueError(f"Error in finding influencer {parent.name}'s restore values.")
-            except ValueError as e:
-                print(f"Unexpected error in finding {parent.name}'s value: {e}")
-            except Exception as e:
-                print(f"Error in finding {parent.name}'s value: {e}")
-            c = new_channels + channels_to_restore
-            v = add_values + restore_values
-            return c, v, controller_type
-        
-        elif controller_type == "Fixture":
-            value = self.find_my_value(parent, p, type)
-            return [parent.int_object_channel_index], [value], controller_type
-        
-        elif controller_type in  ["group", "strip", "Set Piece"]:
-            try: 
-                c, v = self.find_my_group_values(parent, p)  # Should return two lists.
-                print(c, v)
-                if not isinstance(c, list) or not isinstance(v, list):
-                    raise ValueError(f"Error in finding group controller {parent.name}'s values.")
-                return c, v, controller_type
-            except ValueError as e:
-                print(f"Unexpected error in finding group {parent.name}'s values: {e}")
-            except Exception as e:
-                print(f"Error in finding group {parent.name}'s values: {e}")
-        
-        elif controller_type == "mixer":
-            try: 
-                mixing = HarmonizerMixer()
-                c, v = mixing.mix_my_values(parent, p)  # Should return two lists.
-                if not isinstance(c, list) or not isinstance(v, list):
-                    raise ValueError(f"Error in mixing group controller {parent.name}'s values.")
-                return c, v, controller_type
-            except ValueError as e:
-                print(f"Unexpected error in finding mixer {parent.name}'s values: {e}")
-            except Exception as e:
-                print(f"Error in finding mixer {parent.name}'s values: {e}")
-                    
-        else: sorcerer_assert_unreachable()
-        
-        
-    """Recieves a bpy object mesh, parent, and returns a list representing channels within that mesh"""
-    def find_influencer_current_channels(parent):
-        # Use the get_lights_within_mesh function in the library to get channels, then add them to its captured_set().
-        return current_channels
-        
-        
-    """Recieves a bpy object mesh (parent), and returns two lists representing channels that used to be 
-       within that mesh but just left, as well as new additions."""   
-    def find_influencer_channels_to_change(parent, current_channels, context):
-        # Compare current channels with the object's captured_set()
-        return channels_to_restore, channels_to_add
-        
-        
-    """Recieves a bpy object mesh (parent), and parameter, and returns a list of restore values"""
-    def find_my_restore_values(channels_to_restore, p, context):
-        # Use the background property registered on the objects to restore.
-        return restore_values
-
-
-    """Recieves a bpy object mesh (parent), and parameter, and returns integers in a [list]
-       This is for single fixtures."""
-    def find_my_value(self, parent, p, type):
-        # Use effects to mix up values inside a group, or simply return a single integer
-        attribute_name = parameter_mapping.get(p)
-        if attribute_name:
-            unmapped_value = getattr(parent, attribute_name)
-            if p in ["pan", "tilt", "zoom", "gobo_speed", "pan_tilt"]:
-                mapping = HarmonizerMappers()
-                try: 
-                    value = mapping.map_value(parent, p, unmapped_value)
-                    return value
-                except AttributeError:
-                    print("Error in find_my_value when attempting to call map_value.")
-            return unmapped_value
+        if bpy.context.scene.scene_props.is_playing:
+            self.change_requests.append(c, p, v, i, a)  
         else:
-            return None
-
-
-    """Recieves a bpy object mesh (parent), and parameter, and returns two lists for channels list (c) and values list (v)"""
-    def find_my_group_values(self, parent, p):
-        # Use effects to mix up values inside a group, or simply return a simple value
-        channels = []
-        values = []
-        
-        attribute_name = parameter_mapping.get(p)
-        print(f"ITEMS: {parent.list_group_channels.items()}")
-        if attribute_name:  # Find and map value
-            new_value = getattr(parent, attribute_name)
-            values.append(new_value)
-            if p in ["pan", "tilt", "zoom", "gobo_speed", "pan_tilt"]:
-                mapping = HarmonizerMappers()
-                try: 
-                    value = mapping.map_value(parent, p, new_value)
-                except AttributeError:
-                    print("Error in find_my_value when attempting to call map_value.")
-            else: value = new_value
-            
-        for chan in parent.list_group_channels:
-            channels.append(chan.value)
-             
-        return channels, [value]
-
+            address, argument = self.form_osc(c, p, v, i, a)  # Should return 2 strings
+            print(argument)
+            send_osc(address, argument)
         
         
 """This should house all logic for mapping sliders and other inputs to fixture-appropriate values"""
-class HarmonizerMappers(HarmonizerBase): 
+class HarmonizerMappers(HarmonizerBase):
     """
     Finds the relevant min/max values for a specified parameter p
     
@@ -902,7 +499,7 @@ class HarmonizerMappers(HarmonizerBase):
             return None, None
 
          
-    def map_value(self, parent, p, unmapped_value):
+    def map_value(self, parent, chan, p, unmapped_value):  ## This needs to use find my patch function
         min_val, max_val = self.find_my_min_max(parent, p)
 
         if p in ["pan", "tilt", "zoom", "gobo_speed"]:
@@ -940,19 +537,10 @@ class HarmonizerMixer(HarmonizerBase):
     
     """Recieves a bpy object mesh, parent, and returns two lists for channels list (c) and values list (v)"""    
     def mix_my_values(self, parent, p):
-        try:
-            channels_list = parent.list_group_channels
-        except AttributeError:
-            print("list_group_channels attribute not found for mixer.")
-            return [], []
-        
-        try:
-            values_list = parent.parameters
-        except AttributeError:
-            print("parameters attribute not found for mixer.")
-            return [], []
-        
+        channels_list = parent.list_group_channels
+        values_list = parent.parameters
         channels = [item.value for item in channels_list]
+        mode = p
         if p == "color":
             p = "vec_color"
         parameter_name = f"float_{p}"
@@ -963,8 +551,6 @@ class HarmonizerMixer(HarmonizerBase):
         sorted_channels_values = sorted(zip(channels, values))
         sorted_channels, sorted_values = zip(*sorted_channels_values)
         
-        print(f"Input: {sorted_channels}, {sorted_values}")
-        
         # Create the mixed values by interpolating between the sorted values for each channel
         if len(sorted_channels) == 1:
             # If there is only one channel, return its value for all channels
@@ -972,17 +558,405 @@ class HarmonizerMixer(HarmonizerBase):
         else:
             # Interpolate values across the sorted channels
             interpolation_points = np.linspace(sorted_channels[0], sorted_channels[-1], len(channels))
-            mixed_values = np.interp(interpolation_points, sorted_channels, sorted_values)
+            if mode == "color":
+                # Prepare arrays for each color component
+                reds = [color[0] for color in sorted_values]
+                greens = [color[1] for color in sorted_values]
+                blues = [color[2] for color in sorted_values]
+                
+                # Interpolate each color component separately
+                mixed_reds = np.interp(interpolation_points, sorted_channels, reds)
+                mixed_greens = np.interp(interpolation_points, sorted_channels, greens)
+                mixed_blues = np.interp(interpolation_points, sorted_channels, blues)
+                
+                # Combine interpolated components back into simple tuples
+                mixed_values = [(r * 100, g * 100, b * 100) for r, g, b in zip(mixed_reds, mixed_greens, mixed_blues)]
+            
+            else:
+                mixed_values = np.interp(interpolation_points, sorted_channels, sorted_values)
         
-        print(f"Output: {channels}, {mixed_values}")
+        p = [p for _ in channels]
         
-        return list(channels), list(mixed_values)
-
+        return list(channels), p, list(mixed_values)
     
+    
+class ColorSplitter(HarmonizerBase):
+    def calculate_closeness(self, rgb_input, target_rgb, sensitivity=1.0):
+        diff = sum(abs(input_c - target_c) for input_c, target_c in zip(rgb_input, target_rgb))
+        normalized_diff = diff / (300 * sensitivity)
+        closeness_score = max(0, min(1, 1 - normalized_diff))
+        return closeness_score
+
+
+    def rgb_converter(self, red, green, blue):
+        return red, green, blue
+        
+            
+    def rgba_converter(self, red, green, blue):
+        # Calculate the influence of red and the lack of green on the amber component.
+        red_influence = red / 100
+        green_deficit = 1 - abs(green - 50) / 50
+        amber_similarity = red_influence * green_deficit
+        white_similarity = min(red, green, blue) / 100
+        
+        if amber_similarity > white_similarity:
+            amber = round(amber_similarity * 100)
+        else:
+            amber = round(75 * white_similarity)
+            
+        return red, green, blue, amber
+
+        
+    def rgbw_converter(self, red, green, blue):
+        white_similarity = min(red, green, blue) / 100
+        white_peak = 75 + (25 * white_similarity)  # Peaks at 100 for pure white.
+
+        white = round(white_peak * white_similarity)
+        
+        return red, green, blue, white
+
+
+    def rgbaw_converter(self, red, green, blue):
+        amber_sensitivity=1.0
+        white_sensitivity=1.0
+        
+        # Define pure color values for comparison
+        pure_colors = {
+            'amber': (100, 50, 0),
+            'white': (100, 100, 100),
+            'red': (100, 0, 0),
+            'green': (0, 100, 0),
+            'blue': (0, 0, 100)
+        }
+        
+        # Calculate closeness scores for each target color, specifying sensitivity where needed.
+        scores = {}
+        for color, rgb in pure_colors.items():
+            if color == 'amber':
+                scores[color] = calculate_closeness((red, green, blue), rgb, amber_sensitivity)
+            elif color == 'white':
+                scores[color] = calculate_closeness((red, green, blue), rgb, white_sensitivity)
+            else:
+                scores[color] = calculate_closeness((red, green, blue), rgb)
+                
+        amber = round(scores['amber'] * 100)
+        white = round(scores['white'] * 100)
+
+        return red, green, blue, amber, white
+
+
+    def rgbl_converter(self, red, green, blue):
+        lime = 0
+        
+        # Lime peaks at 100 for yellow (100, 100, 0) and white (100, 100, 100).
+        if red == 100 and green == 100:
+            lime = 100
+        # For other combinations, calculate lime based on the lesser of red and green, but only if blue is not dominant.
+        elif blue < red and blue < green:
+            lime = round((min(red, green) / 100) * 100)
+        
+        return red, green, blue, lime
+
+
+    def rgbam_converter(self, red, green, blue):
+        # Handle exact targets with conditional logic.
+        if (red, green, blue) == (0, 0, 0):  # Black
+            amber, mint = 0, 0
+        elif (red, green, blue) == (100, 0, 0):  # Pure Red
+            amber, mint = 0, 0
+        elif (red, green, blue) == (0, 100, 0):  # Pure Green
+            amber, mint = 0, 0
+        elif (red, green, blue) == (0, 0, 100):  # Pure Blue
+            amber, mint = 0, 0
+        elif (red, green, blue) == (100, 100, 100):  # White
+            amber, mint = 100, 100
+        elif (red, green, blue) == (58, 100, 14):  # Specific Mint Peak
+            amber, mint = 0, 100
+        elif (red, green, blue) == (100, 50, 0):  # Specific Amber Peak
+            amber, mint = 100, 0
+        else:
+            proximity_to_white = min(red, green, blue) / 100
+            amber = round(100 * proximity_to_white)
+            mint = round(100 * proximity_to_white)
+            
+            # Adjust for proximity to the specific mint peak color.
+            if green == 100 and red > 0 and blue > 0:
+                mint_peak_proximity = min(red / 58, blue / 14)
+                mint = round(100 * mint_peak_proximity)
+        
+        return red, green, blue, amber, mint
+
+
+    def cmy_converter(self, red, green, blue):
+        # Define a tolerance for near-maximum RGB values to treat them as 1.
+        tolerance = 0.01
+        red_scaled = red / 100.0
+        green_scaled = green / 100.0
+        blue_scaled = blue / 100.0
+
+        # Apply the tolerance to treat near-maximum values as 1.
+        cyan = int((1 - min(red_scaled + tolerance, 1)) * 100)
+        magenta = int((1 - min(green_scaled + tolerance, 1)) * 100)
+        yellow = int((1 - min(blue_scaled + tolerance, 1)) * 100)
+
+        return cyan, magenta, yellow
+
+        
+    def split_color(self, parent, c, v, type):
+        """
+        Splits the input (r, g, b) tuple for value (v) into tuples like (r, g, b, a, m)
+        for the value entries and updates the parameter (p) value for each entry to the 
+        color profile (pf) enumerator option found with find_my_patch().
+        
+        This function prepares the parameters and values for later processing by the 
+        find_my_argument() function, ensuring that the correct argument is formed based 
+        on the received v tuple. The updated parameter p reflects the color_profile choice,
+        allowing the publisher to interpret the v tuple correctly.
+        
+        Parameters:
+            parent: The parent controller object.
+            c: The channel list.
+            v: The value list.
+            type: The controller type.
+
+        Returns:
+            new_p: The updated parameter list.
+            new_v: The updated value list.
+        """
+        new_p = []
+        new_v = []
+        
+        for chan, val in zip(c, v):  # 4chan lol
+            pf = find_my_patch(parent, chan, type, "color_profile_enum")
+            profile_converters = {
+                'option_rgba': (self.rgba_converter, 4),
+                'option_rgbw': (self.rgbw_converter, 4),
+                'option_rgbaw': (self.rgbaw_converter, 5),
+                'option_rgbl': (self.rgbl_converter, 4),
+                'option_cmy': (self.cmy_converter, 3),
+                'option_rgbam': (self.rgbam_converter, 5),
+            }
+
+            if pf == 'option_rgb':
+                new_p.append(pf)
+                new_v.append(val)
+            elif pf in profile_converters:
+                converter, num_values = profile_converters[pf]
+                converted_values = converter(*val[:3])
+                
+                new_p.append(pf)
+                new_v.append(converted_values[:num_values])
+            else: raise ValueError(f"Unknown color profile: {pf}")
+
+        return new_p, new_v
+    
+    
+class HarmonizerFinders(HarmonizerBase): ## This must cater to individual fixtures
+    def find_my_argument_template(self, parent, chan, param, type):
+        if bpy.context.scene.scene_props.console_type_enum == "option_eos":
+            if type not in ["Influencer", "Brush"]:
+                color_templates = {
+                    "option_rgb": "# Red at $1 Enter, # Green at $2 Enter, # Blue at $3 Enter",
+                    "option_cmy": "# Cyan at $1 Enter, # Magenta at $2 Enter, # Yellow at $3 Enter",
+                    "option_rgbw": "# Red at $1 Enter, # Green at $2 Enter, # Blue at $3 Enter, # White at $4 Enter",
+                    "option_rgba": "# Red at $1 Enter, # Green at $2 Enter, # Blue at $3 Enter, # Amber at $4 Enter",
+                    "option_rgbl": "# Red at $1 Enter, # Green at $2 Enter, # Blue at $3 Enter, # Lime at $4 Enter",
+                    "option_rgbaw": "# Red at $1 Enter, # Green at $2 Enter, # Blue at $3 Enter, # Amber at $4 Enter, # White at $5 Enter",
+                    "option_rgbam": "# Red at $1 Enter, # Green at $2 Enter, # Blue at $3 Enter, # Amber at $4 Enter, # Mint at $5 Enter"
+                }
+                if param in color_templates:
+                    return color_templates[param]
+
+                else:
+                    return getattr(bpy.context.scene.scene_props, f"str_{param}_argument")
+            else:
+                return getattr(bpy.context.scene.scene_props, f"str_relative_{p}_argument")
+            
+            
+    def find_my_controller_type(self, parent):
+        """
+        Function called by find_my_channels_and_[parameter values] functions to find controller type.
+
+        Parameters:
+        parent: The object from which this function is called. Should only be a mesh or known node type.
+        
+        Returns:
+        type: The controller type in string, to be used to determine how to find channel list.
+        """    
+        if hasattr(parent, "type"):
+            if parent.type == 'MESH':
+                if hasattr(parent, "object_identities_enum"):
+                    return parent.object_identities_enum
+                else: sorcerer_assert_unreachable()
+            elif parent.type == 'COLOR':  # Color strip
+                return "strip"
+            elif parent.type == 'CUSTOM':  
+                controller_types = {
+                'group_controller_type': "group",
+                'mixer_type': "mixer",
+                }
+                return controller_types.get(parent.bl_idname, None)
+        else: 
+            sorcerer_assert_unreachable()
+        
+        
+    """Recieves a bpy object mesh, parent, and returns a list representing channels within that mesh"""
+    def find_influencer_current_channels(parent):
+        # Use the get_lights_within_mesh function in the library to get channels, then add them to its captured_set().
+        return current_channels
+        
+        
+    """Recieves a bpy object mesh (parent), and returns two lists representing channels that used to be 
+       within that mesh but just left, as well as new additions."""   
+    def find_influencer_channels_to_change(parent, current_channels, context):
+        # Compare current channels with the object's captured_set()
+        return channels_to_restore, channels_to_add
+        
+        
+    """Recieves a bpy object mesh (parent), and parameter, and returns a list of restore values"""
+    def find_my_restore_values(channels_to_restore, p, context):
+        # Use the background property registered on the objects to restore.
+        return restore_values
+    
+    
+    def color_object_to_tuple(self, v):
+        """
+        This function converts an RGB color object into a tuple.
+        """
+        return (v.r * 100, v.g * 100, v.b * 100)
+
+
+    """Recieves a bpy object mesh (parent), and parameter, and returns integers in a [list]
+       This is for single fixtures."""
+    def find_my_value(self, parent, p, type):
+        # Use effects to mix up values inside a group, or simply return a single integer
+        attribute_name = parameter_mapping.get(p)
+        if attribute_name:
+            unmapped_value = getattr(parent, attribute_name)
+            if p in ["pan", "tilt", "zoom", "gobo_speed", "pan_tilt"]:
+                mapping = HarmonizerMappers()
+                try: 
+                    value = mapping.map_value(parent, p, unmapped_value)
+                    return value
+                except AttributeError:
+                    print("Error in find_my_value when attempting to call map_value.")
+            return unmapped_value
+        else:
+            return None
+
+
+    """Recieves a bpy object mesh (parent), and parameter, and returns two lists for channels list (c) and values list (v)"""
+    def find_my_group_values(self, parent, p):
+        # Use effects to mix up values inside a group, or simply return a simple value
+        channels = []
+        parameters = []
+        values = []
+        
+        attribute_name = parameter_mapping.get(p)
+        if attribute_name:  # Find and map value
+            new_value = getattr(parent, attribute_name)
+            
+            if p == "color":
+                new_value = self.color_object_to_tuple(new_value)
+            
+            mapping = HarmonizerMappers()
+            
+            for chan in parent.list_group_channels:
+                channels.append(chan.value)
+                parameters.append(p)
+                if p in ["pan", "tilt", "zoom", "gobo_speed", "pan_tilt"]:
+                    new_value = mapping.map_value(parent, chan, p, new_value)
+                values.append(new_value)
+                 
+            return channels, parameters, values
+        
+        else: sorcerer_assert_unreachable()
+    
+        
+    def find_my_channels_and_values(self, parent, p):
+        """
+        Intensity updater function called from universal_updater that returns 2 lists for channels and values,
+        as well as the controller type for use when building the osc argument
+
+        Parameters:
+        self: The object from which this function is called.
+        p: Parameter.
+        
+        Returns:
+        c: Channel list
+        v: Values list
+        type: Controller type
+        """
+        controller_type = self.find_my_controller_type(parent)  # Should return a string.
+        
+        if controller_type in ["Influencer", "Brush"]:
+            current_channels = parent.find_influencer_current_channels(parent)  # Should return a list.
+            channels_to_restore, channels_to_add = find_influencer_channels_to_change(parent, current_channels)  # Should return a list
+            add_value = parent.find_my_value(parent, p)  # Should return a list with just one [integer].
+            restore_values = parent.find_my_restore_values(parent, p)
+            c = new_channels + channels_to_restore
+            v = add_values + restore_values
+            return c, p, v, controller_type
+        
+        elif controller_type == "Fixture":
+            value = self.find_my_value(parent, p, type)
+            return [parent.int_object_channel_index], [p], [value], controller_type
+        
+        elif controller_type in  ["group", "strip", "Set Piece"]:
+            c, p, v = self.find_my_group_values(parent, p)
+            return c, p, v, controller_type
+        
+        elif controller_type == "mixer":
+            mixing = HarmonizerMixer()
+            c, p, v = mixing.mix_my_values(parent, p)
+            return c, p, v, controller_type
+                    
+        else: sorcerer_assert_unreachable()
+    
+    
+def find_my_patch(parent, chan, type, desired_property):
+    """
+    This function finds the best patch for a given channel. If the controller type is
+    not Fixture or P/T Fixture, then it tries to find an object in the 3D scene that
+    represents that channel. If it finds one, it will return that object's desired
+    property. If the controller type (type) is Fixture or P/T Fixture, then it will
+    use that object's patch. If neither of those 2 options work out, it will give up,
+    surrender, and just use the parent controller's patch. 
+    
+    The goal of this function is to ensure that the user has a way to patch all fixtures
+    and expect that Sorcerer will behave more or less like a full-blown console——that is
+    to say, things like color profiles, mins and maxes, and other things fade away into
+    the background and the user doesn't hardly ever have to worry about it. With this
+    function, if the user patches the min/max, color profiles, and abilities and whatnot
+    for each fixture, then this function will always use that patch for each individual
+    fixture——regardless of what controller is controlling the fixture.
+    
+    At the same time however, if the user doesn't feel like patching beforehand, they
+    can make things happen extremely quickly without ever thinking about patch. That's
+    why we have a local patch built into the UI of each controller.
+    
+    Parameters:
+        parent: the parent controller object, a node, object, or color strip
+        chan: the channel number as defined by the parent's list_group_channels
+        type: the controllertype of parent controller object, can be mixer, group node, set piece, etc.
+        desired_property: the patch property that is being requested, in string form
+        
+    Returns:
+        desired_property: The value of the requested property
+    """
+    if type not in ["Fixture", "Pan/Tilt Fixture"]:
+        for obj in bpy.data.objects:
+            if obj.int_fixture_index == chan:
+                return getattr(obj, desired_property)
+            
+    else: return getattr(chan, desired_property)
+        
+    return getattr(parent, desired_property)
+
 
 def find_node_by_name(node_name):
     """
-    Catches and corrects cases where the parent is a collection property instead of 
+    Catches and corrects cases where the parent is a property group instead of 
     a node, sequencer strip, object, etc. This function returns the bpy object so
     that the rest of the harmonizer can find what it needs.
     
@@ -1015,10 +989,7 @@ def find_parent(self):
     if not isinstance(self, bpy.types.PropertyGroup):
         return self
     else:
-        try:
-            parent = find_node_by_name(self.parent_node_identifier)
-        except AttributeError:
-            print("Error: Could not find mixer node bpy object.")
+        parent = find_node_by_name(self.parent_node_identifier)
         return parent
     
     
@@ -1033,37 +1004,28 @@ def universal_updater(self, context, property_name, find_function):
     find_function (function): The function that finds the channels and values for the given property.
     """
     p = property_name  # inherited from the partial
-    
+    mode = p
     parent = find_parent(self)
+    c, p, v, type = find_function(parent, p)  # Should return 3 lists and a string. find_function() is find_my_channels_and_values()
     
-    try:
-        c, v, type = find_function(parent, p)  # Should return 2 lists and a string.
-        if not isinstance(c, list) or not isinstance(v, list):
-            raise ValueError(f"Channel and value lists are required for {p}.")
+    if mode == "color":
+        color_splitter = ColorSplitter()
+        p, v = color_splitter.split_color(parent, c, v, type)
 
-        harmonizer_finders = HarmonizerFinders()
+    print(f"V:{v}")
 
-        i, a = harmonizer_finders.find_my_properties(parent, p, type)  # Should return an int and string.
-        if not isinstance(i, int) or not isinstance(a, str):
-            raise ValueError(f"Influence and argument template are required for {p}.")
-          
-        publisher = HarmonizerPublisher()
-          
-        if len(c) > 1 and len(v) == 1:  # This is for a group
-            for chan in c:
-                publisher.send_cpvia([chan], p, v, i, a)
-        elif len(c) > 1 and len(v) != 1:  # This is for a mixer
-            for chan, value in zip(c, v):
-                publisher.send_cpvia([chan], p, [value], i, a)
-          
-        else:
-            publisher.send_cpvia(c, p, v, i, a)  # No return value.
-
-    except ValueError as e:
-        print(f"Error in updating {p}: {e}")
-
-    except Exception as e:
-        print(f"Unexpected error in updating {p}: {e}")
+    finders = HarmonizerFinders()
+    i = []
+    a = []
+    influence = parent.influence
+    for chan, param in zip(c, p):
+        argument = finders.find_my_argument_template(parent, chan, param, type)
+        i.append(influence)
+        a.append(argument)
+      
+    publisher = HarmonizerPublisher()
+    for chan, param, val, inf, arg in zip(c, p, v, i, a):
+        publisher.send_cpvia(chan, param, val, inf, arg)
 
 
 harmonizer_instance = HarmonizerFinders()
