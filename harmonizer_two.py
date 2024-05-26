@@ -473,7 +473,6 @@ class HarmonizerPublisher(HarmonizerBase):
             self.change_requests.append(c, p, v, i, a)  
         else:
             address, argument = self.form_osc(c, p, v, i, a)  # Should return 2 strings
-            print(argument)
             send_osc(address, argument)
         
         
@@ -489,19 +488,23 @@ class HarmonizerMappers(HarmonizerBase):
     Returns:
         min_value, max_value: 2 integers
     """
-    def find_my_min_max(self, parent, p):  
+    def find_my_min_max(self, parent, chan, type, p):  
         try:
-            min_value = getattr(parent, f"{p}_min")
-            max_value = getattr(parent, f"{p}_max")
+            min_property = f"{p}_min"
+            max_property = f"{p}_max"
+            min_value = find_my_patch(parent, chan, type, min_property)
+            max_value = find_my_patch(parent, chan, type, max_property)
+            print(parent.pan_max)
             return min_value, max_value
         except AttributeError as e:
             print(f"Error in find_my_min_max: {e}")
             return None, None
 
          
-    def map_value(self, parent, chan, p, unmapped_value):  ## This needs to use find my patch function
-        min_val, max_val = self.find_my_min_max(parent, p)
-
+    def map_value(self, parent, chan, p, unmapped_value, type):
+        min_val, max_val = self.find_my_min_max(parent, chan, type, p)
+        print(f"Input min/max: {min_val, max_val}")
+        print(f"Unmapped value: {unmapped_value}")
         if p in ["pan", "tilt", "zoom", "gobo_speed"]:
             if min_val <= 0 and max_val >= 0:
                 # Normalizing around zero
@@ -513,6 +516,7 @@ class HarmonizerMappers(HarmonizerBase):
                 else:
                     normalized_value = unmapped_value / 100
                     mapped_value = normalized_value * abs(min_val)
+                print(f"Mapped value 1: {mapped_value}")
             else:
                 # Non-symmetrical range
                 range_val = max_val - min_val
@@ -523,13 +527,9 @@ class HarmonizerMappers(HarmonizerBase):
                 else:
                     normalized_value = (unmapped_value + 100) / 200
                     mapped_value = (normalized_value * (max_val - min_val)) + min_val
-
+                print(f"Mapped value 2: {mapped_value}")
             return mapped_value
-        elif p == "pan_tilt":
-            # Insert code for pan/tilt graph mapping here
-            return mapped_value
-        else:
-            raise ValueError("Unknown parameter type")
+        else: sorcerer_assert_unreachable()
     
     
 """This should house all logic for mixing values with the mixers"""   
@@ -540,44 +540,102 @@ class HarmonizerMixer(HarmonizerBase):
         channels_list = parent.list_group_channels
         values_list = parent.parameters
         channels = [item.value for item in channels_list]
-        mode = p
+        offset = parent.float_offset * 0.5
+        subdivisions = parent.int_subdivisions
+        mode = parent.mix_method_enum
+        param_mode = p
+
+        print(f"Subdivisions: {subdivisions}")
+        print(f"Offset: {offset}")
+        print(f"Input Channel List: {channels}")
+#        values_list_print = [getattr(choice, f"float_{p}") for choice in values_list]
+#        print(f"Input Values List: {values_list_print}")
+
         if p == "color":
             p = "vec_color"
         parameter_name = f"float_{p}"
         
         values = [getattr(choice, parameter_name) for choice in values_list]
+        
+        if subdivisions > 0 and mode == "option_gradient":
+            for _ in range(subdivisions):
+                values = values + values
+                
+        print(f"Values after subdivision: {values}")
 
         # Ensure channels and values are sorted together by channels
         sorted_channels_values = sorted(zip(channels, values))
         sorted_channels, sorted_values = zip(*sorted_channels_values)
-        
-        # Create the mixed values by interpolating between the sorted values for each channel
-        if len(sorted_channels) == 1:
-            # If there is only one channel, return its value for all channels
-            mixed_values = [sorted_values[0]] * len(channels)
-        else:
-            # Interpolate values across the sorted channels
-            interpolation_points = np.linspace(sorted_channels[0], sorted_channels[-1], len(channels))
-            if mode == "color":
-                # Prepare arrays for each color component
-                reds = [color[0] for color in sorted_values]
-                greens = [color[1] for color in sorted_values]
-                blues = [color[2] for color in sorted_values]
-                
-                # Interpolate each color component separately
-                mixed_reds = np.interp(interpolation_points, sorted_channels, reds)
-                mixed_greens = np.interp(interpolation_points, sorted_channels, greens)
-                mixed_blues = np.interp(interpolation_points, sorted_channels, blues)
-                
-                # Combine interpolated components back into simple tuples
-                mixed_values = [(r * 100, g * 100, b * 100) for r, g, b in zip(mixed_reds, mixed_greens, mixed_blues)]
-            
+
+        if mode == "option_gradient":
+            # Handle subdivisions at the beginning
+            if subdivisions > 0:
+                expanded_values = []
+                expanded_channels = []
+                for channel, value in zip(sorted_channels, sorted_values):
+                    for _ in range(subdivisions + 1):
+                        expanded_values.append(value)
+                        expanded_channels.append(channel)
+                sorted_values = expanded_values
+                sorted_channels = expanded_channels
+                sorted_channels = np.linspace(sorted_channels[0], sorted_channels[-1], len(expanded_values))
+
+            # Create the mixed values by interpolating between the sorted values for each channel
+            if len(sorted_channels) == 1:
+                mixed_values = [sorted_values[0]] * len(channels)
             else:
-                mixed_values = np.interp(interpolation_points, sorted_channels, sorted_values)
-        
+                # Adjust the interpolation points based on the offset value
+                min_channel = sorted_channels[0]
+                max_channel = sorted_channels[-1]
+                channel_range = max_channel - min_channel
+
+                # Calculate interpolation points with subdivisions
+                num_interpolation_points = len(channels)
+                interpolation_points = np.linspace(min_channel, max_channel, num_interpolation_points, endpoint=False) + offset * channel_range
+
+                # Debug: Print interpolation points
+                print(f"Interpolation Points (Before Wrapping): {interpolation_points}")
+
+                # Handle wrapping around if offset causes points to go out of bounds
+                interpolation_points = np.mod(interpolation_points - min_channel, channel_range) + min_channel
+
+                # Debug: Print interpolation points after wrapping
+                print(f"Interpolation Points (After Wrapping): {interpolation_points}")
+
+                if param_mode == "color":
+                    # Prepare arrays for each color component
+                    reds = [color[0] for color in sorted_values]
+                    greens = [color[1] for color in sorted_values]
+                    blues = [color[2] for color in sorted_values]
+
+                    # Interpolate each color component separately
+                    mixed_reds = np.interp(interpolation_points, sorted_channels, reds)
+                    mixed_greens = np.interp(interpolation_points, sorted_channels, greens)
+                    mixed_blues = np.interp(interpolation_points, sorted_channels, blues)
+
+                    # Combine interpolated components back into simple tuples
+                    mixed_values = [(r * 100, g * 100, b * 100) for r, g, b in zip(mixed_reds, mixed_greens, mixed_blues)]
+                else:
+                    mixed_values = np.interp(interpolation_points, sorted_channels, sorted_values)
+                
+        elif mode == "option_pattern":
+            num_values = len(sorted_values)
+            mixed_values = [sorted_values[i % num_values] for i in range(len(channels))]
+            offset_steps = int(offset * len(channels))
+            mixed_values = mixed_values[-offset_steps:] + mixed_values[:-offset_steps]
+
+            if param_mode == "color":
+                mixed_values = [(r * 100, g * 100, b * 100) for r, g, b in mixed_values]
+        else:
+            raise ValueError(f"Unknown mode: {mode}")
+
         p = [p for _ in channels]
-        
+
+        print(f"Output Channel List: {channels}")
+        print(f"Output Values List: {mixed_values}")
+
         return list(channels), p, list(mixed_values)
+
     
     
 class ColorSplitter(HarmonizerBase):
@@ -836,7 +894,7 @@ class HarmonizerFinders(HarmonizerBase): ## This must cater to individual fixtur
             if p in ["pan", "tilt", "zoom", "gobo_speed", "pan_tilt"]:
                 mapping = HarmonizerMappers()
                 try: 
-                    value = mapping.map_value(parent, p, unmapped_value)
+                    value = mapping.map_value(parent, p, unmapped_value, type)
                     return value
                 except AttributeError:
                     print("Error in find_my_value when attempting to call map_value.")
@@ -860,14 +918,14 @@ class HarmonizerFinders(HarmonizerBase): ## This must cater to individual fixtur
                 new_value = self.color_object_to_tuple(new_value)
             
             mapping = HarmonizerMappers()
-            
             for chan in parent.list_group_channels:
                 channels.append(chan.value)
                 parameters.append(p)
                 if p in ["pan", "tilt", "zoom", "gobo_speed", "pan_tilt"]:
-                    new_value = mapping.map_value(parent, chan, p, new_value)
-                values.append(new_value)
-                 
+                    value_to_add = mapping.map_value(parent, chan, p, new_value, type)
+                    values.append(value_to_add)
+                else:
+                    values.append(new_value)
             return channels, parameters, values
         
         else: sorcerer_assert_unreachable()
@@ -950,29 +1008,7 @@ def find_my_patch(parent, chan, type, desired_property):
                 return getattr(obj, desired_property)
             
     else: return getattr(chan, desired_property)
-        
     return getattr(parent, desired_property)
-
-
-def find_node_by_name(node_name):
-    """
-    Catches and corrects cases where the parent is a property group instead of 
-    a node, sequencer strip, object, etc. This function returns the bpy object so
-    that the rest of the harmonizer can find what it needs.
-    
-    Parameters: 
-        node_name: String that is the name of a bpy object (represented as 
-        parent_node_identifier), typically a mixer node
-    Returns:
-        bpy object that is the mixer node
-    """
-    for node_tree in bpy.data.node_groups:
-        if node_name in node_tree.nodes:
-            return node_tree.nodes[node_name]
-    for world in bpy.data.worlds:
-        if world.node_tree and node_name in world.node_tree.nodes:
-            return world.node_tree.nodes[node_name]
-    return None
     
     
 def find_parent(self):
@@ -989,8 +1025,21 @@ def find_parent(self):
     if not isinstance(self, bpy.types.PropertyGroup):
         return self
     else:
-        parent = find_node_by_name(self.parent_node_identifier)
-        return parent
+        # Use the node_tree_pointer directly to get the node tree
+        node_tree = self.node_tree_pointer
+        if node_tree:
+            node = node_tree.nodes.get(self.node_name)
+            if node:
+                return node
+        
+        # If not found, look in bpy.data.worlds
+        for world in bpy.data.worlds:
+            if world.node_tree and world.node_tree == self.node_tree_pointer:
+                node = world.node_tree.nodes.get(self.node_name)
+                if node:
+                    return node
+        
+        return None
     
     
 def universal_updater(self, context, property_name, find_function):
@@ -1012,8 +1061,6 @@ def universal_updater(self, context, property_name, find_function):
         color_splitter = ColorSplitter()
         p, v = color_splitter.split_color(parent, c, v, type)
 
-    print(f"V:{v}")
-
     finders = HarmonizerFinders()
     i = []
     a = []
@@ -1029,7 +1076,7 @@ def universal_updater(self, context, property_name, find_function):
 
 
 harmonizer_instance = HarmonizerFinders()
-    
+
 intensity_partial = partial(universal_updater, property_name="intensity", find_function=harmonizer_instance.find_my_channels_and_values)
 color_partial = partial(universal_updater, property_name="color", find_function=harmonizer_instance.find_my_channels_and_values)
 pan_partial = partial(universal_updater, property_name="pan", find_function=harmonizer_instance.find_my_channels_and_values)
@@ -1070,6 +1117,20 @@ def prism_updater(self, context):
     return prism_partial(self, context)
 def pan_tilt_updater(self, context):
     return pan_tilt_partial(self, context)
+
+def mixer_offset_updater(self, context):
+    if self.parameters:
+        if self.parameters_enum == "option_intensity":
+            self.parameters[0].float_intensity = self.parameters[0].float_intensity
+        elif self.parameters_enum == "option_color":
+            self.parameters[0].float_vec_color = self.parameters[0].float_vec_color
+        elif self.parameters_enum == "option_pan_tilt":
+            self.parameters[0].float_pan = self.parameters[0].float_pan
+            self.parameters[0].float_tilt = self.parameters[0].float_tilt
+        elif self.parameters_enum == "option_zoom":
+            self.parameters[0].float_zoom = self.parameters[0].float_zoom
+        elif self.parameters_enum == "option_iris":
+            self.parameters[0].float_iris = self.parameters[0].float_iris
         
 
 ###################
@@ -1158,6 +1219,28 @@ class FlashOutSocket(NodeSocket):
         return (1, 1, 0, 1) 
     
     
+class MotorInputSocket(NodeSocket):
+    bl_idname = 'MotorInputType'
+    bl_label = 'Motor Input Socket'
+
+    def draw(self, context, layout, node, text):
+        layout.label(text=text)
+
+    def draw_color(self, context, node):
+        return (.5, .5, .5, .5) 
+    
+    
+class MotorOutputSocket(NodeSocket):
+    bl_idname = 'MotorOutputType'
+    bl_label = 'Motor Output Socket'
+
+    def draw(self, context, layout, node, text):
+        layout.label(text=text)
+
+    def draw_color(self, context, node):
+        return (.5, .5, .5, .5) 
+    
+    
 ###################
 # NODES
 ###################
@@ -1166,7 +1249,7 @@ class GroupControllerNode(bpy.types.Node):
     bl_label = 'Group Controller Node'
     bl_icon = 'STICKY_UVS_LOC'
     bl_width_default = 300
-    
+
     # Assigned by group_info_updater on str_selected_light property.
     str_group_id: StringProperty(default="1")
     list_group_channels: CollectionProperty(type=ChannelListPropertyGroup)
@@ -1227,16 +1310,15 @@ class GroupControllerNode(bpy.types.Node):
         update=color_updater
     )
     float_diffusion: FloatProperty(default=0, min=0, max=100, description="Diffusion value", options={'ANIMATABLE'}, update=diffusion_updater)
-    float_pan: FloatProperty(default=0, min=-315, max=315, description="Pan value", options={'ANIMATABLE'}, update=pan_updater)
-    float_tilt: FloatProperty(default=0, min=-135, max=135, description="Tilt value", options={'ANIMATABLE'}, update=tilt_updater)
+    float_pan: FloatProperty(default=0, min=-100, max=100, description="Pan value", options={'ANIMATABLE'}, update=pan_updater)
+    float_tilt: FloatProperty(default=0, min=-100, max=100, description="Tilt value", options={'ANIMATABLE'}, update=tilt_updater)
     float_strobe: FloatProperty(default=0, min=0, max=100, description="Strobe value", options={'ANIMATABLE'}, update=strobe_updater)
     float_zoom: FloatProperty(default=0, min=0, max=100, description="Zoom value", options={'ANIMATABLE'}, update=zoom_updater)
     float_iris: FloatProperty(default=0, min=0, max=100, description="Iris value", options={'ANIMATABLE'}, update=iris_updater)
     float_edge: FloatProperty(default=0, min=0, max=100, description="Edge value", options={'ANIMATABLE'}, update=edge_updater)
     int_gobo_id: IntProperty(default=1, min=0, max=20, description="Gobo selection", options={'ANIMATABLE'}, update=gobo_id_updater)
     float_gobo_speed: FloatProperty(default=0, min=-100, max=100, description="Rotation of individual gobo speed", options={'ANIMATABLE'}, update=gobo_speed_updater)
-    int_prism: IntProperty(default=0, min=0, max=1, description="Prism value. 1 is on, 0 is off", options={'ANIMATABLE'}, update=prism_updater)  
-    
+    int_prism: IntProperty(default=0, min=0, max=1, description="Prism value. 1 is on, 0 is off", options={'ANIMATABLE'}, update=prism_updater)
     # Toggles for turning off visibility to unneeded parameters.
     influence_is_on: BoolProperty(default=False, description="Influence is enabled when checked")
     intensity_is_on: BoolProperty(default=False, description="Intensity is enabled when checked")
@@ -1249,11 +1331,14 @@ class GroupControllerNode(bpy.types.Node):
     edge_is_on: BoolProperty(default=False, description="Edge is enabled when checked")
     gobo_id_is_on: BoolProperty(default=False, description="Gobo ID is enabled when checked")
     prism_is_on: BoolProperty(default=False, description="Prism is enabled when checked")
-    
+
     def init(self, context):
         self.inputs.new('GroupInputType', "Driver Input")
         self.inputs.new('GroupInputType', "Driver Input")
         self.outputs.new('FlashOutType', "Flash")
+
+        # Assign node group pointer
+        self.node_group_pointer = self.id_data
         return
 
     def draw_buttons(self, context, layout):
@@ -1284,7 +1369,8 @@ class GroupControllerNode(bpy.types.Node):
             row_one = row.column(align=True)
             row_one.scale_x = 1
             op = row_one.operator("my.view_strobe_props", icon='OUTLINER_OB_LIGHTPROBE', text="")
-            op.space_type = "node_editor"
+            op.space_type = self.name
+            op.node_group_name = self.id_data.name
     
         if self.color_is_on:
             sub = row.column(align=True)
@@ -1299,14 +1385,16 @@ class GroupControllerNode(bpy.types.Node):
         if self.pan_tilt_is_on:
             row = layout.row(align=True)
             op = row.operator("my.view_pan_tilt_props", icon='ORIENTATION_GIMBAL', text="")
-            op.space_type = "node_editor"
+            op.space_type = self.name
+            op.node_group_name = self.id_data.name
             row.prop(self, "float_pan", text="Pan", slider=True)
             row.prop(self, "float_tilt", text="Tilt", slider=True)
         
         if self.zoom_is_on or self.iris_is_on:
             row = layout.row(align=True)
             op = row.operator("my.view_zoom_iris_props", text="", icon='LINCURVE')
-            op.space_type = "node_editor"
+            op.space_type = self.name
+            op.node_group_name = self.id_data.name
             
             if self.zoom_is_on:
                 row.prop(self, "float_zoom", slider=True, text="Zoom:")
@@ -1316,7 +1404,8 @@ class GroupControllerNode(bpy.types.Node):
         if self.edge_is_on or self.diffusion_is_on:
             row = layout.row(align=True)
             op = row.operator("my.view_edge_diffusion_props", text="", icon='SELECT_SET')
-            op.space_type = "node_editor"
+            op.space_type = self.name
+            op.node_group_name = self.id_data.name
             
             if self.edge_is_on:
                 row.prop(self, "float_edge", slider=True, text="Edge:")
@@ -1326,17 +1415,39 @@ class GroupControllerNode(bpy.types.Node):
         if self.gobo_id_is_on:
             row = layout.row(align=True)
             op = row.operator("my.view_gobo_props", text="", icon='POINTCLOUD_DATA')
-            op.space_type = "node_editor"
+            op.space_type = self.name
+            op.node_group_name = self.id_data.name
             
             row.prop(self, "int_gobo_id", text="Gobo:")
             row.prop(self, "float_gobo_speed", slider=True, text="Speed:")
             row.prop(self, "int_prism", slider=True, text="Prism:")
 
+
+def mixer_update_handler(scene):
+    for node_tree in bpy.data.node_groups:
+        for node in node_tree.nodes:
+            if isinstance(node, MixerNode):
+                node.update_node_name()
+                
+    for world in bpy.data.worlds:
+        if world.node_tree:
+            for node in world.node_tree.nodes:
+                if isinstance(node, MixerNode):
+                    node.update_node_name()
+
   
 class MixerParameters(bpy.types.PropertyGroup):
-    parent_node_identifier: StringProperty()
+    node_tree_pointer: bpy.props.PointerProperty(
+        name="Node Tree Pointer",
+        type=bpy.types.NodeTree,
+        description="Pointer to the node tree"
+    )
+    node_name: bpy.props.StringProperty(
+        name="Node Name",
+        description="Name of the node"
+    )
 
-    float_intensity: FloatProperty(default=0, min=0, max=100, update=intensity_updater, name="")
+    float_intensity: FloatProperty(default=0, min=0, max=100, update=intensity_updater, name="Intensity:")
     float_vec_color: FloatVectorProperty(
         name="Color",
         subtype='COLOR',
@@ -1349,8 +1460,8 @@ class MixerParameters(bpy.types.PropertyGroup):
     )
     float_pan: FloatProperty(default=0, min=-315, max=315, update=pan_updater, name="Pan:")
     float_tilt: FloatProperty(default=0, min=-135, max=135, update=tilt_updater, name="Tilt:")
-    float_zoom: FloatProperty(default=0, min=-315, max=315, update=zoom_updater, name="")
-    float_iris: FloatProperty(default=0, min=-135, max=135, update=iris_updater, name="")
+    float_zoom: FloatProperty(default=10, min=1, max=100, update=zoom_updater, name="Zoom:")
+    float_iris: FloatProperty(default=100, min=0, max=100, update=iris_updater, name="Iris:")
   
     
 class MixerNode(bpy.types.Node):
@@ -1371,8 +1482,9 @@ class MixerNode(bpy.types.Node):
     
     def mixer_methods(self, context):
         items = [
-            ('option_gradient', "Gradient", "Mix choices across a group evenly"),
-            ('option_pattern', "Pattern", "Create patterns out of choices without mixing"),
+            ('option_gradient', "Gradient", "Mix choices across a group evenly", 'SMOOTHCURVE', 1),
+            ('option_pattern', "Pattern", "Create patterns out of choices without mixing", 'IPO_CONSTANT', 2),
+            ('option_pose', "Pose", "Create poses to oscillate between", 'POSE_HLT', 3),
         ]
         return items
 
@@ -1395,11 +1507,13 @@ class MixerNode(bpy.types.Node):
         name="Color Profile",
         description="Choose a color profile for the group",
         items=color_profiles,
+        update=mixer_offset_updater
     )
     mix_method_enum: EnumProperty(
         name="Method",
         description="Choose a mixing method",
         items=mixer_methods,
+        default=1
     )
     str_selected_group: EnumProperty(
         name="Selected Group",
@@ -1414,30 +1528,52 @@ class MixerNode(bpy.types.Node):
     )
     influence: IntProperty(default=1, min=1, max=10, description="How many votes this controller has when there are conflicts", options={'ANIMATABLE'})
 
-    offset: FloatProperty(name="Offset", description="Move or animate this value for a moving effect")
+    show_settings: BoolProperty(default=True, name="Show Settings", description="Expand/collapse group/parameter row and UI controller row")
+    float_offset: FloatProperty(name="Offset", description="Move or animate this value for a moving effect", update=mixer_offset_updater)
+    int_subdivisions: IntProperty(name="Subdivisions", description="Subdivide the mix into multiple sections", update=mixer_offset_updater, min=0, max=32)
     columns: IntProperty(name="# of Columns:", min=1, max=8, default=3)
     scale: FloatProperty(name="Size of Choices:", min=1, max=3, default=2)
     
     def init(self, context):
         self.inputs.new('MixerInputType', "Driver Input")
+        self.inputs.new('MotorInputType', "Motor Input")
         self.outputs.new('FlashOutType', "Flash")
         node_refs[self.name] = self  # Add this node to the global dictionary
-        self.set_parent_node_name()
+        self.update_node_name()
         return
+    
+    def update_node_name(self):
+        """Update the node name to ensure uniqueness."""
+        if not self.name.startswith("MixerNode_"):
+            self.name = "MixerNode_" + self.name
+
+        # Update names in parameters
+        for param in self.parameters:
+            param.node_tree_pointer = self.id_data
+            param.node_name = self.name
 
     def draw_buttons(self, context, layout):  
+        if self.show_settings:
+            row = layout.row(align=True)
+            op_home = row.operator("node.home_group", icon='HOME', text="")
+            op_home.node_name = self.name
+            op_update = row.operator("node.update_group", icon='FILE_REFRESH', text="")
+            op_update.node_name = self.name
+            if self.str_manual_fixture_selection == "":
+                row.prop(self, "str_selected_group", icon='COLLECTION_NEW', icon_only=0, text="")
+            row.prop(self, "str_manual_fixture_selection", text="")
+            if self.mix_method_enum != "option_pose":
+                row.prop(self, "parameters_enum", expand=True, text="")
+        
         row = layout.row(align=True)
-        op_home = row.operator("node.home_group", icon='HOME', text="")
-        op_home.node_name = self.name
-        op_update = row.operator("node.update_group", icon='FILE_REFRESH', text="")
-        op_update.node_name = self.name
-        if self.str_manual_fixture_selection == "":
-            row.prop(self, "str_selected_group", icon='COLLECTION_NEW', icon_only=0, text="")
-        row.prop(self, "str_manual_fixture_selection", text="")
-        row.prop(self, "parameters_enum", expand=True, text="")
-        row = layout.row()
-        row.prop(self, "mix_method_enum", expand=True)
-        row.prop(self, "offset", text="Offset:")
+        row.prop(self, "show_settings", text="", expand=False, icon='TRIA_DOWN' if self.show_settings else 'TRIA_RIGHT')
+        row.prop(self, "mix_method_enum", expand=True, icon_only=True)
+        if self.mix_method_enum != "option_pose":
+            row.prop(self, "float_offset", text="Offset:")
+            if self.mix_method_enum != "option_pattern":
+                row.prop(self, "int_subdivisions", text="Subdivisions:")
+        if self.parameters_enum in ["option_color", "option_pose"]:
+            row.prop(self, "color_profile_enum", text="", icon='COLOR', icon_only=True)
         layout.separator()
         
         num_columns = self.columns
@@ -1445,31 +1581,55 @@ class MixerNode(bpy.types.Node):
         flow = layout.grid_flow(row_major=True, columns=num_columns, even_columns=True, even_rows=False, align=True)
         flow.scale_y = self.scale
         
+        i = 1
+        
         for par in self.parameters:
-            if self.parameters_enum == 'option_intensity':
-                flow.prop(par, "float_intensity", slider=True)
-            elif self.parameters_enum == 'option_color':
-                flow.template_color_picker(par, "float_vec_color")
-            elif self.parameters_enum == 'option_pan_tilt':
+            if self.mix_method_enum != 'option_pose':
+                if self.parameters_enum == 'option_intensity':
+                    flow.prop(par, "float_intensity", slider=True)
+                elif self.parameters_enum == 'option_color':
+                    flow.template_color_picker(par, "float_vec_color")
+                elif self.parameters_enum == 'option_pan_tilt':
+                    box = flow.box()
+                    row = box.row()
+                    split = row.split(factor=0.5)
+                    col = split.column()
+                    col.prop(par, "float_pan", text="Pan", slider=True)
+                    col = split.column()
+                    col.prop(par, "float_tilt", text="Tilt", slider=True)
+                elif self.parameters_enum == 'option_zoom':
+                    flow.prop(par, "float_zoom", slider=True)
+                else:
+                    flow.prop(par, "float_iris", slider=True)
+            
+            else:
                 box = flow.box()
                 row = box.row()
-                split = row.split(factor=0.5)
+                row.label(text=f"Pose {i}:", icon='POSE_HLT')
+                split = box.split(factor=0.5)
+
+                # Left side: existing properties
                 col = split.column()
+                col.prop(par, "float_intensity")
                 col.prop(par, "float_pan", text="Pan", slider=True)
-                col = split.column()
                 col.prop(par, "float_tilt", text="Tilt", slider=True)
-            elif self.parameters_enum == 'option_zoom':
-                flow.prop(par, "float_zoom", slider=True)
-            else:
-                flow.prop(par, "float_iris", slider=True)
+                col.prop(par, "float_zoom")
+                col.prop(par, "float_iris")
+
+                # Right side: float_vec_color
+                col = split.column()
+                col.template_color_picker(par, "float_vec_color")
+                
+                i += 1
                 
         layout.separator()
-        row = layout.row()
-        row.operator("node.add_choice", icon='ADD')
-        row.operator("node.remove_choice", icon='REMOVE')
-        row.prop(self, "columns")
-        row.prop(self, "scale")
-        layout.separator() 
+        if self.show_settings:
+            row = layout.row()
+            row.operator("node.add_choice", icon='ADD', text="")
+            row.operator("node.remove_choice", icon='REMOVE', text="")
+            row.prop(self, "columns", text="Columns:")
+            row.prop(self, "scale", text="Size:")
+            layout.separator() 
 
 
 class LightingModifier(bpy.types.PropertyGroup):
@@ -1510,6 +1670,8 @@ classes = (
     MasterOutputSocket,
     MasterInputSocket,
     GroupInputSocket,
+    MotorInputSocket,
+    MotorOutputSocket,
     GroupOutputSocket,
     FlashOutSocket,
     AlvaNodeTree,    
@@ -1955,6 +2117,8 @@ def register():
     # Commenting this out until harmonizer is replaced with harmonizer_two per spam issue
     #bpy.app.handlers.frame_change_pre.append(load_changes_handler)
     #bpy.app.handlers.frame_change_post.append(publish_changes_handler)
+        
+    bpy.app.handlers.depsgraph_update_post.append(mixer_update_handler)
 
     
 def unregister():
@@ -1967,6 +2131,8 @@ def unregister():
 #        bpy.app.handlers.frame_change_pre.remove(influencer_deps_updater)
 #    if influencer_deps_updater in bpy.app.handlers.depsgraph_update_pre:
 #        bpy.app.handlers.depsgraph_update_pre.remove(influencer_deps_updater)
+
+    bpy.app.handlers.depsgraph_update_post.remove(update_handler)
 
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
