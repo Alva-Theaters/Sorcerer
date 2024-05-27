@@ -45,12 +45,27 @@ from functools import partial
 import inspect
 import numpy as np
 import logging
+from typing import List, Tuple
     
     
 logging.basicConfig(
     level=logging.ERROR,
     format='%(asctime)s - %(levelname)s - %(module)s - line %(lineno)d - %(message)s'
 )
+
+
+def sorcerer_assert_unreachable(*args):
+    """This is the preferred error-handling method. It reports traceback, line number, and tells user this is 
+    a Sorcerer bug, not a Blender bug, and to report it to Alva Theaters, not Blender. Use on try/excepts 
+    and on final else's that should never be reached. Only use try/except on the most downstream functions
+    to avoid cascading exceptions and useless line number references. Inspired by the Blender version of this
+    in the C++ code."""
+    caller_frame = inspect.currentframe().f_back
+    caller_file = caller_frame.f_code.co_filename
+    caller_line = caller_frame.f_lineno
+    message = "Error found at {}:{}\nCode marked as unreachable has been executed. Please report bug to Alva Theaters.".format(caller_file, caller_line)
+    print(message)
+    
 
 change_requests = []
 stored_channels = set()
@@ -71,18 +86,35 @@ parameter_mapping = {
     "pan_tilt": "float_vec_pan_tilt_graph"
 }
 
+
+def color_profiles(self, context):
+    items = [
+        ('option_rgb', "RGB", "Red, Green, Blue"),
+        ('option_rgba', "RGBA", "Red, Green, Blue, Amber"),
+        ('option_rgbw', "RGBW", "Red, Green, Blue, White"),
+        ('option_rgbaw', "RGBAW", "Red, Green, Blue, Amber, White"),
+        ('option_rgbl', "RGBL", "Red, Green, Blue, Lime"),
+        ('option_rgbam', "RGBAM", "Red, Green, Blue, Amber, Mint"),
+        ('option_cmy', "CMY", "Cyan, Magenta, Yellow")
+    ]
+    
+    return items
+
+
+def object_identities(self, context):
+    items = [
+        ('Fixture', "Fixture", "This controls a single lighting fixture.", 'OUTLINER_OB_LIGHT', 0),
+        ('Pan/Tilt Fixture', "Pan/Tilt", "Select this only if you intend to use Blender's pan/tilt gimbals or constraints.", 'ORIENTATION_GIMBAL', 1),
+        ('Influencer', "Influencer", "This is a bit like 3D bitmapping. Fixtures inside this object will inherit this object's parameters. Changes are reverted when the object leaves.", 'CUBE', 2),
+        ('Set Piece', "Set Piece", "Select the lights on a specific set piece by selecting the set piece, not a light-board group.", 'HOME', 3),
+        ('Brush', "Brush", "Move this object over fixtures for a paint brush effect. Changes persist when the object leaves.", 'BRUSH_DATA', 4)
+    ]
+    
+    return items
+
 # This stores the channel list for each set piece, group controller, strip, etc.
 class ChannelListPropertyGroup(PropertyGroup):
     value: IntProperty()
-
-
-# Purpose of this throughout the codebase is to proactively identify possible pre-bugs and to help diagnose bugs.
-def sorcerer_assert_unreachable(*args):
-    caller_frame = inspect.currentframe().f_back
-    caller_file = caller_frame.f_code.co_filename
-    caller_line = caller_frame.f_lineno
-    message = "Error found at {}:{}\nCode marked as unreachable has been executed. Please report bug to Alva Theaters.".format(caller_file, caller_line)
-    print(message)
 
 
 def send_osc(address, argument):
@@ -352,34 +384,11 @@ def manual_fixture_selection_updater(self, context):
             for chan in channels_list:
                 item = self.list_group_channels.add()
                 item.value = chan
-        
-            
-def color_profiles(self, context):
-    items = [
-        ('option_rgb', "RGB", "Red, Green, Blue"),
-        ('option_rgba', "RGBA", "Red, Green, Blue, Amber"),
-        ('option_rgbw', "RGBW", "Red, Green, Blue, White"),
-        ('option_rgbaw', "RGBAW", "Red, Green, Blue, Amber, White"),
-        ('option_rgbl', "RGBL", "Red, Green, Blue, Lime"),
-        ('option_rgbam', "RGBAM", "Red, Green, Blue, Amber, Mint"),
-        ('option_cmy', "CMY", "Cyan, Magenta, Yellow")
-    ]
-    
-    return items
 
 
-def object_identities(self, context):
-    items = [
-        ('Fixture', "Fixture", "This controls a single lighting fixture.", 'OUTLINER_OB_LIGHT', 0),
-        ('Pan/Tilt Fixture', "Pan/Tilt", "Select this only if you intend to use Blender's pan/tilt gimbals or constraints.", 'ORIENTATION_GIMBAL', 1),
-        ('Influencer', "Influencer", "This is a bit like 3D bitmapping. Fixtures inside this object will inherit this object's parameters. Changes are reverted when the object leaves.", 'CUBE', 2),
-        ('Set Piece', "Set Piece", "Select the lights on a specific set piece by selecting the set piece, not a light-board group.", 'HOME', 3),
-        ('Brush', "Brush", "Move this object over fixtures for a paint brush effect. Changes persist when the object leaves.", 'BRUSH_DATA', 4)
-    ]
-    
-    return items
-
-
+###################
+# HARMONIZER
+###################
 class HarmonizerBase:
     INFLUENCER = 'influencer'
     CHANNEL = 'channel'
@@ -399,9 +408,14 @@ class HarmonizerPublisher(HarmonizerBase):
         in a way the console will understand (by adding a 0 in front of numbers 1-9.)
         """
         c = str(c)
-        v = str(int(v))
-        if len(v) == 1:
+        v = int(v)
+        
+        if v >= 0 and v < 10:
             v = f"0{v}"
+        elif v < 0 and v > -10:
+            v = f"-0{-v}"
+        else:
+            v = str(v)
 
         return c, v
     
@@ -531,12 +545,152 @@ class HarmonizerMappers(HarmonizerBase):
             return mapped_value
         else: sorcerer_assert_unreachable()
     
-    
-"""This should house all logic for mixing values with the mixers"""   
+       
 class HarmonizerMixer(HarmonizerBase):
+    """This should house all logic for mixing values with the mixers"""
     
-    """Recieves a bpy object mesh, parent, and returns two lists for channels list (c) and values list (v)"""    
+    def subdivide_values(self, subdivisions: int, values: List[float]) -> List[float]:
+        """Subdivide the values based on the number of subdivisions."""
+        if subdivisions > 0:
+            for _ in range(subdivisions):
+                values += values
+        return values
+
+    def sort(self, channels: List[int], values: List[float]) -> Tuple[List[int], List[float]]:
+        """Sort channels and values together."""
+        sorted_channels_values = sorted(zip(channels, values))
+        sorted_channels, sorted_values = zip(*sorted_channels_values)
+        return list(sorted_channels), list(sorted_values)
+
+    def subdivide_sort(self, subdivisions: int, sorted_channels: List[int], sorted_values: List[float]) -> Tuple[np.ndarray, List[float]]:
+        """Subdivide and sort the channels and values."""
+        if subdivisions > 0:
+            expanded_values = []
+            expanded_channels = []
+            for channel, value in zip(sorted_channels, sorted_values):
+                for _ in range(subdivisions + 1):
+                    expanded_values.append(value)
+                    expanded_channels.append(channel)
+            sorted_values = expanded_values
+            sorted_channels = np.linspace(expanded_channels[0], expanded_channels[-1], len(expanded_values))
+        return sorted_channels, sorted_values
+
+    def interpolate(self, sorted_channels: np.ndarray, channels: List[int], offset: float) -> np.ndarray:
+        """Interpolate values over the given channels with an offset."""
+        min_channel = sorted_channels[0]
+        max_channel = sorted_channels[-1]
+        channel_range = max_channel - min_channel
+        num_interpolation_points = len(channels)
+        interpolation_points = np.linspace(min_channel, max_channel, num_interpolation_points, endpoint=False) + offset * channel_range
+        interpolation_points = np.mod(interpolation_points - min_channel, channel_range) + min_channel
+        return interpolation_points
+
+    def interpolate_color(self, 
+                sorted_values: List[Tuple[float, float, float]], interpolation_points: np.ndarray, 
+                sorted_channels: np.ndarray) -> List[Tuple[float, float, float]]:
+        """Interpolate color values across the channels."""
+        reds = [color[0] for color in sorted_values]
+        greens = [color[1] for color in sorted_values]
+        blues = [color[2] for color in sorted_values]
+        mixed_reds = np.interp(interpolation_points, sorted_channels, reds)
+        mixed_greens = np.interp(interpolation_points, sorted_channels, greens)
+        mixed_blues = np.interp(interpolation_points, sorted_channels, blues)
+        mixed_values = [(r * 100, g * 100, b * 100) for r, g, b in zip(mixed_reds, mixed_greens, mixed_blues)]
+        return mixed_values
+
+    def patternize(self, sorted_values: List[float], channels: List[int], offset: float) -> List[float]:
+        """Create a repeating pattern with an offset."""
+        num_values = len(sorted_values)
+        mixed_values = [sorted_values[i % num_values] for i in range(len(channels))]
+        offset_steps = int(offset * len(channels))
+        mixed_values = mixed_values[-offset_steps:] + mixed_values[:-offset_steps]
+        return mixed_values
+
+    def mix_values(self, mode, 
+                   sorted_channels: np.ndarray, sorted_values: List[float], subdivisions: int, 
+                   channels: List[int], param_mode: str, offset: float, parent) -> List[float]:
+        """Mix the values based on the mode and parameter settings."""
+        if mode == "option_gradient":
+            sorted_channels, sorted_values = self.subdivide_sort(subdivisions, sorted_channels, sorted_values)
+            if len(sorted_channels) == 1:
+                return [sorted_values[0]] * len(channels)
+            else:
+                interpolation_points = self.interpolate(sorted_channels, channels, offset)
+                if param_mode == "color":
+                    return self.interpolate_color(sorted_values, interpolation_points, sorted_channels)
+                else:
+                    return list(np.interp(interpolation_points, sorted_channels, sorted_values))
+        elif mode == "option_pattern":
+            mixed_values = self.patternize(sorted_values, channels, offset)
+            if param_mode == "color":
+                mixed_values = [(r * 100, g * 100, b * 100) for r, g, b in mixed_values]
+            return mixed_values
+        elif mode == "option_pose":
+            poses = parent.parameters
+            num_poses = len(poses)
+            motor_node = self.find_motor_node(parent)
+            progress = motor_node.float_progress
+            
+            # Ensure pose_index is within range
+            pose_index = int(progress * (num_poses - 1)) % num_poses
+            next_pose_index = (pose_index + 1) % num_poses
+            blend_factor = (progress * (num_poses - 1)) % 1
+            
+            mixed_values = {
+                'float_intensity': [],
+                'float_vec_color': [],
+                'float_pan': [],
+                'float_tilt': [],
+                'float_zoom': [],
+                'float_iris': []
+            }
+
+            for param in mixed_values.keys():
+                value1 = getattr(poses[pose_index], param)
+                value2 = getattr(poses[next_pose_index], param)
+
+                if param == 'float_vec_color':
+                    mixed_value = tuple(v1 * (1 - blend_factor) + v2 * blend_factor for v1, v2 in zip(value1, value2))
+                    mixed_values[param] = [(mixed_value[0] * 100, mixed_value[1] * 100, mixed_value[2] * 100)] * len(channels)
+                else:
+                    mixed_value = value1 * (1 - blend_factor) + value2 * blend_factor
+                    mixed_values[param] = [mixed_value] * len(channels)
+            
+            if param_mode == 'color':
+                return mixed_values['float_vec_color']
+            else:
+                return mixed_values[f'float_{param_mode}']
+        else:
+            sorcerer_assert_unreachable()
+
+    def find_motor_node(self, mixer_node: bpy.types.Node) -> bpy.types.Node:
+        """Find the motor node connected to the mixer node."""
+        if not mixer_node.inputs:
+            return None
+        for input_socket in mixer_node.inputs:
+            if input_socket.is_linked:
+                for link in input_socket.links:
+                    if link.from_socket.bl_idname == 'MotorOutputType':
+                        connected_node = link.from_node
+                        if connected_node.bl_idname == 'motor_type':
+                            return connected_node
+        return None
+
+    def scale(self, parent: bpy.types.Node, param_mode: str, mixed_values: List[float]) -> List[float]:
+        """Scale the mixed values based on the motor node's scale."""
+        motor_node = self.find_motor_node(parent)
+        if motor_node:
+            float_scale = motor_node.float_scale
+            if param_mode == "color":
+                return [(r * float_scale, g * float_scale, b * float_scale) for r, g, b in mixed_values]
+            else:
+                return [v * float_scale for v in mixed_values]
+        return mixed_values
+        
     def mix_my_values(self, parent, p):
+        """Recieves a bpy object mesh, parent, and returns three lists for channels list (c), parameters list, 
+           and values list (v)"""
+        # Define variables
         channels_list = parent.list_group_channels
         values_list = parent.parameters
         channels = [item.value for item in channels_list]
@@ -544,99 +698,25 @@ class HarmonizerMixer(HarmonizerBase):
         subdivisions = parent.int_subdivisions
         mode = parent.mix_method_enum
         param_mode = p
-
-        print(f"Subdivisions: {subdivisions}")
-        print(f"Offset: {offset}")
-        print(f"Input Channel List: {channels}")
-#        values_list_print = [getattr(choice, f"float_{p}") for choice in values_list]
-#        print(f"Input Values List: {values_list_print}")
-
         if p == "color":
             p = "vec_color"
         parameter_name = f"float_{p}"
         
+        # Establish and then subdivide values list
         values = [getattr(choice, parameter_name) for choice in values_list]
+        values = self.subdivide_values(subdivisions, values)
         
-        if subdivisions > 0 and mode == "option_gradient":
-            for _ in range(subdivisions):
-                values = values + values
-                
-        print(f"Values after subdivision: {values}")
-
-        # Ensure channels and values are sorted together by channels
-        sorted_channels_values = sorted(zip(channels, values))
-        sorted_channels, sorted_values = zip(*sorted_channels_values)
-
-        if mode == "option_gradient":
-            # Handle subdivisions at the beginning
-            if subdivisions > 0:
-                expanded_values = []
-                expanded_channels = []
-                for channel, value in zip(sorted_channels, sorted_values):
-                    for _ in range(subdivisions + 1):
-                        expanded_values.append(value)
-                        expanded_channels.append(channel)
-                sorted_values = expanded_values
-                sorted_channels = expanded_channels
-                sorted_channels = np.linspace(sorted_channels[0], sorted_channels[-1], len(expanded_values))
-
-            # Create the mixed values by interpolating between the sorted values for each channel
-            if len(sorted_channels) == 1:
-                mixed_values = [sorted_values[0]] * len(channels)
-            else:
-                # Adjust the interpolation points based on the offset value
-                min_channel = sorted_channels[0]
-                max_channel = sorted_channels[-1]
-                channel_range = max_channel - min_channel
-
-                # Calculate interpolation points with subdivisions
-                num_interpolation_points = len(channels)
-                interpolation_points = np.linspace(min_channel, max_channel, num_interpolation_points, endpoint=False) + offset * channel_range
-
-                # Debug: Print interpolation points
-                print(f"Interpolation Points (Before Wrapping): {interpolation_points}")
-
-                # Handle wrapping around if offset causes points to go out of bounds
-                interpolation_points = np.mod(interpolation_points - min_channel, channel_range) + min_channel
-
-                # Debug: Print interpolation points after wrapping
-                print(f"Interpolation Points (After Wrapping): {interpolation_points}")
-
-                if param_mode == "color":
-                    # Prepare arrays for each color component
-                    reds = [color[0] for color in sorted_values]
-                    greens = [color[1] for color in sorted_values]
-                    blues = [color[2] for color in sorted_values]
-
-                    # Interpolate each color component separately
-                    mixed_reds = np.interp(interpolation_points, sorted_channels, reds)
-                    mixed_greens = np.interp(interpolation_points, sorted_channels, greens)
-                    mixed_blues = np.interp(interpolation_points, sorted_channels, blues)
-
-                    # Combine interpolated components back into simple tuples
-                    mixed_values = [(r * 100, g * 100, b * 100) for r, g, b in zip(mixed_reds, mixed_greens, mixed_blues)]
-                else:
-                    mixed_values = np.interp(interpolation_points, sorted_channels, sorted_values)
-                
-        elif mode == "option_pattern":
-            num_values = len(sorted_values)
-            mixed_values = [sorted_values[i % num_values] for i in range(len(channels))]
-            offset_steps = int(offset * len(channels))
-            mixed_values = mixed_values[-offset_steps:] + mixed_values[:-offset_steps]
-
-            if param_mode == "color":
-                mixed_values = [(r * 100, g * 100, b * 100) for r, g, b in mixed_values]
-        else:
-            raise ValueError(f"Unknown mode: {mode}")
-
+        # Establish channels list, sort channels and values list, mix values, and then scale values
+        sorted_channels, sorted_values = self.sort(channels, values)
+        mixed_values = self.mix_values(mode, sorted_channels, sorted_values, subdivisions, channels, param_mode, offset, parent)
+        scaled_values = self.scale(parent, param_mode, mixed_values)
+        
+        # Establish parameters list
         p = [p for _ in channels]
+        
+        # Return c, p, v lists
+        return list(channels), p, list(scaled_values)
 
-        print(f"Output Channel List: {channels}")
-        print(f"Output Values List: {mixed_values}")
-
-        return list(channels), p, list(mixed_values)
-
-    
     
 class ColorSplitter(HarmonizerBase):
     def calculate_closeness(self, rgb_input, target_rgb, sensitivity=1.0):
@@ -1131,6 +1211,9 @@ def mixer_offset_updater(self, context):
             self.parameters[0].float_zoom = self.parameters[0].float_zoom
         elif self.parameters_enum == "option_iris":
             self.parameters[0].float_iris = self.parameters[0].float_iris
+###################
+# END HARMONIZER
+###################
         
 
 ###################
