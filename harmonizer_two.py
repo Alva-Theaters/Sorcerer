@@ -33,6 +33,8 @@ import re
 import ast
 import math
 import colorsys
+import time
+import bmesh
 from bpy.types import PropertyGroup
 from mathutils import Vector
 from bpy.props import *
@@ -46,15 +48,9 @@ import inspect
 import numpy as np
 import logging
 from typing import List, Tuple
-    
-    
-logging.basicConfig(
-    level=logging.ERROR,
-    format='%(asctime)s - %(levelname)s - %(module)s - line %(lineno)d - %(message)s'
-)
 
 
-def sorcerer_assert_unreachable(*args):
+def SLI_assert_unreachable(*args):
     """This is the preferred error-handling method. It reports traceback, line number, and tells user this is 
     a Sorcerer bug, not a Blender bug, and to report it to Alva Theaters, not Blender. Use on try/excepts 
     and on final else's that should never be reached. Only use try/except on the most downstream functions
@@ -70,6 +66,7 @@ def sorcerer_assert_unreachable(*args):
 change_requests = []
 stored_channels = set()
 
+
 parameter_mapping = {
     "intensity": "float_intensity",
     "color": "float_vec_color",
@@ -84,6 +81,72 @@ parameter_mapping = {
     "gobo_speed": "float_gobo_speed",
     "prism": "int_prism",
     "pan_tilt": "float_vec_pan_tilt_graph"
+}
+
+
+eos_arguments_dict = {
+    # Absolute Arguments
+    "str_intensity_argument": "# at $ Enter",
+    "str_pan_argument": "# Pan at $ Enter",
+    "str_tilt_argument": "# Tilt at $ Enter",
+    "str_diffusion_argument": "# Diffusion at $ Enter",
+    "str_strobe_argument": "# Strobe at $ Enter",
+    "str_zoom_argument": "# Zoom at $ Enter",
+    "str_iris_argument": "# Iris at $ Enter",
+    "str_edge_argument": "# Edge at $ Enter",
+    "str_gobo_id_argument": "# Gobo_Select at $ Enter",
+    "str_gobo_speed_argument": "# Gobo_Mode 191 Enter, # Gobo_Index/Speed at $ Enter",
+    "str_changer_speed_argument": "# Changer_Speed at $ Enter",
+    "str_prism_argument": "# Beam_Fx Select $ Enter",
+    "str_rgb_argument": "# Red at $1 Enter, # Green at $2 Enter, # Blue at $3 Enter",
+    "str_cmy_argument": "# Cyan at $1 Enter, # Magenta at $2 Enter, # Yellow at $3 Enter",
+    "str_rgbw_argument": "# Red at $1 Enter, # Green at $2 Enter, # Blue at $3 Enter, # White at $4 Enter",
+    "str_rgba_argument": "# Red at $1 Enter, # Green at $2 Enter, # Blue at $3 Enter, # Amber at $4 Enter",
+    "str_rgbl_argument": "# Red at $1 Enter, # Green at $2 Enter, # Blue at $3 Enter, # Lime at $4 Enter",
+    "str_rgbaw_argument": "# Red at $1 Enter, # Green at $2 Enter, # Blue at $3 Enter, # Amber at $4 Enter, # White at $5 Enter",
+    "str_rgbam_argument": "# Red at $1 Enter, # Green at $2 Enter, # Blue at $3 Enter, # Amber at $4 Enter, # Mint at $5 Enter",
+
+    # Raise Arguments
+    "str_raise_intensity_argument": "# at + $ Enter",
+    "str_raise_pan_argument": "# Pan at + $ Enter",
+    "str_raise_tilt_argument": "# Tilt at + $ Enter",
+    "str_raise_diffusion_argument": "# Diffusion at + $ Enter",
+    "str_raise_strobe_argument": "# Strobe at + $ Enter",
+    "str_raise_zoom_argument": "# Zoom at + $ Enter",
+    "str_raise_iris_argument": "# Iris at + $ Enter",
+    "str_raise_edge_argument": "# Edge at + $ Enter",
+    "str_raise_gobo_id_argument": "# Gobo_Select at + $ Enter",
+    "str_raise_gobo_speed_argument": "# Gobo_Mode 191 Enter, # Gobo_Index/Speed at + $ Enter",
+    "str_raise_changer_speed_argument": "# Changer_Speed at + $ Enter",
+    "str_raise_prism_argument": "# Beam_Fx Select + $ Enter",
+    "str_raise_rgb_argument": "# Red at + $1 Enter, # Green at + $2 Enter, # Blue at + $3 Enter",
+    "str_raise_cmy_argument": "# Cyan at + $1 Enter, # Magenta at + $2 Enter, # Yellow at + $3 Enter",
+    "str_raise_rgbw_argument": "# Red at + $1 Enter, # Green at + $2 Enter, # Blue at + $3 Enter, # White at + $4 Enter",
+    "str_raise_rgba_argument": "# Red at + $1 Enter, # Green at + $2 Enter, # Blue at + $3 Enter, # Amber at + $4 Enter",
+    "str_raise_rgbl_argument": "# Red at + $1 Enter, # Green at + $2 Enter, # Blue at + $3 Enter, # Lime at + $4 Enter",
+    "str_raise_rgbaw_argument": "# Red at + $1 Enter, # Green at + $2 Enter, # Blue at + $3 Enter, # Amber at + $4 Enter, # White at + $5 Enter",
+    "str_raise_rgbam_argument": "# Red at + $1 Enter, # Green at + $2 Enter, # Blue at + $3 Enter, # Amber at + $4 Enter, # Mint at + $5 Enter",
+
+    # Lower Arguments
+    "str_lower_intensity_argument": "# at - $ Enter",
+    "str_lower_pan_argument": "# Pan at - $ Enter",
+    "str_lower_tilt_argument": "# Tilt at - $ Enter",
+    "str_lower_diffusion_argument": "# Diffusion at - $ Enter",
+    "str_lower_strobe_argument": "# Strobe at - $ Enter",
+    "str_lower_zoom_argument": "# Zoom at - $ Enter",
+    "str_lower_iris_argument": "# Iris at - $ Enter",
+    "str_lower_edge_argument": "# Edge at - $ Enter",
+    "str_lower_gobo_id_argument": "# Gobo_Select at - $ Enter",
+    "str_lower_gobo_speed_argument": "# Gobo_Mode 191 Enter, # Gobo_Index/Speed at - $ Enter",
+    "str_lower_changer_speed_argument": "# Changer_Speed at - $ Enter",
+    "str_lower_prism_argument": "# Beam_Fx Select - $ Enter",
+    "str_lower_rgb_argument": "# Red at - $1 Enter, # Green at - $2 Enter, # Blue at - $3 Enter",
+    "str_lower_cmy_argument": "# Cyan at - $1 Enter, # Magenta at - $2 Enter, # Yellow at - $3 Enter",
+    "str_lower_rgbw_argument": "# Red at - $1 Enter, # Green at - $2 Enter, # Blue at - $3 Enter, # White at - $4 Enter",
+    "str_lower_rgba_argument": "# Red at - $1 Enter, # Green at - $2 Enter, # Blue at - $3 Enter, # Amber at - $4 Enter",
+    "str_lower_rgbl_argument": "# Red at - $1 Enter, # Green at - $2 Enter, # Blue at - $3 Enter, # Lime at - $4 Enter",
+    "str_lower_rgbaw_argument": "# Red at - $1 Enter, # Green at - $2 Enter, # Blue at - $3 Enter, # Amber at - $4 Enter, # White at - $5 Enter",
+    "str_lower_rgbam_argument": "# Red at - $1 Enter, # Green at - $2 Enter, # Blue at - $3 Enter, # Amber at - $4 Enter, # Mint at - $5 Enter"
 }
 
 
@@ -106,21 +169,96 @@ def object_identities(self, context):
         ('Fixture', "Fixture", "This controls a single lighting fixture.", 'OUTLINER_OB_LIGHT', 0),
         ('Pan/Tilt Fixture', "Pan/Tilt", "Select this only if you intend to use Blender's pan/tilt gimbals or constraints.", 'ORIENTATION_GIMBAL', 1),
         ('Influencer', "Influencer", "This is a bit like 3D bitmapping. Fixtures inside this object will inherit this object's parameters. Changes are reverted when the object leaves.", 'CUBE', 2),
-        ('Set Piece', "Set Piece", "Select the lights on a specific set piece by selecting the set piece, not a light-board group.", 'HOME', 3),
-        ('Brush', "Brush", "Move this object over fixtures for a paint brush effect. Changes persist when the object leaves.", 'BRUSH_DATA', 4)
+        ('Brush', "Brush", "Move this object over fixtures for a paint brush effect. Changes persist when the object leaves.", 'BRUSH_DATA', 3),
+        ('Stage Object', "Stage Object", "Select the lights on a specific stage object by selecting the stage object, not a light-board group.", 'HOME', 4)
     ]
     
     return items
 
+
+def scene_groups(self, context):
+    items = []
+
+    if context.scene.scene_props.scene_group_data:
+        for group in context.scene.scene_props.scene_group_data:
+            items.append((group.name, group.name, ""))
+            
+    return items
+
+
+def get_sound_sources(self, context):
+    items = []
+    sequencer = context.scene.sequence_editor
+
+    textual_numbers = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+                       "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty",
+                       "twenty_one", "twenty_two", "twenty_three", "twenty_four", "twenty_five", "twenty_six", "twenty_seven", "twenty_eight", "twenty_nine", "thirty",
+                       "thirty_one", "thirty_two"]
+
+    if sequencer:
+        items.extend([(strip.name, strip.name, "") for strip in sequencer.sequences_all if strip.type == 'SOUND'])
+    
+    for i in range(33):
+        if i == 0:
+            i += 1
+        input_prop_name = f"input_{textual_numbers[i]}"
+        input_display_name = f"Input {i}"
+        input_description = f"Corresponds to Input {i} on the audio mixer"
+        items.append((input_prop_name, input_display_name, input_description))
+
+    for i in range(17):
+        if i == 0:
+            i += 1
+        input_prop_name = f"bus_{textual_numbers[i]}"
+        input_display_name = f"Bus {i}"
+        input_description = f"Corresponds to Bus {i} on the audio mixer"
+        items.append((input_prop_name, input_display_name, input_description))
+        
+    return items
+
+
+def get_speakers(self, context):
+    items = []
+    textual_numbers = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+                       "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty",
+                       "twenty_one", "twenty_two", "twenty_three", "twenty_four", "twenty_five", "twenty_six", "twenty_seven", "twenty_eight", "twenty_nine", "thirty",
+                       "thirty_one", "thirty_two"]
+
+    if sequencer:
+        items.extend([(strip.name, strip.name, "") for strip in sequencer.sequences_all if strip.type == 'SOUND'])
+    
+    for i in range(17):
+        if i == 0:
+            i += 1
+        input_prop_name = f"output_{textual_numbers[i]}"
+        input_display_name = f"Output {i}"
+        input_description = f"Corresponds to Output {i} on the audio mixer"
+        items.append((input_prop_name, input_display_name, input_description))
+            
+    for i in range(7): 
+        if i == 0:
+            i += 1
+        input_prop_name = f"dca_{textual_numbers[i]}"
+        input_display_name = f"DCA {i}"
+        input_description = f"Corresponds to DCA {i} on the audio mixer"
+        items.append((input_prop_name, input_display_name, input_description))
+            
+
 # This stores the channel list for each set piece, group controller, strip, etc.
 class ChannelListPropertyGroup(PropertyGroup):
     value: IntProperty()
+    
+    
+def correct_argument_because_etc_is_weird(argument):
+    return argument.replace(" at - 00 ", " at + 00 ")
 
 
 def send_osc(address, argument):
+    argument = correct_argument_because_etc_is_weird(argument)
     scene = bpy.context.scene.scene_props
     ip_address = scene.str_osc_ip_address
     port = scene.int_osc_port
+    #print(argument)
     send_osc_string(address, ip_address, port, argument)
 
 
@@ -154,11 +292,11 @@ def get_frame_rate(scene):
 
 
 def parse_channels(input_string):
-    formatted_input = re.sub(r'(\d)-(\d)', r'\1 - \2', input_string)
+    formatted_input = re.sub(r'[()]', '', input_string)
+    formatted_input = re.sub(r'(\d)-(\d)', r'\1 - \2', formatted_input)
     tokens = re.split(r'[,\s]+', formatted_input)
-    
+
     channels = []
-    
     i = 0
     while i < len(tokens):
         token = tokens[i]
@@ -167,13 +305,49 @@ def parse_channels(input_string):
             start = int(tokens[i-1])
             end = int(tokens[i+1])
             step = 1 if start < end else -1
-            channels.extend(range(start, end + step, step))  # Changed to extend for simplicity.
-            i += 2  # Skip the next token because we've already processed it.
+            channels.extend(range(start, end + step, step))
+            i += 2 
         elif token.isdigit():
-            channels.append(int(token))
+            if (i == 0 or tokens[i-1] not in ("through", "thru", "-", "tthru", "throu", "--", "por")) and \
+               (i == len(tokens) - 1 or tokens[i+1] not in ("through", "thru", "-", "tthru", "throu", "--", "por")):
+                channels.append(int(token))
         i += 1
     
     return channels
+
+
+def parse_mixer_channels(input_string):
+    groups = re.findall(r'\(([^)]+)\)', input_string)
+    if not groups:
+        groups = [input_string]
+        
+    all_channels = []
+
+    for group in groups:
+        formatted_input = re.sub(r'(\d)-(\d)', r'\1 - \2', group)
+        tokens = re.split(r'[,\s]+', formatted_input)
+        
+        channels = []
+        i = 0
+        while i < len(tokens):
+            token = tokens[i]
+            
+            if token in ("through", "thru", "-", "tthru", "throu", "--", "por") and i > 0 and i < len(tokens) - 1:
+                start = int(tokens[i-1])
+                end = int(tokens[i+1])
+                step = 1 if start < end else -1
+                channels.extend(range(start, end + step, step))
+                i += 3  
+                continue 
+            elif token.isdigit():
+                if (i == 0 or tokens[i-1] not in ("through", "thru", "-", "tthru", "throu", "--", "por")) and \
+                   (i == len(tokens) - 1 or tokens[i+1] not in ("through", "thru", "-", "tthru", "throu", "--", "por")):
+                    channels.append(int(token))
+            i += 1
+        
+        all_channels.append(tuple(channels))
+
+    return all_channels
 
 
 def get_light_rotation_degrees(light_name):
@@ -206,184 +380,49 @@ def get_light_rotation_degrees(light_name):
         print("Light object named", light_name,"not found or is not a lamp.")
         return None, None
 
-
-def is_inside_mesh(obj, mesh_obj):
-    # Transform the object's location into the mesh object's local space.
-    obj_loc_local = mesh_obj.matrix_world.inverted() @ obj.location
-
-    # Get the local bounding box corners of the mesh object.
-    bbox_corners_local = [Vector(corner) for corner in mesh_obj.bound_box]
-
-    # Calculate the min and max bounding box corners in local space.
-    bbox_min = Vector((min(corner.x for corner in bbox_corners_local),
-                       min(corner.y for corner in bbox_corners_local),
-                       min(corner.z for corner in bbox_corners_local)))
-
-    bbox_max = Vector((max(corner.x for corner in bbox_corners_local),
-                       max(corner.y for corner in bbox_corners_local),
-                       max(corner.z for corner in bbox_corners_local)))
-
-    inside = all(bbox_min[i] <= obj_loc_local[i] <= bbox_max[i] for i in range(3))
-
-    return inside
-
-def get_lights_inside_mesh(mesh_obj):
-    """Get all light objects inside the volume of mesh_obj."""
-    lights_inside = [obj for obj in bpy.data.objects if obj.type == 'MESH' and not obj.hide_viewport and is_inside_mesh(obj, mesh_obj)]
-    return lights_inside
-
-
-def lamp_objects(self, context):
-    items = []
-
-    if context.scene.scene_props.group_data:
-        try:
-            group_data = eval(context.scene.scene_props.group_data)
-            for group_number, group_info in group_data.items():
-                label = "{}: Group {}".format(group_info['label'], group_number)
-                items.append((str(group_number), label, label))
-        except SyntaxError as e:
-            print("Error parsing scene.group_data:", e)
-
-    for obj in bpy.data.objects:
-        if obj.type == 'MESH' and obj.get("is_influencer"):
-            label = "INFLUENCER: {}".format(obj.name)
-            items.append((obj.name, label, label))
-            
-    return items
-
-
-def fixture_profiles(self, context):
-    items = []
-
-    if context.scene.scene_props.group_data:
-        try:
-            group_data = eval(context.scene.scene_props.group_data)
-            for group_number, group_info in group_data.items():
-                label = "{}: Group {}".format(group_info['label'], group_number)
-                items.append((str(group_number), label, label))
-        except SyntaxError as e:
-            print("Error parsing scene.group_data:", e)
-
-    for obj in bpy.data.objects:
-        if obj.type == 'MESH' and obj.get("is_influencer"):
-            label = "INFLUENCER: {}".format(obj.name)
-            items.append((obj.name, label, label))
-            
-    return items
-
-
-def group_objects(self, context):
-    items = []
-
-    if context.scene.scene_props.group_data:
-        try:
-            group_data = eval(context.scene.scene_props.group_data)
-            for group_number, group_info in group_data.items():
-                label = "{}: Group {}".format(group_info['label'], group_number)
-                items.append((str(group_number), label, label))
-        except SyntaxError as e:
-            print("Error parsing scene.group_data:", e)
-
-    for obj in bpy.data.objects:
-        if obj.type == 'MESH' and obj.get("is_influencer"):
-            label = "INFLUENCER: {}".format(obj.name)
-            items.append((obj.name, label, label))
-            
-    return items
-
-
-def group_info_updater(self, context):
-    scene = context.scene.scene_props
-    
-    try:
-        group_data_dict = ast.literal_eval(scene.group_data)
-    except ValueError as e:
-        # Handle the case where conversion fails.
-        print(f"Error converting scene.group_data to dictionary: {e}")
-        return
-
-    try:
-        group_id = int(self.str_selected_light)
-    except ValueError:
-        self.str_group_id = ""
-        self.str_group_label = ""
-        self.list_group_channels = []
-        return
-    
-    if group_id in group_data_dict:
-        group_data = group_data_dict[group_id]
-        
-        self.str_group_id = str(group_id)
-        self.str_group_label = group_data.get('label', '')
-        channels_list = group_data.get('channels', []) 
-        self.list_group_channels.clear()
-        for chan in channels_list:
-            item = self.list_group_channels.add()
-            item.value = chan
-        
-    else: 
-        group_id = str(group_id)
-        if group_id in group_data_dict:
-            group_data = group_data_dict[group_id]
-            self.str_group_id = str(group_id) 
-            channels_list = group_data.get('channels', []) 
-            self.list_group_channels.clear()
-            for chan in channels_list:
-                item = self.list_group_channels.add()
-                item.value = chan
-            
-        else:
-            self.str_group_id = ""
-            self.str_group_label = ""
-            self.list_group_channels = []
-            
-            
-def group_info_updater_mixer(self, context):
-    scene = context.scene.scene_props
-    
-    try:
-        group_data_dict = ast.literal_eval(scene.group_data)
-    except ValueError as e:
-        print(f"Error converting scene.group_data to dictionary: {e}")
-        return
-
-    group_id_str = str(self.str_selected_group)
-
-    if group_id_str in group_data_dict:
-        group_data = group_data_dict[group_id_str]
-        
-        self.str_group_id = group_id_str 
-        self.str_group_label = group_data.get('label', '')
-        channels_list = group_data.get('channels', [])
-        self.list_group_channels.clear()
-        for chan in channels_list:
-            item = self.list_group_channels.add()
-            item.value = chan
-        
-    else:
-        self.str_group_id = ""
-        self.str_group_label = ""
-        self.list_group_channels = ""
-        self.label = "INFLUENCER Mixer"
-        return 
-
-    if hasattr(self, "parameters_enum"):    
-        if self.parameters_enum == 'option_intensity':
-            self.label=f"Group {self.str_group_id}: {self.str_group_label} Intensity Mixer"
-        elif self.parameters_enum == 'option_color':
-            self.label=f"Group {self.str_group_id}: {self.str_group_label} Color Mixer"
-        elif self.parameters_enum == 'option_pan_tilt':
-            self.label=f"Group {self.str_group_id}: {self.str_group_label} Pan/Tilt Mixer"
-            
             
 def manual_fixture_selection_updater(self, context):
+    """This creates property group instances based on the manual text input for channels"""
     if self.str_manual_fixture_selection != "":
-            channels_list = parse_channels(self.str_manual_fixture_selection)
-            self.list_group_channels.clear()
-            for chan in channels_list:
-                item = self.list_group_channels.add()
-                item.value = chan
+        channels_list = parse_channels(self.str_manual_fixture_selection)
+        self.list_group_channels.clear()
+        for chan in channels_list:
+            item = self.list_group_channels.add()
+            item.value = chan
+                
+                
+def group_profile_updater(self, context):
+    profile = bpy.context.scene.scene_props.scene_group_data.get(self.selected_profile_enum)
+
+    # List of properties to update
+    properties = [
+        "pan_min", "pan_max", "tilt_min", "tilt_max", "zoom_min", "zoom_max", 
+        "gobo_speed_min", "gobo_speed_max", "influence_is_on", "intensity_is_on", 
+        "pan_tilt_is_on", "color_is_on", "diffusion_is_on", "strobe_is_on", 
+        "zoom_is_on", "iris_is_on", "edge_is_on", "gobo_id_is_on", "prism_is_on", 
+        "str_enable_strobe_argument", "str_disable_strobe_argument", 
+        "str_enable_gobo_speed_argument", "str_disable_gobo_speed_argument", 
+        "str_gobo_id_argument", "str_gobo_speed_value_argument", 
+        "str_enable_prism_argument", "str_disable_prism_argument", "color_profile_enum"
+    ]
+
+    for prop in properties:
+        setattr(self, prop, getattr(profile, prop))
+        
+        
+def call_fixtures_updater(self, context):
+    bpy.ops.viewport.call_fixtures_operator()
+        
+        
+class RaiseChannels(bpy.types.PropertyGroup):
+    chan: PointerProperty(type=bpy.types.Object)
+    original_influence: FloatProperty()
+    original_influence_color: FloatVectorProperty()
+    
+        
+class InfluencerList(bpy.types.PropertyGroup):
+    parameter: StringProperty()
+    raise_channels: CollectionProperty(type=RaiseChannels)
 
 
 ###################
@@ -397,11 +436,11 @@ class HarmonizerBase:
     PAN_TILT = 'pan_tilt'
 
 
+change_requests = []
+
+
 class HarmonizerPublisher(HarmonizerBase):
-    def __init__(self):
-        self.change_requests = []
           
-        
     def format_channel_and_value(self, c, v):
         """
         This function formats the channel and value numbers as string and then formats them
@@ -431,9 +470,14 @@ class HarmonizerPublisher(HarmonizerBase):
         This function formats the channel and value numbers as string and then formats them
         in a way the console will understand (by adding a 0 in front of numbers 1-9.)
         """
-        v = str(int(v))
-        if len(v) == 1:
+        v = int(v)
+        
+        if v >= 0 and v < 10:
             v = f"0{v}"
+        elif v < 0 and v > -10:
+            v = f"-0{-v}"
+        else:
+            v = str(v)
         return v
         
         
@@ -450,14 +494,34 @@ class HarmonizerPublisher(HarmonizerBase):
         address = bpy.context.scene.scene_props.str_command_line_address
 
         color_profiles = {
-            "option_rgb": ["$1", "$2", "$3"],
-            "option_cmy": ["$1", "$2", "$3"],
-            "option_rgbw": ["$1", "$2", "$3", "$4"],
-            "option_rgba": ["$1", "$2", "$3", "$4"],
-            "option_rgbl": ["$1", "$2", "$3", "$4"],
-            "option_rgbaw": ["$1", "$2", "$3", "$4", "$5"],
-            "option_rgbam": ["$1", "$2", "$3", "$4", "$5"]
+            # Absolute Arguments
+            "rgb": ["$1", "$2", "$3"],
+            "cmy": ["$1", "$2", "$3"],
+            "rgbw": ["$1", "$2", "$3", "$4"],
+            "rgba": ["$1", "$2", "$3", "$4"],
+            "rgbl": ["$1", "$2", "$3", "$4"],
+            "rgbaw": ["$1", "$2", "$3", "$4", "$5"],
+            "rgbam": ["$1", "$2", "$3", "$4", "$5"],
+
+            # Raise Arguments
+            "raise_rgb": ["$1", "$2", "$3"],
+            "raise_cmy": ["$1", "$2", "$3"],
+            "raise_rgbw": ["$1", "$2", "$3", "$4"],
+            "raise_rgba": ["$1", "$2", "$3", "$4"],
+            "raise_rgbl": ["$1", "$2", "$3", "$4"],
+            "raise_rgbaw": ["$1", "$2", "$3", "$4", "$5"],
+            "raise_rgbam": ["$1", "$2", "$3", "$4", "$5"],
+
+            # Lower Arguments
+            "lower_rgb": ["$1", "$2", "$3"],
+            "lower_cmy": ["$1", "$2", "$3"],
+            "lower_rgbw": ["$1", "$2", "$3", "$4"],
+            "lower_rgba": ["$1", "$2", "$3", "$4"],
+            "lower_rgbl": ["$1", "$2", "$3", "$4"],
+            "lower_rgbaw": ["$1", "$2", "$3", "$4", "$5"],
+            "lower_rgbam": ["$1", "$2", "$3", "$4", "$5"]
         }
+
         if p not in color_profiles:
             c, v = self.format_channel_and_value(c, v)
             address = address.replace("#", c).replace("$", v)
@@ -483,12 +547,139 @@ class HarmonizerPublisher(HarmonizerBase):
 
         This function does not return a value.
         """
-        if bpy.context.scene.scene_props.is_playing:
-            self.change_requests.append(c, p, v, i, a)  
+        if bpy.context.scene.scene_props.is_playing or bpy.context.scene.scene_props.in_frame_change:
+            global change_requests
+            change_requests.append((c, p, v, i, a))  
         else:
             address, argument = self.form_osc(c, p, v, i, a)  # Should return 2 strings
             send_osc(address, argument)
+            
+            
+    def find_objects(self, chan):
+        relevant_objects = []
+        for obj in bpy.data.objects:
+            if obj.int_object_channel_index == chan and chan != 1:
+                relevant_objects.append(obj)
+                pass
+            try:
+                number = find_int(obj.name)
+                if number == int(chan):
+                    relevant_objects.append(obj)
+            except:
+                pass
+        return relevant_objects
+            
+            
+    def send_value_to_three_dee(self, parent, chan, param, val):
+        """
+        Adds material to relevant objects in 3d scene and sets material as that intensity or color.
+
+        Parameters:
+        val: Either float or tuple, depending on intensity or color
+
+        This function does not return a value.
+        """
+        def find_val_type(val):
+            if isinstance(val, (tuple, list)):
+                return "color"
+            elif isinstance(val, (int, float)):
+                return "intensity"
+            else:
+                raise ValueError("Invalid value type")
+
+        val_type = find_val_type(val)
+        objects = self.find_objects(chan)
         
+        if not objects:
+            return
+        
+        if val_type == "intensity":
+            for obj in objects:
+                # Ensure the object has a material slot and create one if it doesn't
+                if not hasattr(obj.data, "materials"):
+                    continue
+                
+                if not obj.data.materials:
+                    mat = bpy.data.materials.new(name="Intensity_Material")
+                    obj.data.materials.append(mat)
+                else:
+                    mat = obj.data.materials[0]
+
+                # Enable 'Use nodes'
+                if not mat.use_nodes:
+                    mat.use_nodes = True
+                
+                nodes = mat.node_tree.nodes
+                links = mat.node_tree.links
+                
+                # Find existing emission node or create a new one
+                emission = None
+                for node in nodes:
+                    if node.type == 'EMISSION':
+                        emission = node
+                        break
+                if not emission:
+                    emission = nodes.new(type='ShaderNodeEmission')
+                    # Add material output node and link it to emission node
+                    output = nodes.new(type='ShaderNodeOutputMaterial')
+                    links.new(emission.outputs['Emission'], output.inputs['Surface'])
+
+                # Get the current value
+                input = emission.inputs['Strength']
+                current_val = input.default_value
+                    
+                if param == "raise_intensity":
+                    val = current_val + val * 0.01
+                elif param == "lower_intensity":
+                    val = current_val - val * 0.01
+                else:
+                    val *= 0.01
+                    
+                if val > 1:
+                    val = 1
+                elif val < 0:
+                    val = 0
+                    
+                input.default_value = val
+
+        elif val_type == "color":
+            for obj in objects:
+                if not hasattr(obj.data, "materials"):
+                    continue
+                
+                # Ensure the object has a material slot and create one if it doesn't
+                if not obj.data.materials:
+                    mat = bpy.data.materials.new(name="Color_Material")
+                    obj.data.materials.append(mat)
+                else:
+                    mat = obj.data.materials[0]
+
+                # Enable 'Use nodes'
+                if not mat.use_nodes:
+                    mat.use_nodes = True
+                
+                nodes = mat.node_tree.nodes
+                links = mat.node_tree.links
+
+                # Find existing emission node or create a new one
+                emission = None
+                for node in nodes:
+                    if node.type == 'EMISSION':
+                        emission = node
+                        break
+                if not emission:
+                    emission = nodes.new(type='ShaderNodeEmission')
+                    # Add material output node and link it to emission node
+                    output = nodes.new(type='ShaderNodeOutputMaterial')
+                    links.new(emission.outputs['Emission'], output.inputs['Surface'])
+
+                # Set the color value
+                scaled_val = tuple(component * 0.01 for component in val)
+                emission.inputs['Color'].default_value = (*scaled_val, 1)  # Assuming val is an (R, G, B) tuple
+
+        else:
+            SLI_assert_unreachable()
+
         
 """This should house all logic for mapping sliders and other inputs to fixture-appropriate values"""
 class HarmonizerMappers(HarmonizerBase):
@@ -508,7 +699,6 @@ class HarmonizerMappers(HarmonizerBase):
             max_property = f"{p}_max"
             min_value = find_my_patch(parent, chan, type, min_property)
             max_value = find_my_patch(parent, chan, type, max_property)
-            print(parent.pan_max)
             return min_value, max_value
         except AttributeError as e:
             print(f"Error in find_my_min_max: {e}")
@@ -517,8 +707,6 @@ class HarmonizerMappers(HarmonizerBase):
          
     def map_value(self, parent, chan, p, unmapped_value, type):
         min_val, max_val = self.find_my_min_max(parent, chan, type, p)
-        print(f"Input min/max: {min_val, max_val}")
-        print(f"Unmapped value: {unmapped_value}")
         if p in ["pan", "tilt", "zoom", "gobo_speed"]:
             if min_val <= 0 and max_val >= 0:
                 # Normalizing around zero
@@ -530,7 +718,6 @@ class HarmonizerMappers(HarmonizerBase):
                 else:
                     normalized_value = unmapped_value / 100
                     mapped_value = normalized_value * abs(min_val)
-                print(f"Mapped value 1: {mapped_value}")
             else:
                 # Non-symmetrical range
                 range_val = max_val - min_val
@@ -541,9 +728,8 @@ class HarmonizerMappers(HarmonizerBase):
                 else:
                     normalized_value = (unmapped_value + 100) / 200
                     mapped_value = (normalized_value * (max_val - min_val)) + min_val
-                print(f"Mapped value 2: {mapped_value}")
             return mapped_value
-        else: sorcerer_assert_unreachable()
+        else: SLI_assert_unreachable()
     
        
 class HarmonizerMixer(HarmonizerBase):
@@ -629,7 +815,7 @@ class HarmonizerMixer(HarmonizerBase):
             poses = parent.parameters
             num_poses = len(poses)
             motor_node = self.find_motor_node(parent)
-            progress = motor_node.float_progress
+            progress = (motor_node.float_progress * .1)
             
             # Ensure pose_index is within range
             pose_index = int(progress * (num_poses - 1)) % num_poses
@@ -661,7 +847,7 @@ class HarmonizerMixer(HarmonizerBase):
             else:
                 return mixed_values[f'float_{param_mode}']
         else:
-            sorcerer_assert_unreachable()
+            SLI_assert_unreachable()
 
     def find_motor_node(self, mixer_node: bpy.types.Node) -> bpy.types.Node:
         """Find the motor node connected to the mixer node."""
@@ -687,23 +873,47 @@ class HarmonizerMixer(HarmonizerBase):
                 return [v * float_scale for v in mixed_values]
         return mixed_values
         
-    def mix_my_values(self, parent, p):
-        """Recieves a bpy object mesh, parent, and returns three lists for channels list (c), parameters list, 
+    def mix_my_values(self, parent, param):
+        """Receives a bpy object mesh, parent, and returns three lists for channels list (c), parameters list (p), 
            and values list (v)"""
-        # Define variables
-        channels_list = parent.list_group_channels
+        
+        cumulative_c = []
+        cumulative_p = []
+        cumulative_v = []
+        
+        if parent.str_manual_fixture_selection == "":
+            item = bpy.context.scene.scene_props.scene_group_data.get(parent.selected_group_enum)
+            channels_list = item.channels_list
+            channels = [item.chan for item in channels_list]
+            c, p, v = self.append_mixer_cpv(parent, param, channels)
+            cumulative_c.extend(c)
+            cumulative_p.extend(p)
+            cumulative_v.extend(v)
+            return cumulative_c, cumulative_p, cumulative_v
+        else:
+            channel_tuples = parse_mixer_channels(parent.str_manual_fixture_selection)
+            for single_tuple in channel_tuples:
+                channels = list(single_tuple)
+                c, p, v = self.append_mixer_cpv(parent, param, channels)
+                cumulative_c.extend(c)
+                cumulative_p.extend(p)
+                cumulative_v.extend(v)
+            return cumulative_c, cumulative_p, cumulative_v
+        
+        
+    def append_mixer_cpv(self, parent, parameter, channels):
         values_list = parent.parameters
-        channels = [item.value for item in channels_list]
         offset = parent.float_offset * 0.5
         subdivisions = parent.int_subdivisions
         mode = parent.mix_method_enum
-        param_mode = p
-        if p == "color":
-            p = "vec_color"
-        parameter_name = f"float_{p}"
+        param_mode = parameter
+        param = parameter
+        if parameter == "color":
+            param = "vec_color"
+        param = f"float_{param}"
         
         # Establish and then subdivide values list
-        values = [getattr(choice, parameter_name) for choice in values_list]
+        values = [getattr(choice, param) for choice in values_list]
         values = self.subdivide_values(subdivisions, values)
         
         # Establish channels list, sort channels and values list, mix values, and then scale values
@@ -712,7 +922,7 @@ class HarmonizerMixer(HarmonizerBase):
         scaled_values = self.scale(parent, param_mode, mixed_values)
         
         # Establish parameters list
-        p = [p for _ in channels]
+        p = [parameter for _ in channels]
         
         # Return c, p, v lists
         return list(channels), p, list(scaled_values)
@@ -840,7 +1050,7 @@ class ColorSplitter(HarmonizerBase):
         return cyan, magenta, yellow
 
         
-    def split_color(self, parent, c, v, type):
+    def split_color(self, parent, c, p, v, type):
         """
         Splits the input (r, g, b) tuple for value (v) into tuples like (r, g, b, a, m)
         for the value entries and updates the parameter (p) value for each entry to the 
@@ -848,12 +1058,13 @@ class ColorSplitter(HarmonizerBase):
         
         This function prepares the parameters and values for later processing by the 
         find_my_argument() function, ensuring that the correct argument is formed based 
-        on the received v tuple. The updated parameter p reflects the color_profile choice,
-        allowing the publisher to interpret the v tuple correctly.
+        on the received v tuple. The updated parameter p indirectly reflects the 
+        color_profile choice, allowing the publisher to interpret the v tuple correctly.
         
         Parameters:
             parent: The parent controller object.
             c: The channel list.
+            p: The parameter, as list
             v: The value list.
             type: The controller type.
 
@@ -865,52 +1076,72 @@ class ColorSplitter(HarmonizerBase):
         new_v = []
         
         for chan, val in zip(c, v):  # 4chan lol
-            pf = find_my_patch(parent, chan, type, "color_profile_enum")
+            pf = find_my_patch(parent, chan, type, "color_profile_enum") # this returns option_rgb, option_rgba, etc.
             profile_converters = {
-                'option_rgba': (self.rgba_converter, 4),
-                'option_rgbw': (self.rgbw_converter, 4),
-                'option_rgbaw': (self.rgbaw_converter, 5),
-                'option_rgbl': (self.rgbl_converter, 4),
-                'option_cmy': (self.cmy_converter, 3),
-                'option_rgbam': (self.rgbam_converter, 5),
+                # Absolute Arguments
+                'rgba': (self.rgba_converter, 4),
+                'rgbw': (self.rgbw_converter, 4),
+                'rgbaw': (self.rgbaw_converter, 5),
+                'rgbl': (self.rgbl_converter, 4),
+                'cmy': (self.cmy_converter, 3),
+                'rgbam': (self.rgbam_converter, 5),
+
+                # Raise Arguments
+                'raise_rgba': (self.rgba_converter, 4),
+                'raise_rgbw': (self.rgbw_converter, 4),
+                'raise_rgbaw': (self.rgbaw_converter, 5),
+                'raise_rgbl': (self.rgbl_converter, 4),
+                'raise_cmy': (self.cmy_converter, 3),
+                'raise_rgbam': (self.rgbam_converter, 5),
+
+                # Lower Arguments
+                'lower_rgba': (self.rgba_converter, 4),
+                'lower_rgbw': (self.rgbw_converter, 4),
+                'lower_rgbaw': (self.rgbaw_converter, 5),
+                'lower_rgbl': (self.rgbl_converter, 4),
+                'lower_cmy': (self.cmy_converter, 3),
+                'lower_rgbam': (self.rgbam_converter, 5)
             }
 
-            if pf == 'option_rgb':
-                new_p.append(pf)
+            mode = pf.replace("option_", "")
+            corrected_key = p[0].replace("color", mode)
+            
+            publisher = HarmonizerPublisher()
+            publisher.send_value_to_three_dee(parent, chan, corrected_key, val)
+
+            if corrected_key in ['rgb', 'raise_rgb', 'lower_rgb']:
+                new_p.append(corrected_key)
                 new_v.append(val)
-            elif pf in profile_converters:
-                converter, num_values = profile_converters[pf]
+                
+            elif corrected_key in profile_converters:
+                converter, num_values = profile_converters[corrected_key]
                 converted_values = converter(*val[:3])
                 
-                new_p.append(pf)
+                new_p.append(corrected_key)
                 new_v.append(converted_values[:num_values])
-            else: raise ValueError(f"Unknown color profile: {pf}")
+            else: raise ValueError(f"Unknown color profile: {corrected_key}")
 
         return new_p, new_v
     
+        
+number_to_add_if_null = 1
+    
+    
+"""Tries to find an integer inside the string and returns it as an int. 
+   Returns 0 if no integer is found."""
+def find_int(string):
+    match = re.search(r'\d+', string)
+    return int(match.group()) if match else number_to_add_if_null
+    
     
 class HarmonizerFinders(HarmonizerBase): ## This must cater to individual fixtures
+    def __init__(self):
+        super().__init__()
+    
     def find_my_argument_template(self, parent, chan, param, type):
         if bpy.context.scene.scene_props.console_type_enum == "option_eos":
-            if type not in ["Influencer", "Brush"]:
-                color_templates = {
-                    "option_rgb": "# Red at $1 Enter, # Green at $2 Enter, # Blue at $3 Enter",
-                    "option_cmy": "# Cyan at $1 Enter, # Magenta at $2 Enter, # Yellow at $3 Enter",
-                    "option_rgbw": "# Red at $1 Enter, # Green at $2 Enter, # Blue at $3 Enter, # White at $4 Enter",
-                    "option_rgba": "# Red at $1 Enter, # Green at $2 Enter, # Blue at $3 Enter, # Amber at $4 Enter",
-                    "option_rgbl": "# Red at $1 Enter, # Green at $2 Enter, # Blue at $3 Enter, # Lime at $4 Enter",
-                    "option_rgbaw": "# Red at $1 Enter, # Green at $2 Enter, # Blue at $3 Enter, # Amber at $4 Enter, # White at $5 Enter",
-                    "option_rgbam": "# Red at $1 Enter, # Green at $2 Enter, # Blue at $3 Enter, # Amber at $4 Enter, # Mint at $5 Enter"
-                }
-                if param in color_templates:
-                    return color_templates[param]
+            return eos_arguments_dict.get(f"str_{param}_argument", "Unknown Argument")
 
-                else:
-                    return getattr(bpy.context.scene.scene_props, f"str_{param}_argument")
-            else:
-                return getattr(bpy.context.scene.scene_props, f"str_relative_{p}_argument")
-            
-            
     def find_my_controller_type(self, parent):
         """
         Function called by find_my_channels_and_[parameter values] functions to find controller type.
@@ -925,7 +1156,7 @@ class HarmonizerFinders(HarmonizerBase): ## This must cater to individual fixtur
             if parent.type == 'MESH':
                 if hasattr(parent, "object_identities_enum"):
                     return parent.object_identities_enum
-                else: sorcerer_assert_unreachable()
+                else: SLI_assert_unreachable()
             elif parent.type == 'COLOR':  # Color strip
                 return "strip"
             elif parent.type == 'CUSTOM':  
@@ -935,25 +1166,97 @@ class HarmonizerFinders(HarmonizerBase): ## This must cater to individual fixtur
                 }
                 return controller_types.get(parent.bl_idname, None)
         else: 
-            sorcerer_assert_unreachable()
+            SLI_assert_unreachable()
+            
+            
+    def is_torus(self, mesh):
+        # Analyze the bounding box dimensions
+        bbox = mesh.bound_box
+        dims = [Vector(bbox[i]) - Vector(bbox[i + 4]) for i in range(4)]
+        dims = [dim.length for dim in dims]
+
+        # Check if the dimensions are roughly equal (more like a sphere/torus) or significantly different (more like a cube)
+        threshold = 0.1  # Adjust this threshold as needed
+        if all(abs(dims[i] - dims[j]) < threshold for i in range(4) for j in range(i + 1, 4)):
+            print("Is torus")
+            return True
+        print("Is not torus")
+        return False
         
+    
+    def is_inside_mesh(self, obj, mesh_obj):
+        #torus = self.is_torus(mesh_obj)
+        #torus = False
         
-    """Recieves a bpy object mesh, parent, and returns a list representing channels within that mesh"""
-    def find_influencer_current_channels(parent):
-        # Use the get_lights_within_mesh function in the library to get channels, then add them to its captured_set().
-        return current_channels
+        #if not torus:
+        # Transform the object's location into the mesh object's local space.
+        obj_loc_local = mesh_obj.matrix_world.inverted() @ obj.location
+
+        # Get the local bounding box corners of the mesh object.
+        bbox_corners_local = [Vector(corner) for corner in mesh_obj.bound_box]
+
+        # Calculate the min and max bounding box corners in local space.
+        bbox_min = Vector((min(corner.x for corner in bbox_corners_local),
+                           min(corner.y for corner in bbox_corners_local),
+                           min(corner.z for corner in bbox_corners_local)))
+        bbox_max = Vector((max(corner.x for corner in bbox_corners_local),
+                           max(corner.y for corner in bbox_corners_local),
+                           max(corner.z for corner in bbox_corners_local)))
+        inside = all(bbox_min[i] <= obj_loc_local[i] <= bbox_max[i] for i in range(3))
+
+        return inside
+
         
+#        else:
+#            depsgraph = bpy.context.evaluated_depsgraph_get()
+#            evaluated_obj = mesh_obj.evaluated_get(depsgraph)
+
+#            # Ensure the evaluated object has mesh data
+#            if not evaluated_obj or not evaluated_obj.data or not hasattr(evaluated_obj.data, 'polygons'):
+#                print(f"Error: Object '{mesh_obj.name}' has no evaluated mesh data.")
+#                return False
+
+#            # Transform the object's location into the mesh object's local space
+#            obj_loc_local = evaluated_obj.matrix_world.inverted() @ obj.location
+
+#            # Find the closest point on the mesh
+#            success, closest, normal, _ = evaluated_obj.closest_point_on_mesh(obj_loc_local)
+#            
+#            if not success:
+#                return False
+
+#            # Determine if the point is inside the mesh
+#            direction = closest - obj_loc_local
+#            inside = direction.dot(normal) > 0
+
+#            return inside
+    
+
+    def find_influencer_current_channels(self, parent):
+        """Receives a bpy object mesh, parent, and returns a set representing channels within that mesh"""
+        lights_inside = {obj for obj in bpy.data.objects if obj.type == 'MESH' and not obj.hide_viewport and self.is_inside_mesh(obj, parent)}
+        lights_inside = {obj for obj in lights_inside if obj.name != parent.name}
+        return lights_inside
+
         
-    """Recieves a bpy object mesh (parent), and returns two lists representing channels that used to be 
-       within that mesh but just left, as well as new additions."""   
-    def find_influencer_channels_to_change(parent, current_channels, context):
-        # Compare current channels with the object's captured_set()
-        return channels_to_restore, channels_to_add
-        
-        
-    """Recieves a bpy object mesh (parent), and parameter, and returns a list of restore values"""
-    def find_my_restore_values(channels_to_restore, p, context):
-        # Use the background property registered on the objects to restore.
+    def get_list_by_parameter(self, parent, parameter):
+        """Receives parent, object, and parameter, string and returns parameter, string."""
+        for inf_list in parent.influencer_list:
+            if inf_list.parameter == parameter:
+                return inf_list
+        new_list = parent.influencer_list.add()
+        new_list.parameter = parameter
+        return new_list
+    
+
+    def find_my_restore_values(self, channels_to_restore, p, context):
+        restore_values = []
+        for chan in channels_to_restore:
+            attribute_name = f"prev_{p}"
+            if hasattr(chan, attribute_name):
+                restore_values.append(getattr(chan, attribute_name))
+            else:
+                restore_values.append(0 if p != "color" else (0, 0, 0))
         return restore_values
     
     
@@ -961,34 +1264,65 @@ class HarmonizerFinders(HarmonizerBase): ## This must cater to individual fixtur
         """
         This function converts an RGB color object into a tuple.
         """
-        return (v.r * 100, v.g * 100, v.b * 100)
+        #print(f"V: {v}")
+        if type(v) == mathutils.Color:
+            return (v.r * 100, v.g * 100, v.b * 100)
+        
+        else: 
+            r, g, b = v
+            return (r * 100, g * 100, b * 100)
 
 
-    """Recieves a bpy object mesh (parent), and parameter, and returns integers in a [list]
-       This is for single fixtures."""
-    def find_my_value(self, parent, p, type):
-        # Use effects to mix up values inside a group, or simply return a single integer
+    def find_my_value(self, parent, p, type, chan):
+        """Recieves a bpy object mesh (parent), and parameter, and returns integers in a [list]
+           This is for single fixtures."""
         attribute_name = parameter_mapping.get(p)
         if attribute_name:
             unmapped_value = getattr(parent, attribute_name)
-            if p in ["pan", "tilt", "zoom", "gobo_speed", "pan_tilt"]:
+            if p == "color":
+                unmapped_value = self.color_object_to_tuple(unmapped_value)
+            elif p in ["pan", "tilt", "zoom", "gobo_speed", "pan_tilt"]:
                 mapping = HarmonizerMappers()
                 try: 
-                    value = mapping.map_value(parent, p, unmapped_value, type)
+                    value = mapping.map_value(parent, chan, p, unmapped_value, type)
                     return value
                 except AttributeError:
                     print("Error in find_my_value when attempting to call map_value.")
+                    
             return unmapped_value
         else:
             return None
+        
+    def find_channels_list(self, parent):
+        """Recieves a bpy object and returns list of channels, which are ints,"""
+        item = bpy.context.scene.scene_props.scene_group_data.get(parent.selected_group_enum)
+        channels_list = []
+        
+        if parent.str_manual_fixture_selection == "":
+            for channel in item.channels_list:
+                channels_list.append(channel.chan)
+        else:
+            for channel in parent.list_group_channels:
+                channels_list.append(channel.value)
+        return channels_list
 
 
-    """Recieves a bpy object mesh (parent), and parameter, and returns two lists for channels list (c) and values list (v)"""
-    def find_my_group_values(self, parent, p):
+    def trigger_downstream_nodes(self, parent, attribute_name, new_value):
+        """Receives a bpy object and returns nothing"""
+        for output_socket in parent.outputs:
+            if output_socket.bl_idname == 'LightingOutputType':
+                for link in output_socket.links:
+                    connected_node = link.to_socket.node
+                    if connected_node.bl_idname == "group_controller_type":
+                        setattr(connected_node, attribute_name, new_value)
+        
+
+    def find_my_group_values(self, parent, p, type):
+        """Recieves a bpy object mesh (parent), parameter, and controller_type, and returns three lists for channels list (c), parameters list, and values list (v)"""
         # Use effects to mix up values inside a group, or simply return a simple value
-        channels = []
-        parameters = []
-        values = []
+        c = []
+        param = []
+        v = []
         
         attribute_name = parameter_mapping.get(p)
         if attribute_name:  # Find and map value
@@ -997,19 +1331,162 @@ class HarmonizerFinders(HarmonizerBase): ## This must cater to individual fixtur
             if p == "color":
                 new_value = self.color_object_to_tuple(new_value)
             
+            if parent.type == 'CUSTOM':
+                self.trigger_downstream_nodes(parent, attribute_name, new_value)
+            
+            channels_list = []
+            channels_list = self.find_channels_list(parent)
+            
             mapping = HarmonizerMappers()
-            for chan in parent.list_group_channels:
-                channels.append(chan.value)
-                parameters.append(p)
+            for channel in channels_list:
+                c.append(channel)
+                param.append(p)
                 if p in ["pan", "tilt", "zoom", "gobo_speed", "pan_tilt"]:
-                    value_to_add = mapping.map_value(parent, chan, p, new_value, type)
-                    values.append(value_to_add)
+                    value_to_add = mapping.map_value(parent, channel, p, new_value, type)
+                    v.append(value_to_add)
                 else:
-                    values.append(new_value)
-            return channels, parameters, values
+                    v.append(new_value)
+            return c, param, v
         
-        else: sorcerer_assert_unreachable()
+        else: SLI_assert_unreachable()
+        
+        
+    """This is where we try to find the channel number of the object."""
+    def append_channel(self, channels, chan):
+        if not bpy.context.scene.scene_props.use_name_for_id:
+            if chan.int_object_channel_index != 0:
+                channels.append(chan.int_object_channel_index)
+            else:
+                try:
+                    number = find_int(chan.name)
+                    channels.append(number)
+                except:
+                    SLI_assert_unreachable()
+        else:
+            try:
+                channels.append(find_int(chan.name))
+            except:
+                if chan.int_object_channel_index != 0:
+                    channels.append(chan.int_object_channel_index)
+                else: channels.append(self.number_to_add_if_null) 
+                
+                
+    def apply_strength(self, parent, value):
+        x = parent.float_object_strength
+        r, g, b = value
+        return (r * x, g * x, b * x)
     
+    
+    def invert(self, value):
+        r, g, b = value
+        return (1 - r, 1 - g, 1 - b)
+            
+        
+    def find_my_influencer_values(self, parent, p, type):
+        """Receives a bpy object mesh (parent), parameter, and controller_type, and returns three lists for channels list (c), parameters list, and values list (v)"""
+        attribute_name = parameter_mapping.get(p)
+        if attribute_name:  # Find and map value
+            new_value = getattr(parent, attribute_name)
+            new_value_for_raise = new_value
+            
+            if p == 'color':
+                restore_value = getattr(parent, "float_vec_color_restore")
+            
+            current_channels = self.find_influencer_current_channels(parent)
+            mapping = HarmonizerMappers()
+            true_parent = bpy.data.objects[parent.name]
+            influencer_list = self.get_list_by_parameter(true_parent, p)
+            raise_channels = influencer_list.raise_channels
+            old_channels = set(chan.chan for chan in raise_channels)
+            new_channels = set()
+            c = []
+            param = []
+            v = []
+            new_channels = current_channels - old_channels
+            
+            # Release
+            if type == "Influencer":
+                for chan in list(raise_channels):
+                    if chan.chan not in current_channels:
+                        channel = []
+                        self.append_channel(channel, chan.chan)
+                        c.append(channel[0])
+                        param.append(p)
+                        if p == "color":
+                            if not parent.is_erasing:
+                                new_release_value = self.color_object_to_tuple(restore_value)
+                            else: new_release_value = self.color_object_to_tuple(new_value)
+                            v.append(new_release_value)
+                        else: v.append(chan.original_influence * -1)
+                    
+            raise_channels.clear()
+            
+            # Raise
+            for chan in new_channels:
+                # Append Channel
+                channel = []
+                self.append_channel(channel, chan)
+                c.append(channel[0])
+                
+                # Append Parameter
+                if type == "Brush" and p == "color":
+                    param.append(f"raise_{p}")
+                elif type == "Brush":
+                    param.append(f"raise_{p}")
+                else: param.append(p)
+                
+                # Append Value
+                if p in ["pan", "tilt", "zoom", "gobo_speed"]:
+                    value_to_add = mapping.map_value(parent, channel, p, new_value, type)
+                    v.append(value_to_add)
+                else:
+                    if p == "color":
+                        if not parent.is_erasing:
+                            new_raise_value = new_value_for_raise
+                        else: new_raise_value = restore_value
+                        
+                        if type == "Brush":
+                            #return [], [], []
+                            if parent.is_erasing:
+                                new_raise_value = (1, 1, 1)
+                            new_raise_value = self.invert(new_raise_value)
+                        new_raise_value = self.color_object_to_tuple(new_raise_value)  
+                        new_raise_value = self.apply_strength(parent, new_raise_value)
+                        if type == "Brush" and p == "color":
+                            r, g, b = new_raise_value
+                            if not parent.red_is_on:
+                                r = 100
+                            if not parent.green_is_on:
+                                g = 100
+                            if not parent.blue_is_on:
+                                b = 100
+                            if r == 0:
+                                r = -100 * parent.float_object_strength
+                            if g == 0:
+                                g = -100 * parent.float_object_strength
+                            if b == 0:
+                                b = -100 * parent.float_object_strength
+                            new_raise_value = (r * -1, g * -1, b * -1)
+                        v.append(new_raise_value)
+                    else:
+                        if type == "Brush":
+                            new_value_for_raise *= parent.float_object_strength
+                            if parent.is_erasing:
+                                v.append(new_value_for_raise * -1)
+                            else: v.append(new_value_for_raise)
+                        else: v.append(new_value_for_raise)
+                
+            for chan in current_channels:
+                new_channel = raise_channels.add()
+                new_channel.chan = chan
+                if p != "color":
+                    new_channel.original_influence = new_value
+                
+            return c, param, v
+        
+        else:
+            SLI_assert_unreachable()
+
         
     def find_my_channels_and_values(self, parent, p):
         """
@@ -1028,20 +1505,17 @@ class HarmonizerFinders(HarmonizerBase): ## This must cater to individual fixtur
         controller_type = self.find_my_controller_type(parent)  # Should return a string.
         
         if controller_type in ["Influencer", "Brush"]:
-            current_channels = parent.find_influencer_current_channels(parent)  # Should return a list.
-            channels_to_restore, channels_to_add = find_influencer_channels_to_change(parent, current_channels)  # Should return a list
-            add_value = parent.find_my_value(parent, p)  # Should return a list with just one [integer].
-            restore_values = parent.find_my_restore_values(parent, p)
-            c = new_channels + channels_to_restore
-            v = add_values + restore_values
+            c, p, v = self.find_my_influencer_values(parent, p, controller_type)
             return c, p, v, controller_type
         
-        elif controller_type == "Fixture":
-            value = self.find_my_value(parent, p, type)
-            return [parent.int_object_channel_index], [p], [value], controller_type
+        elif controller_type in ["Fixture", "Pan/Tilt Fixture"]:
+            channels = []
+            self.append_channel(channels, parent)
+            value = self.find_my_value(parent, p, controller_type, channels[0])
+            return channels, [p], [value], controller_type
         
-        elif controller_type in  ["group", "strip", "Set Piece"]:
-            c, p, v = self.find_my_group_values(parent, p)
+        elif controller_type in  ["group", "strip", "Stage Object"]:
+            c, p, v = self.find_my_group_values(parent, p, controller_type)
             return c, p, v, controller_type
         
         elif controller_type == "mixer":
@@ -1049,11 +1523,14 @@ class HarmonizerFinders(HarmonizerBase): ## This must cater to individual fixtur
             c, p, v = mixing.mix_my_values(parent, p)
             return c, p, v, controller_type
                     
-        else: sorcerer_assert_unreachable()
+        else: SLI_assert_unreachable()
     
     
 def find_my_patch(parent, chan, type, desired_property):
     """
+    [EDIT 6/29/24: This docustring is slightly outdated now after revising the code for 
+    new patch system]
+    
     This function finds the best patch for a given channel. If the controller type is
     not Fixture or P/T Fixture, then it tries to find an object in the 3D scene that
     represents that channel. If it finds one, it will return that object's desired
@@ -1076,18 +1553,25 @@ def find_my_patch(parent, chan, type, desired_property):
     Parameters:
         parent: the parent controller object, a node, object, or color strip
         chan: the channel number as defined by the parent's list_group_channels
-        type: the controllertype of parent controller object, can be mixer, group node, set piece, etc.
+        type: the controllertype of parent controller object, can be mixer, group node, stage object, etc.
         desired_property: the patch property that is being requested, in string form
         
     Returns:
-        desired_property: The value of the requested property
+        desired_property: The value of the requested property, aka the patch info
     """
     if type not in ["Fixture", "Pan/Tilt Fixture"]:
+        second_options = []
         for obj in bpy.data.objects:
-            if obj.int_fixture_index == chan:
+            if obj.int_object_channel_index == str(chan):
                 return getattr(obj, desired_property)
-            
-    else: return getattr(chan, desired_property)
+            else:
+                try:
+                    option = int(obj.name)
+                    if option == chan:
+                        second_options.append(obj)
+                except: pass
+        if len(second_options) > 0:
+            return getattr(second_options[0], desired_property)
     return getattr(parent, desired_property)
     
     
@@ -1139,7 +1623,7 @@ def universal_updater(self, context, property_name, find_function):
     
     if mode == "color":
         color_splitter = ColorSplitter()
-        p, v = color_splitter.split_color(parent, c, v, type)
+        p, v = color_splitter.split_color(parent, c, p, v, type)
 
     finders = HarmonizerFinders()
     i = []
@@ -1152,6 +1636,8 @@ def universal_updater(self, context, property_name, find_function):
       
     publisher = HarmonizerPublisher()
     for chan, param, val, inf, arg in zip(c, p, v, i, a):
+        if param in ["intensity", "raise_intensity", "lower_intensity"]:
+            publisher.send_value_to_three_dee(parent, chan, param, val)
         publisher.send_cpvia(chan, param, val, inf, arg)
 
 
@@ -1169,7 +1655,6 @@ edge_partial = partial(universal_updater, property_name="edge", find_function=ha
 gobo_id_partial = partial(universal_updater, property_name="gobo_id", find_function=harmonizer_instance.find_my_channels_and_values)
 gobo_speed_partial = partial(universal_updater, property_name="gobo_speed", find_function=harmonizer_instance.find_my_channels_and_values)
 prism_partial = partial(universal_updater, property_name="prism", find_function=harmonizer_instance.find_my_channels_and_values)
-pan_tilt_partial = partial(universal_updater, property_name="pan_tilt", find_function=harmonizer_instance.find_my_channels_and_values)
 
 def intensity_updater(self, context):
     return intensity_partial(self, context)
@@ -1195,8 +1680,6 @@ def gobo_speed_updater(self, context):
     return gobo_speed_partial(self, context)
 def prism_updater(self, context):
     return prism_partial(self, context)
-def pan_tilt_updater(self, context):
-    return pan_tilt_partial(self, context)
 
 def mixer_offset_updater(self, context):
     if self.parameters:
@@ -1217,6 +1700,421 @@ def mixer_offset_updater(self, context):
         
 
 ###################
+# HANDLERS
+###################
+
+DEBOUNCE_INTERVAL = 0.003  # 100 milliseconds
+
+# Initialize the last update time variable
+last_update_time = 0
+
+def check_and_trigger_drivers(updated_objects):
+    evaluated_to_original = [obj.name for obj in updated_objects]
+    
+    for obj in bpy.data.objects:
+        if obj.object_identities_enum == "Stage Object":
+            
+            # Iterate through drivers of the object
+            if obj.animation_data:
+                for driver in obj.animation_data.drivers:
+                    data_path = driver.data_path
+                    # Attempt to resolve the property path to get the property name
+                    try:
+                        # Check if the property path is quoted or not
+                        if '"' in data_path:
+                            # Quoted property
+                            prop_name = data_path.split('"')[1]
+                        else:
+                            # Unquoted property (like float_intensity)
+                            prop_name = data_path.split('.')[-1]
+                        
+                        # Print driver details
+                        for var in driver.driver.variables:
+                            for target in var.targets:
+                                
+                                # Check if the driver targets any of the updated objects
+                                if target.id.name in evaluated_to_original:
+                                    # Trigger the update for this property
+                                    trigger_set_piece_update(obj)
+                    except IndexError:
+                        print(f"Failed to parse data path '{data_path}' for drivers on '{obj.name}'")
+                    except Exception as e:
+                        print(f"Error processing driver on '{obj.name}': {e}")
+
+
+@persistent
+def depsgraph_update_handler(scene, depsgraph):
+#    global last_update_time
+
+#    current_time = time.time()
+#    if current_time - last_update_time < DEBOUNCE_INTERVAL:
+#        return  # Skip this update if within the debounce interval
+#    
+#    last_update_time = current_time
+    updated_objects = {update.id for update in depsgraph.updates if isinstance(update.id, bpy.types.Object)}
+    
+    for update in depsgraph.updates:
+        # Check if the update is for an object
+        if isinstance(update.id, bpy.types.Object):
+            obj = update.id
+            
+            if obj.object_identities_enum in {"Influencer", "Brush"}:
+                if update.is_updated_transform:
+                    trigger_influencer_brush_update(obj)
+            elif obj.object_identities_enum == "Stage Object":
+                if update.is_updated_geometry:
+                    trigger_set_piece_update(obj)
+                    
+    check_and_trigger_drivers(updated_objects)
+
+
+def trigger_influencer_brush_update(obj):
+    # Trigger the harmonizer update for each relevant property, skipping those set to 0
+    properties = ['float_intensity', 'float_vec_color', 'float_zoom', 'float_iris']
+    for prop in properties:
+        value = getattr(obj, prop)
+        if isinstance(value, float) and value != 0:
+            setattr(obj, prop, value)
+        elif isinstance(value, mathutils.Color) and any(c != 0 for c in value):
+            setattr(obj, prop, value)
+
+
+def trigger_set_piece_update(obj):
+    # Trigger the harmonizer update for each relevant property, skipping those set to 0
+    properties = ['float_intensity', 'float_vec_color', 'float_zoom', 'float_iris']
+    for prop in properties:
+        value = getattr(obj, prop)
+        if isinstance(value, float) and value != 0:
+            setattr(obj, prop, value)
+        elif isinstance(value, (list, tuple)) and any(v != 0 for v in value):
+            setattr(obj, prop, value)   
+
+
+#########################
+# SORCERER DEPSGRAPH
+#########################
+old_graph = []
+controllers = []
+
+class AnimationDependencyGraph:  # Because Blender's doesn't care :(
+    def __init__(self):
+        self.toggles = {
+            "intensity_is_on": ["float_intensity"], 
+            "pan_tilt_is_on": ["float_pan", "float_tilt"],
+            "color_is_on": ["float_vec_color"], 
+            "diffusion_is_on": ["float_diffusion"],
+            "strobe_is_on": ["float_strobe"],
+            "zoom_is_on": ["float_zoom"], 
+            "iris_is_on": ["float_iris"], 
+            "edge_is_on": ["float_edge"], 
+            "gobo_id_is_on": ["int_gobo_id", "float_gobo_speed"],
+            "prism_is_on": ["int_prism"]
+        }
+        
+    
+    # Find object, strip, and node controllers.
+    def find_controllers(self, scene):
+        controllers = []
+        
+        if scene.scene_props.objects_enabled:
+            controllers = self.find_objects(scene)
+        if scene.scene_props.strips_enabled:
+            controllers = self.find_strips(scene, controllers)
+        if scene.scene_props.nodes_enabled:
+            controllers = self.find_nodes(scene, controllers)
+        
+        return controllers
+    
+    def find_objects(self, scene):
+        if not scene.scene_props.objects_enabled:
+            return []
+        
+        return [obj for obj in scene.objects]
+    
+    def find_strips(self, scene, controllers):
+        if not scene.scene_props.strips_enabled or not hasattr(scene, "sequence_editor"):
+            return controllers
+        
+        for strip in scene.sequence_editor.sequences_all:
+            if strip.type == 'COLOR' and strip.my_settings.motif_type_enum == 'option_animation':
+                controllers.append(strip)
+                
+        return controllers
+    
+    def find_nodes(self, scene, controllers):
+        if not scene.scene_props.nodes_enabled:
+            return controllers
+        
+        node_trees = set()
+        
+        if bpy.context.scene.world and bpy.context.scene.world.node_tree:
+            node_trees.add(bpy.context.scene.world.node_tree)
+        for node_tree in bpy.data.node_groups:
+            node_trees.add(node_tree)
+        for node_tree in node_trees:
+            for node in node_tree.nodes:
+                controllers.append(node)
+                
+        return controllers
+    
+    
+    # Find the animated properties inside the controllers.
+    def convert_to_props(self, scene, controllers):
+        props = []
+        
+        for controller in controllers:
+            if hasattr(controller, 'bl_idname') and controller.bl_idname == 'mixer_type':
+                props.extend(self.find_props(controller, controller.parameters))
+            else:
+                props.extend(self.find_props(controller, controller))
+                
+        return props
+    
+    def find_props(self, controller, props_location):
+        props = []
+            
+        for toggle, attributes in self.toggles.items():
+            if getattr(props_location, toggle, False):
+                for property in attributes:
+                    if self.has_keyframes(props_location, property):
+                        value = getattr(props_location, property, None)
+                        props.append((controller, property, value))
+            
+        return props
+    
+    def has_keyframes(self, controller, property):
+        if hasattr(controller, "animation_data") and controller.animation_data:
+            if hasattr(controller.animation_data, "action") and controller.animation_data.action:
+                for fcurve in controller.animation_data.action.fcurves:
+                    if fcurve.data_path.endswith(property):
+                        return len(fcurve.keyframe_points) > 0
+
+        if isinstance(controller, bpy.types.ColorSequence):
+            return True
+        
+        if hasattr(controller, "bl_idname") and controller.bl_idname in ['group_controller_type', 'mixer_type']:
+            node_tree = controller.id_data  # Get the node tree containing the node
+            if hasattr(node_tree, "animation_data") and node_tree.animation_data:
+                action = node_tree.animation_data.action
+                if action:
+                    for fcurve in action.fcurves:
+                        # Check if the data path corresponds to the node and the property
+                        if fcurve.data_path.startswith(controller.path_from_id()) and fcurve.data_path.endswith(property):
+                            return len(fcurve.keyframe_points) > 0
+        return False
+    
+    
+    # Find properties that actually need to send OSC right now.
+    def find_updates(self, old_graph, new_graph):
+        old_dict = {(controller, parameter): value for controller, parameter, value in old_graph}
+        new_dict = {(controller, parameter): value for controller, parameter, value in new_graph}
+
+        # Only consider updates if there is a corresponding entry in both graphs and the value has changed
+        updates = [(controller, parameter, new_value) 
+                   for (controller, parameter), new_value in new_dict.items() 
+                   if (controller, parameter) in old_dict and old_dict[(controller, parameter)] != new_value]
+
+        return updates
+    
+    
+    def use_harmonizer(self, flag):
+        bpy.context.scene.scene_props.in_frame_change = flag
+    
+    
+    # Start the logic to create a CPVIA request for the controller's changed property.
+    def fire_updaters(self, updates):    
+        for controller, property, value in updates:
+            setattr(controller, property, getattr(controller, property))
+    
+    
+# HANDLERS 
+@persistent
+def frame_change_pre(scene):
+    global controllers, old_graph
+
+    depsgraph = AnimationDependencyGraph()
+    
+    if not scene.scene_props.is_playing or not controllers:
+        # Find controllers if not playing or if controllers are not set
+        controllers = depsgraph.find_controllers(scene)
+    
+    current_controllers = controllers
+    
+    new_graph = depsgraph.convert_to_props(scene, current_controllers)
+    updates = depsgraph.find_updates(old_graph, new_graph)
+    
+    depsgraph.use_harmonizer(True)  # Bind updater to harmonizer.
+    depsgraph.fire_updaters(updates)  # Form CPVIA request and add to change_requests.
+    depsgraph.use_harmonizer(False)  # Release updater from harmonizer.
+    
+    old_graph = new_graph
+    
+    # Clear controllers when not playing
+    if not scene.scene_props.is_playing:
+        controllers = []
+    
+    
+@persistent
+def frame_change_post(scene):
+    global change_requests
+    
+#    print("")
+#    print("")
+#    print(f"BEGINNING. Democratic mode is {scene.scene_props.is_democratic}. Original input below.")
+#    for request in change_requests:
+#        print(request)
+#    print("")
+
+    no_duplicates = remove_duplicates(change_requests)
+    
+#    print("no_duplicates below.")
+#    for request in no_duplicates:
+#        print(request)
+#    print("")
+    
+    if scene.scene_props.is_democratic:
+        no_conflicts = democracy(no_duplicates)
+    else:
+        no_conflicts = highest_takes_precedence(no_duplicates)
+        
+#    print("no_conflicts below.")
+#    for request in no_conflicts:
+#        print(request)
+#    print("")
+        
+    simplified = simplify(no_conflicts)
+
+#    print("simplified below.")
+    publisher = HarmonizerPublisher()
+    for request in simplified:
+#        print(request)
+        address, argument = publisher.form_osc(*request)  # Should return 2 strings
+        send_osc(address, argument)
+#    print("")
+    
+    if not scene.scene_props.is_playing:
+        scene.scene_props.in_frame_change = False
+        
+    # Clear change_requests here.
+    change_requests = []
+               
+            
+#########################
+# CPVIA HARMONIZER
+#########################
+def remove_duplicates(change_requests):
+    request_dict = {}
+
+    for c, p, v, i, a in change_requests:
+        key = (c, p, v)
+        if key in request_dict:
+            request_dict[key][1] += i  # Collect the eaten request's votes
+        else:
+            request_dict[key] = [a, i]  # Store argument and influence
+
+    return [(c, p, v, influence, argument) for (c, p, v), (argument, influence) in request_dict.items()]
+
+
+def democracy(no_duplicates):
+    '''Democratic mode where influence (i) is the number of votes one gets when there is a conflict'''
+    request_dict = {}
+
+    for c, p, v, i, a in no_duplicates:
+        key = (c, p)
+        if key not in request_dict:
+            request_dict[key] = {'total_influence': 0, 'weighted_sum': 0, 'arguments': a}
+        request_dict[key]['total_influence'] += i
+        request_dict[key]['weighted_sum'] += v * i
+
+    no_conflicts = []
+    for key, value_dict in request_dict.items():
+        c, p = key
+        total_influence = value_dict['total_influence']
+        weighted_sum = value_dict['weighted_sum']
+        a = value_dict['arguments']
+        v = weighted_sum / total_influence  # Calculate weighted average value
+        no_conflicts.append((c, p, v, total_influence, a))
+    
+    return no_conflicts
+
+
+def highest_takes_precedence(no_duplicates):
+    '''Standard HTP protocol mode'''
+    request_dict = {}
+
+    for c, p, v, i, a in no_duplicates:
+        key = (c, p)  # Key based on channel and parameter only
+        if key in request_dict:
+            if v > request_dict[key][2]:  # Compare the value
+                request_dict[key] = (c, p, v, i, a)
+        else:
+            request_dict[key] = (c, p, v, i, a)
+
+    no_conflicts = list(request_dict.values())
+    
+    return no_conflicts
+
+    
+def simplify(no_conflicts):
+    ''' Finds any instances where everything but channel number is the same 
+        between multiple requests and combines them using "thru" for consecutive numbers.
+    '''
+    
+    simplified_dict = {}
+
+    for c, p, v, i, a in no_conflicts:
+        key = (p, v, a)
+        if key in simplified_dict:
+            simplified_dict[key][0].append(int(c))  # Store channels as integers for easier sorting
+        else:
+            simplified_dict[key] = ([int(c)], p, v, i, a)
+
+    simplified = []
+    for (p, v, a), (channels, p, v, i, a) in simplified_dict.items():
+        channels.sort()
+        combined_channels = []
+        start = channels[0]
+        end = channels[0]
+        
+        for c in channels[1:]:
+            if c == end + 1:
+                end = c
+            else:
+                if start == end:
+                    combined_channels.append(str(start))
+                else:
+                    combined_channels.append(f"{start} Thru {end}")
+                start = end = c
+        
+        if start == end:
+            combined_channels.append(str(start))
+        else:
+            combined_channels.append(f"{start} Thru {end}")
+
+        combined_channels_str = " + ".join(combined_channels)
+        simplified.append((combined_channels_str, p, v, i, a))
+
+    return simplified
+    
+    
+#bpy.types.Scene.animation_handler = AnimationHandler()
+
+
+# Ensure the handler is added to the frame change handlers list
+bpy.app.handlers.frame_change_pre.clear()
+bpy.app.handlers.frame_change_post.clear()
+#bpy.app.handlers.animation_playback_pre.clear()
+bpy.app.handlers.frame_change_pre.append(frame_change_pre)
+bpy.app.handlers.frame_change_post.append(frame_change_post)
+#bpy.app.handlers.animation_playback_pre.append(animation_playback_pre)
+
+# Print the handlers in frame_change_pre
+print("Handlers in bpy.app.handlers.frame_change_pre:")
+for handler in bpy.app.handlers.frame_change_pre:
+    print(f" - {handler}")
+# scene.scene_props.is_playing is set to True/False in the SEQ Main script
+
+###################
 # NODE SOCKETS
 ###################
 class AlvaNodeTree(bpy.types.NodeTree):
@@ -1225,9 +2123,9 @@ class AlvaNodeTree(bpy.types.NodeTree):
     bl_icon = 'NODETREE'
     
 
-class MixerInputSocket(NodeSocket):
-    bl_idname = 'MixerInputType'
-    bl_label = 'Mixer Input Socket'
+class LightingInputSocket(NodeSocket):
+    bl_idname = 'LightingInputType'
+    bl_label = 'Lighting Input Socket'
 
     def draw(self, context, layout, node, text):
         layout.label(text=text)
@@ -1236,59 +2134,15 @@ class MixerInputSocket(NodeSocket):
         return (.5, 0, 1, 1)  
 
 
-class MixerOutputSocket(NodeSocket):
-    bl_idname = 'MixerOutputType'
-    bl_label = 'Mixer Input Socket'
+class LightingOutputSocket(NodeSocket):
+    bl_idname = 'LightingOutputType'
+    bl_label = 'Lighting Output Socket'
 
     def draw(self, context, layout, node, text):
         layout.label(text=text)
 
     def draw_color(self, context, node):
         return (.5, 0, 1, 1)  
-   
-    
-class GroupOutputSocket(NodeSocket):
-    bl_idname = 'GroupOutputType'
-    bl_label = 'Group Output Socket'
-
-    def draw(self, context, layout, node, text):
-        layout.label(text=text)
-
-    def draw_color(self, context, node):
-        return (1, 0, 1, 1)  
-    
-    
-class GroupInputSocket(NodeSocket):
-    bl_idname = 'GroupInputType'
-    bl_label = 'Group Input Socket'
-
-    def draw(self, context, layout, node, text):
-        layout.label(text=text)
-
-    def draw_color(self, context, node):
-        return (1, 0, 1, 1) 
-    
-    
-class MasterInputSocket(NodeSocket):
-    bl_idname = 'MasterInputType'
-    bl_label = 'Master Input Socket'
-
-    def draw(self, context, layout, node, text):
-        layout.label(text=text)
-
-    def draw_color(self, context, node):
-        return (1, 1, 1, 1) 
-    
-    
-class MasterOutputSocket(NodeSocket):
-    bl_idname = 'MasterOutputType'
-    bl_label = 'Master Output Socket'
-
-    def draw(self, context, layout, node, text):
-        layout.label(text=text)
-
-    def draw_color(self, context, node):
-        return (1, 1, 1, 1)
     
     
 class FlashOutSocket(NodeSocket):
@@ -1333,7 +2187,7 @@ class GroupControllerNode(bpy.types.Node):
     bl_icon = 'STICKY_UVS_LOC'
     bl_width_default = 300
 
-    # Assigned by group_info_updater on str_selected_light property.
+    # Assigned by group_info_updater on selected_group_enum property.
     str_group_id: StringProperty(default="1")
     list_group_channels: CollectionProperty(type=ChannelListPropertyGroup)
     str_group_label: StringProperty(default="")
@@ -1358,15 +2212,14 @@ class GroupControllerNode(bpy.types.Node):
     tilt_max: IntProperty(default=135, description="Maximum value for tilt")
     zoom_min: IntProperty(default=1, description="Minimum value for zoom")
     zoom_max: IntProperty(default=100, description="Maximum value for zoom")     
-    speed_min: IntProperty(default=-200, description="Minimum value for speed")
-    speed_max: IntProperty(default=200, description="Maximum value for speed")
+    gobo_speed_min: IntProperty(default=-200, description="Minimum value for speed")
+    gobo_speed_max: IntProperty(default=200, description="Maximum value for speed")
 
     # Selected group and color profile enumerators.
-    str_selected_light: EnumProperty(
+    selected_group_enum: EnumProperty(
         name="Selected Light",
         description="Choose a group to control. Create these groups with the Patch function on the N tab in node editor, with USITT ASCII import in the same area, or create/modify them in Properties -> World -> SORCERER: Group Channel Blocks (full screen).",
-        items=lamp_objects,
-        update=group_info_updater
+        items=scene_groups
     )
     str_manual_fixture_selection: StringProperty(
         name="Selected Lights",
@@ -1404,7 +2257,7 @@ class GroupControllerNode(bpy.types.Node):
     int_prism: IntProperty(default=0, min=0, max=1, description="Prism value. 1 is on, 0 is off", options={'ANIMATABLE'}, update=prism_updater)
     # Toggles for turning off visibility to unneeded parameters.
     influence_is_on: BoolProperty(default=False, description="Influence is enabled when checked")
-    intensity_is_on: BoolProperty(default=False, description="Intensity is enabled when checked")
+    intensity_is_on: BoolProperty(default=True, description="Intensity is enabled when checked")
     pan_tilt_is_on: BoolProperty(default=False, description="Pan/Tilt is enabled when checked")    
     color_is_on: BoolProperty(default=False, description="Color is enabled when checked")
     diffusion_is_on: BoolProperty(default=False, description="Diffusion is enabled when checked")
@@ -1416,8 +2269,9 @@ class GroupControllerNode(bpy.types.Node):
     prism_is_on: BoolProperty(default=False, description="Prism is enabled when checked")
 
     def init(self, context):
-        self.inputs.new('GroupInputType', "Driver Input")
-        self.inputs.new('GroupInputType', "Driver Input")
+        group_input = self.inputs.new('LightingInputType', "Lighting Input")
+        group_input.link_limit = 10
+        self.outputs.new('LightingOutputType', "Lighting Output")
         self.outputs.new('FlashOutType', "Flash")
 
         # Assign node group pointer
@@ -1432,9 +2286,9 @@ class GroupControllerNode(bpy.types.Node):
 
         row = layout.row(align=True)
         if self.str_manual_fixture_selection == "":
-            if not self.str_selected_light:
+            if not self.selected_group_enum:
                 row.alert = 1
-            row.prop(self, "str_selected_light", text="", icon_only=False, icon='LIGHT')
+            row.prop(self, "selected_group_enum", text="", icon_only=False, icon='LIGHT')
             row.alert = 0
         row.prop(self, "str_manual_fixture_selection", text="")
         
@@ -1583,7 +2437,6 @@ class MixerNode(bpy.types.Node):
         name="Parameter",
         description="Choose a parameter type to mix",
         items=mixer_parameters,
-        update=group_info_updater_mixer,
         default=1
     )
     color_profile_enum: EnumProperty(
@@ -1598,11 +2451,10 @@ class MixerNode(bpy.types.Node):
         items=mixer_methods,
         default=1
     )
-    str_selected_group: EnumProperty(
+    selected_group_enum: EnumProperty(
         name="Selected Group",
         description="Choose a group to control. Create these groups with the Patch function on the N tab in node editor, with USITT ASCII import in the same area, or create/modify them in Properties -> World -> SORCERER: Group Channel Blocks (full screen).",
-        items=group_objects,
-        update=group_info_updater_mixer
+        items=scene_groups
     )
     str_manual_fixture_selection: StringProperty(
         name="Selected Lights",
@@ -1618,7 +2470,6 @@ class MixerNode(bpy.types.Node):
     scale: FloatProperty(name="Size of Choices:", min=1, max=3, default=2)
     
     def init(self, context):
-        self.inputs.new('MixerInputType', "Driver Input")
         self.inputs.new('MotorInputType', "Motor Input")
         self.outputs.new('FlashOutType', "Flash")
         node_refs[self.name] = self  # Add this node to the global dictionary
@@ -1643,7 +2494,7 @@ class MixerNode(bpy.types.Node):
             op_update = row.operator("node.update_group", icon='FILE_REFRESH', text="")
             op_update.node_name = self.name
             if self.str_manual_fixture_selection == "":
-                row.prop(self, "str_selected_group", icon='COLLECTION_NEW', icon_only=0, text="")
+                row.prop(self, "selected_group_enum", icon='COLLECTION_NEW', icon_only=0, text="")
             row.prop(self, "str_manual_fixture_selection", text="")
             if self.mix_method_enum != "option_pose":
                 row.prop(self, "parameters_enum", expand=True, text="")
@@ -1748,20 +2599,18 @@ class LightingModifier(bpy.types.PropertyGroup):
 ###################
 classes = (
     ChannelListPropertyGroup,
-    MixerInputSocket,
-    MixerOutputSocket,
-    MasterOutputSocket,
-    MasterInputSocket,
-    GroupInputSocket,
+    LightingInputSocket,
+    LightingOutputSocket,
     MotorInputSocket,
     MotorOutputSocket,
-    GroupOutputSocket,
     FlashOutSocket,
     AlvaNodeTree,    
     GroupControllerNode,
     MixerParameters,
     MixerNode,
-    LightingModifier
+    LightingModifier,
+    RaiseChannels,
+    InfluencerList
 )
 
     
@@ -1775,6 +2624,8 @@ def register():
         
     bpy.types.Object.relevant_channels_checker = StringProperty(default="")
     
+    bpy.types.Object.int_speaker_number = IntProperty(name="Speaker Number", description="Number of speaker in Qlab or on sound mixer. You're seeing this here because you selected a Speaker object, and speaker objects represent real, physical speakers in your theater for the purpose of spatial audio. To pan microphones left or right, you don't use an encoder, you just move the microphone or sound object closer to the left or right inside 3D view", default=0)
+    bpy.types.Object.sound_source_enum = EnumProperty(items=get_sound_sources, name="Select either a sound strip in the sequencer or a microphone in Audio Patch")
     
     bpy.types.Object.str_enable_strobe_argument = StringProperty(
         default="# Strobe_Mode 127 Enter", description="Add # for group ID")
@@ -1800,7 +2651,8 @@ def register():
     bpy.types.Object.str_disable_prism_argument = StringProperty(
         default="# Beam_Fx_Select 01 Enter", description="Add # for group ID")
 
-
+    bpy.types.Object.str_gobo_speed_value_argument = StringProperty(
+        default="# Gobo_Index/Speed at $ Enter", description="Add $ for animation data and # for fixture/group ID")
 
 
 
@@ -1827,16 +2679,16 @@ def register():
         default=1, description="")
     bpy.types.Object.color_profile_enum = EnumProperty(
         name="Color Profile",
-        description="Choose a color profile for the group",
+        description="Choose a color profile for the mesh based on the patch in the lighting console",
         items=color_profiles,
     )
     bpy.types.Object.object_identities_enum = EnumProperty(
-        name="Identity",
-        description="Choose an identity for the object",
+        name="Mesh Identity",
+        description="In Sorcerer, meshes can represent and control individual lighting fixtures, microphones, stage objects, brushes, and 3D bitmapping objects. Select what you want your mesh to do here",
         items=object_identities,
     )
     
-    # Assigned by group_info_updater on str_selected_light property.
+    # Assigned by group_info_updater on selected_group_enum property.
     bpy.types.Object.str_group_id = StringProperty(default="1")
     bpy.types.Object.list_group_channels = CollectionProperty(type=ChannelListPropertyGroup)
     bpy.types.Object.str_group_label = StringProperty(default="")
@@ -1857,25 +2709,25 @@ def register():
         default=(1.0, 1.0, 1.0),
         min=0.0,
         max=1.0,
-        description="Color value",
+        description='Color value. If your fixture is not an RGB fixture, but CMY, RGBA, or something like that, Sorcerer will automatically translate RGB to the correct color profile. The best way to tell Sorcerer which color profile is here on the object controller, to the right of this field. To make changes to many at a time, use the magic "Profile to Apply" feature on the top left of this box, or the "Apply Patch to Objects in Scene" button at the end of the group patch below this panel',
         update=color_updater
     )
-    bpy.types.Object.float_vec_pan_tilt_graph = FloatVectorProperty(
-        name="",
+    bpy.types.Object.float_vec_color_restore = FloatVectorProperty(
+        name="Color (restore)",
         subtype='COLOR',
         size=3,
-        default=(.2, .2, .2),
+        default=(1.0, 1.0, 1.0),
         min=0.0,
-        max=.2,
-        update=pan_tilt_updater
+        max=1.0,
+        description="Why are there 2 colors for this one? Because remotely making relative changes to color doesn't work well. Influencers use relative changes for everything but color for this reason. This second color picker picks the color the influencer will restore channels to after passing over"
     )
-    bpy.types.Object.pan_tilt_graph_checker = FloatVectorProperty(
-        name="",
-        subtype='COLOR',
-        size=3,
-        default=(.2, .2, .2),
+    bpy.types.Object.float_volume = FloatProperty(
+        name="Volume",
+        default=0.0,
         min=0.0,
-        max=.2
+        max=100.0,
+        description="Volume of microphone",
+        options={'ANIMATABLE'}
     )
     bpy.types.Object.float_pan = FloatProperty(
         name="Pan",
@@ -2009,8 +2861,6 @@ def register():
     #--------------------------------------------------------------------------------------------
     '''VARIOUS OBJECT TYPES'''
     
-    
-    
     bpy.types.Object.influence = IntProperty(
         default=1, description="How many votes this controller gets when there are conflicts", min=1, max=10)
         
@@ -2028,7 +2878,9 @@ def register():
     bpy.types.Object.is_approaching_limit = BoolProperty(default=False)
     
     bpy.types.Object.influence_is_on = BoolProperty(default=False, description="Influence is enabled when checked")
-    bpy.types.Object.intensity_is_on = BoolProperty(default=False, description="Intensity is enabled when checked")
+    bpy.types.Object.audio_is_on = BoolProperty(default=False, description="Audio is enabled when checked")
+    bpy.types.Object.mic_is_linked = BoolProperty(default=False, description="Microphone volume is linked to Intensity when red")
+    bpy.types.Object.intensity_is_on = BoolProperty(default=True, description="Intensity is enabled when checked")
     bpy.types.Object.pan_tilt_is_on = BoolProperty(default=False, description="Pan/Tilt is enabled when checked")    
     bpy.types.Object.color_is_on = BoolProperty(default=False, description="Color is enabled when checked")
     bpy.types.Object.diffusion_is_on = BoolProperty(default=False, description="Diffusion is enabled when checked")
@@ -2038,6 +2890,9 @@ def register():
     bpy.types.Object.edge_is_on = BoolProperty(default=False, description="Edge is enabled when checked")
     bpy.types.Object.gobo_id_is_on = BoolProperty(default=False, description="Gobo ID is enabled when checked")
     bpy.types.Object.prism_is_on = BoolProperty(default=False, description="Prism is enabled when checked")
+    
+    bpy.types.Object.is_erasing = BoolProperty(name="Eraser", description="Erase instead of add")
+    bpy.types.Object.influencer_list = CollectionProperty(type=InfluencerList)
 
     bpy.types.Object.int_fixture_index = IntProperty(default=0)
     bpy.types.Object.fixture_index_is_locked = BoolProperty(default=True)
@@ -2049,20 +2904,24 @@ def register():
     )
     bpy.types.Object.str_call_fixtures_command = StringProperty(
         name="Call Fixtures Command",
-        description="Command line text to focus moving fixtures onto set piece"
+        description="Command line text to focus moving fixtures onto stage object",
+        update=call_fixtures_updater
     )
-    bpy.types.Object.str_selected_light = EnumProperty(
+    bpy.types.Object.selected_group_enum = EnumProperty(
         name="Selected Group",
         description="Choose a group to control. Create these groups with the Patch function on the N tab in node editor, with USITT ASCII import in the same area, or create/modify them in Properties -> World -> SORCERER: Group Channel Blocks (full screen)",
-        items=lamp_objects,
-        update=group_info_updater
+        items=scene_groups
     )
-    bpy.types.Object.str_selected_profile = EnumProperty(
+    bpy.types.Object.selected_profile_enum = EnumProperty(
         name="Profile to Apply",
         description="Choose a fixture profile to apply to this fixture and any other selected fixtures. Build profiles in Blender's Properties viewport under World",
-        items=fixture_profiles
+        items=scene_groups,
+        update=group_profile_updater
     )
     bpy.types.Object.float_object_strength = FloatProperty(default=1, min=0, max=1)
+    bpy.types.Object.red_is_on = BoolProperty(default=True, description="Disable or enable red output. Useful for trying to paint secondary colors")
+    bpy.types.Object.green_is_on = BoolProperty(default=True, description="Disable or enable green output. Useful for trying to paint secondary colors")
+    bpy.types.Object.blue_is_on = BoolProperty(default=True, description="Disable or enable blue output. Useful for trying to paint secondary colors")
     
     # For animation strips in sequencer
     bpy.types.ColorSequence.str_manual_fixture_selection = StringProperty(
@@ -2070,11 +2929,10 @@ def register():
         description="Instead of the group selector to the left, simply type in what you wish to control here",
         update=manual_fixture_selection_updater
     )
-    bpy.types.ColorSequence.str_selected_light = EnumProperty(
+    bpy.types.ColorSequence.selected_group_enum = EnumProperty(
         name="Selected Group",
         description="Choose a group to control. Create these groups with the Patch function on the N tab in node editor, with USITT ASCII import in the same area, or create/modify them in Properties -> World -> SORCERER: Group Channel Blocks (full screen)",
-        items=lamp_objects,
-        update=group_info_updater
+        items=scene_groups
     )
     bpy.types.ColorSequence.color_profile_enum = EnumProperty(
         name="Color Profile",
@@ -2082,7 +2940,7 @@ def register():
         items=color_profiles,
     )
 
-    # Assigned by group_info_updater on str_selected_light property.
+    # Assigned by group_info_updater on selected_group_enum property.
     bpy.types.ColorSequence.str_group_id =  StringProperty(default="1")
     bpy.types.ColorSequence.list_group_channels = CollectionProperty(type=ChannelListPropertyGroup)
     bpy.types.ColorSequence.str_group_label = StringProperty(default="")
@@ -2134,17 +2992,17 @@ def register():
         default=100, 
         description="Maximum value for zoom"
     )
-    bpy.types.ColorSequence.speed_min = IntProperty(
+    bpy.types.ColorSequence.gobo_speed_min = IntProperty(
         default=-200, 
         description="Minimum value for speed"
     )
-    bpy.types.ColorSequence.speed_max = IntProperty(
+    bpy.types.ColorSequence.gobo_speed_max = IntProperty(
         default=200, 
         description="Maximum value for speed"
     )
     
     bpy.types.ColorSequence.influence_is_on = BoolProperty(default=False, description="Influence is enabled when checked")
-    bpy.types.ColorSequence.intensity_is_on = BoolProperty(default=False, description="Intensity is enabled when checked")
+    bpy.types.ColorSequence.intensity_is_on = BoolProperty(default=True, description="Intensity is enabled when checked")
     bpy.types.ColorSequence.pan_tilt_is_on = BoolProperty(default=False, description="Pan/Tilt is enabled when checked")    
     bpy.types.ColorSequence.color_is_on = BoolProperty(default=False, description="Color is enabled when checked")
     bpy.types.ColorSequence.diffusion_is_on = BoolProperty(default=False, description="Diffusion is enabled when checked")
@@ -2194,8 +3052,8 @@ def register():
     bpy.types.Scene.lighting_modifiers = CollectionProperty(type=LightingModifier)
     bpy.types.Scene.active_modifier_index = IntProperty(default=-1)
 
-#    bpy.app.handlers.depsgraph_update_pre.append(influencer_deps_updater)
-#    bpy.app.handlers.frame_change_pre.append(influencer_deps_updater)
+    if depsgraph_update_handler not in bpy.app.handlers.depsgraph_update_post:
+        bpy.app.handlers.depsgraph_update_post.append(depsgraph_update_handler)
 
     # Commenting this out until harmonizer is replaced with harmonizer_two per spam issue
     #bpy.app.handlers.frame_change_pre.append(load_changes_handler)
@@ -2210,12 +3068,9 @@ def unregister():
 #        bpy.app.handlers.frame_change_post.remove(publish_changes_handler)
 #    if load_changes_handler in bpy.app.handlers.frame_change_pre:
 #        bpy.app.handlers.frame_change_pre.remove(load_changes_handler)
-#    if influencer_deps_updater in bpy.app.handlers.frame_change_pre:
-#        bpy.app.handlers.frame_change_pre.remove(influencer_deps_updater)
-#    if influencer_deps_updater in bpy.app.handlers.depsgraph_update_pre:
-#        bpy.app.handlers.depsgraph_update_pre.remove(influencer_deps_updater)
 
-    bpy.app.handlers.depsgraph_update_post.remove(update_handler)
+    bpy.app.handlers.depsgraph_update_post.remove(depsgraph_update_handler)
+    bpy.app.handlers.depsgraph_update_post.remove(mixer_update_handler)
 
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
@@ -2257,7 +3112,7 @@ def unregister():
     del bpy.types.Object.str_enable_strobe_argument
     del bpy.types.Object.relevant_channels_checker
 
-    del bpy.types.ColorSequence.str_selected_light
+    del bpy.types.ColorSequence.selected_group_enum
     del bpy.types.ColorSequence.influence
     del bpy.types.ColorSequence.float_intensity
     del bpy.types.ColorSequence.float_vec_color
