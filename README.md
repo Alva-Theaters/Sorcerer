@@ -29,14 +29,13 @@ Imagine the software they use to make 3D animated movies like Tangled, Kung Fu P
 **What Sorcerer IS:**
 ---------------------------------------
 
-- Node-based light design
-- Sequence-based light design
-- Animation-based light design
-- Dynamic spatial selections (influencers)
-- Motion capture for light design
-- 3D audio panner integrated directly into stage lighting control
-- Pop-up ML editor within 3D view
-- Automation tools that rapidly produce deliverables
+- Node-based light design for ETC Eos
+- Sequence-based light design for ETC Eos
+- Animation-based light design for ETC Eos
+- 3D bitmapping for light design for ETC Eos
+- Motion capture for light design for ETC Eos
+- 3D audio panner for Qlab and M32
+- Automation tools for ETC Eos
 - ADHD friendly
 
 
