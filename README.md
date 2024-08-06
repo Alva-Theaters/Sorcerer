@@ -1,20 +1,40 @@
 **3D Animation in Real Life, for Theatre, with Blender**
 ======================================================================
 
-Alva Sorcerer is a heavyweight Blender addon that uses OSC to remote-control ETC Eos family theatrical lighting consoles, Qlab, live sound mixers, and other professional lighting consoles. Blender is the free and open source 3D animation suite supporting modeling, rigging, animation, simulation, rendering, compositing, motion tracking and video editing. Alva Sorcerer connects that power to FOH show control to create 3D animations in real life in theatre.
+Alva Sorcerer is a heavyweight Blender addon that uses OSC to remote-control ETC Eos family theatrical lighting consoles, Qlab, live sound mixers, and other professional lighting consoles. Blender is the free and open source 3D animation suite supporting modeling, rigging, animation, simulation, rendering, compositing, motion tracking and video editing. Alva Sorcerer connects that power to FOH show control to create 3D animations in real life for theatre.
 
-Alva Sequencer is the limited version of Sorcerer not behind a paywall.
+
+**What Does it Actually Do?**
+---------------------------------------
+
+Think of the software they use to make 3D animated movies like Tangled, Kung Fu Panda, Frozen, movies like that. Sorcerer lets you use that kind of software to control the lighting, video, and audio at a theater. That's why it's called 3D animation in real life, for theatre, with Blender. Basically, in one software only, you have god-like control over everything in the theater at all times in the most intuitive way possible. There's no programming, there's no syntax, there's hardly any technicals, it's just organic artistic flow.
+
+
+**Entry-level Features:**
+---------------------------------------
+
+- Automation tools for ETC Eos lighting consoles like copy/paste macro builder and timecode setup
+- Sequence-based timecode editing for ETC Eos
+- True 3D audio panner with animatable audio objects
+- Mixers, which make gradients on ETC Eos extremely simple
+- Node-based ML editors, which replaces many magic sheets
+- Stage-manage a theater show like a bad*ss rocket launch director
+- 3D magic sheets without need for words, sliders, buttons, or anything like that
+- Use virtual 3D objects to influence lights for super intuitive effects
+- Full-screen robust graph editor for precisely editing fades
+
+
 
 **What Sorcerer IS:**
 ---------------------------------------
 
-- Node-based light design (Sorcerer only)
+- Node-based light design
 - Sequence-based light design
 - Animation-based light design
-- Dynamic spatial selections (Sorcerer only)
+- Dynamic spatial selections (influencers)
 - Motion capture for light design
 - 3D audio panner integrated directly into stage lighting control
-- Pop-up ML editor within 3D view (Sorcerer only)
+- Pop-up ML editor within 3D view
 - Automation tools that rapidly produce deliverables
 - ADHD friendly
 
@@ -23,8 +43,8 @@ Alva Sequencer is the limited version of Sorcerer not behind a paywall.
 ---------------------------------------
 
 - It is not DMX software, it instead remote-controls professional consoles and produces deliverables
-- It is not visualization software
-- It does not output multichannel audio, it instead outputs separate tracks for each speaker to Qlab and commandeers sound mixer faders for realtime monitoring
+- Sorcerer is not visualization software
+- It does not output multichannel audio, it instead works with Qlab and/or an audio mixer
 - It is not meant to send OSC during final shows, it instead creates deliverables stored on FOH hardware for the final show(s)
 
 
@@ -66,8 +86,9 @@ Alva Sequencer is the limited version of Sorcerer not behind a paywall.
 ---------------------------------------
 
 - Download and install the latest version of Blender from Blender.org
-- Click "Preferences" under "Edit" at the top left, click the "Add-ons" button on the left, click the "Install" button on the top right, select Sorcerer/Sequencer, and then click the checkbox next to the new addon to enable Sorcerer/Sequencer
+- Click "Preferences" under "Edit" at the top left, click the "Add-ons" button on the left, click the "Install" button on the top right, select Sorcerer/Sequencer, and then click the checkbox next to the new addon to enable Sorcerer/Sequencer. 
 - Navigate to the Shader Editor/World, 3D view, or to the video editor  to find Sorcerer/Sequencer UI elements on side N panels, on the T toolbars on the right, by the orb icon in the headers, or on keyboard popup menus ("P" in 3D view for channel controller, "F" in node editor and video editor for Formatter, and "M" in the video editor for Strip Media)
+- Note: Blender recently changed its Preferences UI. The latest version (4.2) has the Install Addon button on a drop down off a down arrow button in the upper right-hand corner inside Preferences.
 
 
 **Examples and Tutorials:**
@@ -80,10 +101,9 @@ Alva Sequencer is the limited version of Sorcerer not behind a paywall.
 **Contributions Guidelines:**
 ---------------------------------------
 
-- Currently the biggest need is to complete Beta testing by testing features and fixing issues that come up there. All features currently work, but only just. Sorcerer's harmonizer logic is in the process of a complete rewrite to greatly enhance reliability, adaptability, and maintainability.
+- Currently the biggest need is to complete Beta testing by testing features and fixing issues that come up there. Most of the features currently work, but only just.
 - This is a massive codebase with a massive feature set that I cannot adequately maintain alone. Any help is much appreciated.
 - The vast majority of the code is largely PEP8ified.
-- Professional developers would likely appreciate the steps taken on the new WIP harmonizer prototype, but would likely wish to rewrite massive sections elsewhere.
 - Contact info is help@alvatheaters.com
 
 
