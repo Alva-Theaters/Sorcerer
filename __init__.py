@@ -237,6 +237,8 @@ def register():
     except Exception as e:
         print("Failed to register keymap:", e)
 
+    from .spy import SorcererPython
+
 
 def unregister():
     try:
