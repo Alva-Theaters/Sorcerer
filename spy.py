@@ -30,12 +30,19 @@
 '''
 This script, spy, is a sort of API here to make it easier for casual users
 to interact with Sorcerer functions programmatically. Inspired by Blender's 
-bpy, spy is both used in Sorcerer's source code and in external development.
+bpy API. End users shall access this API from built-in text editor through:
+
+import bpy
+from bpy import spy
+
 '''
+
+
+import bpy
 
 from .utils.osc import OSC
 from .utils.utils import Utils
-from .cpvia.find import Finders
+from .cpvia.find import Find
 from .cpvia.mix import Mixer
 from .cpvia.influencers import Influencers
 from .assets.sli import SLI
@@ -46,7 +53,24 @@ class SorcererPython:
         def send_osc_lighting(address, argument):
             '''Use lighting console network patch'''
             OSC.send_osc_lighting(address, argument)
-                       
+
+        def lighting_command(argument):
+            '''Send a command line string to the console'''
+            OSC.send_osc_lighting("/eos/newcmd", argument)
+
+        def press_lighting_key(key):
+            '''Press button down and up. Pass key name as string. This 
+               involves a time.sleep of .1, which freezes UI'''
+            OSC.press_lighting_key(key)
+
+        def lighting_key_down(key):
+            '''Just presses the button down, but does not hold release'''
+            OSC.lighting_key_down(key)
+
+        def lighting_key_up(key):
+            '''Just releases the key'''
+            OSC.lighting_key_up(key)
+
         def send_osc_video(address, argument):
             '''Use video switcher network patch'''
             OSC.send_osc_video(address, argument)
@@ -62,23 +86,28 @@ class SorcererPython:
     class utils:
         def get_frame_rate(scene):
             '''ALWAYS use this, NOT scene.render.fps. Must divide 
-               render.fps by render.base for true fps, done here.'''
+               render.fps by render.base and round for true fps, done 
+               here'''
             return Utils.get_frame_rate(scene)
             
         def parse_channels(input_string):
-            '''Convert user string to single [channel, channel]'''
+            '''Convert user string to list of integers representing channel numbers'''
             return Utils.parse_channels(input_string)
             
         def parse_mixer_channels(input_string):
-            '''Convert user string to multiple [channel, channel] via ()'s'''
+            '''Convert user string to list of tuples, the tuples containing integers 
+               that represent channel numbers. Used to create concurrent offset groups
+               in mixers'''
             return Utils.parse_mixer_channels(input_string)
             
         def get_light_rotation_degrees(light_name):
-            '''Find true rotation after modifiers/constraints'''
+            '''Find true rotation after modifiers/constraints, Returns x_rotation_degrees,
+               y_rotation_degreees. Pass to it the object name as string'''
             return Utils.get_light_rotation_degrees(light_name)
             
         def try_parse_int(value):
-            '''Use this to avoid runtime errors converting to int'''
+            '''Use this to avoid runtime errors converting to int. Returns int or none.
+               This is just a try/except for int()'''
             return Utils.try_parse_int(value)
             
         def swap_preview_and_program(cue_list):
@@ -109,11 +138,13 @@ class SorcererPython:
             Utils.duplicate_active_strip_to_selected(context)
 
         def find_relevant_clock_strip(scene):
-            '''Find most relevant sound strip with a timecode clock assignment'''
+            '''Find most relevant sound strip with a timecode clock assignment.
+               Returns a bpy strip object'''
             return Utils.find_relevant_clock_strip(scene)
             
         def calculate_bias_offseter(bias, frame_rate, strip_length_in_frames):
-            '''Used by Flash strip background logic'''
+            '''Used by Flash strip background logic to apply bias to flash down
+               timing, Returns a float'''
             return Utils.calculate_bias_offseter(bias, frame_rate, strip_length_in_frames)
 
         def render_volume(speaker, empty, sensitivity, object_size, int_mixer_channel):
@@ -121,22 +152,25 @@ class SorcererPython:
             Utils.render_volume(speaker, empty, sensitivity, object_size, int_mixer_channel)
 
         def color_object_to_tuple_and_scale_up(v):
-            '''Formats Blender color objects for lighting console use'''
+            '''Formats Blender color objects for lighting console use. Returns 
+               (r, g, b) tuple of ints scaled to 0-100 scale'''
             return Utils.color_object_to_tuple_and_scale_up(v)
         
         def update_alva_controller(controller):
-            '''Logic for the Update button on the controllers'''
+            '''Logic for the Update button on the controllers. Pass controller
+               as bpy object'''
             Utils.update_alva_controller(controller)
             
         def home_alva_controller(controller):
-            '''Logic for the Home button on the controllers'''
+            '''Logic for the Home button on the controllers. Pass controller
+               as bpy object'''
             Utils.home_alva_controller(controller)
 
     class find:
         def is_inside_mesh(obj, mesh_obj):
             '''Returns true if obj is inside mesh_obj. Doesn't work well
                for shapes much more complicated than cubes'''
-            return Finders.is_inside_mesh(obj, mesh_obj)
+            return Find.is_inside_mesh(obj, mesh_obj)
             
         def invert_color(self, value):
             '''Used for influencer calculations'''
@@ -144,12 +178,11 @@ class SorcererPython:
                 
         def find_int(string):
             """Tries to find an integer inside the string and returns it 
-               as an int. Returns 1 if no integer is found.
-            """
-            return Finders.find_int(string)
+               as an int. Returns 1 if no integer is found."""
+            return Find.find_int(string)
             
         def mix_my_values(parent, param):
-            '''Used by Alva's depsgraph for mixer nodes'''
+            '''Used by Alva's cpvia_generator for mixer nodes'''
             return Mixer.mix_my_values(parent, param)
             
         def split_color(parent, c, p, v, type):
@@ -159,33 +192,28 @@ class SorcererPython:
 
         def find_my_patch(parent, chan, type, desired_property):
             '''This function finds the best patch for a given channel.'''
-            return Finders.find_my_patch(parent, chan, type, desired_property)
+            return Find.find_my_patch(parent, chan, type, desired_property)
             
         def find_parent(self, object):
             '''Catches and corrects cases where the self is a collection 
             property instead of a node, sequencer strip, object, etc.'''
-            return Finders.find_parent(self, object)  
+            return Find.find_parent(self, object)  
             
         def find_controllers(self, scene):
             '''Find strips, objects, and nodes in scene relevant to Sorcerer'''
-            return Finders.find_controllers(self, scene)
+            return Find.find_controllers(self, scene)
             
         def find_strips(self, scene):
             '''Find strips in scene relevant to Sorcerer'''
-            return Finders.find_strips(self, scene)
+            return Find.find_strips(self, scene)
             
         def find_objects(self, scene):
             '''Find objects in scene relevant to Sorcerer'''
-            return Finders.find_objects(self, scene)
+            return Find.find_objects(self, scene)
             
         def find_nodes(self, scene):
             '''Find nodes in scene relevant to Sorcerer'''
-            return Finders.find_nodes(self, scene)
-        
-    def SLI_assert_unreachable(*args):
-        '''Main internal error-handling method, often for final else's'''
-        SLI.SLI_assert_unreachable(*args)
-        
-    def find_restrictions(scene):
-        '''Returns list of things currently restricted by school mode'''
-        return SLI.find_restrictions(scene)
+            return Find.find_nodes(self, scene)
+    
+
+bpy.spy = SorcererPython
