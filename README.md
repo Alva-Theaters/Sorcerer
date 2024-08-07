@@ -25,6 +25,19 @@ Imagine the software they use to make 3D animated movies like Tangled, Kung Fu P
 - Full-screen robust graph editor for precisely editing fades
 
 
+**"Organic Artistic Flow" vs "Geeky Techno Syntax":**
+------------------------------------------------------------------------------------
+Alva Sorcerer wants to make light design (and other types of technical theater) super fun, super exciting, super intutive, and super artsy. We can't do that with controllers that use geeky techno syntax. We need way more intuitive controls. Sorcerer's design methodology is "Organic artistic flow" because the software needs to feel like playing a piano or scultping a scultpure. It needs to feel artsy. It needs to feel organic. It needs to feel like an extension of the artist's emotion. 
+
+In practice, this means giving you an extremely robust graph editor, automating as many repetitive tasks as possible, allowing you to audition variations of effects extrememly quickly with no effort, and letting you control lights in ways no one else can. Put simply, every part of the software is dumb, it's just a matter of how dumb. And all the parts of the software is dumb because until DDG reaches 0.
+
+**DDG: Design Drag Coefficient.** Anything that induces design drag, or anything that makes it take longer for you to take your vision to reality on stage—that's the enemy. That's what we're trying to minimize. The smaller the DDG, the higher the potential for awesomeness. The  less time you spend dealing with technicals, the more time you have to make amazing art.
+
+Sorcerer is designed with ADHD in mind. It's designed for people who can't remember syntax and have to sit there for multiple minutes searching the internet trying to remember what this command is or what that command is. That's not artsy, that's not organic, and that's not flow. "Flow" is a software that is so simple that you learn how everything works in under and hour, but you can spend a lifetime mastering it. Like a piano. A child can figure out how a piano works extremely quickly. It's fundamentally simple. But the complexity comes in how you use it. Right now, the status quo technical theatre control systems are not pianos because they are way too complicated, way too technical, are not nearly intuitive enough, are only accessible to technically minded people, and do not let you focus on art. They want to control the way you think, they want you to do it their way, and you spend more time fighting their software than doing art. 
+
+Sorcerer is trying to become a piano because it understands that the best controller is no controller and that the best user experience is the one where the user forgets they are using software. Alva Sorcerer wants to become so simple and intuitive that you feel like you're god—at the theater at least. The time it takes to imagine something — anything — is almost the same amount of time it takes to make it real. And you don't have to have a decade of "programming" experience to do it.
+
+
 
 **What Sorcerer IS:**
 ---------------------------------------
