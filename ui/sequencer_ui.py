@@ -471,24 +471,22 @@ class SequencerUI:
         row = box.row()
         row.prop(active_strip, "int_flash_gobo_id_up", slider=True, text="Gobo ID:")
         row.prop(active_strip, "int_flash_gobo_id_down", slider=True, text="Gobo ID:")
-        
-        box.separator()
-
-        row = box.row()
-        row.operator("seq.flash_preset_search_operator", text="", icon='VIEWZOOM')
-        row.prop(active_strip, "int_up_preset_assignment", text="Up Preset:")
-        row.prop(active_strip, "int_down_preset_assignment", text="Down Preset:")
-        row.operator("seq.record_effect_preset_operator", text="", icon_value=orb.icon_id)
     
 
     @staticmethod
     def draw_strip_flash_footer(self, context, box, active_strip):
-        row = box.row()
-        row.enabled = True
-        row.operator("my.flash_macro_search", text="", icon='VIEWZOOM')
-        row.prop(active_strip, "start_flash_macro_number", text="Up Macro")
-        row.prop(active_strip, "end_flash_macro_number", text="Down Macro")
-        row.operator("my.build_flash_macros", text="", icon_value=orb.icon_id)
+        '''New goal is to delete as many macro orb buttons as possible and let
+           Sorcerer do all that by itself so that the user doesn't have to think 
+           about dumb macro numbers or dumb preset numbers. The best part is no
+           part. Let's delete this entire process from the user's job description'''
+        if not active_strip.flash_type_enum == 'option_use_controllers':
+            row = box.row()
+            row.enabled = True
+            row.operator("my.flash_macro_search", text="", icon='VIEWZOOM')
+            row.prop(active_strip, "start_flash_macro_number", text="Up Macro")
+            row.prop(active_strip, "end_flash_macro_number", text="Down Macro")
+            row.operator("my.build_flash_macros", text="", icon_value=orb.icon_id)
+        else: box.separator()
 
         row = box.row()
         row.prop(active_strip, "flash_bias", text="Bias", slider=True)
