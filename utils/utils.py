@@ -100,26 +100,66 @@ class Utils:
 
 
     def parse_channels(input_string):
+        input_string = input_string.replace("do not want", "not").replace("don't want", "not").replace(".", "")
+        
+        # Remove parentheses
         formatted_input = re.sub(r'[()]', '', input_string)
-        formatted_input = re.sub(r'(\d)-(\d)', r'\1 - \2', formatted_input)
+        
+        # Ensure consistent spacing around the dash for cases like '1-10', '1 -10'
+        formatted_input = re.sub(r'(\d)\s*-\s*(\d)', r'\1 - \2', formatted_input)
+        
+        # Split by commas and whitespace
         tokens = re.split(r'[,\s]+', formatted_input)
-
+        
+        versions_of_through = (
+            "through", "thru", "-", "tthru", "throu", "--", "por", "thr", 
+            "to", "until", "up to", "till", "over"
+        )
+        versions_of_not = (
+            "not", "minus", "except", "excluding", "casting", "aside", 
+            "without", "leave", "omit", "remove", "other", "than"
+        )
+        versions_of_add = (
+            "add", "adding", "including", "keeping", "keep", "include", 
+            "save", "preserve", "plus", "with", "addition", "+", "want",
+            "do"
+        )
+    
         channels = []
+        exclusions = []
         i = 0
+        exclude_mode = False
+        
         while i < len(tokens):
             token = tokens[i]
             
-            if token in ("through", "thru", "-", "tthru", "throu", "--", "por") and i > 0 and i < len(tokens) - 1:
+            if token in versions_of_add:
+                exclude_mode = False
+            elif token in versions_of_not:
+                exclude_mode = True
+            elif token in versions_of_through and i > 0 and i < len(tokens) - 1:
                 start = int(tokens[i-1])
                 end = int(tokens[i+1])
                 step = 1 if start < end else -1
-                channels.extend(range(start, end + step, step))
-                i += 2 
+                range_list = list(range(start, end + step, step))
+                if exclude_mode:
+                    exclusions.extend(range_list)
+                else:
+                    channels.extend(range_list)
+                i += 1  # Skip the end token of the range
             elif token.isdigit():
-                if (i == 0 or tokens[i-1] not in ("through", "thru", "-", "tthru", "throu", "--", "por")) and \
-                    (i == len(tokens) - 1 or tokens[i+1] not in ("through", "thru", "-", "tthru", "throu", "--", "por")):
+                if exclude_mode:
+                    exclusions.append(int(token))
+                else:
                     channels.append(int(token))
             i += 1
+        
+        # Remove excluded channels
+        channels = [ch for ch in channels if ch not in exclusions]
+        
+        # Convert to set to remove duplicates, then back to list
+        channels = list(set(channels))
+        channels.sort()
         
         return channels
 
