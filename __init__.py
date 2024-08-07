@@ -34,7 +34,7 @@ bl_info = {
     "description": "3D animation in real life, for theatre, with Blender.",
     "warning": "For reliability, migrate all data to console prior to real show.",
     "wiki_url": "https://alva-sorcerer.readthedocs.io/en/latest/index.html#",
-    "tracker_url": "https://www.workstraight.com/site/login",
+    "tracker_url": "https://github.com/Alva-Theaters/Sorcerer/issues",
     "category": "EMARs",
 }
 
