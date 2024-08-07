@@ -1,3 +1,39 @@
+**The Problem:**
+============================================================================
+Alva Theaters seeks to revolutionize technical theater by addressing a prevalent issue: hyper-specialization. In the current landscape—whether it’s high school theater, community theater, Broadway, live music, or the touring industry—technical theater is dominated by disparate systems. The lighting console differs from the audio mixer, and the video system is another entity altogether. This creates a 3rd party hodgepodge jungle. Putting together a tour or a new theater is akin to assembling a custom Windows PC from scratch.
+
+This hyper-specialization shifts the focus away from artistic expression to technical sophistication, gear, workflows, and show file setup. The field attracts technically minded individuals and can alienate those with artistic talents. Consequently, many shows are optimized for and graded on their technical prowess rather than for their emotional and artistic impact. Even on the world stage, truly inspired and magical technical theater designs are rare. The technicals are so difficult, complicated and time-consuming. They shouldn't be.
+
+**The Solution:**
+-----------------------------------------------------------------------------
+Alva Theaters aims to be the Apple of technical theater. We envision a network of theaters across America, each identical and featuring proprietary Alva technology. Our theaters will not use third-party hardware; instead, all technology will be Alva-designed and exclusive to our venues. This means no upgrades or modifications, ensuring a perfect, gorgeous user experience that resembles the sleek, unified design of a SpaceX Dragon capsule. All technical theater equipment is designed from the ground up using a first principles approach that asks, "What is the simplest possible version of the problem and how many parts, processes, and components can we delete?"
+
+By standardizing our theaters, we can attract artistically minded professionals and enhance the quality of art.
+
+**Question the Requirements:**
+-----------------------------------------------------------------------------------
+Here are the conventiona requirements that nearly all existing FOH hardware is constrained by:
+
+- Transportability: Not required at Alva.
+- Compatibility with external systems: Not required at Alva.
+- Mass production for sales: Not required at Alva.
+  
+By eliminating these constraints, we can create an exotic, unparalleled control system. Our goal is to establish the best community theater on the planet and replicate it 100 times across America. This allows for perfect, rapid, national playback of technical theater designs, similar to how movies are distributed and shown in theaters nationwide.
+
+**A Better Version of Time**
+------------------------------------------------------------------------------
+The life blood of the Alva way is animation, or keyframes. The lifeblood of traditional live performance is cues. 
+
+**Cues:** These are requests to start doing something and do not a require a timecode clock to be running. These work best when humans are responsible for initiating control events.
+
+**Keyframes:** These are iron chains that shackle a parameter to a certain value at a certain time on a clock. They require a timecode clock to be running. These work best for extremely precise control authority with respect to time.
+
+Control via animation/keyframes is different from control via cues because keyframes offer a vastly superior degree of precision compared to cues. But the drawback is that they need a timecode clock to function. 
+
+Alva Theaters prefers animation over cues because of the vastly superior precision that animation provides. One way to describe the precision is to watch any professional 3D animated film from a major studio like Walt Disney Animation Studios, Pixar, or Dreamworks. Think of the level of control precision they need to be able to make those 3D models come to life the way they do. You need a ludicrous amount of precision to make those models seem like they are alive and have feelings. Alva Sorcerer's job is to allow us to start using those same tools in technical theatre. And not just for lighting, but for the whole thing. That's why Alva stands for Animated Lighting, Video, and Audio. The goal is to make an External Multi-disciplinary Animation Renderer that can make people think the theater itself is alive and has feelings. For such is the perfection of technical theatre.
+
+
+
 
 **Technical Overview for Developers:**
 ============================================================================
