@@ -29,9 +29,12 @@
 
 import bpy 
 import socket
+import time
+
 
 class OSC:
     def correct_argument_because_etc_is_weird(argument):
+        '''Required for influencers to work properly'''
         return argument.replace(" at - 00 ", " at + 00 ")
 
     def send_osc(address, argument):
@@ -49,6 +52,20 @@ class OSC:
         port = scene.int_osc_port
         #print(argument)
         OSC.send_osc_string(address, ip_address, port, argument)
+
+
+    def press_lighting_key(key):
+        OSC.send_osc_lighting(f"/eos/key/{key}", "1")
+        time.sleep(.3)
+        OSC.send_osc_lighting(f"/eos/key/{key}", "0")
+
+
+    def lighting_key_down(key):
+        OSC.send_osc_lighting(f"/eos/key/{key}", "1")
+
+
+    def lighting_key_up(key):
+        OSC.send_osc_lighting(f"/eos/key/{key}", "0")
         
         
     def send_osc_video(address, argument):
