@@ -1,26 +1,42 @@
 **The Problem:**
 ============================================================================
-Alva Theaters seeks to revolutionize technical theater by addressing a prevalent issue: hyper-specialization. In the current landscape—whether it’s high school theater, community theater, Broadway, live music, or the touring industry—technical theater is dominated by disparate systems. The lighting console differs from the audio mixer, and the video system is another entity altogether. This creates a 3rd party hodgepodge jungle. Putting together a tour or a new theater is akin to assembling a custom Windows PC from scratch.
+Alva Theaters seeks to revolutionize technical theater by addressing a prevalent issue: hyper-specialization. In the current landscape—whether it’s high school theater, community theater, Broadway, live music, or the touring industry—technical theater, no single company is responsible for more than one hyperspecialized area. The lighting console is built by one company, the sound mixer is built by another company, and the video system is another entity altogether. This creates a 3rd party jungle. Putting together a tour or a new theater is like building a custom Windows PC from scratch. 
 
-This hyper-specialization shifts the focus away from artistic expression to technical sophistication, gear, workflows, and show file setup. The field attracts technically minded individuals and can alienate those with artistic talents. Consequently, many shows are optimized for and graded on their technical prowess rather than for their emotional and artistic impact. Even on the world stage, truly inspired and magical technical theater designs are rare. The technicals are so difficult, complicated and time-consuming. They shouldn't be.
+This hyper-specialization shifts the focus away from artistic expression to technical sophistication, gear, workflows, and show file setup. The field attracts technically minded individuals and can alienate those with artistic talents. Consequently, many shows are optimized for and graded on their technical prowess rather than for their emotional and artistic impact. Even on the world stage, truly inspired and magical technical theater designs are rare. It's because the technicals are so difficult, complicated and time-consuming. They shouldn't be.
 
 **The Solution:**
 -----------------------------------------------------------------------------
-Alva Theaters aims to be the Apple of technical theater. We envision a network of theaters across America, each identical and featuring proprietary Alva technology. Our theaters will not use third-party hardware; instead, all technology will be Alva-designed and exclusive to our venues. This means no upgrades or modifications, ensuring a perfect, gorgeous user experience that resembles the sleek, unified design of a SpaceX Dragon capsule. All technical theater equipment is designed from the ground up using a first principles approach that asks, "What is the simplest possible version of the problem and how many parts, processes, and components can we delete?"
+Alva Theaters wants to be the Apple of technical theater. When you walk into an Alva Theater, nearly everything you see will have been engineered by one company, Alva Theaters, and only for your venue. Each venue is a carbon copy of every other venue across the country. This means no upgrades or modifications, ensuring a perfect, gorgeous user experience that feels like a SpaceX Dragon capsule. All technical theater equipment is designed from the ground up using a first principles approach that asks, "What is the simplest possible version of the problem and how many parts, processes, and components can we delete?"
 
 By standardizing our theaters, we can attract artistically minded professionals and enhance the quality of art.
+
+"Freedom of construction" is the ability of a show or tour to build their entire show from the ground up every time with all their own custom gear every time. Alva Theater's approach contends that damage done by restricting freedom of construction is dramatically overshadowed by the artistic advantages granted through mass-standardization. Namely, the elimination of nearly every single part of a production that is not artistic. Paperwork, patching, gear rental, gear logistics, power distribution, data distribution, show file setup, etc. At an Alva theater, massive shows can be done entirely with the built-in gear. While this type of venue is not for everyone and is certainly not for every show or tour, it will **radically redefine extraordinary** in theatre design.
 
 **Question the Requirements:**
 -----------------------------------------------------------------------------------
 Here are the conventiona requirements that nearly all existing FOH hardware is constrained by:
 
-- Transportability: Not required at Alva.
-- Compatibility with external systems: Not required at Alva.
-- Mass production for sales: Not required at Alva.
+- Transportability: Not required at Alva Theaters.
+- Compatibility with external systems: Not required at Alva Theaters.
+- Mass production for sales: Not required at Alva Theaters.
   
-By eliminating these constraints, we can create an exotic, unparalleled control system. Our goal is to establish the best community theater on the planet and replicate it 100 times across America. This allows for perfect, rapid, national playback of technical theater designs, similar to how movies are distributed and shown in theaters nationwide.
+By eliminating these constraints, we can create an exotic, unparalleled control system. Our goal is to establish the best community theater on the planet and replicate it 100 times across America. This allows for perfect, rapid, and national playback of technical theatre designs, similar to how movies are distributed and shown in theaters nationwide.
 
-**A Better Version of Time**
+
+**Idiot Parts:**
+---------------------------------------------------------------------------
+An *Idiot Part* in software UX is like medicine a doctor gives you to treat a condition created by medicine the doctor gave you yesterday. Idiot Parts are parts that are there for technical reasons, not artistic reasons. We accidentally add Idiot Parts when we allow unchallenged technical constraints to dictate our mental model of what theatre design is.
+
+We want to ultimately delete every UI/UX component that doesn’t execute an artistic choice. For example, we deleted as many references to macros, event lists, and cue lists as possible. We want the user to only focus on the art. Macros are not art because the macros are not there to make you sad. Event lists are not art because they are not there to make you happy. Cue lists are not art because they are not there to make you afraid. Anything in theatre design UX that is not attributable to an identifiable emotion is probably an Idiot Part. We want to delete all those from our UX.
+
+A lot of control systems end up with a ton of Idiot Parts without realizing it. They create these monstrous cities of Idiot Parts that are all there to address each other’s technical limitations. If 1 Idiot Part has 3 technical limitations, instead of deleting the Idiot Part, they make 3 more Idiot Parts to address the 3 limitations. And then those Idiot Parts have their own limitations, and so the pattern continues. Until you start deleting the top-tier Idiot Parts, you’re going to end up with an extremely elaborate city of Idiot Parts that is 90% focused on technical constraints and is only 10% focused on art. It may seem extremely powerful, thoughtful, and robust, but it’s built on solving all the wrong problems. Because you have created this magnificent, wealthy empire where all of your terminology is divorced from first-principles and is instead built on a mountain of fictional problems, manufactured constraints, invented procedures, and imaginary words.
+
+The first-principles problem to solve is how do we eliminate all design drag? Our *Design Drag Coefficient* (DDC) quantifies exactly how much resistance we are offering to the purest form of artistic intent. We want that number to be as close to 0.0 as possible. To do that, the first thing we have to do is delete all the Idiot Parts from the UX. That way, the user never has to think about the technicals. The technicals magically do their job behind the scenes without ever bothering the designer.
+
+At Alva Theaters, the goal is to delete as many parts as possible so that the user experience is extremely similar to the user experience of a piano. It doesn’t take any time at all to learn the tool’s features. All of your time can be spent learning artistic techniques instead of features. That’s what Alva Sorcerer should be like. You learn the tool itself in 5 minutes and then spend years and years developing your artistic craft, not your technical craft. Sorcerer is not about features, it’s about getting as close to *Piano* as possible.
+
+
+**A Better Version of Time:**
 ------------------------------------------------------------------------------
 The life blood of the Alva way is animation, or keyframes. The lifeblood of traditional live performance is cues. 
 
@@ -31,8 +47,6 @@ The life blood of the Alva way is animation, or keyframes. The lifeblood of trad
 Control via animation/keyframes is different from control via cues because keyframes offer a vastly superior degree of precision compared to cues. But the drawback is that they need a timecode clock to function. 
 
 Alva Theaters prefers animation over cues because of the vastly superior precision that animation provides. One way to describe the precision is to watch any professional 3D animated film from a major studio like Walt Disney Animation Studios, Pixar, or Dreamworks. Think of the level of control precision they need to be able to make those 3D models come to life the way they do. You need a ludicrous amount of precision to make those models seem like they are alive and have feelings. Alva Sorcerer's job is to allow us to start using those same tools in technical theatre. And not just for lighting, but for the whole thing. That's why Alva stands for Animated Lighting, Video, and Audio. The goal is to make an External Multi-disciplinary Animation Renderer that can make people think the theater itself is alive and has feelings. For such is the perfection of technical theatre.
-
-
 
 
 **Technical Overview for Developers:**
