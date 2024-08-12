@@ -39,6 +39,7 @@ class Items:
             ('option_nodes', "Nodes", "Settings for node editor area."),
             ('option_orb', "Orb", "Settings for node editor area."),
             ('option_ui', "UI", "Toggle visibility of select UI components. Use Blender Preferences for other customizations."),
+            ('option_st_sequencer', "S-T", "OSC Settings for Show-Start Sequencer (Properties viewer under Scene)"),
             ('option_system', "System", "System-wide general settings.")
         ]
         return items
@@ -274,6 +275,22 @@ class Items:
         ]
         return items
     
+    def ip_address_view_options(self, context):
+        items = [
+            ('option_lighting', "Lighting", "Adjust IP address/port for lighting console", 'OUTLINER_OB_LIGHT', 1),
+            ('option_video', "Video", "Adjust IP address/port for video switcher", 'OUTLINER_OB_CAMERA', 2),
+            ('option_audio', "Audio", "Adjust IP address/port for audio mixer", 'OUTLINER_OB_SPEAKER', 3),
+        ]
+        return items
+
+    def alva_settings_positions(self, context):
+        items = [
+            ('option_animation', "Animated", "Animation engine settings"),
+            ('option_lighting', "Lighting", "Lighting network settings"),
+            ('option_video', "Video &", "Video network settings"),
+            ('option_audio', "Audio", "Audio network settings")
+        ]
+        return items
     
     # from flash node
     def get_motif_name_items(self, context):

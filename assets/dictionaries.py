@@ -55,7 +55,7 @@ class Dictionaries:
         "zoom_is_on": ["float_zoom"], 
         "iris_is_on": ["float_iris"], 
         "edge_is_on": ["float_edge"], 
-        "gobo_id_is_on": ["int_gobo_id", "float_gobo_speed"],
+        "gobo_is_on": ["int_gobo_id", "float_gobo_speed"],
         "prism_is_on": ["int_prism"]
     }
 
@@ -733,4 +733,3 @@ class Dictionaries:
     time_and_date = ["Date", "Time", "Year", "Month", "Day", "Hour", "Minute", "Second", "AM", "PM", "Sunrise", "Sunset", "Duration", "Interval", "Countdown"]
     miscellaneous = ["Alert", "Info", "Warning", "Error", "Debug", "Log", "Report", "Status", "State", "Mode", "Setting", "Preference", "Config", "Parameter", "Attribute"]
     timecode = ["Timecode_Start", "Timecode_Stop", "Timecode_Reset", "Timecode_Set", "Timecode_Jump", "Enable", "Disable"]
-

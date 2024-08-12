@@ -105,7 +105,7 @@ class NodeUI:
         row.prop(active_node, "diffusion_is_on", text="Diffusion", slider=True)
         
         row = column.row()
-        row.prop(active_node, "gobo_id_is_on", text="Gobo", slider=True)
+        row.prop(active_node, "gobo_is_on", text="Gobo", slider=True)
         
         column.separator()
         
@@ -261,7 +261,7 @@ class NodeUI:
             row.prop(active_node, "diffusion_is_on", text="Diffusion", slider=True)
             
             row = column.row()
-            row.prop(active_node, "gobo_id_is_on", text="Gobo", slider=True)
+            row.prop(active_node, "gobo_is_on", text="Gobo", slider=True)
             
             column.separator()
             
@@ -311,14 +311,14 @@ class NodeUI:
         row.prop(self, "show_effect_preset_settings", icon='PREFERENCES', emboss=True, icon_only=True)
         op = row.operator("node.flash_preset_search_operator", text="", icon='VIEWZOOM')
         op.node_name = self.name
-        row.prop(self, "int_up_preset_assignment", text="Up Preset:")
+        row.prop(self, "int_start_preset", text="Up Preset:")
         op = row.operator("node.record_effect_preset_operator", text="", icon_value=orb.icon_id)
         op.node_name = self.name
         op.node_tree_name = node_tree.name
         
         # 3rd row
         row = column.row(align=True)
-        row.prop(self, "int_down_preset_assignment", text="Down Preset:")
+        row.prop(self, "int_end_preset", text="Down Preset:")
         op = row.operator("node.record_down_effect_preset_operator", text="", icon_value=orb.icon_id)
         op.node_name = self.name
         op.node_tree_name = node_tree.name
@@ -327,10 +327,10 @@ class NodeUI:
         conflict = False
         conflict_node_name = ""
         
-        if world is not None and world.node_tree and self.int_up_preset_assignment not in (0, 1) and self.int_down_preset_assignment not in (0, 1):
+        if world is not None and world.node_tree and self.int_start_preset not in (0, 1) and self.int_end_preset not in (0, 1):
             node_tree = world.node_tree
             for controller in node_tree.nodes:
-                if controller.bl_idname == 'flash_type' and controller.name != self.name and controller.int_up_preset_assignment == self.int_up_preset_assignment:
+                if controller.bl_idname == 'flash_type' and controller.name != self.name and controller.int_start_preset == self.int_start_preset:
                     conflict = True
                     conflict_node_name = str(controller.label)
                     if conflict_node_name == "":

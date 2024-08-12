@@ -28,7 +28,16 @@
 
 
 import bpy
-from bpy.types import Panel
+from bpy.types import Panel, Scene
+from bpy.types import (
+    TOPBAR_HT_upper_bar, 
+    VIEW3D_HT_header, 
+    VIEW3D_HT_tool_header, 
+    SEQUENCER_HT_header, 
+    SEQUENCER_MT_add, 
+    DOPESHEET_HT_header,
+    NODE_MT_add
+    )
 
 from .ui.node_ui import NodeUI
 from .ui.sequencer_ui import SequencerUI
@@ -103,11 +112,14 @@ class VIEW3D_PT_alva_object_controller(Panel, View3D_Panel):
     @classmethod
     def poll(cls, context):
         return (hasattr(context, "scene") and
-                hasattr(context, "active_object"))
+                hasattr(context, "active_object") and
+                context.active_object is not None)
 
     def draw(self, context):
         scene = bpy.context.scene.scene_props
         active_object = context.active_object
+
+        #if active
         
         if active_object.type == 'MESH':
             box, column = View3DUI.draw_object_header(self, context, scene, active_object)
@@ -318,52 +330,36 @@ panels = [
 
 
 def register():
+    from bpy.utils import register_class
     for cls in panels:
-        bpy.utils.register_class(cls)
+        register_class(cls)
     
-    # Define properties to track registration status
-    if not hasattr(bpy.types.Scene, "is_tool_header_registered"):
-        bpy.types.Scene.is_tool_header_registered = bpy.props.BoolProperty()
-        bpy.types.VIEW3D_HT_tool_header.prepend(CommonUI.draw_tool_settings)
-    
-    if not hasattr(bpy.types.Scene, "is_topbar_registered"):
-        bpy.types.Scene.is_topbar_registered = bpy.props.BoolProperty()
-        bpy.types.TOPBAR_HT_upper_bar.append(CommonUI.draw_topbar)
-    
-    if not hasattr(bpy.types.Scene, "is_sequencer_add_menu_registered"):
-        bpy.types.Scene.is_sequencer_add_menu_registered = bpy.props.BoolProperty()
-        bpy.types.SEQUENCER_MT_add.append(SequencerUI.draw_sequencer_add_menu)
-        
-    if not hasattr(bpy.types.Scene, "is_node_menu_registered"):
-        bpy.types.Scene.is_node_menu_registered = bpy.props.BoolProperty()
-        bpy.types.NODE_MT_add.append(NodeUI.draw_alva_node_menu)
-        
-    if not hasattr(bpy.types.Scene, "is_sequencer_cmd_line_registered"):
-        bpy.types.Scene.is_sequencer_cmd_line_registered = bpy.props.BoolProperty()
-        bpy.types.SEQUENCER_HT_header.append(SequencerUI.draw_sequencer_cmd_line)
+    TOPBAR_HT_upper_bar.append(CommonUI.draw_topbar)
+
+    VIEW3D_HT_header.append(View3DUI.draw_view3d_cmd_line)
+    VIEW3D_HT_tool_header.prepend(CommonUI.draw_tool_settings)
+
+    SEQUENCER_MT_add.append(SequencerUI.draw_sequencer_add_menu)
+    SEQUENCER_HT_header.append(SequencerUI.draw_sequencer_cmd_line)
+
+    DOPESHEET_HT_header.append(SequencerUI.draw_timeline_sync) # This goes on space_time too
+
+    NODE_MT_add.append(NodeUI.draw_alva_node_menu)
 
 
 def unregister():
+    from bpy.utils import unregister_class
     for cls in panels:
-        bpy.utils.unregister_class(cls)
+        unregister_class(cls)
     
-    # Unregister callbacks
-    if bpy.context.scene.is_tool_header_registered:
-        bpy.types.VIEW3D_HT_tool_header.remove(CommonUI.draw_tool_settings)
-        bpy.context.scene.is_tool_header_registered = False
-    
-    if bpy.context.scene.is_topbar_registered:
-        bpy.types.TOPBAR_HT_upper_bar.remove(CommonUI.draw_topbar)
-        bpy.context.scene.is_topbar_registered = False
-    
-    if bpy.context.scene.is_sequencer_add_menu_registered:
-        bpy.types.SEQUENCER_MT_add.remove(SequencerUI.draw_sequencer_add_menu)
-        bpy.context.scene.is_sequencer_add_menu_registered = False
-    
-    if bpy.context.scene.is_node_menu_registered:
-        bpy.types.NODE_MT_add.remove(NodeUI.draw_alva_node_menu)
-        bpy.context.scene.is_node_menu_registered = False
-    
-    if bpy.context.scene.is_sequencer_cmd_line_registered:
-        bpy.types.SEQUENCER_HT_header.remove(SequencerUI.draw_sequencer_cmd_line)
-        bpy.context.scene.is_sequencer_cmd_line_registered = False
+    TOPBAR_HT_upper_bar.remove(CommonUI.draw_topbar)
+
+    VIEW3D_HT_header.remove(View3DUI.draw_view3d_cmd_line)
+    VIEW3D_HT_tool_header.remove(CommonUI.draw_tool_settings)
+
+    SEQUENCER_MT_add.remove(SequencerUI.draw_sequencer_add_menu)
+    SEQUENCER_HT_header.remove(SequencerUI.draw_sequencer_cmd_line)
+
+    DOPESHEET_HT_header.remove(SequencerUI.draw_timeline_sync)
+
+    NODE_MT_add.remove(NodeUI.draw_alva_node_menu)

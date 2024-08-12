@@ -50,27 +50,20 @@ class Orb:
     def generate_macros_to_cues(self, context, strip='sound', enable=True):
         scene = context.scene
         console_mode = scene.scene_props.console_type_enum
-        active_strip = scene.sequence_editor.active_strip
+        if hasattr(scene.sequence_editor, "active_strip") and scene.sequence_editor.active_strip is not None:
+            active_strip = scene.sequence_editor.active_strip
+        else:
+            active_strip = scene
 
         if strip == 'sound':
-            event_list = active_strip.song_timecode_clock_number
-            macro = active_strip.execute_with_macro_number if enable else active_strip.disable_with_macro_number
-            cue = active_strip.execute_on_cue_number if enable else active_strip.disable_on_cue_number
-            if console_mode == 'option_eos':
-                yield from Orb.Eos.manipulate_show_control(self, scene, active_strip, event_list, cue, macro, None, desired_state="enable" if enable else "disable")
-                yield None, "Orb complete."
-            elif console_mode in ['option_ma3', 'option_ma2']:
-                yield None, f"Button not supported for {console_mode} yet."
-            else:
-                SLI.SLI_assert_unreachable()
+            event_list = Utils.find_executor(scene, active_strip, 'event_list')
+            start_macro = Utils.find_executor(scene, active_strip, 'start_macro')
+            end_macro = Utils.find_executor(scene, active_strip, 'end_macro')
+            start_cue = active_strip.str_start_cue
+            end_cue = active_strip.str_start_cue
 
-        elif strip == 'animation':
-            event_list = active_strip.animation_cue_list_number
-            macro = active_strip.execute_animation_with_macro_number if enable else active_strip.disable_animation_with_macro_number
-            cue = active_strip.execute_animation_on_cue_number if enable else active_strip.disable_animation_on_cue_number
-            timecode = Utils.frame_to_timecode(active_strip.frame_start) if enable else None
             if console_mode == 'option_eos':
-                yield from Orb.Eos.manipulate_show_control(self, scene, active_strip, event_list, cue, macro, timecode, desired_state="enable" if enable else "disable")
+                yield from Orb.Eos.manipulate_show_control(scene, event_list, start_macro, end_macro, start_cue, end_cue)
                 yield None, "Orb complete."
             elif console_mode in ['option_ma3', 'option_ma2']:
                 yield None, f"Button not supported for {console_mode} yet."
@@ -79,10 +72,12 @@ class Orb:
 
         elif strip == 'macro':
             Updaters.macro_update(active_strip, context)
-            macro = "start_frame_macro" if enable else "end_frame_macro"
-            text = active_strip.start_frame_macro_text if enable else active_strip.end_frame_macro_text
+            macro_number = Utils.find_executor(scene, active_strip, 'start_macro')
+            text = active_strip.start_frame_macro_text
+            is_final = not scene.strip_end_macros
+
             if console_mode == 'option_eos':
-                yield from Orb.Eos.generate_macro_command(self, context, active_strip, macro, text, first=True, final=True)
+                yield from Orb.Eos.generate_macro_command(context, macro_number, text, first=True, final=is_final)
                 yield None, "Orb complete."
             elif console_mode == 'option_ma3':
                 yield None, "Button not supported for grandMA3 yet."
@@ -90,6 +85,20 @@ class Orb:
                 yield None, "Button not supported for grandMA2 yet."
             else:
                 SLI.SLI_assert_unreachable()
+
+            if scene.strip_end_macros:
+                macro_number = Utils.find_executor(scene, active_strip, 'end_macro')
+                text = active_strip.end_frame_macro_text
+
+                if console_mode == 'option_eos':
+                    yield from Orb.Eos.generate_macro_command(context, macro_number, text, first=False, final=True)
+                    yield None, "Orb complete."
+                elif console_mode == 'option_ma3':
+                    yield None, "Button not supported for grandMA3 yet."
+                elif console_mode == 'option_ma2':
+                    yield None, "Button not supported for grandMA2 yet."
+                else:
+                    SLI.SLI_assert_unreachable()
 
         elif strip == 'flash':
             active_strip.flash_input = active_strip.flash_input
@@ -106,8 +115,11 @@ class Orb:
                 end_length = round((strip_length_in_seconds - m1_start_length), 1)
                 m2_text = f"{str(active_strip.flash_down_input_background)} Sneak Time {str(end_length)} Enter"
 
-                yield from Orb.Eos.generate_macro_command(self, context, active_strip, "start_flash_macro_number", m1_text, first=True)
-                yield from Orb.Eos.generate_macro_command(self, context, active_strip, "end_flash_macro_number", m2_text, final=True)
+                start_macro = Utils.find_executor(scene, active_strip, 'start_macro')
+                end_macro = Utils.find_executor(scene, active_strip, 'end_macro')
+
+                yield from Orb.Eos.generate_macro_command(context, start_macro, m1_text, first=True)
+                yield from Orb.Eos.generate_macro_command(context, end_macro, m2_text, final=True)
 
                 yield None, "Orb complete."
             elif console_mode == 'option_ma3':
@@ -122,6 +134,8 @@ class Orb:
             text = StripMapping.get_trigger_offset_start_map(scene, active_strip=active_strip)
             if active_strip.friend_list == "" or active_strip.osc_trigger == "":
                 return {'CANCELLED', "Invalid text inputs."}
+            
+            macro = Utils.find_executor(scene, active_strip, 'start_macro')
             
             if console_mode == 'option_eos':
                 yield from Orb.Eos.generate_macro_command(self, context, active_strip, macro, text, first=True, final=True)
@@ -178,18 +192,28 @@ class Orb:
         # ANIMATION STRIPS
         ###################
         @staticmethod
-        def manipulate_show_control(self, scene, active_strip, event_list, cue, macro, timecode, desired_state):
+        def manipulate_show_control(scene, event_list, start_macro, end_macro, start_cue, end_cue, timecode=None):
             try:
                 yield Orb.Eos.record_snapshot(scene), "Recording snapshot."
-                yield Orb.Eos.save_console_file(scene), "Saving console file."
-                yield Orb.Eos.delete_recreate_macro_enter_edit(macro), "Creating blank macro."
+                yield Orb.Eos.save_console_file(scene), "Orb is running."
+
+                yield Orb.Eos.delete_recreate_macro_enter_edit(start_macro), "Creating blank macro."
                 yield Orb.Eos.type_event_list_number(event_list), "Typing event list number."
                 yield Orb.Eos.type_internal_time(), "Internal Time"
                 yield Orb.Eos.enter_timecode_or_just_enter(timecode), "Typing timecode for sync."
                 yield Orb.Eos.type_event_list_number(event_list), "Typing event list number again."
-                yield Orb.Eos.internal_enable_or_disable_foreground_live_execute_on_cue(cue, macro, desired_state), "Setting to foreground mode."
+                yield Orb.Eos.internal_enable_or_disable_foreground_live_execute_on_cue(start_cue, start_macro, "enable"), "Setting to foreground mode."
+
+                yield Orb.Eos.delete_recreate_macro_enter_edit(end_macro), "Creating blank macro."
+                yield Orb.Eos.type_event_list_number(event_list), "Typing event list number."
+                yield Orb.Eos.type_internal_time(), "Internal Time"
+                yield Orb.Eos.enter_timecode_or_just_enter(None), "Typing timecode for sync."
+                yield Orb.Eos.type_event_list_number(event_list), "Typing event list number again."
+                yield Orb.Eos.internal_enable_or_disable_foreground_live_execute_on_cue(end_cue, end_macro, "disable"), "Setting to foreground mode."
+
                 yield Orb.Eos.reset_macro_key(), "Resetting macro key."
                 yield Orb.Eos.restore_snapshot(scene), "Restoring your screen setup."
+
             except AttributeError as e:
                 logging.error(f"Attribute error in manipulate_show_control: {e}")
                 yield None, f"Attribute error: {e}"
@@ -254,7 +278,7 @@ class Orb:
         def generate_multiline_macro(self, context, scene, macro, text_data):
             try:
                 yield Orb.Eos.record_snapshot(scene), "Recording snapshot."
-                yield Orb.Eos.save_console_file(scene), "Saving console file."
+                yield Orb.Eos.save_console_file(scene), "Orb is running."
                 yield Orb.Eos.delete_recreate_macro_enter_edit(macro), "Creating blank macro."
                 yield Orb.Eos.reset_macro_key(), "Resetting macro key."
                 yield Orb.Eos.type_tokens(text_data), "Typing macro contents"
@@ -290,14 +314,14 @@ class Orb:
         # SINGLE-LINE STRIP MACROS
         ###########################
         @staticmethod
-        def generate_macro_command(self, context, active_strip, macro_type, macro_text, first=False, final=False):
+        def generate_macro_command(context, macro_number, macro_text, first=False, final=False):
             try:
                 if first:
                     yield Orb.Eos.record_snapshot(context.scene), "Recording snapshot."
-                    yield Orb.Eos.save_console_file(context.scene), "Saving console file."
+                    yield Orb.Eos.save_console_file(context.scene), "Orb is running."
 
                 yield Orb.Eos.initiate_macro(), "Initiating macro."
-                yield Orb.Eos.type_macro_number(active_strip, macro_type), "Typing macro number."
+                yield Orb.Eos.type_macro_number(macro_number), "Typing macro number."
                 yield Orb.Eos.learn_macro_and_exit(macro_text), "Learning macro and exiting."
                 yield Orb.Eos.reset_macro_key(), "Resetting macro key."
 
@@ -326,10 +350,9 @@ class Orb:
             Orb.Eos.send_osc_with_delay("/eos/key/macro")
 
         @staticmethod
-        def type_macro_number(active_strip, macro_type):
-            macro_number = str(getattr(active_strip, macro_type))
-            for digit in macro_number:
-                Orb.Eos.send_osc_with_delay(f"/eos/key/{digit}")
+        def type_macro_number(macro_number):
+            for digit in str(macro_number):
+                Orb.Eos.send_osc_with_delay(f"/eos/key/{digit}", delay=0.2)
             Orb.Eos.send_osc_with_delay("/eos/key/enter", delay=0.1)
             Orb.Eos.send_osc_with_delay("/eos/key/enter")
 
@@ -389,7 +412,21 @@ class Orb:
         # OTHER STUFF
         ##############
         @staticmethod
-        def make_qmeo(scene, frame_rate, start_frame, end_frame, cue_list, event_list):
+        def make_qmeo(scene, frame_rate, start_frame, end_frame, cue_list):
+            if hasattr(scene.sequence_editor, "active_strip") and scene.sequence_editor.active_strip is not None:
+                active_strip = scene.sequence_editor.active_strip
+            else:
+                active_strip = scene
+
+            event_list = Utils.find_executor(scene, active_strip, 'event_list')
+            start_macro = Utils.find_executor(scene, active_strip, 'start_macro')
+            end_macro = Utils.find_executor(scene, active_strip, 'end_macro')
+            start_cue = active_strip.str_start_cue
+            end_cue = active_strip.str_start_cue
+            timecode = Utils.frame_to_timecode(active_strip.frame_start)
+
+            yield from Orb.Eos.manipulate_show_control(scene, event_list, start_macro, end_macro, start_cue, end_cue, timecode)
+
             scene.scene_props.is_cue_baking = True
             Orb.Eos.update_label(scene, event_list, "Making a Qmeo! Escape to Cancel.")
             
@@ -469,10 +506,11 @@ class Orb:
             ]
             
             commands = []
-            event_strip = Utils.find_relevant_clock_strip(context.scene)
-            if event_strip == None:
+            from .utils.event_utils import EventUtils
+            event_object = EventUtils.find_relevant_clock_object(context.scene)
+            if event_object == None:
                 return {'CANCELLED'}
-            event_list = event_strip.song_timecode_clock_number
+            event_list = Utils.find_executor(context.scene, context.scene, 'event_list')
 
             i = 1
             for action_map, description in all_maps:
@@ -491,6 +529,7 @@ class Orb:
             time.sleep(.5)
             
             OSC.send_osc_lighting("/eos/newcmd", f"Delete Event {event_list} / Enter Enter")
+            time.sleep(.3)
             OSC.send_osc_lighting("/eos/newcmd", f"Event {event_list} / Enter Enter")
             
             for i in range(0, len(commands), 50):
@@ -505,4 +544,7 @@ class Orb:
             OSC.send_osc_lighting("/eos/newcmd", f"Snapshot {snapshot} Enter")
             
             Orb.Eos.restore_snapshot(context.scene)
+
+            bpy.ops.screen.animation_play()
+
             return {'FINISHED'}

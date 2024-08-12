@@ -29,11 +29,12 @@
 
 import bpy
 from bpy.props import StringProperty, CollectionProperty, BoolProperty, EnumProperty, IntProperty, FloatProperty, FloatVectorProperty, PointerProperty
-from bpy.types import PropertyGroup, Object, ColorSequence
+from bpy.types import PropertyGroup, Object, ColorSequence, Sequence, Scene
 
 from ..utils.utils import Utils # type: ignore
 from ..assets.items import Items as AlvaItems # type: ignore
 from ..updaters.common_updaters import CommonUpdaters # type: ignore
+from ..updaters.sequencer_updaters import SequencerUpdaters # type: ignore
 from ..updaters.node_updaters import NodeUpdaters # type: ignore
 from ..cpvia.cpvia_generator import CPVIAGenerator # type: ignore
 
@@ -444,7 +445,7 @@ class CommonProperties:
         ('zoom_is_on', BoolProperty(default=False, description="Zoom is enabled when checked")),
         ('iris_is_on', BoolProperty(default=False, description="Iris is enabled when checked")),
         ('edge_is_on', BoolProperty(default=False, description="Edge is enabled when checked")),
-        ('gobo_id_is_on', BoolProperty(default=False, description="Gobo ID is enabled when checked")),
+        ('gobo_is_on', BoolProperty(default=False, description="Gobo ID is enabled when checked")),
         ('prism_is_on', BoolProperty(default=False, description="Prism is enabled when checked")),
     ]
         
@@ -474,12 +475,34 @@ class CommonProperties:
             default="# Gobo_Index/Speed at $ Enter", description="Add $ for animation data and # for fixture/group ID"))
     ]
 
+    timecode_executors = [
+        ('int_event_list', IntProperty(
+            name="Event List", min=0, max=9999, default=0, description="This should be the number of the event list you have created on the console for this song")),
+        
+        ('int_cue_list', IntProperty(
+            name="Cue List", min=0, max=999, default=0, description="This should be the number of the event list you have created on the console for this song")),
+        
+        ('str_start_cue', StringProperty(
+            name="Start Cue", default="1 / 1", update=SequencerUpdaters.timecode_clock_update_safety, description="Specifies which cue will start (or enable) the timecode clock. Can't be the same as first cue in Blender sequence or that will create loop")),
+        
+        ('str_end_cue', StringProperty(
+            name="End Cue", default="1 / 2", update=SequencerUpdaters.timecode_clock_update_safety, description="Specifies which cue will stop (or disable) the timecode clock")),
+        
+        ('int_start_macro', IntProperty(
+            name="Start Macro", min=0, max=99999, default=0, description="Universal macro used for various starting activities")),
+        
+        ('int_end_macro', IntProperty(
+            name="End Macro", min=0, max=99999, default=0, description="Universal macro used for various ending activities")),
+        
+        ('int_start_preset', IntProperty(
+            name="Start Preset", default=0, min=0, max=9999, description="Universal preset used for various starting activities")),
+        
+        ('int_end_preset', IntProperty(
+            name="End Preset", default=0, min=0, max=9999, description="Universal preset used for various ending activities"))
+    ]
 
 
 def register():
-
-    common_properties = CommonProperties()
-
     # Object, excluding flash_strip_parameters
     Utils.register_properties(Object, CommonProperties.controller_ids)
     Utils.register_properties(Object, CommonProperties.object_only)  # Unique
@@ -499,6 +522,12 @@ def register():
     Utils.register_properties(ColorSequence, CommonProperties.parameter_toggles)
     Utils.register_properties(ColorSequence, CommonProperties.special_arguments)
     Utils.register_properties(ColorSequence, CommonProperties.flash_strip_parameters)  # Unique
+
+    # Sequence
+    Utils.register_properties(Sequence, CommonProperties.timecode_executors)
+
+    # Scene
+    Utils.register_properties(Scene, CommonProperties.timecode_executors)
 
 
 def unregister():
@@ -521,3 +550,9 @@ def unregister():
     Utils.register_properties(ColorSequence, CommonProperties.parameter_toggles, register=False)
     Utils.register_properties(ColorSequence, CommonProperties.special_arguments, register=False)
     Utils.register_properties(ColorSequence, CommonProperties.flash_strip_parameters, register=False)  # Unique
+
+    # Sequence
+    Utils.register_properties(Sequence, CommonProperties.timecode_executors, register=False)
+
+    # Scene
+    Utils.register_properties(Scene, CommonProperties.timecode_executors, register=False)  

@@ -179,18 +179,18 @@ class COMMON_OT_gobo_props(Operator):
 '''SPLASH Operators'''
 #-------------------------------------------------------------------------------------------------------------------------------------------   
 class TOPBAR_OT_splash_screen(Operator):
-    bl_idname = "wm.custom_splash_screen"
-    bl_label = "Splash"
+    bl_idname = "wm.sorcerer_splash"
+    bl_label = "Alva Sorcerer Splash"
     
     def execute(self, context):
         return {'FINISHED'}
     
     def invoke(self, context, event):
-        width = 300
-        return context.window_manager.invoke_popup(self, width=width)
+        width = 375
+        return context.window_manager.invoke_props_dialog(self, width=width)
 
     def draw(self, context):
-        bpy.types.ALVA_CommonUI.draw_splash(self, context)
+        CommonUI.draw_splash(self, context)
         
         
 #-------------------------------------------------------------------------------------------------------------------------------------------

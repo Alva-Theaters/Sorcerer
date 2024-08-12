@@ -84,7 +84,7 @@ color_codes = [
 # Hotkeys and Popups
 class SEQUENCER_OT_scale_strips(Operator):  ## Scale type not the most helpful.
     """Scale the length of a single strip or the offsets between multiple selected strips in the VSE"""
-    bl_idname = "vse.scale_strips"
+    bl_idname = "seq.scale_strips"
     bl_label = "Scale VSE Strips"
 
     initial_mouse_x = None
@@ -402,6 +402,7 @@ class SEQUENCER_OT_new_strip(Operator):
                     frame_end=frame_end)
             
             color_strip.color = (0, 0, 0)
+            color_strip.my_settings.motif_type_enum = context.scene.add_strip_type_default
 
             # Deselect all other strips and set the new strip as the active one.
             for strip in sequence_editor.sequences_all:
@@ -440,7 +441,8 @@ class SEQUENCER_OT_new_kick(Operator):
                     frame_start=current_frame,
                     frame_end=frame_end)
             
-            color_strip.color = (1, 1, 1)
+            color_strip.color = (1, 1, 0)
+            color_strip.my_settings.motif_type_enum = context.scene.add_strip_type_default
 
             for strip in sequence_editor.sequences_all:
                 strip.select = False
@@ -480,7 +482,8 @@ class SEQUENCER_OT_new_pointer(Operator):
                 frame_start=frame_start,
                 frame_end=frame_end)
         
-        color_strip.color = (1, 1, 1)
+        color_strip.color = (1, 1, 0)
+        color_strip.my_settings.motif_type_enum = context.scene.add_strip_type_default
 
         for strip in sequence_editor.sequences_all:
             strip.select = False
@@ -694,7 +697,7 @@ class SEQUENCER_OT_right_five(Operator):
     
 def bump_timecode(context, time):
     active_strip = context.scene.sequence_editor.active_strip
-    event_list = active_strip.song_timecode_clock_number
+    event_list = active_strip.int_event_list
     OSC.send_osc_lighting("/eos/newcmd", f"Event {str(event_list)} / 1 Thru 1000000 Time + {str(time)} Enter")
 
 class SEQUENCER_OT_tc_left_five(Operator):
@@ -1450,7 +1453,7 @@ class SEQUENCER_OT_zero_clock(Operator):
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
-        event_list_number = str(active_strip.song_timecode_clock_number)
+        event_list_number = str(active_strip.int_event_list)
         OSC.send_osc_lighting("/eos/newcmd", f"Event {event_list_number} / Internal Disable Time Enter")
         return {'FINISHED'}
     
@@ -1464,7 +1467,7 @@ class SEQUENCER_OT_delete_events(Operator):
         active_strip = context.scene.sequence_editor.active_strip
 
         if active_strip and active_strip.type == 'SOUND':
-            event_list_number = active_strip.song_timecode_clock_number
+            event_list_number = active_strip.int_event_list
 
             OSC.send_osc_lighting("/eos/key/tab", "11 Enter")
             OSC.send_osc_lighting("/eos/key/1", "Enter")
@@ -1622,7 +1625,7 @@ class SEQUENCER_OT_delete_qmeo_cues(Operator):
         scene = bpy.context.scene
         context = bpy.context
         active_strip = context.scene.sequence_editor.active_strip
-        cue_list = active_strip.animation_cue_list_number
+        cue_list = active_strip.int_cue_list
         
         OSC.send_osc_lighting("/eos/key/live", "1")
         OSC.send_osc_lighting("/eos/key/live", "0")
@@ -1661,7 +1664,7 @@ class SEQUENCER_OT_stop_single_clock(Operator):
     def execute(self, context):
         scene = bpy.context.scene
         active_strip = context.scene.sequence_editor.active_strip
-        cue_list = active_strip.animation_cue_list_number
+        cue_list = active_strip.int_cue_list
         
         OSC.send_osc_lighting("/eos/newcmd", f"Event {str(active_strip.animation_event_list_number)} / Internal Disable Enter")
         return {'FINISHED'}
@@ -1674,7 +1677,7 @@ class SEQUENCER_OT_generate_text(Operator):
     
     def execute(self, context):
         scene = context.scene
-        song_timecode_clock_number = context.scene.sequence_editor.active_strip.song_timecode_clock_number
+        int_event_list = context.scene.sequence_editor.active_strip.int_event_list
         seq_start = context.scene.frame_start
         seq_end = context.scene.frame_end
         active_strip = context.scene.sequence_editor.active_strip
@@ -1725,7 +1728,7 @@ $$Software Version 3.2.2 Build 25  Fixture Library 3.2.0.75, 26.Apr.2023
 
 """)
 
-        text_block.write("$SCList " + str(active_strip.song_timecode_clock_number) + " 2\n")
+        text_block.write("$SCList " + str(active_strip.int_event_list) + " 2\n")
         text_block.write("$$FirstFrame  00:00:00:00\n")
         text_block.write("$$LastFrame  23:59:59:00\n")
         text_block.write("$$FramesPerSecond " + str(frames_per_second) + "\n")
@@ -1840,7 +1843,22 @@ class SEQUENCER_OT_base_modal_operator(Operator):
 
     def execute(self, context):
         self._cancel = False
-        self._generator = self.generate_macros_to_cues(context, strip=self.strip, enable=self.enable)
+        if self.strip != 'qmeo':
+            self._generator = self.generate_macros_to_cues(context, strip=self.strip, enable=self.enable)
+        else:
+            frame_rate = Utils.get_frame_rate(context.scene)
+            if hasattr(context.scene.sequence_editor, "active_strip") and context.scene.sequence_editor.active_strip is not None:
+                active_strip = context.scene.sequence_editor.active_strip
+                start_frame = active_strip.frame_start
+                end_frame = active_strip.frame_final_end
+                cue_list = active_strip.int_cue_list
+            else:
+                start_frame = context.scene.frame_start
+                end_frame = context.scene.frame_end
+                cue_list = context.scene.int_cue_list
+            
+            self._generator = self.make_qmeo(context.scene, frame_rate, start_frame, end_frame, cue_list)
+
         wm = context.window_manager
         self._timer = wm.event_timer_add(0.1, window=context.window)
         wm.modal_handler_add(self)
@@ -1869,6 +1887,9 @@ class SEQUENCER_OT_base_modal_operator(Operator):
 
     def generate_macros_to_cues(self, context, strip='sound', enable=True):
         yield from Orb.generate_macros_to_cues(self, context, strip=strip, enable=enable)
+
+    def make_qmeo(self, scene, frame_rate, start_frame, end_frame, cue_list):
+        yield from Orb.Eos.make_qmeo(scene, frame_rate, start_frame, end_frame, cue_list)
 
     def cancel(self, context):
         wm = context.window_manager
@@ -1968,21 +1989,15 @@ class SEQUENCER_OT_generate_offset_macro(SEQUENCER_OT_base_modal_operator):
         return super().execute(context)
     
     
-class SEQUENCER_OT_bake_curves_to_cues(Operator):
+class SEQUENCER_OT_bake_curves_to_cues(SEQUENCER_OT_base_modal_operator):
     bl_idname = "my.bake_fcurves_to_cues_operator"
     bl_label = "Bake F-curves To Cues"
     bl_description = "Orb will create a qmeo. A qmeo is like a video, only each frame is a lighting cue. Use it to store complex animation data on the lighting console" 
 
     def execute(self, context):
-        active_strip = context.scene.sequence_editor.active_strip
-        frame_rate = Utils.get_frame_rate(context.scene)
-        start_frame = active_strip.frame_start
-        end_frame = active_strip.frame_final_end
-        event_list = active_strip.animation_event_list_number
-        cue_list = active_strip.animation_cue_list_number
-        
-        Orb.Eos.make_qmeo(context.scene, frame_rate, start_frame, end_frame, cue_list, event_list)
-        return {'FINISHED'}
+        self.strip = 'qmeo'
+        self.enable=True
+        return super().execute(context)
  
  
 class SEQUENCER_OT_only_cues(Operator):
@@ -1995,7 +2010,7 @@ class SEQUENCER_OT_only_cues(Operator):
         frame_rate = Utils.get_frame_rate(context.scene)
         start_frame = active_strip.frame_start
         end_frame = active_strip.frame_final_end
-        cue_list = active_strip.animation_cue_list_number
+        cue_list = active_strip.int_cue_list
         
         Orb.Eos.make_qmeo(context.scene, frame_rate, start_frame, end_frame, cue_list, None)
         return {'FINISHED'}

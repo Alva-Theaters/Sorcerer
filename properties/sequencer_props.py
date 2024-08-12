@@ -27,7 +27,7 @@
 
 
 from bpy.props import *
-from bpy.types import Scene, ColorSequence, SoundSequence, Object
+from bpy.types import Scene, ColorSequence, SoundSequence, Object, Sequence
 
 from ..assets.items import Items as AlvaItems
 from ..updaters.sequencer_updaters import SequencerUpdaters as Updaters
@@ -53,7 +53,6 @@ def register():
     ColorSequence.motif_name = StringProperty(default="", description="Use this to link cues together that should act as one. They must have the same name here and have the link button turned on so that it is red for them to automatically update each other. Not everything will necessarily be updated.")
     ColorSequence.strip_length_proxy = IntProperty(name="", min=-9999, max=1000000)  ## Is this junk?
 
-
     # Strip formatter
     Scene.color_is_magnetic = BoolProperty(name="", description="Select Magnetic button will only select other strips if they share Active Strip's color", default=False)
     Scene.strip_name_is_magnetic = BoolProperty(name="", description="Select Magnetic button will only select other strips if they share Active Strip's strip name", default=False)
@@ -71,14 +70,7 @@ def register():
     SoundSequence.song_bpm_channel = IntProperty(name="", min=1, max=32, description='Use this to choose which channel to place the new strips on')
     SoundSequence.beats_per_measure = IntProperty(name="", min=1, max=16, description='Use this to determine how many beats are in each measure. In a time signature like 3/4, this would be the top number 3')
 
-
     # Sound strips
-    SoundSequence.song_timecode_clock_number = IntProperty(name="", min=0, max=99, description="This should be the number of the event list you have created on the console for this song")
-    SoundSequence.execute_on_cue_number = IntProperty(name="", min=0, max=10000, update=Updaters.timecode_clock_update_safety, description="Specifies which cue will start (or enable) the timecode clock. Can't be the same as first cue in Blender sequence or that will create loop")
-    SoundSequence.execute_with_macro_number = IntProperty(name="", min=0, max=100000, description="Specifies which macro number to build to use to start the timecode clock on the console")
-    SoundSequence.disable_on_cue_number = IntProperty(name="", min=0, max=10000, update=Updaters.timecode_clock_update_safety, description="Specifies which cue will stop (or disable) the timecode clock")
-    SoundSequence.disable_with_macro_number = IntProperty(name="", min=0, max=100000, description="Specifies which macro number to build to use to start the timecode clock on the console")
-    # 3D sound
     SoundSequence.audio_type_enum = EnumProperty(
         items=AlvaItems.get_audio_object_items,
         name="Audio Types",
@@ -103,18 +95,12 @@ def register():
     SoundSequence.dummy_volume = FloatProperty(default=0, name="Dummy Volume", min=0, max=1)
     SoundSequence.audio_object_size = FloatProperty(default=1, name="Dummy Volume", min=0, max=20)
     SoundSequence.int_mixer_channel = IntProperty(default=1, name="Channel/fader number on mixer", min=1, max=9999, description='This is for the OSC real-time monitor below. This is talking about the fader on the audio mixer. It will be replace "#" in the OSC templates below')
-    
 
     # Macro strips
-    ColorSequence.start_frame_macro = IntProperty(name="", min=0, max=99999, update=Updaters.motif_property_updater)
     ColorSequence.start_frame_macro_text = StringProperty(name="")
     ColorSequence.start_frame_macro_text_gui = StringProperty(name="", update=Updaters.macro_update)
-    ColorSequence.end_frame_macro = IntProperty(name="", min=0, max=99999, update=Updaters.motif_property_updater)
     ColorSequence.end_frame_macro_text = StringProperty(name="")
     ColorSequence.end_frame_macro_text_gui = StringProperty(name="", update=Updaters.macro_update)
-    ColorSequence.start_macro_muted = BoolProperty(name="", description="Toggle mute/unmute for the start macro", default=False)
-    ColorSequence.end_macro_muted = BoolProperty(name="", description="Toggle mute/unmute for the end macro", default=False)
-
 
     # Cue Strips
     ColorSequence.eos_cue_number = StringProperty(name="", update=Updaters.motif_property_updater, description="This argument will be fired with the above prefix when frame 1 of the strip comes up in the sequencer. The top three fields here will definitely work on any console brand/type that has an OSC input library")
@@ -208,48 +194,36 @@ def register():
         default = False
     ) 
 
-
     # Flash strips
-    ColorSequence.flash_input = StringProperty(name="", description="Type in what feels natural as a request for a flash up. It IS the software's job to read your mind", update=Updaters.flash_input_updater)
+    ColorSequence.flash_input = StringProperty(name="Flash Input", description="Type in what feels natural as a request for a flash up. It IS the software's job to read your mind", update=Updaters.flash_input_updater)
     ColorSequence.flash_down_input = StringProperty(name="", description="Type in the second half of the flash, which tells Sorcerer what to do to flash back down", update=Updaters.flash_down_input_updater)
     ColorSequence.flash_input_background = StringProperty(name="",)
     ColorSequence.flash_down_input_background = StringProperty(name="",)
-    ColorSequence.start_flash_macro_number = IntProperty(name="", min=0, max=99999, description="This is the macro number on the console that Alva will use to fire the beginning of the flash", update=Updaters.motif_property_updater)
-    ColorSequence.end_flash_macro_number = IntProperty(name="", min=0, max=99999, description="This is the macro number on the console that Alva will use to fire the end of the flash", update=Updaters.motif_property_updater)
     ColorSequence.frame_middle = IntProperty(name="", min=-100000, max=100000, default=0)
-    ColorSequence.flash_bias = IntProperty(name="", min=-49, max=49, default=0, description="This allows you to make the flash start with a rapid fade up and then fade down slowly and vise-versa", update=Updaters.motif_property_updater)
+    ColorSequence.flash_bias = IntProperty(name="Bias", min=-49, max=49, default=0, description="This allows you to make the flash start with a rapid fade up and then fade down slowly and vise-versa", update=Updaters.motif_property_updater)
     ColorSequence.flash_prefix = StringProperty(name="", default="")
-    ColorSequence.start_flash = StringProperty(name="", default="")
-    ColorSequence.end_flash = StringProperty(name="", default="")
+    ColorSequence.start_flash = StringProperty(name="Start Flash", default="")
+    ColorSequence.end_flash = StringProperty(name="End Flash", default="")
     ColorSequence.flash_type_enum = EnumProperty(
         items=AlvaItems.flash_types,
         name="Flash Types",
         description="Choose how to create flashes",
         default=0
     )
-    ColorSequence.int_up_preset_assignment = IntProperty(name="Flash up Preset")
-    ColorSequence.int_down_preset_assignment = IntProperty(name="Flash up Preset")
-
+    ColorSequence.int_start_preset = IntProperty(name="Flash up Preset")
+    ColorSequence.int_end_preset = IntProperty(name="Flash up Preset")
 
     # Animation strips
     Scene.bake_panel_toggle = BoolProperty(
         name="Oven", 
         description="Use this to store animation data locally on the console", 
         default = False
-    ) 
-    ColorSequence.animation_cue_list_number = IntProperty(default=10, min=2, max=99999)
-    ColorSequence.animation_event_list_number = IntProperty(default=10, min=2, max=99999)
-    ColorSequence.execute_animation_on_cue_number = IntProperty(name="", min=0, max=10000, description="Specifies which cue will start (or enable) the timecode clock")
-    ColorSequence.execute_animation_with_macro_number = IntProperty(name="", min=0, max=100000, description="Specifies which macro number to build to use to start the timecode clock on the console")
-    ColorSequence.disable_animation_on_cue_number = IntProperty(name="", min=0, max=10000, update=Updaters.timecode_clock_update_safety, description="Specifies which cue will stop (or disable) the timecode clock")
-    ColorSequence.disable_animation_with_macro_number = IntProperty(name="", min=0, max=100000, description="Specifies which macro number to build to use to start the timecode clock on the console")
-    
+    )
 
     # Trigger strips
     ColorSequence.trigger_prefix = StringProperty(name="", default="/eos/newcmd", description="Prefix, aka address, is the first half of an OSC message. The top three fields here will definitely work on any console brand/type that has an OSC input library", update=Updaters.motif_property_updater)
     ColorSequence.osc_trigger = StringProperty(name="", description="This argument will be fired with the above prefix when frame 1 of the strip comes up in the sequencer. The top three fields here will definitely work on any console brand/type that has an OSC input library", update=Updaters.motif_property_updater)
     ColorSequence.osc_trigger_end = StringProperty(name="", description="This argument will be fired with the above prefix when the final frame of the strip comes up in the sequencer. The top three fields here will definitely work on any console brand/type that has an OSC input library", update=Updaters.motif_property_updater)
-
 
     # Offset strips
     ColorSequence.offset_type_enum = EnumProperty(
@@ -268,9 +242,7 @@ def register():
     ColorSequence.offset_channels = StringProperty(name="Offset Channels", description="Just type in the channels to offset. Use () for simultaneous offset groups")
     ColorSequence.offset_fade_time = FloatProperty(name="Fade Time", description="The fade time, or sneak time, for each channel when triggered, in seconds", default=.5, min=0)
     ColorSequence.use_macro = BoolProperty(name="Use Macro", default=False, update=Updaters.motif_property_updater)
-    ColorSequence.offset_macro = IntProperty(name="Offsets Macro", min=0, max=99999, update=Updaters.motif_property_updater)
     ColorSequence.friend_list = StringProperty(default="", name="Offsets", description='Create offset effects by typing in the numbers of channels that should accompany the Start Strip in its action. Use () to separate concurrent offset groups. For example, 1-10 for 1 wipe or (1-5) (5-10) for 2 simultaneous wipes. Concurrent offset groups must be equal in number of channels')
-
 
 
 def unregister():
@@ -280,7 +252,6 @@ def unregister():
     del ColorSequence.motif_name
     del ColorSequence.strip_length_proxy
 
-    # Strip formatter
     del Scene.color_is_magnetic
     del Scene.strip_name_is_magnetic
     del Scene.channel_is_magnetic
@@ -293,16 +264,10 @@ def unregister():
     del Scene.generate_quantity
     del Scene.normal_offset
     del Scene.i_know_the_shortcuts
+
     del SoundSequence.song_bpm_input
     del SoundSequence.song_bpm_channel
     del SoundSequence.beats_per_measure
-
-    # Sound strips
-    del SoundSequence.song_timecode_clock_number
-    del SoundSequence.execute_on_cue_number
-    del SoundSequence.execute_with_macro_number
-    del SoundSequence.disable_on_cue_number
-    del SoundSequence.disable_with_macro_number
     del SoundSequence.audio_type_enum
     del SoundSequence.selected_stage_object
     del SoundSequence.selected_speaker
@@ -312,20 +277,16 @@ def unregister():
     del SoundSequence.audio_object_size
     del SoundSequence.int_mixer_channel
 
-    # Macro strips
-    del ColorSequence.start_frame_macro
     del ColorSequence.start_frame_macro_text
     del ColorSequence.start_frame_macro_text_gui
-    del ColorSequence.end_frame_macro
     del ColorSequence.end_frame_macro_text
     del ColorSequence.end_frame_macro_text_gui
-    del ColorSequence.start_macro_muted
-    del ColorSequence.end_macro_muted
 
-    # Cue strips
     del ColorSequence.eos_cue_number
     del ColorSequence.osc_auto_cue
+
     del Scene.livemap_label
+
     del Scene.cue_builder_toggle
     del Scene.cue_builder_id_offset
     del Scene.builder_settings_toggle
@@ -342,6 +303,7 @@ def unregister():
     del Scene.cyc_two_light_groups
     del Scene.cyc_three_light_groups
     del Scene.cyc_four_light_groups
+
     del ColorSequence.key_light
     del ColorSequence.rim_light
     del ColorSequence.fill_light
@@ -351,10 +313,12 @@ def unregister():
     del ColorSequence.energy_light
     del ColorSequence.energy_speed
     del ColorSequence.energy_scale
+    del ColorSequence.background_light
     del ColorSequence.background_light_one
     del ColorSequence.background_light_two
     del ColorSequence.background_light_three
     del ColorSequence.background_light_four
+
     del ColorSequence.band_color
     del ColorSequence.accent_color
     del ColorSequence.background_color
@@ -367,37 +331,34 @@ def unregister():
     del ColorSequence.accent_is_recording
     del ColorSequence.cyc_is_recording
 
-    # Flash strips
     del ColorSequence.flash_input
     del ColorSequence.flash_down_input
     del ColorSequence.flash_input_background
     del ColorSequence.flash_down_input_background
-    del ColorSequence.start_flash_macro_number
-    del ColorSequence.end_flash_macro_number
     del ColorSequence.frame_middle
     del ColorSequence.flash_bias
     del ColorSequence.flash_prefix
     del ColorSequence.start_flash
     del ColorSequence.end_flash
     del ColorSequence.flash_type_enum
-    del ColorSequence.int_up_preset_assignment
-    del ColorSequence.int_down_preset_assignment
+    del ColorSequence.int_start_preset
+    del ColorSequence.int_end_preset
 
-    # Animation strips
     del Scene.bake_panel_toggle
-    del ColorSequence.animation_cue_list_number
-    del ColorSequence.animation_event_list_number
-    del ColorSequence.execute_animation_on_cue_number
-    del ColorSequence.execute_animation_with_macro_number
-    del ColorSequence.disable_animation_on_cue_number
-    del ColorSequence.disable_animation_with_macro_number
 
-    # Trigger strips
     del ColorSequence.trigger_prefix
     del ColorSequence.osc_trigger
     del ColorSequence.osc_trigger_end
 
-    # Offset strips
-    del ColorSequence.friend_list
-    del ColorSequence.offset_macro
+    del ColorSequence.offset_type_enum
+    del ColorSequence.offset_intensity
+    del ColorSequence.offset_zoom
+    del ColorSequence.offset_iris
+    del ColorSequence.offset_color_palette
+    del ColorSequence.offset_intensity_palette
+    del ColorSequence.offset_focus_palette
+    del ColorSequence.offset_beam_palette
+    del ColorSequence.offset_channels
+    del ColorSequence.offset_fade_time
     del ColorSequence.use_macro
+    del ColorSequence.friend_list

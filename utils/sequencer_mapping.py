@@ -39,10 +39,9 @@ class StripMapping:
         start_macro_address = "/eos/macro/fire"    
         
         for strip in filter_eos_macro_strips(scene.sequence_editor.sequences):
-            if not strip.start_macro_muted:
-                data = (strip.name, str(strip.start_frame_macro))
-                if data[0] and data[1]:
-                    mapping[strip.frame_start].append(data)
+            data = (strip.name, str(strip.int_start_macro))
+            if data[0] and data[1]:
+                mapping[strip.frame_start].append(data)
                             
         return dict(mapping)
 
@@ -51,10 +50,9 @@ class StripMapping:
         end_macro_address = "/eos/macro/fire"
 
         for strip in filter_eos_macro_strips(scene.sequence_editor.sequences):
-                    if not strip.end_macro_muted:
-                        data = (strip.name, str(strip.end_frame_macro))
-                        if data[0] and data[1]:
-                            mapping[strip.frame_final_end].append(data)
+            data = (strip.name, str(strip.int_end_macro))
+            if data[0] and data[1]:
+                mapping[strip.frame_final_end].append(data)
                             
         return dict(mapping)
 
@@ -63,9 +61,9 @@ class StripMapping:
         start_flash_macro_address = "/eos/macro/fire"    
         
         for strip in filter_eos_flash_strips(scene.sequence_editor.sequences):
-                    data = (strip.name, str(strip.start_flash_macro_number))
-                    if data[0] and data[1]:
-                        mapping[strip.frame_start].append(data)
+            data = (strip.name, str(strip.int_start_macro))
+            if data[0] and data[1]:
+                mapping[strip.frame_start].append(data)
                         
         return dict(mapping)
 
@@ -74,17 +72,17 @@ class StripMapping:
         end_flash_macro_address = "/eos/macro/fire"    
         
         for strip in filter_eos_flash_strips(scene.sequence_editor.sequences):
-                    data = (strip.name, str(strip.end_flash_macro_number))
-                    bias = strip.flash_bias
-                    frame_rate = Utils.get_frame_rate(scene)
-                    strip_length_in_frames = strip.frame_final_duration
-                    bias_in_frames = Utils.calculate_bias_offseter(bias, frame_rate, strip_length_in_frames)
-                    start_frame = strip.frame_start
-                    end_flash_macro_frame = start_frame + bias_in_frames
-                    end_flash_macro_frame = int(round(end_flash_macro_frame))
-                    
-                    if data[0] and data[1]:
-                        mapping[end_flash_macro_frame].append(data)
+            data = (strip.name, str(strip.int_end_macro))
+            bias = strip.flash_bias
+            frame_rate = Utils.get_frame_rate(scene)
+            strip_length_in_frames = strip.frame_final_duration
+            bias_in_frames = Utils.calculate_bias_offseter(bias, frame_rate, strip_length_in_frames)
+            start_frame = strip.frame_start
+            end_flash_macro_frame = start_frame + bias_in_frames
+            end_flash_macro_frame = int(round(end_flash_macro_frame))
+            
+            if data[0] and data[1]:
+                mapping[end_flash_macro_frame].append(data)
                         
         return dict(mapping)
         
@@ -144,11 +142,11 @@ class StripMapping:
         mapping = defaultdict(list)
         
         for strip in filter_eos_cue_strips(scene.sequence_editor.sequences):
-                    data = (strip.name, strip.eos_cue_number)
-                    if strip.eos_cue_number == 0:
-                        continue
-                    elif data[0] and data[1]:
-                        mapping[strip.frame_start].append(data)
+            data = (strip.name, strip.eos_cue_number)
+            if strip.eos_cue_number == 0:
+                continue
+            elif data[0] and data[1]:
+                mapping[strip.frame_start].append(data)
 
         return dict(mapping)
     
@@ -158,7 +156,7 @@ class StripMapping:
         
         for strip in filter_trigger_strips(scene.sequence_editor.sequences):
             if strip.use_macro:
-                data = (strip.name, str(strip.offset_macro))
+                data = (strip.name, str(strip.int_start_macro))
                 if data[0] and data[1]:
                     mapping[strip.frame_start].append(data)
                             
@@ -179,10 +177,10 @@ def filter_trigger_strips(sequences):
     return [strip for strip in sequences if strip.type == 'COLOR' and strip.my_settings.motif_type_enum == 'option_trigger' and strip.use_macro and not strip.mute]
 
 def filter_timecode_learn_strips(sequences):
-    return [strip for strip in sequences if strip.type == 'SOUND' and strip.song_timecode_clock_number != 0 and strip.my_learning_checkbox == True and not strip.mute]
+    return [strip for strip in sequences if strip.type == 'SOUND' and strip.int_event_list != 0 and strip.my_learning_checkbox == True and not strip.mute]
 
 def filter_timecode_strips(sequences):
-    return [strip for strip in sequences if strip.type == 'SOUND' and strip.song_timecode_clock_number != 0 and strip.my_learning_checkbox == False and not strip.mute]
+    return [strip for strip in sequences if strip.type == 'SOUND' and strip.int_event_list != 0 and strip.my_learning_checkbox == False and not strip.mute]
 
 def filter_eos_macro_strips(sequences):
     return [strip for strip in sequences if strip.type == 'COLOR' and strip.my_settings.motif_type_enum == 'option_eos_macro' and not strip.mute]

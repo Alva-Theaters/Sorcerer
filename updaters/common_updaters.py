@@ -63,7 +63,7 @@ class CommonUpdaters:
             "pan_min", "pan_max", "tilt_min", "tilt_max", "zoom_min", "zoom_max", 
             "gobo_speed_min", "gobo_speed_max", "influence_is_on", "intensity_is_on", 
             "pan_tilt_is_on", "color_is_on", "diffusion_is_on", "strobe_is_on", 
-            "zoom_is_on", "iris_is_on", "edge_is_on", "gobo_id_is_on", "prism_is_on", 
+            "zoom_is_on", "iris_is_on", "edge_is_on", "gobo_is_on", "prism_is_on", 
             "str_enable_strobe_argument", "str_disable_strobe_argument", 
             "str_enable_gobo_speed_argument", "str_disable_gobo_speed_argument", 
             "str_gobo_id_argument", "str_gobo_speed_value_argument", 
@@ -119,6 +119,41 @@ class CommonUpdaters:
             mesh = self.selected_stage_object
             if mesh:
                 mesh.sound_source_enum = self.name
+
+
+    @staticmethod
+    def channel_ids_updater(self, context):
+        index = context.scene.scene_props.group_data_index
+        item = context.scene.scene_group_data[index]  # Get the object by index
+
+        if item is None:
+            self.report({'ERROR'}, "Group not found")
+            return {'CANCELLED'}
+        channels_to_add, channels_to_remove = Utils.parse_channels(context.scene.scene_props.add_channel_ids, remove=True) # returns list of ints
+        if len(channels_to_add) == 0 and len(channels_to_remove) == 0:
+            self.report({'WARNING'}, "Nothing to add or remove")
+            return{'CANCELLED'}
+        i = 0
+        if len(channels_to_add) > 0:
+            for channel in channels_to_add:
+                # Check if the channel already exists
+                if any(ch.chan == channel for ch in item.channels_list):
+                    continue
+                
+                # Add the new channel
+                new_channel = item.channels_list.add()
+                new_channel.chan = channel
+                i += 1
+            
+        if i == 0 and len(channels_to_remove) == 0:
+            self.report({'WARNING'}, "Nothing to add or remove")
+            return{'CANCELLED'}
+        
+        for channel in channels_to_remove:
+            for i, ch in enumerate(item.channels_list):
+                if ch.chan == channel:
+                    item.channels_list.remove(i)
+                    break
              
 
     @staticmethod    
@@ -161,6 +196,18 @@ class CommonUpdaters:
     
     def call_fixtures_updater(self, context):
         bpy.ops.viewport.call_fixtures_operator()
+
+
+    def view3d_cmd_line_updater(self, context):
+        if context.scene.scene_props.view3d_command_line != "":
+            OSC.send_osc_lighting("/eos/cmd", f"{context.scene.scene_props.view3d_command_line} Enter")
+            context.scene.scene_props.view3d_command_line = ""
+        else:
+            OSC.press_lighting_key("enter")
+
+
+    def network_settings_updater(self, context):
+        context.scene.lock_ip_settings = True
 
 
     def update_light_array(self, context):
@@ -311,4 +358,14 @@ class CommonUpdaters:
             selected_index = context.scene.macro_buttons_index
             if 0 <= selected_index < len(context.scene.macro_buttons):
                 selected_macro_button = context.scene.macro_buttons[selected_index].name
-                context.window_manager.clipboard = f" {selected_macro_button} "
+
+                text_block = context.space_data.text
+                if text_block:
+                    text_block.write(f"{selected_macro_button} ")
+                    new_cursor_position = text_block.current_character
+
+                    if new_cursor_position < len(text_block.lines[text_block.current_line_index].body):
+                        text_block.select_set(new_cursor_position - 1)
+                        bpy.ops.text.delete(type='NEXT_CHARACTER')
+                        
+                        text_block.write(text_block.lines[text_block.current_line_index].body[new_cursor_position - 1])

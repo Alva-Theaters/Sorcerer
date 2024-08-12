@@ -102,9 +102,6 @@ class SequencerUI:
                     CommonUI.draw_text_or_group_input(self, context, box, active_strip, object=False)
                     CommonUI.draw_parameters(self, context, column, box, active_strip)
                     CommonUI.draw_footer_toggles(self, context, column, active_strip)
-                    if bake_panel:
-                        box = column.box()
-                        SequencerUI.draw_bake_panel(self, context, box, scene, active_strip)
 
                 elif console_context == "offset":
                     SequencerUI.draw_strip_offset(self, context, column, box, active_strip)
@@ -215,47 +212,19 @@ class SequencerUI:
         row.operator("my.bump_tc_left_one", text="", icon='TRIA_LEFT')
         row.operator("my.bump_tc_right_one", text="", icon='TRIA_RIGHT')
         row.operator("my.bump_tc_right_five", text="", icon='FORWARD')
-        row.prop(active_strip, "song_timecode_clock_number", text="Event List #")
+        row.prop(active_strip, "int_event_list", text="Event List #")
         row.operator("my.clear_timecode_clock", icon="CANCEL")
-
-        box.separator()     
-
-        row = box.row()
-        row.prop(active_strip, "execute_on_cue_number", text='"Enable" Cue #')
-
-        row = box.row()
-        row.prop(active_strip, "execute_with_macro_number", text="With Macro #")
-        row.operator("my.execute_on_cue_operator", icon_value=orb.icon_id)
-
-        box.separator()
-
-        row = box.row()
-        row.prop(active_strip, "disable_on_cue_number", text='"Disable" Cue #')
-
-        row = box.row()
-        row.prop(active_strip, "disable_with_macro_number", text="With Macro #")
-        row.operator("my.disable_on_cue_operator", icon_value=orb.icon_id)
-
-        box.separator()
-        column.separator() ## ?
+        row.operator("my.execute_on_cue_operator", icon_value=orb.icon_id, text="")
 
         row = box.row()
         row.operator("seq.analyze_song", icon='SHADERFX')
-
-        column.separator() ## ?
-
-        row = box.row()
-        row.operator("my.generate_text", icon="TEXT")
-
-        box.separator()
-        row = box.row(align=True) ## ?
         return box
         
 
     @staticmethod    
     def draw_color_header(self, context, column, scene, active_strip, console_context):
-        SequencerUI.draw_add_buttons_row(self, context, column, scene, active_strip, motif_name=True, lighting_icons=True, console_context=console_context) 
-        column.separator()
+        # SequencerUI.draw_add_buttons_row(self, context, column, scene, active_strip, motif_name=True, lighting_icons=True, console_context=console_context) 
+        # column.separator()
         box = SequencerUI.draw_color_subheader(self, context, column, active_strip, console_context)
         return box
         
@@ -299,22 +268,13 @@ class SequencerUI:
         row = box.row()
         row.label(text='* = "Sneak Time " + [Strip length]')
         row = box.row(align=True)
-        row.operator("my.start_macro_search", icon='VIEWZOOM')
-        row.prop(active_strip, "start_frame_macro", text="Start frame macro #")
-        row.operator("my.start_macro_fire", icon='FILE_REFRESH')
-        row.prop(active_strip, "start_macro_muted", icon='HIDE_OFF' if not active_strip.start_macro_muted else 'HIDE_ON', toggle=True)
-        row = box.row(align=True)
         row.prop(active_strip, "start_frame_macro_text_gui")
         row.operator("my.generate_start_frame_macro", icon_value=orb.icon_id)
-        row = box.separator()
-        row = box.row(align=True)
-        row.operator("my.end_macro_search", icon='VIEWZOOM')
-        row.prop(active_strip, "end_frame_macro", text="End frame macro #")
-        row.operator("my.end_macro_fire", icon='FILE_REFRESH')
-        row.prop(active_strip, "end_macro_muted", icon='HIDE_OFF' if not active_strip.end_macro_muted else 'HIDE_ON', toggle=True)
-        row = box.row(align=True)
-        row.prop(active_strip, "end_frame_macro_text_gui")
-        row.operator("my.generate_end_frame_macro", icon_value=orb.icon_id)
+        if context.scene.strip_end_macros:
+            row = box.separator()
+            row = box.row(align=True)
+            row.prop(active_strip, "end_frame_macro_text_gui")
+            row.operator("my.generate_end_frame_macro", icon_value=orb.icon_id)
                 
 
     @staticmethod    
@@ -418,14 +378,14 @@ class SequencerUI:
         row = box.label(text=f"Flash Up: {active_strip.flash_input_background}")
         row = box.row(align=True)
         row.enabled = is_manual_enabled
-        row.prop(active_strip, "flash_input")
+        row.prop(active_strip, "flash_input", text="")
         row.operator("my.flash_copy_down", text="", icon='DOWNARROW_HLT')
         
         row = box.row()
         row = box.label(text=f"Flash Down: {active_strip.flash_down_input_background}")
         row = box.row()
         row.enabled = is_manual_enabled
-        row.prop(active_strip, "flash_down_input")
+        row.prop(active_strip, "flash_down_input", text="")
         
         row = box.separator()
         
@@ -475,21 +435,9 @@ class SequencerUI:
 
     @staticmethod
     def draw_strip_flash_footer(self, context, box, active_strip):
-        '''New goal is to delete as many macro orb buttons as possible and let
-           Sorcerer do all that by itself so that the user doesn't have to think 
-           about dumb macro numbers or dumb preset numbers. The best part is no
-           part. Let's delete this entire process from the user's job description'''
-        if not active_strip.flash_type_enum == 'option_use_controllers':
-            row = box.row()
-            row.enabled = True
-            row.operator("my.flash_macro_search", text="", icon='VIEWZOOM')
-            row.prop(active_strip, "start_flash_macro_number", text="Up Macro")
-            row.prop(active_strip, "end_flash_macro_number", text="Down Macro")
-            row.operator("my.build_flash_macros", text="", icon_value=orb.icon_id)
-        else: box.separator()
-
-        row = box.row()
+        row = box.row(align=True)
         row.prop(active_strip, "flash_bias", text="Bias", slider=True)
+        row.operator("my.build_flash_macros", text="", icon_value=orb.icon_id)
 
         row = box.row()
         if active_strip.flash_bias > 0:
@@ -498,45 +446,6 @@ class SequencerUI:
             row.label(text="Bias: Flash will come in faster and go out slower.")
         if active_strip.flash_bias == 0:
             row.label(text="Bias: Flash will come in and go out at same speed.")
-
-
-    @staticmethod    
-    def draw_bake_panel(self, context, box, scene, active_strip):
-        row = box.row()
-        row.prop(scene, "bake_panel_toggle", icon="TRIA_DOWN" if scene.bake_panel_toggle else "TRIA_RIGHT", icon_only=True, emboss=False)
-        row.label(text="Film a Qmeo", icon='FILE_MOVIE')
-        if scene.bake_panel_toggle:
-            row = box.row(align=True)
-            row.operator("my.delete_animation_cue_list_operator", text="", icon='CANCEL')
-            row.prop(active_strip, "animation_cue_list_number", text="Cue List")
-
-            row = box.row(align=True)
-            row.operator("my.delete_animation_event_list_operator", text="", icon='CANCEL')
-            row.operator("my.stop_animation_clock_operator", text="", icon='PAUSE')
-            row.prop(active_strip, "animation_event_list_number", text="Event List")
-
-            row = box.row()
-            row.operator("my.bake_fcurves_to_cues_operator", text=scene.scene_props.str_bake_info, icon_value=orb.icon_id)
-
-            row = box.row()
-            row.operator("my.rerecord_cues_operator", text=scene.scene_props.str_cue_bake_info, icon_value=orb.icon_id)
-            box.separator()
-            
-            row = box.row()
-            row.prop(active_strip, "execute_animation_on_cue_number", text='"Enable" Cue #')
-            
-            row = box.row()
-            row.prop(active_strip, "execute_animation_with_macro_number", text="With Macro #")
-            row.operator("my.execute_animation_on_cue_operator", icon_value=orb.icon_id)
-
-            box.separator()
-            
-            row = box.row()
-            row.prop(active_strip, "disable_animation_on_cue_number", text='"Disable" Cue #')
-            
-            row = box.row()
-            row.prop(active_strip, "disable_animation_with_macro_number", text="With Macro #")
-            row.operator("my.disable_animation_on_cue_operator", icon_value=orb.icon_id)
         
 
     @staticmethod    
@@ -560,17 +469,6 @@ class SequencerUI:
         split.label(text="End Frame:")
         split.prop(active_strip, "osc_trigger_end", text="")
 
-        row = box.row()
-        box = column.box()
-        row = box.row()
-        row.label(text="Start Frame Offsets:")
-        
-        row = box.row()
-        row.prop(active_strip, "friend_list", text="")
-        row = box.row(align=True)
-        row.prop(active_strip, "use_macro", expand=True, text="")
-        row.prop(active_strip, "offset_macro", text="Offset Macro")
-        row.operator("my.generate_offset_macro", text="", icon_value=orb.icon_id)
         box.separator(factor=.01)
 
 
@@ -598,12 +496,7 @@ class SequencerUI:
 
         row = box.row(align=True)
         row.prop(active_strip, 'offset_channels', text="")
-
-        box.separator()
-
-        row = box.row(align=True)
-        row.prop(active_strip, "use_macro", expand=True, text="")
-        row.prop(active_strip, "offset_macro", text="Offset Macro")
+        row.prop(active_strip, "use_macro", text="", icon='REC')
         row.operator("my.generate_offset_macro", text="", icon_value=orb.icon_id)
         
         box.separator(factor=.01)
@@ -905,7 +798,52 @@ class SequencerUI:
             scene = context.scene
             layout.label(text=scene.livemap_label)
             layout.label(text=scene.command_line_label)
-        
+
+
+    @staticmethod
+    def draw_timeline_sync(self, context):
+        if (hasattr(context.scene, "sync_timecode") and
+            hasattr(context.scene, "timecode_expected_lag")):
+            pcoll = preview_collections["main"]
+            orb = pcoll["orb"]
+
+            scene = context.scene
+
+            sequencer_open = False
+            active_strip = False
+
+            for area in context.screen.areas:
+                if area.type == 'SEQUENCE_EDITOR':
+                    sequencer_open = True
+                    if context.scene.sequence_editor.active_strip and (context.scene.sequence_editor.active_strip.type == 'COLOR' or context.scene.sequence_editor.active_strip.type == 'SOUND'):
+                        if context.scene.sequence_editor.active_strip.type == 'COLOR' and context.scene.sequence_editor.active_strip.my_settings.motif_type_enum != 'option_animation':
+                            break
+                        active_strip = True
+                    break
+
+            layout = self.layout
+            row = layout.row()
+            row.prop(scene, "sync_timecode", text="", icon='LINKED' if scene.sync_timecode else 'UNLINKED')
+
+            row = layout.row()
+
+            if sequencer_open and active_strip:
+                active_strip = context.scene.sequence_editor.active_strip
+                icon = 'IPO_BEZIER' if active_strip.type == 'COLOR' else 'SOUND'
+                row.label(text="", icon=icon)
+                target = active_strip
+            else:
+                row.label(text="", icon='SCENE_DATA')
+                target = scene
+
+            row = layout.row(align=True)
+            row.scale_x = 0.5
+            row.prop(target, "str_start_cue", text="")
+            row.prop(target, "str_end_cue", text="")
+
+            row = layout.row()
+            row.operator("my.bake_fcurves_to_cues_operator", text="", icon_value=orb.icon_id)
+
 
     def determine_contexts(sequence_editor, active_strip):
         """

@@ -137,10 +137,10 @@ class SorcererPython:
             '''The function used by Copy Various to Selected and others'''
             Utils.duplicate_active_strip_to_selected(context)
 
-        def find_relevant_clock_strip(scene):
+        def find_relevant_clock_object(scene):
             '''Find most relevant sound strip with a timecode clock assignment.
                Returns a bpy strip object'''
-            return Utils.find_relevant_clock_strip(scene)
+            return Utils.find_relevant_clock_object(scene)
             
         def calculate_bias_offseter(bias, frame_rate, strip_length_in_frames):
             '''Used by Flash strip background logic to apply bias to flash down
@@ -214,6 +214,6 @@ class SorcererPython:
         def find_nodes(self, scene):
             '''Find nodes in scene relevant to Sorcerer'''
             return Find.find_nodes(self, scene)
-    
+
 
 bpy.spy = SorcererPython

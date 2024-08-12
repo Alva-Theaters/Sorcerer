@@ -40,10 +40,12 @@ class SceneProperties(PropertyGroup):
     group_data_index: IntProperty(name="Index", default=0, update=CommonUpdaters.highlight_mode_updater) # type: ignore
     expand_toggles: BoolProperty(name="Parameter toggle position", default=True, description="Choose whether to draw the toggles beside group name or off to the side") # type: ignore
 
-    add_channel_ids: StringProperty(name="Add channel ID's")     # type: ignore
+    add_channel_ids: StringProperty(name="Add channel ID's", update=CommonUpdaters.channel_ids_updater)     # type: ignore
     
-    str_osc_ip_address: StringProperty(default="192.168.1.1", description="This should be the IP address of the console. This must set for anything to work. Press the About key on the console to find the console's IP address. Console must be on same local network") # type: ignore
-    int_osc_port: IntProperty(min=0, max=65535, description="On the console, Displays > Setup > System Settings > Show Control > OSC > (enable OSC RX and make the port number there on the left match the one in this field in Alva. OSC TX = transmit and OSC RX = receive. We want receive", default=8000) # type: ignore
+    view3d_command_line: StringProperty(name="Lighting Console Command Line", default="", update=CommonUpdaters.view3d_cmd_line_updater) # type: ignore
+
+    str_osc_ip_address: StringProperty(default="192.168.1.1", description="This should be the IP address of the console. This must set for anything to work. Press the About key on the console to find the console's IP address. Console must be on same local network", update=CommonUpdaters.network_settings_updater) # type: ignore
+    int_osc_port: IntProperty(min=0, max=65535, description="On the console, Displays > Setup > System Settings > Show Control > OSC > (enable OSC RX and make the port number there on the left match the one in this field in Alva. OSC TX = transmit and OSC RX = receive. We want receive", default=8000, update=CommonUpdaters.network_settings_updater) # type: ignore
     string_osc_receive_port: IntProperty(min=0, max=65535) # type: ignore
     
     str_record_cue: StringProperty(default="Record Cue # Time $ Enter Enter", description="Write command line syntax for recording cue # with duration $. # and $ are filled in by Orb as cue number and duration, respectively") # type: ignore
@@ -53,7 +55,7 @@ class SceneProperties(PropertyGroup):
     str_event_bake_info: StringProperty(default="Just Events")  # type: ignore
     str_cue_bake_info: StringProperty(default="Just Cues")  # type: ignore
     selected_text_block_name: StringProperty() # type: ignore
-    
+
     preferences_enum: EnumProperty(
         name="Preferences",
         description="",

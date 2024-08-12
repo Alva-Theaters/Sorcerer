@@ -36,6 +36,7 @@ from bpy.types import ColorSequence
 from ..updaters.common_updaters import CommonUpdaters as CommonUpdaters
 from ..assets.dictionaries import Dictionaries as Dictionaries
 from ..utils.osc import OSC
+from ..utils.utils import Utils
     
 
 stop_updating_color = "No"
@@ -47,8 +48,7 @@ class SequencerUpdaters:
     def timecode_clock_update_safety(self, context):
         '''
         Prevents user from setting timecode clock cue number to first cue on sequence 
-        to prevent infinite looping on the console.
-        '''
+        to prevent infinite looping on the console.'''
         sorted_strips = sorted([s for s in context.scene.sequence_editor.sequences_all if s.type == 'COLOR'], key=lambda s: s.frame_start)
 
         first_eos_cue_strip = None
@@ -58,9 +58,9 @@ class SequencerUpdaters:
                 first_eos_cue_strip = strip
                 break
 
-        if first_eos_cue_strip and first_eos_cue_strip.eos_cue_number == self.execute_on_cue_number and self.execute_on_cue_number:
-                self.execute_on_cue_number = 0
-                print("Cue # for timecode clock cannot be equal to the first cue in the sequence. That will result in infinite looping. The console would go to cue " + str(self.execute_on_cue_number) + " and then the timecode clock would start, and then the timecode clock would immediately call the first cue, thereby starting the timecode clock over again. This would repeat forever without advancing to the next frames.")
+        if first_eos_cue_strip and first_eos_cue_strip.eos_cue_number == self.str_start_cue and self.str_start_cue:
+                self.str_start_cue = ""
+                print("Cue # for timecode clock cannot be equal to the first cue in the sequence. That will result in infinite looping. The console would go to cue " + str(self.str_start_cue) + " and then the timecode clock would start, and then the timecode clock would immediately call the first cue, thereby starting the timecode clock over again. This would repeat forever without advancing to the next frames.")
                 return
                 
         
@@ -91,8 +91,6 @@ class SequencerUpdaters:
         Universal macro updater for Macro strips. Just updates the read-only text.
         '''
         active_strip = context.scene.sequence_editor.active_strip
-        ip_address = context.scene.scene_props.str_osc_ip_address
-        port = context.scene.scene_props.int_osc_port
         
         if is_start:
             self.start_frame_macro_text = self.start_frame_macro_text_gui
@@ -218,6 +216,9 @@ class SequencerUpdaters:
 
     def motif_type_enum_updater(self, context):
         active_strip = context.scene.sequence_editor.active_strip
+        if not active_strip:
+            return
+        
         motif_type_enum = context.scene.sequence_editor.active_strip.my_settings.motif_type_enum
         
         global stop_updating_color
@@ -292,25 +293,25 @@ class SequencerUpdaters:
 
 
     def key_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.key_light, parse_builder_groups(context.scene.key_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.key_light, Utils.parse_channels(context.scene.key_light_groups))
 
     def rim_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.rim_light, parse_builder_groups(context.scene.rim_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.rim_light, Utils.parse_channels(context.scene.rim_light_groups))
 
     def fill_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.fill_light, parse_builder_groups(context.scene.fill_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.fill_light, Utils.parse_channels(context.scene.fill_light_groups))
 
     def texture_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.texture_light, parse_builder_groups(context.scene.texture_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.texture_light, Utils.parse_channels(context.scene.texture_light_groups))
 
     def band_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.band_light, parse_builder_groups(context.scene.band_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.band_light, Utils.parse_channels(context.scene.band_light_groups))
 
     def accent_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.accent_light, parse_builder_groups(context.scene.accent_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.accent_light, Utils.parse_channels(context.scene.accent_light_groups))
 
     def energy_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.energy_light, parse_builder_groups(context.scene.energy_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.energy_light, Utils.parse_channels(context.scene.energy_light_groups))
 
     def energy_speed_updater(self, context):
         SequencerUpdaters.effect_updater(self, context, self.energy_speed, "Rate")
@@ -319,36 +320,13 @@ class SequencerUpdaters:
         SequencerUpdaters.effect_updater(self, context, self.energy_scale, "Scale")
 
     def background_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.background_light_one, parse_builder_groups(context.scene.cyc_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.background_light_one, Utils.parse_channels(context.scene.cyc_light_groups))
 
     def background_two_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.background_light_two, parse_builder_groups(context.scene.cyc_two_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.background_light_two, Utils.parse_channels(context.scene.cyc_two_light_groups))
 
     def background_three_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.background_light_three, parse_builder_groups(context.scene.cyc_three_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.background_light_three, Utils.parse_channels(context.scene.cyc_three_light_groups))
 
     def background_four_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.background_light_four, parse_builder_groups(context.scene.cyc_four_light_groups))
-
-
-def parse_builder_groups(input_text): ##
-    '''This function takes a string input that contains numbers separated by commas, spaces, 
-       or dashes and returns a list of numbers. For range inputs like "1-3", it will return 
-       [1, 2, 3].
-       
-       Can this not use a spy function instead?
-    '''
-    parts = input_text.replace(',', ' ').split()
-    result = []
-
-    for part in parts:
-        if '-' in part:
-            start, end = map(int, part.split('-'))
-            result.extend(range(start, end + 1))
-        else:
-            result.append(int(part))
-
-    return result
-    
-
-Updaters = SequencerUpdaters
+        SequencerUpdaters.light_updater(self, context, self.background_light_four, Utils.parse_channels(context.scene.cyc_four_light_groups))

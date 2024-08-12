@@ -165,13 +165,18 @@ class EventUtils:
 
 
     @staticmethod
-    def find_relevant_clock_strip(scene):    
+    def find_relevant_clock_object(scene):    
+        relevant_object = None
         for strip in scene.sequence_editor.sequences:
             if (strip.type == 'SOUND' and
                 not strip.mute and 
-                getattr(strip, 'song_timecode_clock_number', 0) != 0 and
+                getattr(strip, 'int_event_list', 0) != 0 and
                 strip.frame_start <= scene.frame_current < strip.frame_final_end):
-                return strip
+                relevant_object = strip
+        if not relevant_object and scene.use_default_clock:
+            relevant_object = scene
+
+        return relevant_object
             
     @staticmethod
     def find_livemap_cue(scene, current_frame, active_strip):
@@ -190,11 +195,10 @@ class EventUtils:
         relevant_sound_strip = None
         current_frame = scene.frame_current
         current_frame = current_frame + scene.timecode_expected_lag
-
-        relevant_sound_strip = Utils.find_relevant_clock_strip(scene)
+        relevant_sound_strip = EventUtils.find_relevant_clock_object(scene)
         
         if relevant_sound_strip:
             fps = Utils.get_frame_rate(scene)
             timecode = Utils.frame_to_timecode(current_frame, fps)
-            clock = relevant_sound_strip.song_timecode_clock_number
+            clock = relevant_sound_strip.int_event_list
             OSC.send_osc_lighting("/eos/newcmd", f"Event {clock} / Internal Time {timecode} Enter, Event {clock} / Internal Enable Enter")

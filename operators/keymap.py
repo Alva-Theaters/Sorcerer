@@ -38,6 +38,9 @@ def register_keymap_item(keymap, idname, key, value, **kwargs):
 def register_keymaps():
     wm = bpy.context.window_manager
     if wm.keyconfigs.addon:
+        view3d_km = wm.keyconfigs.addon.keymaps.new(name='View3D', space_type='VIEW_3D')
+        register_keymap_item(view3d_km, "view3d.object_controller", 'P', 'PRESS')
+
         sequencer_km = wm.keyconfigs.addon.keymaps.new(name='Sequencer', space_type='SEQUENCE_EDITOR')
 
         # Command line stuff
@@ -45,9 +48,9 @@ def register_keymaps():
         register_keymap_item(sequencer_km, "seq.render_strips_operator", 'SPACE', 'PRESS', shift=True)
 
         # Define the hotkeys
-        register_keymap_item(sequencer_km, "vse.scale_strips", 'S', 'PRESS')
-        register_keymap_item(sequencer_km, "vse.extrude_strips", 'E', 'PRESS')
-        register_keymap_item(sequencer_km, "vse.duplicate_pattern", 'E', 'PRESS', shift=True)
+        register_keymap_item(sequencer_km, "seq.scale_strips", 'S', 'PRESS')
+        register_keymap_item(sequencer_km, "sequencer.vse_extrude_strips", 'E', 'PRESS')
+        register_keymap_item(sequencer_km, "sequencer.duplicate_pattern", 'E', 'PRESS', shift=True)
 
         # Bump up
         kmi = register_keymap_item(sequencer_km, 'sequencer.vse_bump_strip_channel', 'U', 'PRESS')

@@ -58,7 +58,7 @@ class COMMON_UL_group_data_list(UIList):
                 row.prop(item, "iris_is_on", text="", icon='RADIOBUT_OFF' if item.iris_is_on else 'ADD', emboss=False)
                 row.prop(item, "edge_is_on", text="", icon='SELECT_SET' if item.edge_is_on else 'ADD', emboss=False)
                 row.prop(item, "diffusion_is_on", text="", icon='MOD_CLOTH' if item.diffusion_is_on else 'ADD', emboss=False)
-                row.prop(item, "gobo_id_is_on", text="", icon='POINTCLOUD_DATA' if item.gobo_id_is_on else 'ADD', emboss=False)
+                row.prop(item, "gobo_is_on", text="", icon='POINTCLOUD_DATA' if item.gobo_is_on else 'ADD', emboss=False)
                 
 
 class SCENE_UL_preview_cue_list(UIList):

@@ -32,6 +32,7 @@ import math
 import mathutils
 import re
 from bpy.props import FloatProperty, FloatVectorProperty, IntProperty
+from bpy.types import Scene, Object
 
 try:
     import allin1 # type: ignore
@@ -40,6 +41,9 @@ except:
     
 from ..assets.dictionaries import Dictionaries # type: ignore
 from ..utils.osc import OSC
+
+
+DEFAULT_EXECUTOR_INDEX = 1
 
 
 class Segment:
@@ -99,7 +103,7 @@ class Utils:
         return round((scene.render.fps / scene.render.fps_base), 2)
 
 
-    def parse_channels(input_string):
+    def parse_channels(input_string, remove=False):
         try:
             input_string = input_string.replace("do not want", "not").replace("don't want", "not").replace(".", "").replace("!", "").replace("?", "")
             input_string = input_string.lower()
@@ -118,7 +122,8 @@ class Utils:
             )
             versions_of_not = (
                 "not", "minus", "except", "excluding", "casting", "aside", 
-                "without", "leave", "omit", "remove", "other", "than"
+                "without", "leave", "omit", "remove", "other", "than", "delete",
+                "deleting"
             )
             versions_of_add = (
                 "add", "adding", "including", "include", 
@@ -172,7 +177,11 @@ class Utils:
             channels = list(set(channels))
             channels.sort()
             
-            return channels
+            if not remove:
+                return channels
+            else:
+                print(f"Returning {exclusions}")
+                return channels, exclusions
         
         except Exception as e:
             print(f"An error has occured within parse_channels: {e}")
@@ -412,15 +421,6 @@ class Utils:
             strip.select = True
 
         return True, "Strips replaced with duplicates of the active strip successfully."
-
-
-    def find_relevant_clock_strip(scene):
-        for strip in scene.sequence_editor.sequences:
-            if (strip.type == 'SOUND' and 
-                not strip.mute and 
-                getattr(strip, 'song_timecode_clock_number', 0) != 0 and
-                strip.frame_start <= scene.frame_current < strip.frame_final_end):
-                return strip
             
     # "auto_cue" aka Livemap
     def get_auto_cue_string(self):
@@ -598,3 +598,77 @@ class Utils:
         input_string = input_string.replace("[", "").replace("]", "").replace("<", "").replace(">", "")
         tokens = re.findall(r'\d|[^\d\s]+', input_string)
         return tokens
+
+
+    def find_executor(scene: Scene, object: Object, executor_type: str) -> int:
+        try:
+            existing_prop = getattr(object, f"int_{executor_type}")
+        except:
+            print("An error occured in find_executor because of an invalid object or incorrect registration.")
+
+        if existing_prop != 0:
+            return existing_prop
+
+        new_index = Utils.find_new_executor(scene, executor_type)
+
+        return Utils.add_new_index(scene, new_index, object, executor_type)
+
+
+    def find_new_executor(scene, executor_type):
+        executor_map = {
+            'event_list': 'event_list',
+            'cue_list': 'cue_list',
+            'start_macro': 'macro',
+            'end_macro': 'macro',
+            'start_preset': 'preset',
+            'end_preset': 'preset',
+        }
+
+        base_name = executor_map[executor_type]
+        
+        range_min = getattr(scene, f"orb_{base_name}s_start")
+        range_max = getattr(scene, f"orb_{base_name}s_end")
+
+        index_range = list(range(range_min, range_max + 1))
+
+        if executor_type in executor_map:
+            return Utils.find_unused_index(scene, index_range, executor_map[executor_type])
+        else:
+            print(f"An error occurred within find_new_executor with argument {executor_type}. Returning default index")
+            return DEFAULT_EXECUTOR_INDEX
+
+    def get_all_executor_strip_names(scene):
+        return [strip.name for strip in scene.sequence_editor.sequences if (strip.type == 'COLOR' or strip.type =='SOUND')]
+
+    def find_unused_index(scene, range, base_attribute):
+        strips = Utils.get_all_executor_strips(scene)
+        used_indices = set()
+
+        start_attr = f"int_start_{base_attribute}"
+        end_attr = f"int_end_{base_attribute}"
+        attr = f"int_{base_attribute}"
+
+        for strip in strips:
+            if hasattr(strip, start_attr):
+                used_indices.add(getattr(strip, start_attr))
+            if hasattr(strip, end_attr):
+                used_indices.add(getattr(strip, end_attr))
+            if hasattr(strip, attr):
+                used_indices.add(getattr(strip, attr))
+
+        for index in range:
+            if index not in used_indices:
+                return index
+
+        return None
+    
+    def get_all_executor_strips(scene):
+        strips = [strip for strip in scene.sequence_editor.sequences if (strip.type == 'COLOR' or strip.type =='SOUND')]
+        strips.append(scene)
+        return strips
+    def add_new_index(scene, new_index, object, executor_type):
+        try:
+            setattr(object, f"int_{executor_type}", new_index)
+        except:
+            print("An error occured while trying to set property to new index.")
+        return new_index 

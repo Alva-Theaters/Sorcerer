@@ -197,7 +197,7 @@ class GroupData(PropertyGroup):
     zoom_is_on: BoolProperty(name="Zoom", default=False, description="Zoom is enabled when checked") # type: ignore
     iris_is_on: BoolProperty(name="Iris", default=False, description="Iris is enabled when checked") # type: ignore
     edge_is_on: BoolProperty(name="Edge", default=False, description="Edge is enabled when checked") # type: ignore
-    gobo_id_is_on: BoolProperty(name="Gobo", default=False, description="Gobo ID is enabled when checked") # type: ignore
+    gobo_is_on: BoolProperty(name="Gobo", default=False, description="Gobo ID is enabled when checked") # type: ignore
     prism_is_on: BoolProperty(name="Prism", default=False, description="Prism is enabled when checked") # type: ignore
 
     # OSC argument templates for properties specific to the fixture type. For example, strobe, not intensity.
@@ -307,7 +307,7 @@ class MixerParameters(PropertyGroup):
 
 class MacroButtonItem(PropertyGroup):
     name: StringProperty() # type: ignore
-        
+
         
 prop_groups = [
     Cue,
@@ -350,6 +350,7 @@ def register():
 
     Scene.macro_buttons = CollectionProperty(type=MacroButtonItem)
     Scene.macro_buttons_index = IntProperty(update=CommonUpdaters.update_macro_buttons_index)
+    
 
 def unregister():
     if hasattr(Scene, "macro_buttons"):

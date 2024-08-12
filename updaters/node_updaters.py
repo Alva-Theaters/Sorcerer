@@ -63,8 +63,8 @@ class NodeUpdaters:
         # Update all subscribing flash strips in sequencer
         for strip in context.scene.sequence_editor.sequences_all:
             if strip.my_settings.motif_type_enum == "option_eos_flash" and strip.motif_name == self.flash_motif_names_enum and strip.flash_type_enum == 'option_use_nodes':
-                strip.flash_input = f"Chan {up_channels_str} Preset {self.int_up_preset_assignment}"
-                strip.flash_down_input = f"Chan {down_channels_str} Preset {self.int_down_preset_assignment}" 
+                strip.flash_input = f"Chan {up_channels_str} Preset {self.int_start_preset}"
+                strip.flash_down_input = f"Chan {down_channels_str} Preset {self.int_end_preset}" 
                    
                     
     @staticmethod                

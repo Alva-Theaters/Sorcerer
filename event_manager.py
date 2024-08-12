@@ -111,8 +111,8 @@ Sequence of events when playback STARTS:
     
     C1:3. We find the most relevant sound strip with a valid clock...
     
-    C1:4. We fire OSC to start the console clock with the sequencer's 
-          clock...
+    C1:4. We fire OSC to set fps and start the console clock with the 
+          sequencer's clock...
        
     C1:5. And we fire the livemap cue if enabled by user. (The rest
           is handled by frame change handlers, at least right now.
@@ -298,17 +298,19 @@ class EventManager:
         # Go timecode sync.    
         if scene.sync_timecode:
             '''C1:3'''
-            relevant_sound_strip = Utils.find_relevant_clock_strip(scene)
+            relevant_clock_object = Utils.find_relevant_clock_object(scene)
             
-            if relevant_sound_strip:
+            if relevant_clock_object or scene.use_default_clock:
                 current_frame = scene.frame_current
                 fps = NormalUtils.get_frame_rate(scene)
                 lag = scene.timecode_expected_lag
                 timecode = NormalUtils.frame_to_timecode(current_frame+lag, fps)
-                clock = relevant_sound_strip.song_timecode_clock_number
+                int_fps = int(fps)
+                clock = relevant_clock_object.int_event_list
                 '''C1:4'''
+                OSC.send_osc_lighting("/eos/newcmd", f"Event {clock} / Frame_Rate {int_fps} Enter")
                 OSC.send_osc_lighting("/eos/newcmd", f"Event {clock} / Internal Time {timecode} Enter, Event {clock} / Internal Enable Enter")
-                    
+
         # Go livemap.
         '''C1:5'''
         if scene.sequence_editor and scene.is_armed_livemap:
@@ -341,10 +343,10 @@ class EventManager:
         # End timecode.    
         if scene.sync_timecode:
             '''C3:2'''
-            relevant_sound_strip = Utils.find_relevant_clock_strip(scene)
+            relevant_sound_strip = Utils.find_relevant_clock_object(scene)
                 
             if relevant_sound_strip:
-                clock = relevant_sound_strip.song_timecode_clock_number
+                clock = relevant_sound_strip.int_event_list
                 OSC.send_osc_lighting("/eos/newcmd", f"Event {clock} / Internal Disable Enter")
 
         '''C3:3'''

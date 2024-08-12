@@ -32,7 +32,6 @@ from functools import partial
 from ..cpvia.find import Find # type: ignore
 from ..cpvia.cpvia_finders import CPVIAFinders # type: ignore
 from ..cpvia.split_color import ColorSplitter # type: ignore
-from ..cpvia.publish import Publisher # type: ignore
 
 
 class CPVIAGenerator:
@@ -66,6 +65,7 @@ class CPVIAGenerator:
             i.append(influence)
             a.append(argument)
 
+        from ..event_manager import Publisher # type: ignore ## TEMPORARY
         publisher = Publisher()
         for chan, param, val, inf, arg in zip(c, p, v, i, a):
             if param in ["intensity", "raise_intensity", "lower_intensity"]:

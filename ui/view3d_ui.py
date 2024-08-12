@@ -136,3 +136,9 @@ class View3DUI:
                     col.prop(mod, "highlights", slider=True)
                     col.prop(mod, "shadows", slider=True)
                     col.prop(mod, "blacks", slider=True)
+
+    @staticmethod
+    def draw_view3d_cmd_line(self, context):
+        row = self.layout.row()
+        row.scale_x = 2
+        row.prop(context.scene.scene_props, 'view3d_command_line', text="")

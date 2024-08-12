@@ -29,14 +29,22 @@ bl_info = {
     "name": "Alva Sorcerer",
     "author": "Alva Theaters",
     "location": "ShaderEditor/View3D/Sequencer/TextEditor/Properties",
-    "version": (2, 0),
+    "version": (2, 0, 1),
     "blender": (4, 1, 0),
     "description": "3D animation in real life, for theatre, with Blender.",
-    "warning": "For reliability, migrate all data to console prior to real show.",
+    "warning": "Copious UI components. Not for existing Blender workflows.",
     "wiki_url": "https://alva-sorcerer.readthedocs.io/en/latest/index.html#",
-    "tracker_url": "https://github.com/Alva-Theaters/Sorcerer/issues",
+    "tracker_url": "https://www.workstraight.com/site/login",
     "category": "EMARs",
 }
+
+as_info = {
+    "alpha": True,
+    "beta": False,
+    "rating": "Experimental",
+    "restrictions_url": "https://github.com/Alva-Theaters/Sorcerer/discussions/40"
+}
+
 
 import sys
 import os

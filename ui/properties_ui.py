@@ -296,7 +296,7 @@ class PropertiesUI:
         box = layout.box()
         row = box.row()
         row.label
-        row.label(text='"All crew, go/no go poll for Show Start beginning with fly..."')
+        row.label(text='"All crew, go/no go poll for Show-Start beginning with fly..."')
         row = box.row()
         row.alert = not scene.fly_is_go
         row.prop(scene, "fly_is_go", text="Fly is Go" if scene.fly_is_go else "Fly", toggle=True)
@@ -332,7 +332,7 @@ class PropertiesUI:
             row.alert=1
             poll_three = "Hold"
         else: poll_three = "Go"
-        row.prop(scene, "go_for_show_open", emboss=0, text='''"Go for Show Start. Crew, set the theater to Underway Configuration. To hold, announce 'Hold, hold, hold.'"''' if scene.go_for_show_open else "Show Stay Closed", toggle=True)
+        row.prop(scene, "go_for_show_open", emboss=0, text='''"Go for Show-Start. Crew, set the theater to Underway Configuration. To hold, announce 'Hold, hold, hold.'"''' if scene.go_for_show_open else "Show Stay Closed", toggle=True)
 
         # House Open Checklist
         layout.separator()
@@ -348,7 +348,7 @@ class PropertiesUI:
         row.label(text='Now, Status Check, starting with Backstage Manager. Initial cast in place?..."')
         row = box.row()
         row.alert = not scene.initial_cast_in_place
-        row.prop(scene, "initial_cast_in_place", text="Initial Cast in Place" if scene.initial_cast_in_place else "Initial Cast in Place??", toggle=True)
+        row.prop(scene, "initial_cast_in_place", text="Initial Cast in Place" if scene.initial_cast_in_place else "Initial Cast in Place?", toggle=True)
         row.alert = 0
         row.label(text="", icon='RIGHTARROW')
         row.alert = not scene.theater_is_ready
@@ -363,7 +363,7 @@ class PropertiesUI:
             row.alert = True
             poll_four = "Hold"
         else: poll_four = "Go"
-        row.prop(scene, "clear_to_proceed", emboss=False, text='"Clear to proceed... T minus 10, 9, 8, 7, 6, 5, 4, 3 , 2, 1, Renegade in startup, Underway"' if scene.clear_to_proceed else "Not Clear to Proceed", toggle=True)
+        row.prop(scene, "clear_to_proceed", emboss=False, text='"Continuing with Show-Start... T minus 10, 9, 8, 7, 6, 5, 4, 3 , 2, 1, Renegade is in startup, Underway"' if scene.clear_to_proceed else "Not Clear to Proceed", toggle=True)
             
         layout.separator()
         

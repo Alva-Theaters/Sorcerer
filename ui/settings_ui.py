@@ -55,6 +55,7 @@ class SettingsUI:
         col1.scale_x = 1.3
         col1.scale_y = 1.3
         
+        col1.operator("wm.sorcerer_splash", text="Splash")
         col1.separator()
         col1.prop(bpy.context.scene.scene_props, "preferences_enum", expand=True)
 
@@ -77,7 +78,7 @@ class SettingsUI:
             if 'house_lights' not in restrictions:
                 SettingsUI.draw_house_lights(self, context, col2)
             if 'sequencer' not in restrictions:
-                SettingsUI.draw_misc(self, context, col2)
+                SettingsUI.draw_sequencer(self, context, col2)
             
         elif mode == 'option_3d' and 'patch' not in restrictions:
             SettingsUI.draw_patch(self, context, col2)
@@ -85,7 +86,11 @@ class SettingsUI:
         elif mode == 'option_nodes':
             row = col2.row()
             row.label(text="Nothing to display here yet.")
-            
+
+        elif mode == 'option_st_sequencer':
+            row = col2.row()
+            row.label(text="Nothing to display here yet.")
+
         elif mode == 'option_orb':
             SettingsUI.draw_orb(self, context, col2)
             
@@ -168,9 +173,13 @@ class SettingsUI:
         row.label(text="Remotely Manage Console Event List:")
         box = column.box()
         row = box.row()
-        row.prop(context.scene, "sync_timecode", slider=True, text="Sync timecode on console")
+        row.prop(context.scene, "sync_timecode", slider=True, text="Sync Timecode on Console")
         if context.scene.sync_timecode:
-            row.prop(context.scene, "timecode_expected_lag", text="Expected lag in frames")
+            row.prop(context.scene, "timecode_expected_lag", text="Expected Lag in Frames:")
+            row = box.row()
+            row.prop(context.scene, "use_default_clock", text="Use default clock", slider=True)
+            row.prop(context.scene, "int_event_list", text="Default clock:")
+
         row = box.row()
         row.prop(context.scene.scene_props, "auto_update_event_list", slider=True, text="Automatically update event list")
         column.separator()
@@ -178,6 +187,7 @@ class SettingsUI:
     
     @staticmethod
     def draw_orb(self, context, column):
+        scene = context.scene
         box = column.box()
         row = box.row()
         row.label(text="Livemap and Orb:")
@@ -186,16 +196,41 @@ class SettingsUI:
         split = box.split(factor=.5)
         
         col1 = split.column()
-        col1.prop(context.scene, "is_armed_livemap", text="Livemap", slider=True)   
+        col1.prop(scene, "is_armed_livemap", text="Livemap", slider=True)   
         col1.separator()
-        col1.prop(context.scene, "is_armed_turbo", text="Orb skips Shift+Update", slider=True)
+        col1.prop(scene, "is_armed_turbo", text="Orb skips Shift+Update", slider=True)
         col1.separator()
-        col1.prop(context.scene.scene_props, "ghost_out_time", text="Ghost Out time")
+        col1.prop(context.scene.scene_props, "ghost_out_time", text="Ghost Out Time:")
 
         col2 = split.column()
-        col2.prop(context.scene, "orb_records_snapshot", text="Orb records snapshot first", slider=True)
+        col2.prop(scene, "orb_records_snapshot", text="Orb records snapshot first", slider=True)
         col2.separator()
-        col2.prop(context.scene, "orb_finish_snapshot", text="Snapshot after orb", slider=False)
+        col2.prop(scene, "orb_finish_snapshot", text="Snapshot After Orb:", slider=False)
+
+        box = column.box()
+
+        row = box.row()
+        row.label(text="Orb wants you to spend more time focusing on art rather than on macros.")
+
+        row = box.row()
+        row.separator()
+        row.prop(scene, "orb_macros_start", text="Macro Range Start:")
+        row.prop(scene, "orb_macros_end", text="End:")
+
+        row = box.row()
+        row.separator()
+        row.prop(scene, "orb_cue_lists_start", text="Cue List Range Start:")
+        row.prop(scene, "orb_cue_lists_end", text="End:")
+
+        row = box.row()
+        row.separator()
+        row.prop(scene, "orb_event_lists_start", text="Event List Range Start:")
+        row.prop(scene, "orb_event_lists_end", text="End:")
+
+        row = box.row()
+        row.separator()
+        row.prop(scene, "orb_presets_start", text="Preset Range Start:")
+        row.prop(scene, "orb_presets_end", text="End:")
 
         box.separator()
         
@@ -214,16 +249,55 @@ class SettingsUI:
         column.separator()
         
     @staticmethod
-    def draw_misc(self, context, column):
+    def draw_sequencer(self, context, column):
         box = column.box()
+
         row = box.row()
-        row.label(text="Miscellaneous:")
+        row.label(text="Strips:")
         box = column.box()
+
         row = box.row()
         row.prop(context.scene, "i_know_the_shortcuts", text="Show keyboard shortcuts",  slider=True)    
         row.prop(context.scene, "is_updating_strip_color", text="Update strip color",  slider=True)
+
         row = box.row()
         row.prop(context.scene, "is_armed_release", text="O adds strip on release", slider=True) 
+        row.prop(context.scene, "strip_end_macros", text="Strip end macros", slider=True)
+
+        active_strip = None
+        for area in context.screen.areas:
+            if area.type == 'SEQUENCE_EDITOR':
+                if context.scene.sequence_editor.active_strip and (context.scene.sequence_editor.active_strip.type == 'COLOR' or context.scene.sequence_editor.active_strip.type == 'SOUND'):
+                    active_strip = True
+                    break
+
+        if active_strip:
+            target = context.scene.sequence_editor.active_strip
+        else:
+            target = context.scene
+
+        box = column.box()
+        row = box.row()
+        row.label(text=f"Showing properties for {target.name}:")
+
+        row = box.row()
+        row.prop(target, "int_cue_list", text="Cue List:") 
+        row.prop(target, "int_event_list", text="Event List:")
+
+        row = box.row()
+        row.prop(target, "str_start_cue", text="Start Cue") 
+
+        row = box.row()
+        row.prop(target, "str_end_cue", text="End Cue")
+
+        row = box.row()
+        row.prop(target, "int_start_macro", text="Start Macro:") 
+        row.prop(target, "int_end_macro", text="End Macro:")
+
+        row = box.row()
+        row.prop(target, "int_start_preset", text="Start Preset:") 
+        row.prop(target, "int_end_preset", text="End Preset:")
+
         column.separator()
         column.separator()
         
@@ -281,58 +355,81 @@ class SettingsUI:
     def draw_network(self, context, column):
         pcoll = preview_collections["main"]
         orb = pcoll["orb"]
+
         scene = context.scene
+        vt = scene.alva_settings_view_enum
+        core = scene.scene_props.use_alva_core
+
         box = column.box()
         row = box.row()
         row.label(text="ALVA Network Settings:")
-        row.prop(scene.scene_props, "use_alva_core", icon_value=orb.icon_id, text="")
-        
-        box = column.box()
+        row.prop(scene.scene_props, "use_alva_core", icon_value=orb.icon_id, text="In-house Mode")
+
         row = box.row()
-        row.label(text="ANIMATION:")
-        if scene.scene_props.is_democratic:
-            row.alert = 1
-        row.operator("my.democratic_operator", text="Democratic", icon='HEART')
-        row.alert = 0
-        if scene.scene_props.is_not_democratic:
-            row.alert = 1
-        row.operator("my.non_democratic_operator", text="Non-democratic", icon='ORPHAN_DATA')
-        row.alert = 0
-        
-        if not scene.scene_props.use_alva_core:
+        row.prop(scene, "alva_settings_view_enum", expand=True)
+
+        if not core:
             box = column.box()
             row = box.row()
+        
+        # Animated
+        if vt == 'option_animation':
+            if core:
+                box = box = column.box()
+                row = box.row()
+            row.alert = scene.scene_props.is_democratic
+            row.operator("my.democratic_operator", text="Democratic", icon='HEART')
+            row.alert = scene.scene_props.is_not_democratic
+            row.operator("my.non_democratic_operator", text="Non-democratic", icon='ORPHAN_DATA')
+            row.alert = 0
+        
+        # Lighting
+        elif vt == 'option_lighting' and not core:
             row.enabled = not scene.scene_props.use_alva_core
-            row.prop(scene.scene_props, "console_type_enum", text="LIGHTING")
+            row.prop(scene.scene_props, "console_type_enum", text="Lighting Console")
             row.prop(scene.scene_props, "lighting_enabled", expand=True, text="")
+
             row = box.row()
             row.enabled = not scene.scene_props.use_alva_core
             row.prop(scene.scene_props, "str_osc_ip_address", text="")
             row.prop(scene.scene_props, "int_osc_port", text=":")
             row.prop(scene.scene_props, "int_argument_size", text="x")
-            
-            box = column.box()
+
+            box.separator()
+
             row = box.row()
-#            row.enabled = not scene.scene_props.use_alva_core
+            row.prop(scene.scene_props, 'strips_enabled', text="Enable OSC from strips", slider=True)
+            row.prop(scene.scene_props, 'objects_enabled', text="Enable OSC from meshes", slider=True)
+            row = box.row()
+            row.prop(scene.scene_props, 'nodes_enabled', text="Enable OSC from nodes", slider=True)
+        
+        # Video &
+        elif vt == 'option_video' and not core:
             row.enabled=False
-            row.label(text="VIDEO:")
+            row.label(text="Video Switcher:")
             row.label(text="Coming soon.")
             row.prop(scene.scene_props, "video_enabled", expand=True, text="")
-            
-            box = column.box()
             row = box.row()
+            row.enabled=False
+            row.prop(scene, "str_video_ip_address", text="")
+            row.prop(scene, "int_video_port", text=":")
+        
+        # Audio
+        elif vt == 'option_audio' and not core:
             row.enabled = not scene.scene_props.use_alva_core
-            row.prop(scene.scene_props, "mixer_type_enum", text="AUDIO")
+            row.prop(scene.scene_props, "mixer_type_enum", text="Audio Mixer")
             row.prop(scene.scene_props, "audio_enabled", expand=True, text="")
             row = box.row()
             row.enabled = not scene.scene_props.use_alva_core
             row.prop(scene, "str_audio_ip_address", text="")
             row.prop(scene, "int_audio_port", text=":")
-        else:
+
+        # Renegade
+        if core:
             box = column.box()
             row = box.row()
             row.enabled = False
-            row.prop(scene.scene_props, "core_type_enum", text="THEATER")
+            row.prop(scene.scene_props, "core_type_enum", text="ALVA Format")
             row.prop(scene.scene_props, "core_enabled", expand=True, text="")
             row = box.row()
             row.enabled = False
@@ -342,5 +439,6 @@ class SettingsUI:
             row.enabled=False
             row.prop(scene.scene_props, "core_drives_enum", text="", icon='DISC')
             row.operator("main.save_dtp_operator", icon='FILE_TICK')
+
         column.separator()
         column.separator()

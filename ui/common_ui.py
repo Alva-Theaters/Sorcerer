@@ -35,8 +35,20 @@ import os
 preview_collections = {}
 pcoll = bpy.utils.previews.new()
 preview_collections["main"] = pcoll
+
 addon_dir = os.path.dirname(__file__)
 pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
+
+icons_dir = os.path.join(addon_dir, "icons")
+pcoll.load("sound_dark", os.path.join(icons_dir, "sound_dark.svg"), 'IMAGE')
+pcoll.load("color_dark", os.path.join(icons_dir, "color_dark.svg"), 'IMAGE')
+pcoll.load("strobe_dark", os.path.join(icons_dir, "strobe_dark.svg"), 'IMAGE')
+pcoll.load("pan_tilt_dark", os.path.join(icons_dir, "pan_tilt_dark.svg"), 'IMAGE')
+pcoll.load("zoom_dark", os.path.join(icons_dir, "zoom_dark.svg"), 'IMAGE')
+pcoll.load("iris_dark", os.path.join(icons_dir, "iris_dark.svg"), 'IMAGE')
+pcoll.load("edge_dark", os.path.join(icons_dir, "edge_dark.svg"), 'IMAGE')
+pcoll.load("diffusion_dark", os.path.join(icons_dir, "diffusion_dark.svg"), 'IMAGE')
+pcoll.load("gobo_dark", os.path.join(icons_dir, "gobo_dark.svg"), 'IMAGE')
 
 
 class CommonUI:   
@@ -92,39 +104,119 @@ class CommonUI:
 
     @staticmethod
     def draw_topbar(self, context):
+        pcoll = preview_collections["main"]
+        orb = pcoll["orb"]
+
         if (hasattr(context, "scene") and 
             hasattr(context.scene, "scene_props")): # Avoid unregistration error
             scene = context.scene.scene_props
             layout = self.layout
-            layout.prop(scene, "objects_enabled", text="", icon='MESH_CUBE')
-            layout.prop(scene, "strips_enabled", text="", icon='SEQUENCE')
-            layout.prop(scene, "nodes_enabled", text="", icon='NODETREE')
+            col = layout.column()
+            row = col.row(align=True)
+            row.operator("seq.show_sequencer_settings", text="", icon_value=orb.icon_id, emboss=1)
+            row.prop(scene, "lighting_enabled", text="", icon='OUTLINER_OB_LIGHT' if scene.lighting_enabled else 'LIGHT_DATA', emboss=1)
+            row.prop(scene, "video_enabled", text="", icon='VIEW_CAMERA' if scene.video_enabled else 'OUTLINER_DATA_CAMERA', emboss=1)
+            row.prop(scene, "audio_enabled", text="", icon='OUTLINER_OB_SPEAKER' if scene.audio_enabled else 'OUTLINER_DATA_SPEAKER', emboss=1)
 
 
     @staticmethod
     def draw_tool_settings(self, context):
+        '''The way this is written is extremely dumb. The issue is the stupid, stupid, stupid 
+           context.scene vs context.scene.scene_props stupidity. Need to eventually put 100%
+           of scene-registered properties on the scene_props, but haven't yet because doing so
+           would introduce hundreds of bugs throughout the codebase.'''
         if (hasattr(context, "scene") and 
             hasattr(context.scene, "scene_props")): # Avoid unregistration error
             scene = context.scene.scene_props
             layout = self.layout
-            column = layout.row()
-            column.prop(scene, "str_osc_ip_address", text="Lighting")
-            column.label(text=":")
-            column.prop(scene, "int_osc_port", text="")
+            row = layout.row(align=True)
+            row.prop(context.scene, "lock_ip_settings", text="", icon='LOCKED' if context.scene.lock_ip_settings else 'UNLOCKED')
+            row.prop(context.scene, "ip_address_view_options", text="", expand=True)
+
+            if context.scene.ip_address_view_options == 'option_lighting':
+                ip = scene.str_osc_ip_address
+                port = scene.int_osc_port
+                if context.scene.lock_ip_settings:
+                    row = layout.row()
+                    row.label(text=f"{ip}:{port}")
+                else:
+                    row = layout.row()
+                    row.prop(scene, "str_osc_ip_address", text="")
+                    row = layout.row()
+                    row.scale_x = .8
+                    row.prop(scene, "int_osc_port", text=":")
+
+            elif context.scene.ip_address_view_options == 'option_video':
+                ip = context.scene.str_video_ip_address
+                port = context.scene.int_video_port
+                if context.scene.lock_ip_settings:
+                    row = layout.row()
+                    row.label(text=f"{ip}:{port}")
+                else:
+                    row = layout.row()
+                    row.prop(context.scene, "str_video_ip_address", text="")
+                    row = layout.row()
+                    row.scale_x = .9
+                    row.prop(context.scene, "int_video_port", text=":")
+
+            else:
+                ip = context.scene.str_audio_ip_address
+                port = context.scene.int_audio_port
+                if context.scene.lock_ip_settings:
+                    row = layout.row()
+                    row.label(text=f"{ip}:{port}")
+                else:
+                    row = layout.row()
+                    row.prop(context.scene, "str_audio_ip_address", text="")
+                    row = layout.row()
+                    row.scale_x = .9
+                    row.prop(context.scene, "int_audio_port", text=":")
+
+        
 
     @staticmethod
     def draw_splash(self, context):
+        pcoll = preview_collections["main"]
+        orb = pcoll["orb"]
+
+        from .. import bl_info, as_info
+        version = bl_info["version"]
+        primary = version[0]
+        if len(version) > 1:
+            secondary = version[1]
+        else: secondary = 0
+
+        if len(version) > 2:
+            tertiary = version[2]
+        else: tertiary = 0
+
+        version = f"v{primary}.{secondary}.{tertiary}"
+        restrictions = as_info["restrictions_url"]
+
         layout = self.layout
         box = layout.box()
 
-        box.label(text="Welcome to Alva Sorcerer.", icon='INFO')
-        box.label(text="Today I'm just a baby, but one day I'll grow big and strong!")
+        row = box.row()
+        row.scale_y = 3
+        row.label(text=f"Alva Sorcerer {version}", icon_value=orb.icon_id)
+        row = box.row()
+        row.label(text="Today I'm just a baby, but one day I'll grow big and strong!")
         box.separator()
 
+        if as_info["alpha"]:
+            row = box.row()
+            row.alert = 1
+            row.label(text="Warning: Many features do not work in this alpha version.")
+            row.alert = 0
+        elif as_info["beta"]:
+            row = box.row()
+            row.label(text="Warning: Some features may not work in this beta version.")
+        
         row = box.row()
-        row.scale_y = 1.5
+        if restrictions != "":
+            row.operator("wm.url_open", text="See Restrictions").url = restrictions
         row.operator("wm.url_open", text="Learn More").url = "https://www.alvatheaters.com/alva-sorcerer"
-        row.operator("wm.url_open", text="Close").url = ""
+
 
     @staticmethod
     def draw_text_or_group_input(self, context, row_or_box, active_object, object=False):
@@ -255,7 +347,7 @@ class CommonUI:
                 row.prop(active_object, "float_diffusion", slider=True, text="Diffusion:")
         
         # GOBO
-        if active_object.gobo_id_is_on:
+        if active_object.gobo_is_on:
             row = box.row(align=True)
             op = row.operator("my.view_gobo_props", text="", icon='POINTCLOUD_DATA')
             op.space_type = space_type
@@ -287,6 +379,17 @@ class CommonUI:
     
     @staticmethod    
     def draw_footer_toggles(self, context, column, active_object, box=True, vertical=False):
+        pcoll = preview_collections["main"]
+        sound_dark = pcoll["sound_dark"]
+        strobe_dark = pcoll["strobe_dark"]
+        color_dark = pcoll["color_dark"]
+        pan_tilt_dark = pcoll["pan_tilt_dark"]
+        zoom_dark = pcoll["zoom_dark"]
+        iris_dark = pcoll["iris_dark"]
+        edge_dark = pcoll["edge_dark"]
+        diffusion_dark = pcoll["diffusion_dark"]
+        gobo_dark = pcoll["gobo_dark"]
+
         if box: # Normal condition
             box = column.box()
             row = box.row() 
@@ -311,22 +414,86 @@ class CommonUI:
             row.prop(active_object, "fixture_index_is_locked", emboss = False, icon='LOCKED' if active_object.fixture_index_is_locked else 'UNLOCKED', text="")
         
         if object_type == "Stage Object":
-            row.prop(active_object, "audio_is_on", text="", icon='SOUND' if active_object.audio_is_on else 'ADD', emboss=False)
+            if active_object.audio_is_on:
+                row.prop(active_object, "audio_is_on", text="", icon='SOUND', emboss=False)
+            else: row.prop(active_object, "audio_is_on", text="", icon_value=sound_dark.icon_id, emboss=False)
         
         if object_type not in ["Influencer", "Brush"]:
-            row.prop(active_object, "strobe_is_on", text="", icon='OUTLINER_DATA_LIGHTPROBE' if active_object.strobe_is_on else 'ADD', emboss=False)
-        row.prop(active_object, "color_is_on", text="", icon='COLOR' if active_object.color_is_on else 'ADD', emboss=False)
+            if active_object.strobe_is_on:
+                row.prop(active_object, "strobe_is_on", text="", icon='OUTLINER_DATA_LIGHTPROBE', emboss=False)
+            else: row.prop(active_object, "strobe_is_on", text="", icon_value=strobe_dark.icon_id, emboss=False)
+        
+        if active_object.color_is_on:
+            row.prop(active_object, "color_is_on", text="", icon='COLOR', emboss=False)
+        else: row.prop(active_object, "color_is_on", text="", icon_value=color_dark.icon_id, emboss=False)
         
         if object_type not in ["Stage Object", "Influencer", "Brush"]:
-            row.prop(active_object, "pan_tilt_is_on", text="", icon='ORIENTATION_GIMBAL' if active_object.pan_tilt_is_on else 'ADD', emboss=False)
-        row.prop(active_object, "zoom_is_on", text="", icon='LINCURVE' if active_object.zoom_is_on else 'ADD', emboss=False)
-        row.prop(active_object, "iris_is_on", text="", icon='RADIOBUT_OFF' if active_object.iris_is_on else 'ADD', emboss=False)
+            if active_object.pan_tilt_is_on:
+                row.prop(active_object, "pan_tilt_is_on", text="", icon='ORIENTATION_GIMBAL', emboss=False)
+            else: row.prop(active_object, "pan_tilt_is_on", text="", icon_value=pan_tilt_dark.icon_id, emboss=False)
+
+        if active_object.zoom_is_on:
+            row.prop(active_object, "zoom_is_on", text="", icon='LINCURVE', emboss=False)
+        else: row.prop(active_object, "zoom_is_on", text="", icon_value=zoom_dark.icon_id, emboss=False)
+
+        if active_object.iris_is_on:
+            row.prop(active_object, "iris_is_on", text="", icon='RADIOBUT_OFF', emboss=False)
+        else: row.prop(active_object, "iris_is_on", text="", icon_value=iris_dark.icon_id, emboss=False)
         
         if object_type not in ["Influencer", "Brush"]:
-            row.prop(active_object, "edge_is_on", text="", icon='SELECT_SET' if active_object.edge_is_on else 'ADD', emboss=False)
-            row.prop(active_object, "diffusion_is_on", text="", icon='MOD_CLOTH' if active_object.diffusion_is_on else 'ADD', emboss=False)
-            row.prop(active_object, "gobo_id_is_on", text="", icon='POINTCLOUD_DATA' if active_object.gobo_id_is_on else 'ADD', emboss=False)
+            if active_object.edge_is_on:
+                row.prop(active_object, "edge_is_on", text="", icon='SELECT_SET', emboss=False)
+            else: row.prop(active_object, "edge_is_on", text="", icon_value=edge_dark.icon_id, emboss=False)
+            
+            if active_object.diffusion_is_on:
+                row.prop(active_object, "diffusion_is_on", text="", icon='MOD_CLOTH', emboss=False)
+            else: row.prop(active_object, "diffusion_is_on", text="", icon_value=diffusion_dark.icon_id, emboss=False)
+
+            if active_object.gobo_is_on:
+                row.prop(active_object, "gobo_is_on", text="", icon='POINTCLOUD_DATA', emboss=False)
+            else: row.prop(active_object, "gobo_is_on", text="", icon_value=gobo_dark.icon_id, emboss=False)
     
+    @staticmethod
+    def draw_play_bar(self, context, layout):
+        '''Copy/pasted from /scripts/startup/bl_ui/space_time.py.
+           This is here because the normal keymaps don't work for 
+           keyframing in the popup window context.'''
+        scene = context.scene
+        tool_settings = context.tool_settings
+        screen = context.screen
+
+        layout.separator_spacer()
+
+        row = layout.row(align=True)
+        row.prop(tool_settings, "use_keyframe_insert_auto", text="", toggle=True)
+        sub = row.row(align=True)
+        sub.active = tool_settings.use_keyframe_insert_auto
+        sub.popover(
+            panel="TIME_PT_auto_keyframing",
+            text="",
+        )
+
+        row = layout.row(align=True)
+        row.operator("screen.frame_jump", text="", icon='REW').end = False
+        row.operator("screen.keyframe_jump", text="", icon='PREV_KEYFRAME').next = False
+        if not screen.is_animation_playing:
+            # if using JACK and A/V sync:
+            #   hide the play-reversed button
+            #   since JACK transport doesn't support reversed playback
+            if scene.sync_mode == 'AUDIO_SYNC' and context.preferences.system.audio_device == 'JACK':
+                row.scale_x = 2
+                row.operator("screen.animation_play", text="", icon='PLAY')
+                row.scale_x = 1
+            else:
+                row.operator("screen.animation_play", text="", icon='PLAY_REVERSE').reverse = True
+                row.operator("screen.animation_play", text="", icon='PLAY')
+        else:
+            row.scale_x = 2
+            row.operator("screen.animation_play", text="", icon='PAUSE')
+            row.scale_x = 1
+        row.operator("screen.keyframe_jump", text="", icon='NEXT_KEYFRAME').next = True
+        row.operator("screen.frame_jump", text="", icon='FF').end = True
+
     @staticmethod    
     def draw_fixture_groups(self, context):
         layout = self.layout
@@ -345,7 +512,7 @@ class CommonUI:
         col.alert = False
 
         try:
-            item = scene.scene_group_data[scene.scene_props.group_data_index]  # Ensure this line exists to define 'item'
+            item = scene.scene_group_data[scene.scene_props.group_data_index]
         except:
             return
         
@@ -379,8 +546,6 @@ class CommonUI:
         row = box.row(align=True)
         row.prop(item, "highlight_or_remove_enum", expand=True, text="")
         row.prop(scene.scene_props, "add_channel_ids", text="")
-        add = row.operator("patch.add_channel", text="", icon='PLUS')
-        add.group_id = item.name
         
         if item.strobe_is_on:
             col.separator()
@@ -428,7 +593,7 @@ class CommonUI:
             row.prop(item, "zoom_min", text="Zoom Min:")
             row.prop(item, "zoom_max", text="Max:")
         
-        if item.gobo_id_is_on:
+        if item.gobo_is_on:
             col.separator()
             box = col.box()
             row = box.row()
@@ -564,23 +729,21 @@ class CommonUI:
 #            
 #            box.separator()
 
-                
+
     @staticmethod
     def draw_strobe_settings(self, context, active_controller):
         layout = self.layout
         column = layout.row()
-        
+
         if active_controller:
             split = layout.split(factor=0.5)
             row = split.column()
             row.label(text="Strobe Value", icon='OUTLINER_DATA_LIGHTPROBE')
             row = split.column()
             row.prop(active_controller, "float_strobe", text="", slider=True)
-            
-            row.operator("popup.keyframe_strobe_popup_operator", text="Keyframe", icon='KEYTYPE_KEYFRAME_VEC')
-            
+
             layout.separator()
-            
+
             if hasattr(active_controller, "str_enable_strobe_argument"):
                 split = layout.split(factor=0.5)
                 row = split.column()

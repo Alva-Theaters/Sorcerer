@@ -342,8 +342,8 @@ class NODE_NT_flash(Node):
     ) # type: ignore
     
     show_effect_preset_settings: BoolProperty(default=False, description="Show settings", update=NodeUpdaters.flash_node_updater) # type: ignore
-    int_up_preset_assignment: IntProperty(default=0, description="Preset number on console", update=NodeUpdaters.flash_node_updater) # type: ignore # type: ignore
-    int_down_preset_assignment: IntProperty(default=0, description="Preset number on console", update=NodeUpdaters.flash_node_updater) # type: ignore # type: ignore
+    int_start_preset: IntProperty(default=0, description="Preset number on console", update=NodeUpdaters.flash_node_updater) # type: ignore # type: ignore
+    int_end_preset: IntProperty(default=0, description="Preset number on console", update=NodeUpdaters.flash_node_updater) # type: ignore # type: ignore
     
     def init(self, context):
         up = self.inputs.new('FlashUpType', "Flash Up")

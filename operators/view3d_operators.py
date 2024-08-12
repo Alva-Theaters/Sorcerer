@@ -45,7 +45,7 @@ def apply_patch(item, object):
         "pan_min", "pan_max", "tilt_min", "tilt_max", "zoom_min", "zoom_max", 
         "gobo_speed_min", "gobo_speed_max", "influence_is_on", "intensity_is_on", 
         "pan_tilt_is_on", "color_is_on", "diffusion_is_on", "strobe_is_on", 
-        "zoom_is_on", "iris_is_on", "edge_is_on", "gobo_id_is_on", "prism_is_on", 
+        "zoom_is_on", "iris_is_on", "edge_is_on", "gobo_is_on", "prism_is_on", 
         "str_enable_strobe_argument", "str_disable_strobe_argument", 
         "str_enable_gobo_speed_argument", "str_disable_gobo_speed_argument", 
         "str_gobo_id_argument", "str_gobo_speed_value_argument", 
@@ -250,7 +250,7 @@ class PatchGroupOperator(bpy.types.Operator):
                 new_controller.diffusion_is_on = scene.scene_props.diffusion_is_on
                 new_controller.edge_is_on = scene.scene_props.edge_is_on
                 new_controller.iris_is_on = scene.scene_props.iris_is_on
-                new_controller.gobo_id_is_on = scene.scene_props.gobo_id_is_on
+                new_controller.gobo_is_on = scene.scene_props.gobo_is_on
                 new_controller.zoom_is_on = scene.scene_props.zoom_is_on
             
                 new_controller.label = new_controller.str_group_label
@@ -263,34 +263,13 @@ class PatchGroupOperator(bpy.types.Operator):
 class AddChannelToGroupOperator(bpy.types.Operator):
     bl_idname = "patch.add_channel"
     bl_label = ""
-    bl_description = "Add Channel to Group"
+    bl_description = "Add channel to group"
     
     group_id: StringProperty() # type: ignore
     
     def execute(self, context):
-        item = context.scene.scene_group_data.get(self.group_id)  # Get the object by name
-        if item is None:
-            self.report({'ERROR'}, "Group not found")
-            return {'CANCELLED'}
-        channels_to_add = Utils.parse_channels(context.scene.scene_props.add_channel_ids) # returns list of ints
-        if len(channels_to_add) == 0:
-            self.report({'WARNING'}, "Nothing to add")
-            return{'CANCELLED'}
-        i = 0
-        for channel in channels_to_add:
-            # Check if the channel already exists
-            if any(ch.chan == channel for ch in item.channels_list):
-                continue
-            
-            # Add the new channel
-            new_channel = item.channels_list.add()
-            new_channel.chan = channel
-            i += 1
-            
-        if i == 0:
-            self.report({'WARNING'}, "Nothing to add")
-            return{'CANCELLED'}
-          
+        # The best part is no part.
+        # This is just an automatic updater now. 1 less step for user.
         return {'FINISHED'}
     
     
@@ -693,7 +672,7 @@ class SendUSITTASCIITo3DOperator(bpy.types.Operator):
                 new_controller.intensity_is_on = 'Intensity' in capabilities or '1' in capabilities
                 new_controller.edge_is_on = 'Edge' in capabilities or '78' in capabilities
                 new_controller.iris_is_on = 'Iris' in capabilities or '73' in capabilities
-                new_controller.gobo_id_is_on = 'Gobo' in capabilities or '200' in capabilities
+                new_controller.gobo_is_on = 'Gobo' in capabilities or '200' in capabilities
                 new_controller.zoom_is_on = 'Zoom' in capabilities or '79' in capabilities                
                 
                 # Initialize flags.
@@ -761,7 +740,7 @@ class SendUSITTASCIITo3DOperator(bpy.types.Operator):
             new_group.intensity_is_on = new_controller.intensity_is_on
             new_group.edge_is_on = new_controller.edge_is_on
             new_group.iris_is_on = new_controller.iris_is_on
-            new_group.gobo_id_is_on = new_controller.gobo_id_is_on
+            new_group.gobo_is_on = new_controller.gobo_is_on
             new_group.zoom_is_on = new_controller.zoom_is_on
             
             for channel in channels:
@@ -937,30 +916,6 @@ class BumpDownCustomButton(bpy.types.Operator):
             self.report({'WARNING'}, "Cannot move the last button down or invalid index.")
 
         return {'FINISHED'}
-    
-    
-class KeyframeStrobePopupOperator(bpy.types.Operator):
-    bl_idname = "popup.keyframe_strobe_popup_operator"
-    bl_label = "Keyframe Strobe"
-    bl_description = "Keyframe the strobe property of a node"
-
-    node_name: StringProperty()
-
-    def execute(self, context):
-        world = context.scene.world
-        if world and world.node_tree:
-            node = world.node_tree.nodes.get(self.node_name)
-            if node:
-                frame = context.scene.frame_current
-                node.keyframe_insert(data_path="float_strobe", frame=frame)
-                return {'FINISHED'}
-            else:
-                self.report({'WARNING'}, "Node not found.")
-                return {'CANCELLED'}
-        else:
-            self.report({'WARNING'}, "World or node tree not found.")
-            
-            return {'CANCELLED'}
 
     
 class CustomButton(bpy.types.Operator):
@@ -995,10 +950,10 @@ class RecordEffectPresetOperator(bpy.types.Operator):
         up_channels_list, down_channels_list = finders.find_flash_node_channels(self, update_nodes=True)
         up_channels_str, down_channels_str = finders.join_flash_channels(up_channels_list, down_channels_list)
         
-        preset_number = active_node.int_up_preset_assignment
+        preset_number = active_node.int_start_preset
         OSC.send_osc_lighting("/eos/newcmd", "Group {str(up_channels_list)} Record Preset {str(preset_number)} Enter Enter")
         
-        preset_number = active_node.int_down_preset_assignment
+        preset_number = active_node.int_end_preset
         OSC.send_osc_lighting("/eos/newcmd", "Group {str(down_channels_list)} Record Preset {str(preset_number)} Enter Enter")
         
         return {'FINISHED'}
@@ -1071,7 +1026,7 @@ class RecordDownEffectPresetOperator(bpy.types.Operator):  ## I'm pretty sure th
         scene = context.scene
         node = context.active_node
         group_numbers = ' + Group '.join(groups_list)
-        preset_number = active_node.int_down_preset_assignment
+        preset_number = active_node.int_end_preset
         argument_template = scene.scene_props.str_preset_assignment_argument
           
         argument = argument_template.replace("#", str(group_numbers))
@@ -1120,14 +1075,14 @@ class FlashPresetSearchOperator(bpy.types.Operator):
             if node_tree.bl_idname == 'AlvaNodeTree' or node_tree.bl_idname == 'ShaderNodeTree':
                 for node in node_tree.nodes:
                     if node.bl_idname == "flash_type":
-                        used_presets.add(node.int_up_preset_assignment)
-                        used_presets.add(node.int_down_preset_assignment)
+                        used_presets.add(node.int_start_preset)
+                        used_presets.add(node.int_end_preset)
         for world in bpy.data.worlds:
             if world.use_nodes:
                 for node in world.node_tree.nodes:
                     if node.bl_idname == "flash_type":
-                        used_presets.add(node.int_up_preset_assignment)
-                        used_presets.add(node.int_down_preset_assignment)
+                        used_presets.add(node.int_start_preset)
+                        used_presets.add(node.int_end_preset)
                         
         result_one = 1
         result_two = 2 
@@ -1139,8 +1094,8 @@ class FlashPresetSearchOperator(bpy.types.Operator):
         active_node = find_node_by_name(self.node_name)
         
         if active_node and active_node.bl_idname == "flash_type":
-            active_node.int_up_preset_assignment = result_one
-            active_node.int_down_preset_assignment = result_two
+            active_node.int_start_preset = result_one
+            active_node.int_end_preset = result_two
         else:
             self.report({'WARNING'}, "Active node is not a valid 'flash_type' node.")
 
@@ -1312,6 +1267,38 @@ class RemoveGroupOperator(bpy.types.Operator):
 
         return {'FINISHED'}
 
+
+class VIEW3D_OT_object_controller(Operator):
+    bl_idname = "view3d.object_controller"
+    bl_label = "Object Controller"
+    
+    def execute(self, context):
+        return {'FINISHED'}
+    
+    def invoke(self, context, event):
+        width = 300
+        return context.window_manager.invoke_popup(self, width=width)
+
+    @classmethod
+    def poll(cls, context):
+        return (hasattr(context, "scene") and
+                hasattr(context, "active_object"))
+
+    def draw(self, context):
+        scene = bpy.context.scene.scene_props
+        active_object = context.active_object
+        from ..ui.common_ui import CommonUI
+        from ..ui.view3d_ui import View3DUI
+        
+        if active_object.type == 'MESH':
+            box, column = View3DUI.draw_object_header(self, context, scene, active_object)
+            CommonUI.draw_parameters(self, context, column, box, active_object)
+            CommonUI.draw_footer_toggles(self, context, column, active_object)
+            CommonUI.draw_play_bar(self, context, self.layout)
+        
+        if active_object.type == 'SPEAKER':
+            View3DUI.draw_speaker(self, context, active_object)
+
     
 classes = (
     ModalChannelControllerPanel,
@@ -1356,7 +1343,8 @@ classes = (
     AddChoiceOperator,
     RemoveChoiceOperator,
     AddGroupOperator,
-    RemoveGroupOperator
+    RemoveGroupOperator,
+    VIEW3D_OT_object_controller
 )
 
 
