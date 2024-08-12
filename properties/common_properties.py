@@ -143,7 +143,7 @@ class CommonProperties:
     ]
 
     object_only = [
-        ('mute', BoolProperty(default=False, description="Mute this object's OSC output")),
+        ('mute', BoolProperty(name="Mute OSC", default=False, description="Mute this object's OSC output")),
         ('object_identities_enum', EnumProperty(
             name="Mesh Identity",
             description="In Sorcerer, meshes can represent and control individual lighting fixtures, microphones, stage objects, brushes, and 3D bitmapping objects. Select what you want your mesh to do here",
@@ -154,10 +154,10 @@ class CommonProperties:
             description="Command line text to focus moving fixtures onto stage object",
             update=CommonUpdaters.call_fixtures_updater
         )),
-        ('int_object_channel_index', IntProperty(default=1)),
+        ('int_object_channel_index', IntProperty(name="Channel Index", default=1, description="Manual value for channel index, as on the console")),
         ('is_erasing', BoolProperty(name="Eraser", description="Erase instead of add")),
         ('influencer_list', CollectionProperty(type=InfluencerListSubClass)),
-        ('float_object_strength', FloatProperty(default=1, min=0, max=1)),
+        ('float_object_strength', FloatProperty(name="Strength", default=1, min=0, max=1, description="Make this brush less powerful so it is easier to make more refined changes")),
         ('int_fixture_index', IntProperty(default=0)),
         ('fixture_index_is_locked', BoolProperty(default=True)),
         
@@ -198,13 +198,13 @@ class CommonProperties:
         
         # 3D Audio Properties
         ('int_speaker_number', IntProperty(name="Speaker Number", description="Number of speaker in Qlab or on sound mixer. You're seeing this here because you selected a Speaker object, and speaker objects represent real, physical speakers in your theater for the purpose of spatial audio. To pan microphones left or right, you don't use an encoder, you just move the microphone or sound object closer to the left or right inside 3D view", default=0)),
-        ('sound_source_enum', EnumProperty(items=AlvaItems.get_sound_sources, name="Select either a sound strip in the sequencer or a microphone in Audio Patch", update=CommonUpdaters.sound_source_updater))
+        ('sound_source_enum', EnumProperty(name="Sound Source", items=AlvaItems.get_sound_sources, description="Select either a sound strip in the sequencer or a microphone in Audio Patch", update=CommonUpdaters.sound_source_updater))
     ]
 
     flash_strip_parameters = [
-        ('float_flash_intensity_up', FloatProperty(default=0, min=0, max=100, description="Intensity value", update=CPVIAGenerator.intensity_updater)),
+        ('float_flash_intensity_up', FloatProperty(name="Intensity Up", default=0, min=0, max=100, description="Intensity value", update=CPVIAGenerator.intensity_updater)),
         ('float_vec_flash_color_up', FloatVectorProperty(
-            name="",
+            name="Color Up",
             subtype='COLOR',
             size=3,
             default=(1.0, 1.0, 1.0),
@@ -213,15 +213,15 @@ class CommonProperties:
             description="Color value",
             update=CPVIAGenerator.color_updater
         )), 
-        ('float_flash_pan_up', FloatProperty(default=0, min=-315, max=315, description="Pan value", update=CPVIAGenerator.pan_updater)),
-        ('float_flash_tilt_up', FloatProperty(default=0, min=-135, max=135, description="Tilt value", update=CPVIAGenerator.tilt_updater)),
-        ('float_flash_strobe_up', FloatProperty(default=0, min=0, max=100, description="Strobe value", update=CPVIAGenerator.strobe_updater)),
-        ('float_flash_zoom_up', FloatProperty(default=0, min=0, max=100, description="Zoom value", update=CPVIAGenerator.zoom_updater)),
-        ('float_flash_iris_up', FloatProperty(default=0, min=0, max=100, description="Iris value", update=CPVIAGenerator.iris_updater)),
-        ('int_flash_gobo_id_up', IntProperty(default=1, min=0, max=20, description="Gobo selection", update=CPVIAGenerator.gobo_id_updater)),
-        ('float_flash_intensity_down', FloatProperty(default=0, min=0, max=100, description="Intensity value", update=CPVIAGenerator.intensity_updater)),
+        ('float_flash_pan_up', FloatProperty(name="Pan Up", default=0, min=-315, max=315, description="Pan value", update=CPVIAGenerator.pan_updater)),
+        ('float_flash_tilt_up', FloatProperty(name="Tilt Up", default=0, min=-135, max=135, description="Tilt value", update=CPVIAGenerator.tilt_updater)),
+        ('float_flash_strobe_up', FloatProperty(name="Strobe Up", default=0, min=0, max=100, description="Strobe value", update=CPVIAGenerator.strobe_updater)),
+        ('float_flash_zoom_up', FloatProperty(name="Zoom Up", default=0, min=0, max=100, description="Zoom value", update=CPVIAGenerator.zoom_updater)),
+        ('float_flash_iris_up', FloatProperty(name="Iris Up", default=0, min=0, max=100, description="Iris value", update=CPVIAGenerator.iris_updater)),
+        ('int_flash_gobo_id_up', IntProperty(name="Gobo ID Up", default=1, min=0, max=20, description="Gobo selection", update=CPVIAGenerator.gobo_id_updater)),
+        ('float_flash_intensity_down', FloatProperty(name="Inensity Down", default=0, min=0, max=100, description="Intensity value", update=CPVIAGenerator.intensity_updater)),
         ('float_vec_flash_color_down', FloatVectorProperty(
-            name="",
+            name="Color Down",
             subtype='COLOR',
             size=3,
             default=(1.0, 1.0, 1.0),
@@ -230,12 +230,12 @@ class CommonProperties:
             description="Color value",
             update=CPVIAGenerator.color_updater
         )),
-        ('float_flash_pan_down', FloatProperty(default=0, min=-315, max=315, description="Pan value", update=CPVIAGenerator.pan_updater)),
-        ('float_flash_tilt_down', FloatProperty(default=0, min=-135, max=135, description="Tilt value", update=CPVIAGenerator.tilt_updater)),
-        ('float_flash_strobe_down', FloatProperty(default=0, min=0, max=100, description="Strobe value", update=CPVIAGenerator.strobe_updater)),
-        ('float_flash_zoom_down', FloatProperty(default=0, min=0, max=100, description="Zoom value", update=CPVIAGenerator.zoom_updater)),
-        ('float_flash_iris_down', FloatProperty(default=0, min=0, max=100, description="Iris value", update=CPVIAGenerator.iris_updater)),
-        ('int_flash_gobo_id_down', IntProperty(default=1, min=0, max=20, description="Gobo selection", update=CPVIAGenerator.gobo_id_updater))
+        ('float_flash_pan_down', FloatProperty(name="Pan Down", default=0, min=-315, max=315, description="Pan value", update=CPVIAGenerator.pan_updater)),
+        ('float_flash_tilt_down', FloatProperty(name="Tilt Down", default=0, min=-135, max=135, description="Tilt value", update=CPVIAGenerator.tilt_updater)),
+        ('float_flash_strobe_down', FloatProperty(name="Strobe Down", default=0, min=0, max=100, description="Strobe value", update=CPVIAGenerator.strobe_updater)),
+        ('float_flash_zoom_down', FloatProperty(name="Zoom Down", default=0, min=0, max=100, description="Zoom value", update=CPVIAGenerator.zoom_updater)),
+        ('float_flash_iris_down', FloatProperty(name="Iris Down", default=0, min=0, max=100, description="Iris value", update=CPVIAGenerator.iris_updater)),
+        ('int_flash_gobo_id_down', IntProperty(name="Gobo ID Down", default=1, min=0, max=20, description="Gobo selection", update=CPVIAGenerator.gobo_id_updater))
     ]  
 
     common_header = [
@@ -399,34 +399,42 @@ class CommonProperties:
         
     mins_maxes = [
         ('pan_min', IntProperty(
+            name="Pan Min", 
             default=-270, 
             description="Minimum value for pan"
         )),
         ('pan_max', IntProperty(
+            name="Pan Max", 
             default=270, 
             description="Maximum value for pan"
         )),
         ('tilt_min', IntProperty(
+            name="Tilt Min", 
             default=-135, 
             description="Minimum value for tilt"
         )),
         ('tilt_max', IntProperty(
+            name="Tilt Max", 
             default=135, 
             description="Maximum value for tilt"
         )),
         ('zoom_min', IntProperty(
+            name="Zoom Min", 
             default=1, 
             description="Minimum value for zoom"
         )),
         ('zoom_max', IntProperty(
+            name="Zoom Max", 
             default=100, 
             description="Maximum value for zoom"
         )),
         ('gobo_speed_min', IntProperty(
+            name="Gobo Rotation Speed Min", 
             default=-200, 
             description="Minimum value for speed"
         )),
         ('gobo_speed_max', IntProperty(
+            name="Gobo Rotation Speed Min", 
             default=200, 
             description="Maximum value for speed"
         ))
@@ -434,71 +442,116 @@ class CommonProperties:
         
     '''IMPORTANT: intensity_is_on MUST default to True for Event Manager to work.'''
     parameter_toggles = [
-        ('influence_is_on', BoolProperty(default=False, description="Influence is enabled when checked")),
-        ('audio_is_on', BoolProperty(default=False, description="Audio is enabled when checked")),
-        ('mic_is_linked', BoolProperty(default=False, description="Microphone volume is linked to Intensity when red")),
-        ('intensity_is_on', BoolProperty(default=True, description="Intensity is enabled when checked")),
-        ('pan_tilt_is_on', BoolProperty(default=False, description="Pan/Tilt is enabled when checked")), 
-        ('color_is_on', BoolProperty(default=False, description="Color is enabled when checked")),
-        ('diffusion_is_on', BoolProperty(default=False, description="Diffusion is enabled when checked")),
-        ('strobe_is_on', BoolProperty(default=False, description="Strobe is enabled when checked")),
-        ('zoom_is_on', BoolProperty(default=False, description="Zoom is enabled when checked")),
-        ('iris_is_on', BoolProperty(default=False, description="Iris is enabled when checked")),
-        ('edge_is_on', BoolProperty(default=False, description="Edge is enabled when checked")),
-        ('gobo_is_on', BoolProperty(default=False, description="Gobo ID is enabled when checked")),
-        ('prism_is_on', BoolProperty(default=False, description="Prism is enabled when checked")),
+        ('influence_is_on', BoolProperty(name="Influence Toggle", default=False, description="Influence is enabled when checked")),
+        ('audio_is_on', BoolProperty(name="Audio Toggle", default=False, description="Audio is enabled when checked")),
+        ('mic_is_linked', BoolProperty(name="Microphone Linking", default=False, description="Microphone volume is linked to Intensity when red")),
+        ('intensity_is_on', BoolProperty(name="Intensity Toggle", default=True, description="Intensity is enabled when checked")),
+        ('pan_tilt_is_on', BoolProperty(name="Pan/Tilt Toggle", default=False, description="Pan/Tilt is enabled when checked")), 
+        ('color_is_on', BoolProperty(name="Color Toggle", default=False, description="Color is enabled when checked")),
+        ('diffusion_is_on', BoolProperty(name="Diffusion Toggle", default=False, description="Diffusion is enabled when checked")),
+        ('strobe_is_on', BoolProperty(name="Strobe Toggle", default=False, description="Strobe is enabled when checked")),
+        ('zoom_is_on', BoolProperty(name="Zoom Toggle", default=False, description="Zoom is enabled when checked")),
+        ('iris_is_on', BoolProperty(name="Iris Toggle", default=False, description="Iris is enabled when checked")),
+        ('edge_is_on', BoolProperty(name="Edge Toggle", default=False, description="Edge is enabled when checked")),
+        ('gobo_is_on', BoolProperty(name="Gobo Toggle", default=False, description="Gobo ID is enabled when checked")),
+        ('prism_is_on', BoolProperty(name="Prism Toggle", default=False, description="Prism is enabled when checked")),
     ]
         
     special_arguments = [
         ('str_enable_strobe_argument', StringProperty(
-            default="# Strobe_Mode 127 Enter", description="Add # for group ID")),
+            name="Enable Strobe Argument", 
+            default="# Strobe_Mode 127 Enter", 
+            description="Add # for group ID")),
         
         ('str_disable_strobe_argument', StringProperty(
-            default="# Strobe_Mode 76 Enter", description="Add # for group ID")),
+            name="Disable Strobe Argument", 
+            default="# Strobe_Mode 76 Enter", 
+            description="Add # for group ID")),
         
         ('str_enable_gobo_speed_argument', StringProperty(
-            default="", description="Add # for group ID")),
+            name="Enable Gobo Rotation Argument", 
+            default="", 
+            description="Add # for group ID")),
             
         ('str_disable_gobo_speed_argument', StringProperty(
-            default="", description="Add # for group ID")),
+            name="Disable Gobo Rotation Argument", 
+            default="", 
+            description="Add # for group ID")),
             
         ('str_gobo_id_argument', StringProperty(
-            default="# Gobo_Select $ Enter", description="Add # for group ID and $ for value")),
+            name="Select Gobo Argument", 
+            default="# Gobo_Select $ Enter", 
+            description="Add # for group ID and $ for value")),
 
         ('str_enable_prism_argument', StringProperty(
-            default="# Beam_Fx_Select 02 Enter", description="Add # for group ID")),
+            name="Enable Prism Argument", 
+            default="# Beam_Fx_Select 02 Enter", 
+            description="Add # for group ID")),
             
         ('str_disable_prism_argument', StringProperty(
-            default="# Beam_Fx_Select 01 Enter", description="Add # for group ID")),
+            name="Disable Prism Argument", 
+            default="# Beam_Fx_Select 01 Enter", 
+            description="Add # for group ID")),
 
         ('str_gobo_speed_value_argument', StringProperty(
-            default="# Gobo_Index/Speed at $ Enter", description="Add $ for animation data and # for fixture/group ID"))
+            name="Gobo Speed Value Argument", 
+            default="# Gobo_Index/Speed at $ Enter", 
+            description="Add $ for animation data and # for fixture/group ID"))
     ]
 
     timecode_executors = [
         ('int_event_list', IntProperty(
-            name="Event List", min=0, max=9999, default=0, description="This should be the number of the event list you have created on the console for this song")),
+            name="Event List", 
+            min=0, 
+            max=9999, 
+            default=0, 
+            description="This should be the number of the event list you have created on the console for this song")),
         
         ('int_cue_list', IntProperty(
-            name="Cue List", min=0, max=999, default=0, description="This should be the number of the event list you have created on the console for this song")),
+            name="Cue List", 
+            min=0, max=999, 
+            default=0, 
+            description="This should be the number of the event list you have created on the console for this song")),
         
         ('str_start_cue', StringProperty(
-            name="Start Cue", default="1 / 1", update=SequencerUpdaters.timecode_clock_update_safety, description="Specifies which cue will start (or enable) the timecode clock. Can't be the same as first cue in Blender sequence or that will create loop")),
+            name="Start Cue", 
+            default="1 / 1", 
+            update=SequencerUpdaters.timecode_clock_update_safety, 
+            description="Specifies which cue will start (or enable) the timecode clock. Can't be the same as first cue in Blender sequence or that will create loop")),
         
         ('str_end_cue', StringProperty(
-            name="End Cue", default="1 / 2", update=SequencerUpdaters.timecode_clock_update_safety, description="Specifies which cue will stop (or disable) the timecode clock")),
+            name="End Cue", 
+            default="1 / 2", 
+            update=SequencerUpdaters.timecode_clock_update_safety, 
+            description="Specifies which cue will stop (or disable) the timecode clock")),
         
         ('int_start_macro', IntProperty(
-            name="Start Macro", min=0, max=99999, default=0, description="Universal macro used for various starting activities")),
+            name="Start Macro", 
+            min=0, 
+            max=99999, 
+            default=0, 
+            description="Universal macro used for various starting activities")),
         
         ('int_end_macro', IntProperty(
-            name="End Macro", min=0, max=99999, default=0, description="Universal macro used for various ending activities")),
+            name="End Macro", 
+            min=0, 
+            max=99999, 
+            default=0, 
+            description="Universal macro used for various ending activities")),
         
         ('int_start_preset', IntProperty(
-            name="Start Preset", default=0, min=0, max=9999, description="Universal preset used for various starting activities")),
+            name="Start Preset", 
+            default=0, 
+            min=0, 
+            max=9999, 
+            description="Universal preset used for various starting activities")),
         
         ('int_end_preset', IntProperty(
-            name="End Preset", default=0, min=0, max=9999, description="Universal preset used for various ending activities"))
+            name="End Preset", 
+            default=0, 
+            min=0, 
+            max=9999, 
+            description="Universal preset used for various ending activities"))
     ]
 
 

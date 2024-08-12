@@ -80,10 +80,8 @@ class ModalChannelControllerPanel(Operator):
             bpy.context.scene.scene_props.channel_controller_is_active = False
     
     def draw(self, context):
-        scene = bpy.context.scene.scene_props
         layout = self.layout
         active_object = context.active_object
-        sequencer = context.scene.sequence_editor
         
         if active_object.type == 'MESH':
             bpy.types.ALVA_CommonUI.draw_object_header(self, context)
@@ -99,7 +97,7 @@ class ModalChannelControllerPanel(Operator):
     
 class PatchGroupOperator(bpy.types.Operator):
     bl_idname = "array.patch_group_operator"
-    bl_label = "Patch Selected Lights as Group"
+    bl_label = "Patch Group"
     bl_description = "Patch group on console"
 
     def execute(self, context):
@@ -262,7 +260,7 @@ class PatchGroupOperator(bpy.types.Operator):
 
 class AddChannelToGroupOperator(bpy.types.Operator):
     bl_idname = "patch.add_channel"
-    bl_label = ""
+    bl_label = "Add Channels"
     bl_description = "Add channel to group"
     
     group_id: StringProperty() # type: ignore
@@ -275,7 +273,7 @@ class AddChannelToGroupOperator(bpy.types.Operator):
     
 class ApplyPatchToObjectsOperator(bpy.types.Operator):
     bl_idname = "patch.apply_patch_to_objects"
-    bl_label = ""
+    bl_label = "Apply Settings"
     bl_description = "Apply Patch to Objects"
     
     group_id: StringProperty()
@@ -460,7 +458,7 @@ class ColorFifteen(BaseColorOperator):
 
 class SendUSITTASCIITo3DOperator(bpy.types.Operator):
     bl_idname = "my.send_usitt_ascii_to_3d"
-    bl_label = ""
+    bl_label = "Import Patch"
     bl_description = "Automatically populate fixtures in Blender based on USITT ASCII export from the console"
     bl_options = {'REGISTER', 'UNDO'}
     
@@ -811,7 +809,7 @@ class SendUSITTASCIITo3DOperator(bpy.types.Operator):
     
 class SendUSITTASCIIToSequencer(bpy.types.Operator):
     bl_idname = "my.send_usitt_ascii_to_sequencer"
-    bl_label = ""
+    bl_label = "Not Enabled"
     bl_description = "Automatically populate strips in Sequencer based on USITT ASCII (event list data) export from the console"
     bl_options = {'REGISTER', 'UNDO'}
     
@@ -825,7 +823,7 @@ class SendUSITTASCIIToSequencer(bpy.types.Operator):
     
 class DemocraticOperator(bpy.types.Operator):
     bl_idname = "my.democratic_operator"
-    bl_label = ""
+    bl_label = "Democratic"
     bl_description = "This is a democracy. When different controllers try to change the same channel parameter, their Influence parameter gives them votes in a weighted average"
 
     def execute(self, context):
@@ -841,7 +839,7 @@ class DemocraticOperator(bpy.types.Operator):
     
 class NonDemocraticOperator(bpy.types.Operator):
     bl_idname = "my.non_democratic_operator"
-    bl_label = ""
+    bl_label = "Non-democratic"
     bl_description = "This isn't a democracy anymore. When different controllers try to change the same channel parameter, the strongest completely erases everyone else's opinion"
 
     def execute(self, context):
@@ -859,6 +857,7 @@ class NonDemocraticOperator(bpy.types.Operator):
     
         
 class AddCustomButton(bpy.types.Operator):
+    '''Add custom button'''
     bl_idname = "node.add_custom_button"
     bl_label = "Add Custom Button"
 
@@ -869,6 +868,7 @@ class AddCustomButton(bpy.types.Operator):
     
 
 class RemoveCustomButton(bpy.types.Operator):
+    '''Move the custom button's position in the stack vertically'''
     bl_idname = "node.remove_custom_button"
     bl_label = "Remove Custom Button"
 
@@ -885,6 +885,7 @@ class RemoveCustomButton(bpy.types.Operator):
     
     
 class BumpUpCustomButton(bpy.types.Operator):
+    '''Move the custom button's position in the stack vertically'''
     bl_idname = "node.bump_up_custom_button"
     bl_label = "Move Button Up"
 
@@ -919,6 +920,7 @@ class BumpDownCustomButton(bpy.types.Operator):
 
     
 class CustomButton(bpy.types.Operator):
+    '''Make a custom console button'''
     bl_idname = "node.custom_button"
     bl_label = "Custom Button"
 
@@ -1062,7 +1064,7 @@ def find_node_by_name(node_name):
     
 class FlashPresetSearchOperator(bpy.types.Operator):
     bl_idname = "node.flash_preset_search_operator"
-    bl_label = ""
+    bl_label = "Search"
     bl_description = "Search for unused preset. Warning: does not poll the console."
 
     node_name: StringProperty(default="")
@@ -1104,7 +1106,7 @@ class FlashPresetSearchOperator(bpy.types.Operator):
     
 class ToggleObjectMuteOperator(bpy.types.Operator):
     bl_idname = "object.toggle_object_mute_operator"
-    bl_label = ""
+    bl_label = "Mute OSC"
     bl_description = "Disable object's OSC output"
 
     def execute(self, context):
@@ -1116,7 +1118,7 @@ class ToggleObjectMuteOperator(bpy.types.Operator):
     
 class PullFixtureSelectionOperator(bpy.types.Operator):
     bl_idname = "object.pull_selection_operator"
-    bl_label = ""
+    bl_label = "Call Fixtures"
     bl_description = "Pull current selection"
 
     def execute(self, context):
@@ -1130,7 +1132,7 @@ class PullFixtureSelectionOperator(bpy.types.Operator):
 class AddLightingModifierOperator(bpy.types.Operator):
     bl_idname = "viewport.lighting_modifier_add"
     bl_label = "Add Lighting Modifier"
-    bl_description = "Control all fixtures at once using photo-editing principles"
+    bl_description = "Control all fixtures at once using photo-editing principles like layering"
     
     type: bpy.props.EnumProperty(
         name="Lighting Modifiers",
@@ -1154,6 +1156,7 @@ class AddLightingModifierOperator(bpy.types.Operator):
 
 
 class RemoveLightingModifierOperator(bpy.types.Operator):
+    '''Remove selected modifier'''
     bl_idname = "viewport.lighting_modifier_remove"
     bl_label = "Remove Lighting Modifier"
 
@@ -1169,6 +1172,7 @@ class RemoveLightingModifierOperator(bpy.types.Operator):
 
 
 class MoveLightingModifierOperator(bpy.types.Operator):
+    '''Bump modifiers position in the stack vertically'''
     bl_idname = "viewport.lighting_modifier_move"
     bl_label = "Move Lighting Modifier"
 

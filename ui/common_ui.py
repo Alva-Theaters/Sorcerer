@@ -655,41 +655,42 @@ class CommonUI:
     def draw_generate_fixtures(self, context):
         scene = context.scene
         layout = self.layout
-        active_object = context.active_object
-        modifiers = []
         
         box = layout.box()
         row = box.row()
-        row.label(text="Generate fixtures with console (USITT ASCII):")
+        row.label(text="Import USITT ASCII:")
         row = box.row(align=True)
         row.prop_search(context.scene.scene_props, "selected_text_block_name", bpy.data, "texts", text="")
         row.operator("my.send_usitt_ascii_to_3d", text="", icon='SHADERFX')
         box.separator()
 
         if scene.scene_props.console_type_enum == 'option_eos' and not scene.scene_props.school_mode_enabled:
+            threshold_width = 610
+            show_label = context.region.width <= threshold_width
+            
             box = layout.box()
             row = box.row()
-            row.label(text="Generate console fixtures with Blender:")
+            row.label(text="Patch console remotely:")
             row = box.row()
-            row.prop(scene.scene_props, "array_cone_enum", text="", icon='MESH_CONE')
-            row.prop(scene.scene_props, "array_modifier_enum", text="", icon='MOD_ARRAY')
+            row.prop(scene.scene_props, "array_cone_enum", text="", icon='MESH_CONE', icon_only=show_label)
+            row.prop(scene.scene_props, "array_modifier_enum", text="", icon='MOD_ARRAY', icon_only=show_label)
             if scene.scene_props.array_curve_enum !="":
-                row.prop(scene.scene_props, "array_curve_enum", text="", icon='CURVE_BEZCURVE')
+                row.prop(scene.scene_props, "array_curve_enum", text="", icon='CURVE_BEZCURVE', icon_only=show_label)
                 row = box.row()
                 
             layout.separator()
 
             split = box.split(factor=.4)
             col = split.column()
-            col.label(text="Group #:", icon='STICKY_UVS_LOC')
-            col.label(text="Start Chan #:", icon='OUTLINER_OB_LIGHT')
-            col.label(text="Group Label:", icon='INFO')
+            col.label(text="Group #:" if not show_label else "Group:", icon='STICKY_UVS_LOC')
+            col.label(text="Start Chan #:" if not show_label else "Chan:", icon='OUTLINER_OB_LIGHT')
+            col.label(text="Group Label:" if not show_label else "Label:", icon='INFO')
             col.separator()
             col.label(text="Maker:")
             col.label(text="Type:")
             col.label(text="Universe #:")
-            col.label(text="Start Addr. #:")
-            col.label(text="Channel Mode:")
+            col.label(text="Start Addr. #:" if not show_label else "Addr.:")
+            col.label(text="Channel Mode:" if not show_label else "Chan Mode:")
             
             col2 = split.column()
             col2.prop(scene.scene_props, "int_array_group_index", text="")

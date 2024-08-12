@@ -68,7 +68,7 @@ class View3DUI:
             CommonUI.draw_text_or_group_input(self, context, row, active_object, object=True)
 
             row = box.row(align=True)
-            row.prop(active_object, "str_call_fixtures_command", text="Call Fixtures")
+            row.prop(active_object, "str_call_fixtures_command", text="Call")
             row.operator("viewport.call_fixtures_operator", text = "", icon='LOOP_BACK')
             if active_object.audio_is_on:
                 row = box.row()

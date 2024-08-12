@@ -184,32 +184,27 @@ class SceneProperties(PropertyGroup):
     ) # type: ignore # type: ignore
     array_cone_enum: EnumProperty(
         name="Cones",
-        description="You're supposed to make a bunch of cones in 3D View using an Array modifier to represent the group of lights to be patched so that Sorcerer can patch Augment 3D for you",
+        description="You're supposed to make a bunch of cones in 3D View using an Array modifier to represent the group of lights to be patched so that Orb can patch Augment 3D for you",
         items=AlvaItems.get_cone_items,
         update=CommonUpdaters.cone_enum_updater,
         default=0
     ) # type: ignore # type: ignore
 
-    '''TWO LONE STRINGS'''
-    str_group_label_to_add: StringProperty(default="") # type: ignore
-    int_group_number_to_add: IntProperty(default=1, min=1, max=9999, description="Index of group as on console") # type: ignore
-    str_group_channels_to_add: StringProperty(default="") # type: ignore
-    
     int_array_quantity: IntProperty(default=1, min=1, max=999, description="How many lights to add", update=CommonUpdaters.update_light_array) # type: ignore
     float_offset_x: FloatProperty(default=1, min=0, max=100, unit = 'LENGTH', update=CommonUpdaters.update_light_positions) # type: ignore
     float_offset_y: FloatProperty(default=0, min=0, max=100, unit = 'LENGTH', update=CommonUpdaters.update_light_positions) # type: ignore
     float_offset_z: FloatProperty(default=0, min=-1000, max=100, unit = 'LENGTH', update=CommonUpdaters.update_light_positions) # type: ignore
 
-    str_array_group_name: StringProperty(default="", description="Group label on console") # type: ignore
-    str_array_group_maker: StringProperty(default="", description="Fixture manufacturer on console") # type: ignore # type: ignore
-    str_array_group_type: StringProperty(default="", description="Fixture type on console") # type: ignore
+    str_array_group_name: StringProperty(name="Group Name", default="", description="Group label on console") # type: ignore
+    str_array_group_maker: StringProperty(name="Group Maker/Maufacturer", default="", description="Fixture manufacturer on console") # type: ignore # type: ignore
+    str_array_group_type: StringProperty(name="Fixture Type", default="", description="Fixture type on console") # type: ignore
     
-    int_array_group_index: IntProperty(default=1, max=9999, description="Group number on console") # type: ignore
-    int_array_start_channel: IntProperty(default=1, max=9999, description="Channel number to start at on console") # type: ignore
+    int_array_group_index: IntProperty(name="Group #", default=1, max=9999, description="Group number on console") # type: ignore
+    int_array_start_channel: IntProperty(name="Start Channel #", default=1, max=9999, description="Channel number to start at on console") # type: ignore
     
-    int_array_universe: IntProperty(default=1, max=9999, description="Universe to start patching to on console") # type: ignore # type: ignore
-    int_array_start_address: IntProperty(default=1, max=9999, description="Address to start patching to on console") # type: ignore
-    int_array_channel_mode: IntProperty(default=1, max=9999, description="How many channels each fixture needs on console") # type: ignore
+    int_array_universe: IntProperty(name="Universe #", default=1, max=9999, description="Universe to start patching to on console") # type: ignore # type: ignore
+    int_array_start_address: IntProperty(name="Start Address #", default=1, max=9999, description="Address to start patching to on console") # type: ignore
+    int_array_channel_mode: IntProperty(name="Channel Mode", default=1, max=9999, description="How many channels each fixture needs on console") # type: ignore
 
     bool_eos_console_mode: BoolProperty(default=False, description="I am using an ETC Eos lighting console") # type: ignore
 
