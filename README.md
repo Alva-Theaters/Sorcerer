@@ -26,7 +26,7 @@ Imagine the software they use to make 3D animated movies like Tangled, Kung Fu P
 
 **"Organic Artistic Flow" vs "Geeky Techno Syntax":**
 ------------------------------------------------------------------------------------
-Alva Sorcerer wants to make light design (and other types of technical theater) super fun, super exciting, super intutive, and super artsy. We can't do that with controllers that use geeky techno syntax. We need way more intuitive controls. Sorcerer's design methodology is "organic artistic flow" because the software needs to feel like playing a piano or scultping a scultpure. It needs to feel artsy. It needs to feel organic. It needs to feel like an extension of the artist's emotion. 
+Alva Sorcerer wants to make light design (and other types of technical theater) super fun, super exciting, super intutive, and super artsy. We can't do that with controllers that use geeky techno syntax. We need way more intuitive controls. Sorcerer's design methodology is "organic artistic flow" because the software needs to feel like playing a piano or scultping a scultpure. It needs to feel artsy. It needs to feel organic. It needs to feel like an extension of the artist's emotion. And we need to do this while actually increasing precision, which is the hard part.
 
 In practice, this means giving you an extremely robust graph editor, automating as many repetitive tasks as possible, allowing you to audition variations of effects extremely quickly with no effort, and letting you control lights in ways no one else can. Put simply, every part of the software is dumb, it's just a matter of how dumb. And all the parts of the software will continue to evaluate to Dumb until DDC reaches 0.0.
 
