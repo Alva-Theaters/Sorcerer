@@ -10,6 +10,12 @@ Alva Sorcerer is a heavyweight Blender addon that uses OSC to remote-control ETC
 
 Imagine the software they use to make 3D animated movies like Tangled, Kung Fu Panda, Frozen, movies like that. Sorcerer lets you use that kind of software to control the lighting, video, and audio at a theater. That's why it's called 3D animation in real life, for theatre, with Blender. Basically, in one software only, you have god-like control over everything in the theater at all times in the most intuitive way possible. There's no geeky techno syntax, it's just organic artistic flow. In fact, the term "pro\*\*\*mming" is banned at Alva Theaters, except in the context of an actual programming language (like Python or C). You don't "pro\*\*\*m" lights, you "design" lights.
 
+
+**Even More Simply:**
+-------------------------------------------
+The quickest way to use Sorcerer is when you're trying to make lights dance to music, but you have to use an ETC Eos theatrical lighting console to do it since that's the console your theater has. Sorcerer makes that stupidly easy, so easy that it's extremely unfair to everyone else. It's so easy to sync the lights to the music with Sorcerer/Eos that you could teach a 3rd grader to do it.
+
+
 **Entry-level Features:**
 ---------------------------------------
 
