@@ -118,22 +118,10 @@ class CPVIAFinders:
             
     def find_channel_number(self, parent):
         """This is where we try to find the channel number of the object."""
-        if not bpy.context.scene.scene_props.use_name_for_id:
-            if parent.int_object_channel_index != 0:
-                return parent.int_object_channel_index
-            else:
-                try:
-                    return CPVIAFinders._find_int(parent.name)
-                except:
-                    SLI.SLI_assert_unreachable()
-        else:
-            try:
-                return CPVIAFinders._find_int(parent.name)
-
-            except:
-                if parent.int_object_channel_index != 0:
-                    return parent.int_object_channel_index
-                else: return NUMBER_TO_ADD_IF_NULL
+        try:
+            return parent.list_group_channels[0].chan
+        except:
+            return NUMBER_TO_ADD_IF_NULL
 
 
     def _find_int(string):        

@@ -33,19 +33,15 @@ from bpy.props import *
 
 from ..utils.utils import Utils
 from ..utils.osc import OSC
-from ..assets.sli import SLI
 
 
 class CommonUpdaters:
-    @staticmethod              
+    @staticmethod
     def controller_ids_updater(self, context):
-        """This creates property group instances based on the manual 
+        """This creates property group instances based on the manual
            text input or group_profile_enum for list_group_channels"""
-        if self.str_manual_fixture_selection != "" or self.selected_group_enum == "Dynamic":
-            if self.selected_group_enum == "Dynamic":
-                self.is_group_not_manual = False
-            else:
-                self.is_group_not_manual = True
+        if self.str_manual_fixture_selection != "":
+            self.is_group_not_manual = True
 
             channels_list = Utils.parse_channels(self.str_manual_fixture_selection)
 
@@ -56,16 +52,19 @@ class CommonUpdaters:
             elif num_channels == 1:
                 new_type = "Fixture"
             elif num_channels == 0:
-                new_type = "Influencer"
+                new_type = "Influencer" # If the input text was unintelligible
 
         else:
             self.is_group_not_manual = False
-            item = [item for item in context.scene.scene_group_data if item.name == self.selected_group_enum]
-            if item is not None:
-                print(f"Item is: {item} and its length is {str(len(item))}")
-                channels_list = [chan.chan for chan in item[0].channels_list]
+            if self.selected_group_enum != "Dynamic":
+                item = [item for item in context.scene.scene_group_data if item.name == self.selected_group_enum]
+                if item is not None:
+                    channels_list = [chan.chan for chan in item[0].channels_list]
 
                 new_type = "Stage Object"
+            else:
+                channels_list = []
+                new_type = "Influencer"
 
         if new_type == "Influencer":
             if not self.float_object_strength == 1:

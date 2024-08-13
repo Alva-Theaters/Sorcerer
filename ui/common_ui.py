@@ -410,9 +410,6 @@ class CommonUI:
         else:
             object_type = getattr(active_object, "object_identities_enum")
         
-        if object_type in ["Fixture", "Pan/Tilt Fixture"]:
-            row.prop(active_object, "fixture_index_is_locked", emboss = False, icon='LOCKED' if active_object.fixture_index_is_locked else 'UNLOCKED', text="")
-        
         if object_type == "Stage Object":
             if active_object.audio_is_on:
                 row.prop(active_object, "audio_is_on", text="", icon='SOUND', emboss=False)

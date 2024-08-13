@@ -123,8 +123,6 @@ class NodeUI:
         row.prop(active_node, "parameters_enum", text="")
         if active_node.parameters_enum == 'option_color':
             row.prop(active_node, "color_profile_enum", text="")
-  
-        row.prop(active_node, "collapse_most", text="Collapse most")
     
     @staticmethod
     def draw_node_formatter_footer(self, context, active_node):
@@ -236,7 +234,7 @@ class NodeUI:
             layout.separator() 
             
     @staticmethod        
-    def draw_node_formatter(self, context):
+    def draw_node_formatter(self, context): ## All this needs to be redone.
         layout = self.layout
         scene = context.scene
         column = layout.column(align=True)
@@ -245,7 +243,7 @@ class NodeUI:
         active_node = None 
         active_node = context.space_data.edit_tree.nodes.active
 
-        if active_node and (active_node.bl_idname == "group_controller_type" or active_node.bl_idname == "group_driver_type" or active_node.bl_idname == "master_type"):
+        if active_node and (active_node.bl_idname == "group_controller_type"):
             row.prop(active_node, "strobe_is_on", text="Strobe", slider=True)
             row.prop(active_node, "color_is_on", text="Color", slider=True)
             
@@ -271,23 +269,13 @@ class NodeUI:
                 
                 column.separator()
                 
-        elif active_node and active_node.bl_idname == "mixer_type" or active_node.bl_idname == "mixer_driver_type":
+        elif active_node and active_node.bl_idname == "mixer_type":
             row = layout.row(align=True)
             row.prop(active_node, "selected_group_enum", text="")
             row = layout.row(align=True)
             row.prop(active_node, "parameters_enum", text="")
             if active_node.parameters_enum == 'option_color':
                 row.prop(active_node, "color_profile_enum", text="")
-  
-#            if active_node.parameters_enum != None:
-#                row = layout.row()
-#                row.prop(active_node, "show_middle", text="Show Middle", slider=True)
-#                
-#                if not active_node.show_middle:
-#                    row.prop(active_node, "every_other", text="Every Other", slider=True)
-                    
-            row = layout.row()
-            row.prop(active_node, "collapse_most", text="Collapse most")
             
         row = layout.row()
         row.prop(active_node, "label", text="Label")

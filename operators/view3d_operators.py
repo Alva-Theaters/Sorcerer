@@ -284,17 +284,14 @@ class ApplyPatchToObjectsOperator(bpy.types.Operator):
             self.report({'ERROR'}, "Group not found")
             return {'CANCELLED'}
         
-        channels = [chan.chan for chan in item.channels_list]
+        channels = [chan.chan for chan in item.list_group_channels]
         
         for obj in bpy.data.objects:
-            if obj.int_object_channel_index in channels:
-                apply_patch(item, obj)
-                
             try:
-                number = int(obj.name)
-                if number in channels:
-                    apply_patch(item, obj)
-                    pass
+                if obj.object_identities_enum == "Fixture":
+                    if obj.list_group_channels[0].chan in channels:
+                        apply_patch(item, obj)
+                
             except: pass
           
         return {'FINISHED'}

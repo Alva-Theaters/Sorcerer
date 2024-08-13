@@ -133,7 +133,7 @@ class CommonProperties:
         ('str_group_id',  StringProperty(default="1")),
         ('list_group_channels', CollectionProperty(type=ChannelsListSubClass)),
         ('str_group_label', StringProperty(default="")),
-        ('is_group_not_manual', BoolProperty(default=False, description="Stores the decision to use manual input or group enum")),
+        ('is_group_not_manual', BoolProperty(default=True, description="Stores the decision to use manual input or group enum")),
         ('node_tree_pointer', PointerProperty(
             name="Node Tree Pointer",
             type=bpy.types.NodeTree,
@@ -151,16 +151,13 @@ class CommonProperties:
             default=2
         )),
         ('str_call_fixtures_command', StringProperty(
-            name="Call Fixtures Command",
+            name="Summon Movers Command",
             description="Command line text to focus moving fixtures onto stage object",
             update=CommonUpdaters.call_fixtures_updater
         )),
-        ('int_object_channel_index', IntProperty(name="Channel Index", default=1, description="Manual value for channel index, as on the console")),
         ('is_erasing', BoolProperty(name="Eraser", description="Erase instead of add")),
         ('influencer_list', CollectionProperty(type=InfluencerListSubClass)),
         ('float_object_strength', FloatProperty(name="Strength", default=1, min=0, max=1, description="If you diminish the strength, it will act like a brush. If you keep this up all the way, it will act more like an object passing through the lights that resets them as it leaves", update=CommonUpdaters.controller_ids_updater)),
-        ('int_fixture_index', IntProperty(default=0)),
-        ('fixture_index_is_locked', BoolProperty(default=True)),
         
         # Pan/Tilt node properties. Registered on object for patch reasons.
         ('float_vec_pan_tilt_graph', FloatVectorProperty(
@@ -247,7 +244,7 @@ class CommonProperties:
         )),
         ('selected_group_enum', EnumProperty(
             name="Selected Group",
-            description="Choose a group to control. Create these groups with the Patch function on the N tab in node editor, with USITT ASCII import in the same area, or create/modify them in Properties -> World -> SORCERER: Group Channel Blocks (full screen)",
+            description="Choose a fixtures to control. Use either the static Lighting Groups or the mesh's location relative to other meshes for a dynamic spatial selection instead (Dynamic)",
             items=AlvaItems.scene_groups,
             update=CommonUpdaters.controller_ids_updater
         )),

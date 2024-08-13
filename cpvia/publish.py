@@ -155,16 +155,7 @@ class Publisher:
             
     def find_objects(self, chan):
         relevant_objects = []
-        for obj in bpy.data.objects:
-            if obj.int_object_channel_index == chan and chan != 1:
-                relevant_objects.append(obj)
-                pass
-            try:
-                number = CPVIAFinders._find_int(obj.name)
-                if number == int(chan):
-                    relevant_objects.append(obj)
-            except:
-                pass
+        ## DELETE THIS CODE AND REPLACE WITH STUFF INSIDE OTHER SCRIPT
         return relevant_objects
             
             

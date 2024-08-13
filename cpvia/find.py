@@ -77,19 +77,10 @@ class Find:
             desired_property: The value of the requested property, aka the patch info
         """
         if type not in ["Fixture", "Pan/Tilt Fixture"]:
-            second_options = []
             for obj in bpy.data.objects:
-                if obj.int_object_channel_index == str(chan):
+                if obj.object_identities_enum == "Fixture" and obj.list_group_channels[0].chan == chan:
                     return getattr(obj, desired_property)
-                else:
-                    try:
-                        option = int(obj.name)
-                        if option == chan:
-                            second_options.append(obj)
-                    except: pass
-            if len(second_options) > 0:
-                return getattr(second_options[0], desired_property)
-
+                
         return getattr(parent, desired_property)
 
 
