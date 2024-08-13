@@ -147,7 +147,8 @@ class CommonProperties:
         ('object_identities_enum', EnumProperty(
             name="Mesh Identity",
             description="In Sorcerer, meshes can represent and control individual lighting fixtures, microphones, stage objects, brushes, and 3D bitmapping objects. Select what you want your mesh to do here",
-            items=AlvaItems.object_identities
+            items=AlvaItems.object_identities,
+            default=2
         )),
         ('str_call_fixtures_command', StringProperty(
             name="Call Fixtures Command",
@@ -157,7 +158,7 @@ class CommonProperties:
         ('int_object_channel_index', IntProperty(name="Channel Index", default=1, description="Manual value for channel index, as on the console")),
         ('is_erasing', BoolProperty(name="Eraser", description="Erase instead of add")),
         ('influencer_list', CollectionProperty(type=InfluencerListSubClass)),
-        ('float_object_strength', FloatProperty(name="Strength", default=1, min=0, max=1, description="Make this brush less powerful so it is easier to make more refined changes")),
+        ('float_object_strength', FloatProperty(name="Strength", default=1, min=0, max=1, description="If you diminish the strength, it will act like a brush. If you keep this up all the way, it will act more like an object passing through the lights that resets them as it leaves", update=CommonUpdaters.controller_ids_updater)),
         ('int_fixture_index', IntProperty(default=0)),
         ('fixture_index_is_locked', BoolProperty(default=True)),
         

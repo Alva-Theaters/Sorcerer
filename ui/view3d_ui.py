@@ -34,18 +34,22 @@ from ..ui.common_ui import CommonUI
 
 class View3DUI:
     def draw_speaker(self, context, active_object):
+        ao = active_object
         layout = self.layout
         box = layout.box()
         row = box.row()
-        if active_object.mixer_type_enum == 'option_qlab':
+        if ao.mixer_type_enum == 'option_qlab':
             row.label(text="Qlab Output:", icon='PLAY_SOUND')
-            row.prop(active_object, "int_speaker_number", text="crosspoint:")
-        elif active_object.mixer_type_enum == 'option_m32':
+            row.prop(ao, "int_speaker_number", text="crosspoint:")
+        elif ao.mixer_type_enum == 'option_m32':
             row.label(text="M32/X32:", icon='PLAY_SOUND')
-            row.prop(active_object, "int_speaker_number", text="Bus:")
+            row.prop(ao, "int_speaker_number", text="Bus:")
         
     @staticmethod
     def draw_object_header(self, context, scene, active_object, node_layout=None):
+        ao = active_object
+        identity = ao.object_identities_enum
+        
         if hasattr(self, "layout"):
             column = self.layout.column(align=True)
         else:
@@ -53,40 +57,33 @@ class View3DUI:
 
         box = column.box()
         row = box.row(align=True)
-        row.prop(active_object, "selected_profile_enum", icon_only=True, icon='SHADERFX')
-        row.prop(active_object, "object_identities_enum", icon_only=True, expand = True)
-        row.label(text="  " + active_object.object_identities_enum)
+        row.prop(ao, "selected_profile_enum", icon_only=True, icon='SHADERFX')
+        CommonUI.draw_text_or_group_input(self, context, row, ao, object=True)
 
-        if active_object.object_identities_enum in ["Fixture", "Pan/Tilt Fixture"]:
+        if identity == "Stage Object":
             row = box.row(align=True)
-            row.enabled = not active_object.fixture_index_is_locked
-            row.prop(active_object, "fixture_index_is_locked", emboss = True, icon='LOCKED' if active_object.fixture_index_is_locked else 'UNLOCKED', text="")
-            row.prop(active_object, "int_object_channel_index", text="Fixture ID:")
-
-        if active_object.object_identities_enum == "Stage Object":
-            row = box.row(align=True)
-            CommonUI.draw_text_or_group_input(self, context, row, active_object, object=True)
-
-            row = box.row(align=True)
-            row.prop(active_object, "str_call_fixtures_command", text="Call")
+            row.prop(ao, "str_call_fixtures_command", text="Summon")
             row.operator("viewport.call_fixtures_operator", text = "", icon='LOOP_BACK')
-            if active_object.audio_is_on:
+            if ao.audio_is_on:
                 row = box.row()
-                row.prop(active_object, "sound_source_enum", text="", icon='SOUND')
+                row.prop(ao, "sound_source_enum", text="", icon='SOUND')
             
-        if active_object.object_identities_enum == "Brush":
+        if identity in ["Brush", "Influencer"]:
             row = box.row(align=True)
-            row.prop(active_object, "float_object_strength", slider = True, text = "Strength:")
-            row.prop(active_object, "is_erasing", icon='GPBRUSH_ERASE_STROKE', text="Erase")
-        
-        if not active_object.influence_is_on and active_object.object_identities_enum != "Brush": ## temporary "not"
+            row.prop(ao, "float_object_strength", slider = True, text = "Strength:")
+            if identity == "Brush":
+                row.prop(ao, "is_erasing", icon='GPBRUSH_ERASE_STROKE', text="Erase")
+
+        if scene.is_democratic and identity != "Brush":
             box = column.box()
             row = box.row()
-            row.prop(active_object, "influence", slider=False, text="Influence:")
+            row.prop(ao, "influence", slider=False, text="Influence:")
+
+        box = column.box()
             
         return box, column
-    
-    
+
+
     @staticmethod
     def draw_lighting_modifiers(self, context):
         scene = bpy.context.scene

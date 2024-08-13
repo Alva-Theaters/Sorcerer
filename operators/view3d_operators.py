@@ -1118,8 +1118,8 @@ class ToggleObjectMuteOperator(bpy.types.Operator):
     
 class PullFixtureSelectionOperator(bpy.types.Operator):
     bl_idname = "object.pull_selection_operator"
-    bl_label = "Call Fixtures"
-    bl_description = "Pull current selection"
+    bl_label = "Pull Fixtures"
+    bl_description = "Pull current selection from 3D view"
 
     def execute(self, context):
         channels = [str(obj.int_fixture_index) for obj in context.selected_objects]
@@ -1199,7 +1199,7 @@ class MoveLightingModifierOperator(bpy.types.Operator):
     
 class CallFixturesOperator(bpy.types.Operator):
     bl_idname = "viewport.call_fixtures_operator"
-    bl_label = "Call Fixtures"
+    bl_label = "Summon Movers"
     bl_description = "You're supposed to type in a command line command in the space to the left and then fire that command by pressing this button. Use this feature to call any relevant moving lights to focus on this set piece"
 
     def execute(self, context):

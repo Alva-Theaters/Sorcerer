@@ -274,7 +274,7 @@ class CommonUI:
         op_update.node_tree_name = node_tree_name
         
         # INTENSITY
-        row.prop(active_object, "float_intensity", slider=True, text="Intensity:")
+        row.prop(active_object, "float_intensity", slider=True, text="Intensity")
         
         # STROBE
         if active_object.strobe_is_on:
@@ -307,7 +307,7 @@ class CommonUI:
                 row.alert = active_object.mic_is_linked
                 row.prop(active_object, "mic_is_linked", text="", icon='LINKED' if active_object.mic_is_linked else 'UNLINKED')
                 row.alert = False
-                row.prop(active_object, "float_volume", text = "Volume:", slider=True)
+                row.prop(active_object, "float_volume", text = "Volume", slider=True)
     
         # PAN/TILT    
         if active_object.pan_tilt_is_on and object_type not in ["Stage Object", "Influencer", "Brush"]:
@@ -329,9 +329,9 @@ class CommonUI:
             op.node_tree_name = node_tree_name
             
             if active_object.zoom_is_on:
-                row.prop(active_object, "float_zoom", slider=True, text="Zoom:")
+                row.prop(active_object, "float_zoom", slider=True, text="Zoom")
             if active_object.iris_is_on:
-                row.prop(active_object, "float_iris", slider=True, text="Iris:")
+                row.prop(active_object, "float_iris", slider=True, text="Iris")
         
         # EDGE/DIFFUSION
         if active_object.edge_is_on or active_object.diffusion_is_on:
@@ -342,9 +342,9 @@ class CommonUI:
             op.node_tree_name = node_tree_name
             
             if active_object.edge_is_on:
-                row.prop(active_object, "float_edge", slider=True, text="Edge:")
+                row.prop(active_object, "float_edge", slider=True, text="Edge")
             if active_object.diffusion_is_on:
-                row.prop(active_object, "float_diffusion", slider=True, text="Diffusion:")
+                row.prop(active_object, "float_diffusion", slider=True, text="Diffusion")
         
         # GOBO
         if active_object.gobo_is_on:
@@ -354,9 +354,9 @@ class CommonUI:
             op.node_name = node_name
             op.node_tree_name = node_tree_name
             
-            row.prop(active_object, "int_gobo_id", text="Gobo:")
-            row.prop(active_object, "float_gobo_speed", slider=True, text="Speed:")
-            row.prop(active_object, "int_prism", slider=True, text="Prism:")
+            row.prop(active_object, "int_gobo_id", text="Gobo")
+            row.prop(active_object, "float_gobo_speed", slider=True, text="Speed")
+            row.prop(active_object, "int_prism", slider=True, text="Prism")
     
     @staticmethod                      
     def draw_volume_monitor(self, context, sequence_editor):
@@ -551,7 +551,7 @@ class CommonUI:
             col.separator()
             box = col.box()
             row = box.row()
-            row.label(text="Shutter Strobe:", icon='OUTLINER_DATA_LIGHTPROBE')
+            row.label(text="Shutter Strobe", icon='OUTLINER_DATA_LIGHTPROBE')
             box = col.box()
             row = box.row()
             row.label(text="Strobe Enable Argument:")
@@ -564,7 +564,7 @@ class CommonUI:
             col.separator()
             box = col.box()
             row = box.row()
-            row.label(text="Color:", icon='COLOR')
+            row.label(text="Color", icon='COLOR')
             box = col.box()
             row = box.row()
             row.label(text="Color Profile:")
@@ -574,7 +574,7 @@ class CommonUI:
             col.separator()
             box = col.box()
             row = box.row()
-            row.label(text="Pan/Tilt:", icon='ORIENTATION_GIMBAL')
+            row.label(text="Pan/Tilt", icon='ORIENTATION_GIMBAL')
             box = col.box()
             row = box.row()
             row.prop(item, "pan_min", text="Pan Min:")
@@ -587,7 +587,7 @@ class CommonUI:
             col.separator()
             box = col.box()
             row = box.row()
-            row.label(text="Zoom:", icon='LINCURVE')
+            row.label(text="Zoom", icon='LINCURVE')
             box = col.box()
             row = box.row()
             row.prop(item, "zoom_min", text="Zoom Min:")
@@ -597,7 +597,7 @@ class CommonUI:
             col.separator()
             box = col.box()
             row = box.row()
-            row.label(text="Gobo:", icon='POINTCLOUD_DATA')
+            row.label(text="Gobo", icon='POINTCLOUD_DATA')
             box = col.box()
             row = box.row()
             split = box.split(factor=.5)

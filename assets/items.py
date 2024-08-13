@@ -192,6 +192,8 @@ class Items:
     def scene_groups(self, context):
         items = []
 
+        items.append(("Dynamic", "Dynamic", "Use the object's location with respect to others to change its targets", 'VIEW3D', 0))
+
         if context.scene.scene_group_data:
             for group in context.scene.scene_group_data:
                 items.append((group.name, group.name, ""))
