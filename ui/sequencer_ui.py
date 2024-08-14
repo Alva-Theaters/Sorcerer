@@ -37,11 +37,22 @@ import os
 preview_collections = {}
 pcoll = bpy.utils.previews.new()
 preview_collections["main"] = pcoll
+
 addon_dir = os.path.dirname(__file__)
 pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
 
-pcoll = preview_collections["main"]
-orb = pcoll["orb"]
+icons_dir = os.path.join(addon_dir, "icons")
+pcoll.load("preset_one", os.path.join(icons_dir, "preset_one.png"), 'IMAGE')
+pcoll.load("preset_two", os.path.join(icons_dir, "preset_two.png"), 'IMAGE')
+pcoll.load("preset_three", os.path.join(icons_dir, "preset_three.png"), 'IMAGE')
+pcoll.load("preset_four", os.path.join(icons_dir, "preset_four.png"), 'IMAGE')
+
+pcoll.load("effect_one", os.path.join(icons_dir, "effect_one.png"), 'IMAGE')
+pcoll.load("effect_two", os.path.join(icons_dir, "effect_two.png"), 'IMAGE')
+pcoll.load("effect_three", os.path.join(icons_dir, "effect_three.png"), 'IMAGE')
+pcoll.load("effect_four", os.path.join(icons_dir, "effect_four.png"), 'IMAGE')
+pcoll.load("effect_five", os.path.join(icons_dir, "effect_five.png"), 'IMAGE')
+pcoll.load("effect_six", os.path.join(icons_dir, "effect_six.png"), 'IMAGE')
 
 
 class SequencerUI:
@@ -198,6 +209,9 @@ class SequencerUI:
 
     @staticmethod    
     def draw_only_sound(self, context, column, active_strip):
+        pcoll = preview_collections["main"]
+        orb = pcoll["orb"]
+
         row = column.row(align=True)
         row.operator("my.mute_button", icon='HIDE_OFF' if not active_strip.mute else 'HIDE_ON')
         row.prop(active_strip, "name", text="")
@@ -265,6 +279,9 @@ class SequencerUI:
 
     @staticmethod    
     def draw_strip_macro(self, context, column, box, active_strip):
+        pcoll = preview_collections["main"]
+        orb = pcoll["orb"]
+
         row = box.row()
         row.label(text='* = "Sneak Time " + [Strip length]')
         row = box.row(align=True)
@@ -279,6 +296,9 @@ class SequencerUI:
 
     @staticmethod    
     def draw_strip_cue(self, context, column, box, active_strip):
+        pcoll = preview_collections["main"]
+        orb = pcoll["orb"]
+
         row = box.row(align=True)  
         row.prop(active_strip, "eos_cue_number", text="Cue #")
         row.operator("my.go_to_cue_out_operator", text="", icon='GHOST_ENABLED')
@@ -288,12 +308,21 @@ class SequencerUI:
         row.operator("my.sync_cue", icon_value=orb.icon_id)
         box.separator()
         row = box.row(align=True)
-        row.prop(active_strip, "background_color", text="")
-        row.prop(active_strip, "accent_color", text="")
+        row.scale_x = .6
+        row.prop(active_strip, "sixty_color", text="")
+        row.scale_x = .4
+        row.prop(active_strip, "thirty_color", text="")
+        row.scale_x = .21
+        row.prop(active_strip, "ten_color", text="")
         
 
     def draw_builder_row(box, ops_list, id, active_strip, label, alert_flag, is_color=True, record_prop_name=""):
-        event_icons = ['EVENT_F1', 'EVENT_F2', 'EVENT_F3', 'EVENT_F4']
+        pcoll = preview_collections["main"]
+        preset_one = pcoll["preset_one"]
+        preset_two = pcoll["preset_two"]
+        preset_three = pcoll["preset_three"]
+        preset_four = pcoll["preset_four"]
+        event_icons = [preset_one.icon_id, preset_two.icon_id, preset_three.icon_id, preset_four.icon_id]
         color_icons = ['COLORSET_01_VEC', 'COLORSET_02_VEC', 'COLORSET_03_VEC', 'COLORSET_04_VEC', 
                     'COLORSET_05_VEC', 'COLORSET_06_VEC', 'COLORSET_07_VEC', 'COLORSET_08_VEC']
         row = box.row(align=True)
@@ -302,13 +331,24 @@ class SequencerUI:
         row.alert = alert_flag
         row_icons = color_icons if is_color else event_icons
         for op, icon in zip(ops_list, row_icons):
-            row.operator(op, text="", icon=icon)
+            if is_color:
+                row.operator(op, text="", icon=icon)
+            else:
+                row.operator(op, text="", icon_value=icon)
         
         row.prop(active_strip, record_prop_name, text="", icon='REC')
 
 
     @staticmethod    
     def draw_cue_builder(self, context, box, scene, active_strip):
+        pcoll = preview_collections["main"]
+        effect_one = pcoll["effect_one"]
+        effect_two = pcoll["effect_two"]
+        effect_three = pcoll["effect_three"]
+        effect_four = pcoll["effect_four"]
+        effect_five = pcoll["effect_five"]
+        effect_six = pcoll["effect_six"]
+
         key_ops = ["my.focus_one", "my.focus_two", "my.focus_three", "my.focus_four"]
 
         rim_ops = ["my.focus_rim_one", "my.focus_rim_two", "my.focus_rim_three", "my.focus_rim_four"]
@@ -331,11 +371,14 @@ class SequencerUI:
 
         fx_ops = ["my.focus_energy_one", "my.focus_energy_two", "my.focus_energy_three", "my.focus_energy_four", "my.focus_energy_five", "my.focus_energy_six"]
 
+        fx_icons = [effect_one.icon_id, effect_two.icon_id, effect_three.icon_id, effect_four.icon_id, effect_five.icon_id, effect_six.icon_id]
+
+
         # Key, Rim, and Fill rows
         SequencerUI.draw_builder_row(box, key_ops, 'key', active_strip, "Key", active_strip.key_is_recording, is_color=0, record_prop_name="key_is_recording")
         SequencerUI.draw_builder_row(box, rim_ops, 'rim', active_strip, "Rim/Hair", active_strip.rim_is_recording, is_color=0, record_prop_name="rim_is_recording")
         SequencerUI.draw_builder_row(box, fill_ops, 'fill', active_strip, "Fill", active_strip.fill_is_recording, is_color=0, record_prop_name="fill_is_recording")
-        
+
         # Background row
         if scene.using_gels_for_cyc:
             row = box.row(align=True)
@@ -345,7 +388,7 @@ class SequencerUI:
             row.prop(active_strip, "background_light_three", text="Cyc 3", slider=True)
             row.prop(active_strip, "background_light_four", text="Cyc 4", slider=True)
         else:
-            SequencerUI.draw_builder_row(box, cyc_ops, 'cyc', active_strip, "Cyclorama", active_strip.cyc_is_recording, is_color=1, record_prop_name="cyc_is_recording")
+            SequencerUI.draw_builder_row(box, cyc_ops, 'gel_one', active_strip, "Cyclorama", active_strip.cyc_is_recording, is_color=1, record_prop_name="cyc_is_recording")
 
         # Texture, Band, and Accent rows
         SequencerUI.draw_builder_row(box, texture_ops, 'texture', active_strip, "Texture", active_strip.texture_is_recording, is_color=1, record_prop_name="texture_is_recording")
@@ -362,9 +405,9 @@ class SequencerUI:
         # Effects row
         row = box.row(align=True)
         row.operator("my.stop_effect", text="", icon='CANCEL')
-        for effect_id, operator in zip(effect_ids, fx_ops):
+        for effect_id, operator, icon in zip(effect_ids, fx_ops, fx_icons):
             row.alert = active_strip.cue_builder_effect_id == effect_id
-            row.operator(operator, text="", icon='SHADERFX')
+            row.operator(operator, text="", icon_value=icon)
             row.alert = 0
         row.prop(active_strip, "energy_speed", text="Speed", slider=True)
         row.prop(active_strip, "energy_scale", text="Scale", slider=True)
@@ -435,6 +478,9 @@ class SequencerUI:
 
     @staticmethod
     def draw_strip_flash_footer(self, context, box, active_strip):
+        pcoll = preview_collections["main"]
+        orb = pcoll["orb"]
+
         row = box.row(align=True)
         row.prop(active_strip, "flash_bias", text="Bias", slider=True)
         row.operator("my.build_flash_macros", text="", icon_value=orb.icon_id)
@@ -474,24 +520,28 @@ class SequencerUI:
 
     @staticmethod    
     def draw_strip_offset(self, context, column, box, active_strip):
+        pcoll = preview_collections["main"]
+        orb = pcoll["orb"]
+
         box.separator(factor=.01)
 
         row = box.row()
+        row.scale_y = 2
         row.prop(active_strip, 'offset_type_enum', text="")
         if active_strip.offset_type_enum == 'option_intensity':
-            row.prop(active_strip, 'offset_intensity', text="Intensity:", slider=True)
+            row.prop(active_strip, 'offset_intensity', text="", slider=True)
         elif active_strip.offset_type_enum == 'option_zoom':    
-            row.prop(active_strip, 'offset_zoom', text="Zoom:", slider=True)
+            row.prop(active_strip, 'offset_zoom', text="", slider=True)
         elif active_strip.offset_type_enum == 'option_iris':
-            row.prop(active_strip, 'offset_iris', text="Iris:", slider=True)
+            row.prop(active_strip, 'offset_iris', text="", slider=True)
         elif active_strip.offset_type_enum == 'option_color_palette':
-            row.prop(active_strip, 'offset_color_palette', text="CP:")
+            row.prop(active_strip, 'offset_color_palette', text="")
         elif active_strip.offset_type_enum == 'option_intensity_palette':
-            row.prop(active_strip, 'offset_intensity_palette', text="IP:")
+            row.prop(active_strip, 'offset_intensity_palette', text="")
         elif active_strip.offset_type_enum == 'option_focus_palette':
-            row.prop(active_strip, 'offset_focus_palette', text="FP:")
+            row.prop(active_strip, 'offset_focus_palette', text="")
         elif active_strip.offset_type_enum == 'option_beam_palette':
-            row.prop(active_strip, 'offset_beam_palette', text="BP:")
+            row.prop(active_strip, 'offset_beam_palette', text="")
         row.prop(active_strip, 'offset_fade_time', text="Fade:")
 
         row = box.row(align=True)
@@ -779,6 +829,9 @@ class SequencerUI:
 
     @staticmethod    
     def draw_sequencer_add_menu(self, layout):
+        pcoll = preview_collections["main"]
+        orb = pcoll["orb"]
+
         layout = self.layout
         layout.separator()
         layout.label(text="Alva Sorcerer", icon_value=orb.icon_id)
@@ -802,6 +855,9 @@ class SequencerUI:
 
     @staticmethod
     def draw_timeline_sync(self, context):
+        pcoll = preview_collections["main"]
+        orb = pcoll["orb"]
+
         if (hasattr(context.scene, "sync_timecode") and
             hasattr(context.scene, "timecode_expected_lag")):
             scene = context.scene

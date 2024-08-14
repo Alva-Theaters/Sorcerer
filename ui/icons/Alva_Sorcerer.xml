@@ -477,7 +477,7 @@
     <graph_editor>
       <ThemeGraphEditor
         grid="#1a1a1a"
-        frame_current="#4772b3"
+        frame_current="#840ab3"
         time_scrub_background="#161616ff"
         time_marker_line="#ffffff4d"
         time_marker_line_selected="#ffffffb3"
@@ -552,7 +552,7 @@
     </graph_editor>
     <file_browser>
       <ThemeFileBrowser
-        selected_file="#4772b3"
+        selected_file="#840ab3"
         row_alternate="#ffffff04"
         >
         <space>
@@ -609,7 +609,7 @@
         tweak_duplicate="#d90000"
         keyframe_border="#000000ff"
         keyframe_border_selected="#000000ff"
-        frame_current="#4772b3"
+        frame_current="#840ab3"
         time_scrub_background="#161616ff"
         time_marker_line="#ffffff4d"
         time_marker_line_selected="#ffffffb3"
@@ -761,7 +761,7 @@
         preview_stitch_unstitchable="#ff0000ff"
         preview_stitch_active="#e1d2c323"
         uv_shadow="#707070ff"
-        frame_current="#4772b3"
+        frame_current="#840ab3"
         metadatabg="#000000"
         metadatatext="#ffffff"
         handle_free="#000000"
@@ -889,8 +889,8 @@
     </sequence_editor>
     <properties>
       <ThemeProperties
-        match="#4772b3"
-        active_modifier="#4772b3ff"
+        match="#840ab3"
+        active_modifier="#840ab3ff"
         >
         <space>
           <ThemeSpaceGeneric
@@ -1090,7 +1090,7 @@
     </outliner>
     <info>
       <ThemeInfo
-        info_selected="#3b5689"
+        info_selected="#840ab3"
         info_selected_text="#ffffff"
         info_error="#b34c34ff"
         info_error_text="#ffffff"
@@ -1173,7 +1173,7 @@
     </preferences>
     <console>
       <ThemeConsole
-        line_output="#71a8ff"
+        line_output="#840ab3"
         line_input="#f2f2f2"
         line_info="#95d600"
         line_error="#ff4d84"
@@ -1225,7 +1225,7 @@
         path_after="#0000ff"
         path_keyframe_before="#ffc4c4"
         path_keyframe_after="#c4c4ff"
-        frame_current="#4772b3"
+        frame_current="#840ab3"
         time_scrub_background="#181818ff"
         time_marker_line="#ffffff4d"
         time_marker_line_selected="#ffffffb3"

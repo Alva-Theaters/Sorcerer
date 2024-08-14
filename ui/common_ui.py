@@ -40,13 +40,23 @@ addon_dir = os.path.dirname(__file__)
 pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
 
 icons_dir = os.path.join(addon_dir, "icons")
+
+# Edge is diffusion
+# Diffusion is iris
+# Iris is zoom
+# Zoom is iris
+pcoll.load("zoom", os.path.join(icons_dir, "iris.png"), 'IMAGE')
+pcoll.load("iris", os.path.join(icons_dir, "diffusion.png"), 'IMAGE')
+pcoll.load("edge", os.path.join(icons_dir, "zoom.png"), 'IMAGE')
+pcoll.load("diffusion", os.path.join(icons_dir, "edge.png"), 'IMAGE')
+
 pcoll.load("sound_dark", os.path.join(icons_dir, "sound_dark.svg"), 'IMAGE')
 pcoll.load("color_dark", os.path.join(icons_dir, "color_dark.svg"), 'IMAGE')
 pcoll.load("strobe_dark", os.path.join(icons_dir, "strobe_dark.svg"), 'IMAGE')
 pcoll.load("pan_tilt_dark", os.path.join(icons_dir, "pan_tilt_dark.svg"), 'IMAGE')
-pcoll.load("zoom_dark", os.path.join(icons_dir, "zoom_dark.svg"), 'IMAGE')
-pcoll.load("iris_dark", os.path.join(icons_dir, "iris_dark.svg"), 'IMAGE')
-pcoll.load("edge_dark", os.path.join(icons_dir, "edge_dark.svg"), 'IMAGE')
+pcoll.load("zoom_dark", os.path.join(icons_dir, "zoom_dark.png"), 'IMAGE')
+pcoll.load("iris_dark", os.path.join(icons_dir, "iris_dark.png"), 'IMAGE')
+pcoll.load("edge_dark", os.path.join(icons_dir, "edge_dark.png"), 'IMAGE')
 pcoll.load("diffusion_dark", os.path.join(icons_dir, "diffusion_dark.svg"), 'IMAGE')
 pcoll.load("gobo_dark", os.path.join(icons_dir, "gobo_dark.svg"), 'IMAGE')
 
@@ -238,6 +248,10 @@ class CommonUI:
             
     @staticmethod
     def draw_parameters(self, context, column, box, active_object):
+        pcoll = preview_collections["main"]
+        zoom = pcoll["zoom"]
+        edge = pcoll["edge"]
+
         if not hasattr(active_object, "object_identities_enum"):
             object_type = "Strip"
         else:
@@ -320,7 +334,7 @@ class CommonUI:
         # ZOOM/IRIS
         if active_object.zoom_is_on or active_object.iris_is_on:
             row = box.row(align=True)
-            op = row.operator("my.view_zoom_iris_props", text="", icon='LINCURVE')
+            op = row.operator("my.view_zoom_iris_props", text="", icon_value=zoom.icon_id)
             op.space_type = space_type
             op.node_name = node_name
             op.node_tree_name = node_tree_name
@@ -333,7 +347,7 @@ class CommonUI:
         # EDGE/DIFFUSION
         if active_object.edge_is_on or active_object.diffusion_is_on:
             row = box.row(align=True)
-            op = row.operator("my.view_edge_diffusion_props", text="", icon='SELECT_SET')
+            op = row.operator("my.view_edge_diffusion_props", text="", icon_value=edge.icon_id)
             op.space_type = space_type
             op.node_name = node_name
             op.node_tree_name = node_tree_name
@@ -355,28 +369,16 @@ class CommonUI:
             row.prop(active_object, "float_gobo_speed", slider=True, text="Speed")
             row.prop(active_object, "int_prism", slider=True, text="Prism")
     
-    @staticmethod                      
-    def draw_volume_monitor(self, context, sequence_editor):
-        layout = self.layout
-        box = layout.box()
-        row = box.row()
-        row.label(text="Volume Monitor (Read-only)")
-        counter = 0
-        for strip in sequence_editor.sequences:
-            if strip.type == 'SOUND':
-                if hasattr(strip, "selected_speaker") and strip.selected_speaker is not None:
-                    label = strip.selected_speaker.name
-                    row = box.row()
-                    row.enabled = False
-                    row.prop(strip, "dummy_volume", text=f"{label} Volume", slider=True)
-                    counter += 1
-        if counter == 0:
-            row = box.row()
-            row.label(text="No participating speaker strips found.")
     
     @staticmethod    
     def draw_footer_toggles(self, context, column, active_object, box=True, vertical=False):
         pcoll = preview_collections["main"]
+
+        zoom = pcoll["zoom"]
+        edge = pcoll["edge"]
+        iris = pcoll["iris"]
+        diffusion = pcoll["diffusion"]
+
         sound_dark = pcoll["sound_dark"]
         strobe_dark = pcoll["strobe_dark"]
         color_dark = pcoll["color_dark"]
@@ -427,26 +429,47 @@ class CommonUI:
             else: row.prop(active_object, "pan_tilt_is_on", text="", icon_value=pan_tilt_dark.icon_id, emboss=False)
 
         if active_object.zoom_is_on:
-            row.prop(active_object, "zoom_is_on", text="", icon='LINCURVE', emboss=False)
+            row.prop(active_object, "zoom_is_on", text="", icon_value=zoom.icon_id, emboss=False)
         else: row.prop(active_object, "zoom_is_on", text="", icon_value=zoom_dark.icon_id, emboss=False)
 
         if active_object.iris_is_on:
-            row.prop(active_object, "iris_is_on", text="", icon='RADIOBUT_OFF', emboss=False)
+            row.prop(active_object, "iris_is_on", text="", icon_value=iris.icon_id, emboss=False)
         else: row.prop(active_object, "iris_is_on", text="", icon_value=iris_dark.icon_id, emboss=False)
         
         if object_type not in ["Influencer", "Brush"]:
             if active_object.edge_is_on:
-                row.prop(active_object, "edge_is_on", text="", icon='SELECT_SET', emboss=False)
+                row.prop(active_object, "edge_is_on", text="", icon_value=edge.icon_id, emboss=False)
             else: row.prop(active_object, "edge_is_on", text="", icon_value=edge_dark.icon_id, emboss=False)
             
             if active_object.diffusion_is_on:
-                row.prop(active_object, "diffusion_is_on", text="", icon='MOD_CLOTH', emboss=False)
+                row.prop(active_object, "diffusion_is_on", text="", icon_value=diffusion.icon_id, emboss=False)
             else: row.prop(active_object, "diffusion_is_on", text="", icon_value=diffusion_dark.icon_id, emboss=False)
 
             if active_object.gobo_is_on:
                 row.prop(active_object, "gobo_is_on", text="", icon='POINTCLOUD_DATA', emboss=False)
             else: row.prop(active_object, "gobo_is_on", text="", icon_value=gobo_dark.icon_id, emboss=False)
     
+
+    @staticmethod                      
+    def draw_volume_monitor(self, context, sequence_editor):
+        layout = self.layout
+        box = layout.box()
+        row = box.row()
+        row.label(text="Volume Monitor (Read-only)")
+        counter = 0
+        for strip in sequence_editor.sequences:
+            if strip.type == 'SOUND':
+                if hasattr(strip, "selected_speaker") and strip.selected_speaker is not None:
+                    label = strip.selected_speaker.name
+                    row = box.row()
+                    row.enabled = False
+                    row.prop(strip, "dummy_volume", text=f"{label} Volume", slider=True)
+                    counter += 1
+        if counter == 0:
+            row = box.row()
+            row.label(text="No participating speaker strips found.")
+
+
     @staticmethod
     def draw_play_bar(self, context, layout):
         '''Copy/pasted from /scripts/startup/bl_ui/space_time.py.

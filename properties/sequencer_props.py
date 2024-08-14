@@ -149,14 +149,14 @@ def register():
     ColorSequence.energy_light = IntProperty(name="Energy Light", min=0, max=100,  update=Updaters.energy_light_updater, description="Intensity of lights on energy effect")
     ColorSequence.energy_speed = IntProperty(name="Energy Speed", min=0, max=500, update=Updaters.energy_speed_updater, description="Speed of energy effect")
     ColorSequence.energy_scale = IntProperty(name="Energy Scale", min=0, max=500, update=Updaters.energy_scale_updater, description="Scale of energy effect")
-    ColorSequence.background_light = IntProperty(name="Background Light", min=0, max=100,  update=Updaters.background_light_updater, description="Background light intensity, typically for cyclorama or uplights. Change the colors on console, not here")
+    ColorSequence.gel_one_light = IntProperty(name="Background Light", min=0, max=100,  update=Updaters.background_light_updater, description="Background light intensity, typically for cyclorama or uplights. Change the colors on console, not here")
     ColorSequence.background_light_one = IntProperty(name="Background Light 1", min=0, max=100,  update=Updaters.background_light_updater, description="Background light intensity, typically for cyclorama or uplights. Change the colors on console, not here")
     ColorSequence.background_light_two = IntProperty(name="Background Light 2", min=0, max=100,  update=Updaters.background_two_light_updater, description="Use these additional slots if you're controlling backdrop color by varying intensity of multiple channels with different color gels")
     ColorSequence.background_light_three = IntProperty(name="Background Light 3", min=0, max=100,  update=Updaters.background_three_light_updater, description="Use these additional slots if you're controlling backdrop color by varying intensity of multiple channels with different color gels")
     ColorSequence.background_light_four = IntProperty(name="Background Light 4", min=0, max=100,  update=Updaters.background_four_light_updater, description="Use these additional slots if you're controlling backdrop color by varying intensity of multiple channels with different color gels")
-    ColorSequence.band_color = FloatVectorProperty(name="Band Color", subtype='COLOR', size=3, min=0.0, max=1.0, default=(1.0, 1.0, 1.0), description="Dummy, reference color only. Does not control console parameters")
-    ColorSequence.accent_color = FloatVectorProperty(name="Accent Color", subtype='COLOR', size=3, min=0.0, max=1.0, default=(1.0, 1.0, 1.0), description="Dummy, reference color only. Does not control console parameters")
-    ColorSequence.background_color = FloatVectorProperty(name="Background Color", subtype='COLOR', size=3, min=0.0, max=1.0, default=(1.0, 1.0, 1.0), description="Dummy, reference color only. Does not control console parameters")
+    ColorSequence.sixty_color = FloatVectorProperty(name="60% Color", subtype='COLOR', size=3, min=0.0, max=1.0, default=(.009, .009, .009), description="Dummy, reference color only. Does not control console parameters")
+    ColorSequence.thirty_color = FloatVectorProperty(name="30% Color", subtype='COLOR', size=3, min=0.0, max=1.0, default=(.089, .089, .089), description="Dummy, reference color only. Does not control console parameters")
+    ColorSequence.ten_color = FloatVectorProperty(name="10% Color", subtype='COLOR', size=3, min=0.0, max=1.0, default=(.231, 0.003, .45), description="Dummy, reference color only. Does not control console parameters")
     ColorSequence.cue_builder_effect_id = StringProperty(name="")
     ColorSequence.key_is_recording = BoolProperty(
         name="", 
@@ -313,15 +313,15 @@ def unregister():
     del ColorSequence.energy_light
     del ColorSequence.energy_speed
     del ColorSequence.energy_scale
-    del ColorSequence.background_light
+    del ColorSequence.gel_one_light
     del ColorSequence.background_light_one
     del ColorSequence.background_light_two
     del ColorSequence.background_light_three
     del ColorSequence.background_light_four
 
-    del ColorSequence.band_color
-    del ColorSequence.accent_color
-    del ColorSequence.background_color
+    del ColorSequence.sixty_color
+    del ColorSequence.thirty_color
+    del ColorSequence.ten_color
     del ColorSequence.cue_builder_effect_id
     del ColorSequence.key_is_recording
     del ColorSequence.rim_is_recording

@@ -367,12 +367,10 @@ class Items:
         items = [
             ('option_eos_macro', "", "Build and fire macros based on strip length", 'REC', 0),
             ('option_eos_cue', "", "Use strip length to define cue duration", 'PLAY', 1),
-            ('option_eos_flash', "", "Flash intensity up and down with strip length", 'LIGHT_SUN', 2)
+            ('option_eos_flash', "", "Flash intensity up and down with strip length", 'LIGHT_SUN', 2),
+            ('option_animation', "", "Use keyframes, or inverted cues, to control parameters", 'IPO_BEZIER', 3),
+            ('option_offset', "", "Rapidly make offset effects like wipes and chases using parameters or palettes", 'UV_SYNC_SELECT', 4),
+            ('option_trigger', "", "Send discrete trigger at strip's start and/or end frame. Eos does not record this", 'SETTINGS', 5)
         ]
-
-        # Don't know why these need to be separate, but there's a reason.
-        items.append(('option_animation', "", "Use keyframes, or inverted cues, to control parameters", 'IPO_BEZIER', 3))
-        items.append(('option_offset', "", "Rapidly make offset effects like wipes and chases using parameters or palettes", 'UV_SYNC_SELECT', 4))
-        items.append(('option_trigger', "", "Send discrete trigger at strip's start and/or end frame. Eos does not record this", 'SETTINGS', 5))
 
         return items
