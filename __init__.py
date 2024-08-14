@@ -51,8 +51,6 @@ import os
 
 sys.path.append(os.path.dirname(__file__))
 
-import bpy
-
 try:
     from .operators.strip_formatter_ops import register as strip_formatter_ops_register, unregister as strip_formatter_ops_unregister
 except ImportError as e:
