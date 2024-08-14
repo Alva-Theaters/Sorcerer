@@ -277,6 +277,7 @@ class TOOL_OT_alva_settings(Operator):
     '''Pop-up for Sorcerer Settings menu'''
     bl_idname = "seq.show_sequencer_settings"
     bl_label = "Sorcerer Settings"
+    bl_options = {'REGISTER', 'UNDO'}
     
     @classmethod
     def poll(cls, context):

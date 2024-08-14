@@ -79,6 +79,7 @@ class SettingsUI:
                 SettingsUI.draw_house_lights(self, context, col2)
             if 'sequencer' not in restrictions:
                 SettingsUI.draw_sequencer(self, context, col2)
+                SettingsUI.draw_cue_builder(self, context, col2)
             
         elif mode == 'option_3d' and 'patch' not in restrictions:
             SettingsUI.draw_patch(self, context, col2)
