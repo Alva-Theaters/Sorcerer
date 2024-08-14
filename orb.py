@@ -421,7 +421,7 @@ class Orb:
         ##############
         @staticmethod
         def make_qmeo(scene, frame_rate, start_frame, end_frame):
-            if hasattr(scene.sequence_editor, "active_strip") and scene.sequence_editor.active_strip is not None and (scene.sequence_editor.active_strip.type == 'SOUND' or scene.sequence_editor.active_strip.my_settings.motif_type_enum == 'option_animation'):
+            if hasattr(scene.sequence_editor, "active_strip") and scene.sequence_editor.active_strip is not None and scene.sequence_editor.active_strip.type == 'SOUND':
                 active_strip = scene.sequence_editor.active_strip
             else:
                 active_strip = scene

@@ -272,18 +272,25 @@ class SettingsUI:
                     active_strip = True
                     break
 
+        is_scene = False
+        has_strip = False
+
         if active_strip:
             target = context.scene.sequence_editor.active_strip
+            has_strip = True
         else:
             target = context.scene
+            is_scene = True
 
         box = column.box()
         row = box.row()
+        row.operator("view3d.alva_set_context_to_scene", text="", icon='SCENE_DATA')
         row.label(text=f"Showing properties for {target.name}:")
 
-        row = box.row()
-        row.prop(target, "int_cue_list", text="Cue List:") 
-        row.prop(target, "int_event_list", text="Event List:")
+        if is_scene or (has_strip and target.type == 'SOUND'):
+            row = box.row()
+            row.prop(target, "int_cue_list", text="Cue List:") 
+            row.prop(target, "int_event_list", text="Event List:")
 
         row = box.row()
         row.prop(target, "str_start_cue", text="Start Cue") 

@@ -285,22 +285,19 @@ class EventManager:
             house_prefix = scene.house_prefix
             house_down_argument = scene.house_down_argument
             OSC.send_osc_lighting(house_prefix, house_down_argument)
-            
+
         # Get trigger maps
-        '''C1:2''' # No instance
-#        self.start_mapping = None
-#        self.offset_mapping = None
-#        self.end_mapping = None
+        '''C1:2'''
         self.start_mapping = StripMapping.get_trigger_start_map(scene)
         self.offset_start_mapping = StripMapping.get_trigger_offset_start_map(scene)
         self.end_mapping = StripMapping.get_trigger_end_map(scene)
-             
-        # Go timecode sync.    
+
+        # Go timecode sync.
         if scene.sync_timecode:
             '''C1:3'''
             relevant_clock_object = Utils.find_relevant_clock_object(scene)
-            
-            if relevant_clock_object or scene.use_default_clock:
+
+            if relevant_clock_object:
                 current_frame = scene.frame_current
                 fps = NormalUtils.get_frame_rate(scene)
                 lag = scene.timecode_expected_lag

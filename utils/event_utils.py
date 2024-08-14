@@ -175,7 +175,6 @@ class EventUtils:
                 relevant_object = strip
         if not relevant_object and scene.use_default_clock:
             relevant_object = scene
-        print(relevant_object)
         return relevant_object
             
     @staticmethod

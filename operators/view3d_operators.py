@@ -1300,6 +1300,17 @@ class VIEW3D_OT_object_controller(Operator):
         if active_object.type == 'SPEAKER':
             View3DUI.draw_speaker(self, context, active_object)
 
+
+class VIEW3D_OT_alva_set_context_to_scene(bpy.types.Operator):
+    '''Sets active_strip to nothing so you can see the settings for the global Scene instead'''
+    bl_idname = "view3d.alva_set_context_to_scene"
+    bl_label = "Show Scene properties"
+
+    def execute(self, context):
+        if context.scene.sequence_editor:
+            context.scene.sequence_editor.active_strip = None
+        return {'FINISHED'}
+
     
 classes = (
     ModalChannelControllerPanel,
@@ -1345,7 +1356,8 @@ classes = (
     RemoveChoiceOperator,
     AddGroupOperator,
     RemoveGroupOperator,
-    VIEW3D_OT_object_controller
+    VIEW3D_OT_object_controller,
+    VIEW3D_OT_alva_set_context_to_scene
 )
 
 

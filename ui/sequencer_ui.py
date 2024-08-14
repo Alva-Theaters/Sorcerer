@@ -868,11 +868,9 @@ class SequencerUI:
             for area in context.screen.areas:
                 if area.type == 'SEQUENCE_EDITOR':
                     sequencer_open = True
-                    if context.scene.sequence_editor.active_strip and (context.scene.sequence_editor.active_strip.type == 'COLOR' or context.scene.sequence_editor.active_strip.type == 'SOUND'):
-                        if context.scene.sequence_editor.active_strip.type == 'COLOR' and context.scene.sequence_editor.active_strip.my_settings.motif_type_enum != 'option_animation':
-                            break
+                    if context.scene.sequence_editor.active_strip and context.scene.sequence_editor.active_strip.type == 'SOUND':
                         active_strip = True
-                    break
+                        break
 
             layout = self.layout
             row = layout.row()
