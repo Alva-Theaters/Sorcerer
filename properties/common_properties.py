@@ -498,6 +498,8 @@ class CommonProperties:
     ]
 
     timecode_executors = [
+        ('str_parent_name', StringProperty(default="")),
+         
         ('int_event_list', IntProperty(
             name="Event List", 
             min=0, 

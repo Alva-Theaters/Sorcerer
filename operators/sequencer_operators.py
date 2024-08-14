@@ -1847,17 +1847,16 @@ class SEQUENCER_OT_base_modal_operator(Operator):
             self._generator = self.generate_macros_to_cues(context, strip=self.strip, enable=self.enable)
         else:
             frame_rate = Utils.get_frame_rate(context.scene)
-            if hasattr(context.scene.sequence_editor, "active_strip") and context.scene.sequence_editor.active_strip is not None:
+            scene = context.scene
+            if hasattr(scene.sequence_editor, "active_strip") and scene.sequence_editor.active_strip is not None and (scene.sequence_editor.active_strip.type == 'SOUND' or scene.sequence_editor.active_strip.my_settings.motif_type_enum == 'option_animation'):
                 active_strip = context.scene.sequence_editor.active_strip
                 start_frame = active_strip.frame_start
                 end_frame = active_strip.frame_final_end
-                cue_list = active_strip.int_cue_list
             else:
                 start_frame = context.scene.frame_start
                 end_frame = context.scene.frame_end
-                cue_list = context.scene.int_cue_list
             
-            self._generator = self.make_qmeo(context.scene, frame_rate, start_frame, end_frame, cue_list)
+            self._generator = self.make_qmeo(context.scene, frame_rate, start_frame, end_frame)
 
         wm = context.window_manager
         self._timer = wm.event_timer_add(0.1, window=context.window)
@@ -1888,8 +1887,8 @@ class SEQUENCER_OT_base_modal_operator(Operator):
     def generate_macros_to_cues(self, context, strip='sound', enable=True):
         yield from Orb.generate_macros_to_cues(self, context, strip=strip, enable=enable)
 
-    def make_qmeo(self, scene, frame_rate, start_frame, end_frame, cue_list):
-        yield from Orb.Eos.make_qmeo(scene, frame_rate, start_frame, end_frame, cue_list)
+    def make_qmeo(self, scene, frame_rate, start_frame, end_frame):
+        yield from Orb.Eos.make_qmeo(scene, frame_rate, start_frame, end_frame)
 
     def cancel(self, context):
         wm = context.window_manager

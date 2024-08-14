@@ -202,14 +202,17 @@ class Orb:
                 yield Orb.Eos.type_internal_time(), "Internal Time"
                 yield Orb.Eos.enter_timecode_or_just_enter(timecode), "Typing timecode for sync."
                 yield Orb.Eos.type_event_list_number(event_list), "Typing event list number again."
-                yield Orb.Eos.internal_enable_or_disable_foreground_live_execute_on_cue(start_cue, start_macro, "enable"), "Setting to foreground mode."
+                yield Orb.Eos.internal_enable_or_disable_foreground(start_cue, start_macro, "enable"), "Setting to foreground mode."
 
-                yield Orb.Eos.delete_recreate_macro_enter_edit(end_macro), "Creating blank macro."
+                yield Orb.Eos.delete_recreate_macro_enter_edit(end_macro, live=False), "Creating blank macro."
                 yield Orb.Eos.type_event_list_number(event_list), "Typing event list number."
                 yield Orb.Eos.type_internal_time(), "Internal Time"
                 yield Orb.Eos.enter_timecode_or_just_enter(None), "Typing timecode for sync."
                 yield Orb.Eos.type_event_list_number(event_list), "Typing event list number again."
-                yield Orb.Eos.internal_enable_or_disable_foreground_live_execute_on_cue(end_cue, end_macro, "disable"), "Setting to foreground mode."
+                yield Orb.Eos.internal_enable_or_disable_foreground(end_cue, end_macro, "disable"), "Setting to foreground mode."
+
+                yield Orb.Eos.live_and_execute_on_cue(start_cue, start_macro), "Setting start cue executor"
+                yield Orb.Eos.live_and_execute_on_cue(end_cue, end_macro), "Setting end cue executor"
 
                 yield Orb.Eos.reset_macro_key(), "Resetting macro key."
                 yield Orb.Eos.restore_snapshot(scene), "Restoring your screen setup."
@@ -230,17 +233,17 @@ class Orb:
             
         @staticmethod
         def type_event_list_number(event_list_number):
-            Orb.Eos.send_osc_with_delay("/eos/key/event")
+            Orb.Eos.send_osc_with_delay("/eos/key/event", delay=.2)
             
             for digit in str(event_list_number):
-                Orb.Eos.send_osc_with_delay(f"/eos/key/{digit}")
+                Orb.Eos.send_osc_with_delay(f"/eos/key/{digit}", delay=.2)
                 
                 
         @staticmethod    
         def type_internal_time():
-            Orb.Eos.send_osc_with_delay("/eos/key/\\")
-            Orb.Eos.send_osc_with_delay("/eos/key/internal")
-            Orb.Eos.send_osc_with_delay("/eos/key/time")
+            Orb.Eos.send_osc_with_delay("/eos/key/\\", delay=.2)
+            Orb.Eos.send_osc_with_delay("/eos/key/internal", delay=.2)
+            Orb.Eos.send_osc_with_delay("/eos/key/time", delay=.2)
             
 
         @staticmethod
@@ -255,20 +258,24 @@ class Orb:
 
 
         @staticmethod
-        def internal_enable_or_disable_foreground_live_execute_on_cue(cue_number, macro_number, desired_state):
-            Orb.Eos.send_osc_with_delay("/eos/key/\\")
-            Orb.Eos.send_osc_with_delay("/eos/key/internal")
-            Orb.Eos.send_osc_with_delay(f"/eos/key/{desired_state}")
-            Orb.Eos.send_osc_with_delay("/eos/key/enter")
-            Orb.Eos.send_osc_with_delay("/eos/key/select")
-            Orb.Eos.send_osc_with_delay("/eos/softkey/3")  # "Foreground Mode" softkey
-            Orb.Eos.send_osc_with_delay("/eos/key/enter")
-            Orb.Eos.send_osc_with_delay("/eos/key/live")
+        def internal_enable_or_disable_foreground(cue_number, macro_number, desired_state):
+            Orb.Eos.send_osc_with_delay("/eos/key/\\", delay=.2)
+            Orb.Eos.send_osc_with_delay("/eos/key/internal", delay=.2)
+            Orb.Eos.send_osc_with_delay(f"/eos/key/{desired_state}", delay=.2)
+            Orb.Eos.send_osc_with_delay("/eos/key/enter", delay=.2)
+            Orb.Eos.send_osc_with_delay("/eos/key/select", delay=.2)
+            Orb.Eos.send_osc_with_delay("/eos/softkey/3", delay=.2)  # "Foreground Mode" softkey
+            Orb.Eos.send_osc_with_delay("/eos/key/enter", delay=.2)
+
+        @staticmethod
+        def live_and_execute_on_cue(cue_number, macro_number, live=True):
+            if live:
+                Orb.Eos.send_osc_with_delay("/eos/key/live", delay=.2)
             Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Cue {str(cue_number)} Execute Macro {str(macro_number)} Enter Enter")
 
         @staticmethod
         def reset_macro_key():
-            Orb.Eos.send_osc_with_delay("/eos/key/macro", "0")
+            Orb.Eos.send_osc_with_delay("/eos/key/macro", "0", delay=.2)
 
 
         ####################
@@ -398,9 +405,10 @@ class Orb:
             Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Snapshot {snapshot} Enter", 0.5)
       
         @staticmethod
-        def delete_recreate_macro_enter_edit(macro_number):
-            Orb.Eos.send_osc_with_delay("/eos/key/live")
-            Orb.Eos.send_osc_with_delay("/eos/key/live", "0", 0.5)
+        def delete_recreate_macro_enter_edit(macro_number, live=True):
+            if live:
+                Orb.Eos.send_osc_with_delay("/eos/key/live")
+                Orb.Eos.send_osc_with_delay("/eos/key/live", "0", 0.5)
             Orb.Eos.send_osc_with_delay("/eos/key/macro", "11 Enter", 0)
             Orb.Eos.send_osc_with_delay("/eos/key/macro", "11 Enter", 0.5)
             Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Delete {str(macro_number)} Enter Enter", 0.5)
@@ -409,11 +417,11 @@ class Orb:
             
         
         ##############
-        # OTHER STUFF
+        # QMEOS
         ##############
         @staticmethod
-        def make_qmeo(scene, frame_rate, start_frame, end_frame, cue_list):
-            if hasattr(scene.sequence_editor, "active_strip") and scene.sequence_editor.active_strip is not None:
+        def make_qmeo(scene, frame_rate, start_frame, end_frame):
+            if hasattr(scene.sequence_editor, "active_strip") and scene.sequence_editor.active_strip is not None and (scene.sequence_editor.active_strip.type == 'SOUND' or scene.sequence_editor.active_strip.my_settings.motif_type_enum == 'option_animation'):
                 active_strip = scene.sequence_editor.active_strip
             else:
                 active_strip = scene
@@ -421,76 +429,85 @@ class Orb:
             event_list = Utils.find_executor(scene, active_strip, 'event_list')
             start_macro = Utils.find_executor(scene, active_strip, 'start_macro')
             end_macro = Utils.find_executor(scene, active_strip, 'end_macro')
-            start_cue = active_strip.str_start_cue
-            end_cue = active_strip.str_start_cue
-            timecode = Utils.frame_to_timecode(active_strip.frame_start)
+            cue_list = Utils.find_executor(scene, active_strip, 'cue_list')
 
+            active_strip.str_parent_name = active_strip.name # Allow find_executor() to distinguish duplicates
+
+            start_cue = active_strip.str_start_cue
+            end_cue = active_strip.str_end_cue
+            timecode = Utils.frame_to_timecode(active_strip.frame_start)
             yield from Orb.Eos.manipulate_show_control(scene, event_list, start_macro, end_macro, start_cue, end_cue, timecode)
 
-            scene.scene_props.is_cue_baking = True
-            Orb.Eos.update_label(scene, event_list, "Making a Qmeo! Escape to Cancel.")
-            
-            current_frame_number = scene.frame_current
-            cue_duration = 1 / frame_rate
-            cue_duration = round(cue_duration, 2)
-            
-            # Create a sorted list of frames.
-            frames = list(range(int(start_frame), int(end_frame)))
-            
-            cue_duration = round(1 / frame_rate, 2)
-            
-            percentage_remaining = 100 / len(frames)
-            percentage_steps = percentage_remaining
-            
-            rounded_remaining = round(percentage_remaining)
-            
-            Orb.Eos.update_label(scene, event_list, f"{str(rounded_remaining)}% Complete")
+            yield from Orb.Eos.bake_qmeo_generator(scene, event_list, frame_rate, start_frame, end_frame, cue_list)
 
-            if event_list:
-                argument = f"Event {str(event_list)} / 1 Thru {str(end_frame)} Enter"
 
-            wm = bpy.context.window_manager
-            wm.progress_begin(0, 100)  # Start progress bar
-
-            for i, frame in enumerate(frames):
-                bpy.context.scene.frame_set(frame)
-                bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
-                
-                current_frame_number = scene.frame_current
-                
-                argument = f"Record Cue {str(cue_list)} / {str(current_frame_number)} Time {str(cue_duration)} Enter Enter"
-                
-                if event_list:
-                    timecode = Utils.frame_to_timecode(frame)
-                    argument = f"{argument}, Event 1 / {str(frame)} Time {str(timecode)} Show_Control_Action Cue {str(frame)} Enter"
-
-                percentage_remaining += percentage_steps
-                rounded_remaining = round(percentage_remaining)
-                Orb.Eos.update_label(scene, event_list, f"{str(rounded_remaining)}% Complete")
-                print(f"{str(rounded_remaining)}% Complete")
-
-                # Update progress bar
-                wm.progress_update(i / len(frames) * 100)
-                
-                time.sleep(.1)
-                
-                OSC.send_osc_lighting("/eos/newcmd", argument)
-            
-            wm.progress_end()  # End progress bar
-            scene.scene_props.str_bake_info = "Create Qmeo"    
-            scene.scene_props.str_cue_bake_info = "Just Cues"
-            bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
-            scene.scene_props.is_cue_baking = False
 
         @staticmethod
-        def update_label(scene, event_list, text):
+        def bake_qmeo_generator(scene, event_list, frame_rate, start_frame, end_frame, cue_list):
+            frames = list(range(int(start_frame), int(end_frame)))
+            cue_duration = round(1 / frame_rate, 2)
+
             if event_list:
-                scene.scene_props.str_bake_info = text
-            else:
-                scene.scene_props.str_cue_bake_info = text
-            bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1) # Force UI redraw
+                yield Orb.Eos.delete_recreate_event_list(event_list, end_frame, frame_rate), "Recreating event list"
+
+            wm = bpy.context.window_manager
+            wm.progress_begin(0, 100)
+
+            for i, frame in enumerate(frames):
+                yield Orb.Eos.qmeo_frame(frame, scene, cue_list, event_list, cue_duration, wm, frames, i), "Making Qmeo"
+            
+            wm.progress_end()
+            bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
+
+            yield Orb.Eos.reset_cue_list(), "Resetting cue list"
+
+        @staticmethod
+        def delete_recreate_event_list(event_list, end_frame, fps):
+            # Delete event list so we don't have unexpected leftover baggage.
+            Orb.Eos.send_osc_with_delay("/eos/newcmd/", f"Delete Event {event_list} / Enter Enter", delay=.3)
+
+            # Recreate the event list from a blank slate.
+            argument = f"Event {str(event_list)} / 1 Thru {str(end_frame)} Enter"
+            Orb.Eos.send_osc_with_delay("/eos/newcmd/", argument, delay=.2)
+
+            # Set the frame rate based on Blender scene.
+            int_fps = int(fps)
+            Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Event {event_list} / Frame_Rate {int_fps} Enter", delay=.2)
+
+            # Go back to live for convenience.
+            OSC.press_lighting_key("live")
+            time.sleep(.2)
+
+        @staticmethod
+        def qmeo_frame(frame, scene, cue_list, event_list, cue_duration, wm, frames, i):
+            # Set current frame and redraw window so user knows what's going on.
+            bpy.context.scene.frame_set(frame)
+            bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
+            
+            # Get ready to record cue with the new CPVIA updates.
+            current_frame_number = scene.frame_current
+            argument = f"Record Cue {str(cue_list)} / {str(current_frame_number)} Time {str(cue_duration)} Enter Enter"
+            
+            # Get ready to record the cue while also binding cue to its event.
+            if event_list:
+                timecode = Utils.frame_to_timecode(frame)
+                argument = f"{argument}, Event {event_list} / {str(frame)} Time {str(timecode)} Show_Control_Action Cue {str(frame)} Enter"
+
+            # Update progress bar to keep user in the loop.
+            wm.progress_update(i / len(frames) * 100)
+            
+            # Go ahead and actually send the final command
+            time.sleep(.1)
+            OSC.send_osc_lighting("/eos/newcmd", argument)
+
+        @staticmethod
+        def reset_cue_list():
+            Orb.Eos.send_osc_with_delay("/eos/newcmd/", "Cue 1 / Enter")
 
 
+        ################
+        # RENDER STRIPS
+        ################
         @staticmethod
         def render_strips(self, context, event):
             Orb.Eos.record_snapshot(context.scene)
@@ -510,7 +527,8 @@ class Orb:
             event_object = EventUtils.find_relevant_clock_object(context.scene)
             if event_object == None:
                 return {'CANCELLED'}
-            event_list = Utils.find_executor(context.scene, context.scene, 'event_list')
+            
+            event_list = event_object.int_event_list
 
             i = 1
             for action_map, description in all_maps:

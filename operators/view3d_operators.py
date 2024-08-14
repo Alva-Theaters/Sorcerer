@@ -284,7 +284,7 @@ class ApplyPatchToObjectsOperator(bpy.types.Operator):
             self.report({'ERROR'}, "Group not found")
             return {'CANCELLED'}
         
-        channels = [chan.chan for chan in item.list_group_channels]
+        channels = [chan.chan for chan in item.channels_list]
         
         for obj in bpy.data.objects:
             try:

@@ -66,11 +66,12 @@ class CommonUpdaters:
                 channels_list = []
                 new_type = "Influencer"
 
-        if new_type == "Influencer":
+        if new_type == "Influencer" and hasattr(self, "float_object_strength"):
             if not self.float_object_strength == 1:
                 new_type = "Brush"
 
-        self.object_identities_enum = new_type
+        if hasattr(self, "object_identities_enum"):
+            self.object_identities_enum = new_type
         
         self.list_group_channels.clear()
         

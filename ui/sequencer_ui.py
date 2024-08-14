@@ -804,9 +804,6 @@ class SequencerUI:
     def draw_timeline_sync(self, context):
         if (hasattr(context.scene, "sync_timecode") and
             hasattr(context.scene, "timecode_expected_lag")):
-            pcoll = preview_collections["main"]
-            orb = pcoll["orb"]
-
             scene = context.scene
 
             sequencer_open = False

@@ -83,7 +83,6 @@ class CommonUI:
             flow.operator("my.about_operator", icon='INFO', text="About" if region_width > 200 else "")
             flow.operator("my.copy_above_to_selected", icon='COPYDOWN', text="Disable Clocks" if region_width > 200 else "")
             flow.operator("my.disable_all_clocks_operator", icon='MOD_TIME', text="Disable Clocks" if region_width > 200 else "")
-            flow.operator("seq.show_sequencer_settings", icon='PREFERENCES', text="Settings" if region_width > 200 else "")
 
         elif space_type == 'NODE_EDITOR' and scene.view_node_toolbar:
             flow.operator("node.add_group_controller_node", icon='ADD', text="Add Group" if region_width >= 200 else "", emboss=True)
@@ -91,7 +90,6 @@ class CommonUI:
             flow.operator("my.displays_operator", icon='MENU_PANEL', text="Displays" if region_width >= 200 else "")
             flow.operator("my.about_operator", icon='INFO', text="About" if region_width >= 200 else "")
             flow.operator("my.disable_all_clocks_operator", icon='MOD_TIME', text="Disable Clocks" if region_width >= 200 else "")
-            flow.operator("seq.show_sequencer_settings", icon='PREFERENCES', text="Settings" if region_width > 200 else "")
 
         elif space_type == 'VIEW_3D' and scene.view_viewport_toolbar:
             flow.operator("node.add_group_controller_node", icon='ADD', text="Add Group" if region_width >= 200 else "", emboss=True)
@@ -99,7 +97,6 @@ class CommonUI:
             flow.operator("my.displays_operator", icon='MENU_PANEL', text="Displays" if region_width >= 200 else "")
             flow.operator("my.about_operator", icon='INFO', text="About" if region_width >= 200 else "")
             flow.operator("my.disable_all_clocks_operator", icon='MOD_TIME', text="Disable Clocks" if region_width >= 200 else "")
-            flow.operator("seq.show_sequencer_settings", icon='PREFERENCES', text="Settings" if region_width > 200 else "")
 
 
     @staticmethod

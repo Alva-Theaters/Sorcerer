@@ -606,13 +606,12 @@ class Utils:
         except:
             print("An error occured in find_executor because of an invalid object or incorrect registration.")
 
-        if existing_prop != 0:
+        if existing_prop != 0 and object.name == object.str_parent_name: # 2nd check filters duplicates
             return existing_prop
 
         new_index = Utils.find_new_executor(scene, executor_type)
 
         return Utils.add_new_index(scene, new_index, object, executor_type)
-
 
     def find_new_executor(scene, executor_type):
         executor_map = {
@@ -666,6 +665,7 @@ class Utils:
         strips = [strip for strip in scene.sequence_editor.sequences if (strip.type == 'COLOR' or strip.type =='SOUND')]
         strips.append(scene)
         return strips
+    
     def add_new_index(scene, new_index, object, executor_type):
         try:
             setattr(object, f"int_{executor_type}", new_index)
