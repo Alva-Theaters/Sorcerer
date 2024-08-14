@@ -32,6 +32,7 @@ import bpy
 # Custom icon stuff
 import bpy.utils.previews
 import os
+
 preview_collections = {}
 pcoll = bpy.utils.previews.new()
 preview_collections["main"] = pcoll
@@ -41,14 +42,10 @@ pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
 
 icons_dir = os.path.join(addon_dir, "icons")
 
-# Edge is diffusion
-# Diffusion is iris
-# Iris is zoom
-# Zoom is iris
-pcoll.load("zoom", os.path.join(icons_dir, "iris.png"), 'IMAGE')
-pcoll.load("iris", os.path.join(icons_dir, "diffusion.png"), 'IMAGE')
-pcoll.load("edge", os.path.join(icons_dir, "zoom.png"), 'IMAGE')
-pcoll.load("diffusion", os.path.join(icons_dir, "edge.png"), 'IMAGE')
+pcoll.load("zoom", os.path.join(icons_dir, "zoom.png"), 'IMAGE')
+pcoll.load("iris", os.path.join(icons_dir, "iris.png"), 'IMAGE')
+pcoll.load("edge", os.path.join(icons_dir, "edge.png"), 'IMAGE')
+pcoll.load("diffusion", os.path.join(icons_dir, "diffusion.png"), 'IMAGE')
 
 pcoll.load("sound_dark", os.path.join(icons_dir, "sound_dark.svg"), 'IMAGE')
 pcoll.load("color_dark", os.path.join(icons_dir, "color_dark.svg"), 'IMAGE')
