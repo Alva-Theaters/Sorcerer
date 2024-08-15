@@ -139,7 +139,41 @@ def register():
     Scene.cyc_light_groups = StringProperty(name="Background Light 1 Groups")
     Scene.cyc_two_light_groups = StringProperty(name="Background Light 1 Groups")
     Scene.cyc_three_light_groups = StringProperty(name="Background Light 1 Groups")
-    Scene.cyc_four_light_groups = StringProperty(name="Background Light 1 Groups")   
+    Scene.cyc_four_light_groups = StringProperty(name="Background Light 1 Groups")  
+
+    Scene.key_light_channels = StringProperty(name="Key Light Channels")
+    Scene.rim_light_channels = StringProperty(name="Rim Light Channels")
+    Scene.fill_light_channels = StringProperty(name="Fill Light Channels")
+    Scene.texture_light_channels = StringProperty(name="Texture Light Channels")
+    Scene.band_light_channels = StringProperty(name="Band Light Channels")
+    Scene.accent_light_channels = StringProperty(name="Accent Light Channels")
+    Scene.energy_light_channels = StringProperty(name="Accent Light Channels")
+    Scene.cyc_light_channels = StringProperty(name="Background Light 1 Channels")
+    Scene.cyc_two_light_channels = StringProperty(name="Background Light 1 Channels")
+    Scene.cyc_three_light_channels = StringProperty(name="Background Light 1 Channels")
+    Scene.cyc_four_light_channels = StringProperty(name="Background Light 1 Channels") 
+
+    Scene.key_light_submasters = StringProperty(name="Key Light Submasters")
+    Scene.rim_light_submasters = StringProperty(name="Rim Light Submasters")
+    Scene.fill_light_submasters = StringProperty(name="Fill Light Submasters")
+    Scene.texture_light_submasters = StringProperty(name="Texture Light Submasters")
+    Scene.band_light_submasters = StringProperty(name="Band Light Submasters")
+    Scene.accent_light_submasters = StringProperty(name="Accent Light Submasters")
+    Scene.energy_light_submasters = StringProperty(name="Accent Light Submasters")
+    Scene.cyc_light_submasters = StringProperty(name="Background Light 1 Submasters")
+    Scene.cyc_two_light_submasters = StringProperty(name="Background Light 1 Submasters")
+    Scene.cyc_three_light_submasters = StringProperty(name="Background Light 1 Submasters")
+    Scene.cyc_four_light_submasters = StringProperty(name="Background Light 1 Submasters") 
+
+    ColorSequence.key_light_slow = FloatProperty(name="Slow", description="Slow the transition for this group", min=0, max=1000)
+    ColorSequence.rim_light_slow = FloatProperty(name="Slow", description="Slow the transition for this group", min=0, max=1000)
+    ColorSequence.fill_light_slow = FloatProperty(name="Slow", description="Slow the transition for this group", min=0, max=1000)
+    ColorSequence.texture_light_slow = FloatProperty(name="Slow", description="Slow the transition for this group", min=0, max=1000)
+    ColorSequence.band_light_slow = FloatProperty(name="Slow", description="Slow the transition for this group", min=0, max=1000)
+    ColorSequence.accent_light_slow = FloatProperty(name="Slow", description="Slow the transition for this group", min=0, max=1000)
+    ColorSequence.energy_light_slow = FloatProperty(name="Slow", description="Slow the transition for this group", min=0, max=1000)
+    ColorSequence.cyc_light_slow = FloatProperty(name="Slow", description="Slow the transition for this group", min=0, max=1000)
+
     ColorSequence.key_light = IntProperty(name="Key Light", min=0, max=100, update=Updaters.key_light_updater, description="White, nuetral, primary light for primary performers")
     ColorSequence.rim_light = IntProperty(name="Rim Light", min=0, max=100,  update=Updaters.rim_light_updater, description="White or warm light coming from upstage to create definition between foreground and background")
     ColorSequence.fill_light = IntProperty(name="Fill Light", min=0, max=100,  update=Updaters.fill_light_updater, description="White, nuetral light to balance edges between key and rim lights")
@@ -154,10 +188,21 @@ def register():
     ColorSequence.background_light_two = IntProperty(name="Background Light 2", min=0, max=100,  update=Updaters.background_two_light_updater, description="Use these additional slots if you're controlling backdrop color by varying intensity of multiple channels with different color gels")
     ColorSequence.background_light_three = IntProperty(name="Background Light 3", min=0, max=100,  update=Updaters.background_three_light_updater, description="Use these additional slots if you're controlling backdrop color by varying intensity of multiple channels with different color gels")
     ColorSequence.background_light_four = IntProperty(name="Background Light 4", min=0, max=100,  update=Updaters.background_four_light_updater, description="Use these additional slots if you're controlling backdrop color by varying intensity of multiple channels with different color gels")
-    ColorSequence.sixty_color = FloatVectorProperty(name="60% Color", subtype='COLOR', size=3, min=0.0, max=1.0, default=(.009, .009, .009), description="Dummy, reference color only. Does not control console parameters")
-    ColorSequence.thirty_color = FloatVectorProperty(name="30% Color", subtype='COLOR', size=3, min=0.0, max=1.0, default=(.089, .089, .089), description="Dummy, reference color only. Does not control console parameters")
-    ColorSequence.ten_color = FloatVectorProperty(name="10% Color", subtype='COLOR', size=3, min=0.0, max=1.0, default=(.231, 0.003, .45), description="Dummy, reference color only. Does not control console parameters")
+    
+    ColorSequence.cue_description = StringProperty(name="Description", description="What this look has to say")
+    ColorSequence.sixty_color = FloatVectorProperty(name="60% Color", subtype='COLOR', size=3, min=0.0, max=1.0, default=(.009, .009, .009), description="Reference color only")
+    ColorSequence.thirty_color = FloatVectorProperty(name="30% Color", subtype='COLOR', size=3, min=0.0, max=1.0, default=(.089, .089, .089), description="Reference color only")
+    ColorSequence.ten_color = FloatVectorProperty(name="10% Color", subtype='COLOR', size=3, min=0.0, max=1.0, default=(.231, 0.003, .45), description="Reference color only")
+    
     ColorSequence.cue_builder_effect_id = StringProperty(name="")
+    ColorSequence.cue_builder_key_id = StringProperty(name="")
+    ColorSequence.cue_builder_rim_id = StringProperty(name="")
+    ColorSequence.cue_builder_fill_id = StringProperty(name="")
+    ColorSequence.cue_builder_texture_id = StringProperty(name="")
+    ColorSequence.cue_builder_band_id = StringProperty(name="")
+    ColorSequence.cue_builder_accent_id = StringProperty(name="")
+    ColorSequence.cue_builder_cyc_id = StringProperty(name="")
+    
     ColorSequence.key_is_recording = BoolProperty(
         name="", 
         description="Record presets when pose buttons are red", 
@@ -304,6 +349,39 @@ def unregister():
     del Scene.cyc_three_light_groups
     del Scene.cyc_four_light_groups
 
+    del Scene.key_light_channels
+    del Scene.rim_light_channels
+    del Scene.fill_light_channels
+    del Scene.texture_light_channels
+    del Scene.band_light_channels
+    del Scene.accent_light_channels
+    del Scene.energy_light_channels
+    del Scene.cyc_light_channels
+    del Scene.cyc_two_light_channels
+    del Scene.cyc_three_light_channels
+    del Scene.cyc_four_light_channels
+
+    del Scene.key_light_submasters
+    del Scene.rim_light_submasters
+    del Scene.fill_light_submasters
+    del Scene.texture_light_submasters
+    del Scene.band_light_submasters
+    del Scene.accent_light_submasters
+    del Scene.energy_light_submasters
+    del Scene.cyc_light_submasters
+    del Scene.cyc_two_light_submasters
+    del Scene.cyc_three_light_submasters
+    del Scene.cyc_four_light_submasters
+
+    del ColorSequence.key_light_slow
+    del ColorSequence.rim_light_slow
+    del ColorSequence.fill_light_slow
+    del ColorSequence.texture_light_slow
+    del ColorSequence.band_light_slow
+    del ColorSequence.accent_light_slow
+    del ColorSequence.energy_light_slow
+    del ColorSequence.cyc_light_slow
+
     del ColorSequence.key_light
     del ColorSequence.rim_light
     del ColorSequence.fill_light
@@ -319,10 +397,20 @@ def unregister():
     del ColorSequence.background_light_three
     del ColorSequence.background_light_four
 
+    del ColorSequence.cue_description
     del ColorSequence.sixty_color
     del ColorSequence.thirty_color
     del ColorSequence.ten_color
+
     del ColorSequence.cue_builder_effect_id
+    del ColorSequence.cue_builder_key_id 
+    del ColorSequence.cue_builder_rim_id
+    del ColorSequence.cue_builder_fill_id
+    del ColorSequence.cue_builder_texture_id
+    del ColorSequence.cue_builder_band_id
+    del ColorSequence.cue_builder_accent_id
+    del ColorSequence.cue_builder_cyc_id
+
     del ColorSequence.key_is_recording
     del ColorSequence.rim_is_recording
     del ColorSequence.fill_is_recording

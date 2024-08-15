@@ -73,6 +73,7 @@ class SEQUENCER_OT_record_cue(Operator):
         return {'FINISHED'}
     
  
+# Focus key
 class SEQUENCER_OT_focus_one(Operator):
     bl_idname = "my.focus_one"
     bl_label = "Preset 1"
@@ -111,6 +112,56 @@ class SEQUENCER_OT_focus_four(Operator):
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
         send_cue_builder_group_command(4, 'key', active_strip.key_is_recording, context)
+        return {'FINISHED'}
+    
+class SEQUENCER_OT_focus_five(Operator):
+    bl_idname = "my.focus_five"
+    bl_label = "Preset 5"
+    bl_description = "Set to preset five"
+    
+    def execute(self, context):
+        active_strip = context.scene.sequence_editor.active_strip
+        send_cue_builder_group_command(5, 'key', active_strip.key_is_recording, context)
+        return {'FINISHED'}
+
+class SEQUENCER_OT_focus_six(Operator):
+    bl_idname = "my.focus_six"
+    bl_label = "Preset 6"
+    bl_description = "Set to preset six"
+    
+    def execute(self, context):
+        active_strip = context.scene.sequence_editor.active_strip
+        send_cue_builder_group_command(6, 'key', active_strip.key_is_recording, context)
+        return {'FINISHED'}
+
+class SEQUENCER_OT_focus_seven(Operator):
+    bl_idname = "my.focus_seven"
+    bl_label = "Preset 7"
+    bl_description = "Set to preset seven"
+    
+    def execute(self, context):
+        active_strip = context.scene.sequence_editor.active_strip
+        send_cue_builder_group_command(7, 'key', active_strip.key_is_recording, context)
+        return {'FINISHED'}
+
+class SEQUENCER_OT_focus_eight(Operator):
+    bl_idname = "my.focus_eight"
+    bl_label = "Preset 8"
+    bl_description = "Set to preset eight"
+    
+    def execute(self, context):
+        active_strip = context.scene.sequence_editor.active_strip
+        send_cue_builder_group_command(8, 'key', active_strip.key_is_recording, context)
+        return {'FINISHED'}
+    
+class SEQUENCER_OT_focus_nine(Operator):
+    bl_idname = "my.focus_nine"
+    bl_label = "Preset 9"
+    bl_description = "Set to preset nine"
+    
+    def execute(self, context):
+        active_strip = context.scene.sequence_editor.active_strip
+        send_cue_builder_group_command(9, 'key', active_strip.key_is_recording, context)
         return {'FINISHED'}
 
 
@@ -154,7 +205,59 @@ class SEQUENCER_OT_focus_rim_four(Operator):
         active_strip = context.scene.sequence_editor.active_strip
         send_cue_builder_group_command(4, 'rim', active_strip.rim_is_recording, context)
         return {'FINISHED'}
+    
+class SEQUENCER_OT_focus_rim_five(Operator):
+    bl_idname = "my.focus_rim_five"
+    bl_label = "Preset 5"
+    bl_description = "Set to preset five"
+    
+    def execute(self, context):
+        active_strip = context.scene.sequence_editor.active_strip
+        send_cue_builder_group_command(5, 'rim', active_strip.rim_is_recording, context)
+        return {'FINISHED'}
 
+class SEQUENCER_OT_focus_rim_six(Operator):
+    bl_idname = "my.focus_rim_six"
+    bl_label = "Preset 6"
+    bl_description = "Set to preset six"
+    
+    def execute(self, context):
+        active_strip = context.scene.sequence_editor.active_strip
+        send_cue_builder_group_command(6, 'rim', active_strip.rim_is_recording, context)
+        return {'FINISHED'}
+
+class SEQUENCER_OT_focus_rim_seven(Operator):
+    bl_idname = "my.focus_rim_seven"
+    bl_label = "Preset 7"
+    bl_description = "Set to preset seven"
+    
+    def execute(self, context):
+        active_strip = context.scene.sequence_editor.active_strip
+        send_cue_builder_group_command(7, 'rim', active_strip.rim_is_recording, context)
+        return {'FINISHED'}
+
+class SEQUENCER_OT_focus_rim_eight(Operator):
+    bl_idname = "my.focus_rim_eight"
+    bl_label = "Preset 8"
+    bl_description = "Set to preset eight"
+    
+    def execute(self, context):
+        active_strip = context.scene.sequence_editor.active_strip
+        send_cue_builder_group_command(8, 'rim', active_strip.rim_is_recording, context)
+        return {'FINISHED'}
+    
+class SEQUENCER_OT_focus_rim_nine(Operator):
+    bl_idname = "my.focus_rim_nine"
+    bl_label = "Preset 9"
+    bl_description = "Set to preset nine"
+    
+    def execute(self, context):
+        active_strip = context.scene.sequence_editor.active_strip
+        send_cue_builder_group_command(9, 'rim', active_strip.rim_is_recording, context)
+        return {'FINISHED'}
+
+
+# Focus fill
 class SEQUENCER_OT_focus_fill_one(Operator):
     bl_idname = "my.focus_fill_one"
     bl_label = "Preset 1"
@@ -193,6 +296,56 @@ class SEQUENCER_OT_focus_fill_four(Operator):
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
         send_cue_builder_group_command(4, 'fill', active_strip.fill_is_recording, context)
+        return {'FINISHED'}
+    
+class SEQUENCER_OT_focus_fill_five(Operator):
+    bl_idname = "my.focus_fill_five"
+    bl_label = "Preset 5"
+    bl_description = "Set to preset five"
+    
+    def execute(self, context):
+        active_strip = context.scene.sequence_editor.active_strip
+        send_cue_builder_group_command(5, 'fill', active_strip.fill_is_recording, context)
+        return {'FINISHED'}
+    
+class SEQUENCER_OT_focus_fill_six(Operator):
+    bl_idname = "my.focus_fill_six"
+    bl_label = "Preset 6"
+    bl_description = "Set to preset six"
+    
+    def execute(self, context):
+        active_strip = context.scene.sequence_editor.active_strip
+        send_cue_builder_group_command(6, 'fill', active_strip.fill_is_recording, context)
+        return {'FINISHED'}
+    
+class SEQUENCER_OT_focus_fill_seven(Operator):
+    bl_idname = "my.focus_fill_seven"
+    bl_label = "Preset 7"
+    bl_description = "Set to preset seven"
+    
+    def execute(self, context):
+        active_strip = context.scene.sequence_editor.active_strip
+        send_cue_builder_group_command(7, 'fill', active_strip.fill_is_recording, context)
+        return {'FINISHED'}
+    
+class SEQUENCER_OT_focus_fill_eight(Operator):
+    bl_idname = "my.focus_fill_eight"
+    bl_label = "Preset 8"
+    bl_description = "Set to preset eight"
+    
+    def execute(self, context):
+        active_strip = context.scene.sequence_editor.active_strip
+        send_cue_builder_group_command(8, 'fill', active_strip.fill_is_recording, context)
+        return {'FINISHED'}
+    
+class SEQUENCER_OT_focus_fill_nine(Operator):
+    bl_idname = "my.focus_fill_nine"
+    bl_label = "Preset 9"
+    bl_description = "Set to preset nine"
+    
+    def execute(self, context):
+        active_strip = context.scene.sequence_editor.active_strip
+        send_cue_builder_group_command(9, 'fill', active_strip.fill_is_recording, context)
         return {'FINISHED'}
 
 
@@ -276,6 +429,16 @@ class SEQUENCER_OT_focus_texture_eight(Operator):
         active_strip = context.scene.sequence_editor.active_strip
         send_cue_builder_group_command(8, 'texture', active_strip.texture_is_recording, context)
         return {'FINISHED'}
+    
+class SEQUENCER_OT_focus_texture_nine(Operator):
+    bl_idname = "my.focus_texture_nine"
+    bl_label = "Preset 9"
+    bl_description = "Set to preset nine"
+    
+    def execute(self, context):
+        active_strip = context.scene.sequence_editor.active_strip
+        send_cue_builder_group_command(9, 'texture', active_strip.texture_is_recording, context)
+        return {'FINISHED'}
 
 
 # Focus band.
@@ -358,6 +521,17 @@ class SEQUENCER_OT_focus_band_eight(Operator):
         active_strip = context.scene.sequence_editor.active_strip
         send_cue_builder_group_command(8, 'band', active_strip.band_is_recording, context)
         return {'FINISHED'}
+    
+class SEQUENCER_OT_focus_band_nine(Operator):
+    bl_idname = "my.focus_band_nine"
+    bl_label = "Preset 9"
+    bl_description = "Set to preset nine"
+    
+    def execute(self, context):
+        active_strip = context.scene.sequence_editor.active_strip
+        send_cue_builder_group_command(9, 'band', active_strip.band_is_recording, context)
+        return {'FINISHED'}
+    
 
 # Focus accent.
 class SEQUENCER_OT_focus_accent_one(Operator):
@@ -439,6 +613,17 @@ class SEQUENCER_OT_focus_accent_eight(Operator):
         active_strip = context.scene.sequence_editor.active_strip
         send_cue_builder_group_command(8, 'accent', active_strip.accent_is_recording, context)
         return {'FINISHED'}
+    
+class SEQUENCER_OT_focus_accent_nine(Operator):
+    bl_idname = "my.focus_accent_nine"
+    bl_label = "Preset 9"
+    bl_description = "Set to preset nine"
+    
+    def execute(self, context):
+        active_strip = context.scene.sequence_editor.active_strip
+        send_cue_builder_group_command(9, 'accent', active_strip.accent_is_recording, context)
+        return {'FINISHED'}
+
 
 # Focus cyc.
 class SEQUENCER_OT_focus_cyc_one(Operator):
@@ -520,6 +705,16 @@ class SEQUENCER_OT_focus_cyc_eight(Operator):
         active_strip = context.scene.sequence_editor.active_strip
         send_cue_builder_group_command(8, 'cyc', active_strip.cyc_is_recording, context)
         return {'FINISHED'} 
+    
+class SEQUENCER_OT_focus_cyc_nine(Operator):
+    bl_idname = "my.focus_cyc_nine"
+    bl_label = "Preset 9"
+    bl_description = "Set to preset nine"
+    
+    def execute(self, context):
+        active_strip = context.scene.sequence_editor.active_strip
+        send_cue_builder_group_command(9, 'cyc', active_strip.cyc_is_recording, context)
+        return {'FINISHED'} 
  
  
 # Effects.
@@ -538,8 +733,6 @@ class SEQUENCER_OT_focus_energy(Operator):
             for group in groups:
                 address = "/eos/newcmd"
                 argument = f"Group {group} Effect {self.effect_number + scene.cue_builder_id_offset} Enter"
-                ip_address = context.scene.scene_props.str_osc_ip_address
-                port = context.scene.scene_props.int_osc_port
                 OSC.send_osc_lighting(address, argument)
         return {'FINISHED'}
 
@@ -572,6 +765,47 @@ class SEQUENCER_OT_focus_energy_six(SEQUENCER_OT_focus_energy):
     bl_idname = "my.focus_energy_six"
     bl_label = "Effect 6"
     effect_number = 6
+
+class SEQUENCER_OT_focus_energy_seven(SEQUENCER_OT_focus_energy):
+    bl_idname = "my.focus_energy_seven"
+    bl_label = "Effect 7"
+    effect_number = 7
+
+class SEQUENCER_OT_focus_energy_eight(SEQUENCER_OT_focus_energy):
+    bl_idname = "my.focus_energy_eight"
+    bl_label = "Effect 8"
+    effect_number = 8
+
+class SEQUENCER_OT_focus_energy_nine(SEQUENCER_OT_focus_energy):
+    bl_idname = "my.focus_energy_nine"
+    bl_label = "Effect 9"
+    effect_number = 9
+
+class SEQUENCER_OT_focus_energy_ten(SEQUENCER_OT_focus_energy):
+    bl_idname = "my.focus_energy_ten"
+    bl_label = "Effect 10"
+    effect_number = 10
+
+class SEQUENCER_OT_focus_energy_eleven(SEQUENCER_OT_focus_energy):
+    bl_idname = "my.focus_energy_eleven"
+    bl_label = "Effect 11"
+    effect_number = 11
+
+class SEQUENCER_OT_focus_energy_twelve(SEQUENCER_OT_focus_energy):
+    bl_idname = "my.focus_energy_twelve"
+    bl_label = "Effect 12"
+    effect_number = 12
+
+class SEQUENCER_OT_focus_energy_thirteen(SEQUENCER_OT_focus_energy):
+    bl_idname = "my.focus_energy_thirteen"
+    bl_label = "Effect 13"
+    effect_number = 13
+
+class SEQUENCER_OT_focus_energy_fourteen(SEQUENCER_OT_focus_energy):
+    bl_idname = "my.focus_energy_fourteen"
+    bl_label = "Effect 14"
+    effect_number = 14
+
     
 def send_cue_builder_group_command(id, group_type, recording, context):
     scene = context.scene
@@ -587,6 +821,8 @@ def send_cue_builder_group_command(id, group_type, recording, context):
     argument_parts = ["Group " + str(group) + " " + command_suffix for group in groups]
     argument = " + ".join(argument_parts)
     OSC.send_osc_lighting(address, argument)
+
+    setattr(active_strip, f"cue_builder_{group_type}_id", str(id))
     
 class SEQUENCER_OT_stop_effect(Operator):
     bl_idname = "my.stop_effect"
@@ -613,105 +849,140 @@ class SEQUENCER_OT_stop_effect(Operator):
 # Channel list pop-ups.    
 class SEQUENCER_OT_key_groups(Operator):
     bl_idname = "my.key_groups"
-    bl_label = "Console Groups"
+    bl_label = "Settings"
     bl_description = "Set groups for key light"
     
     def execute(self, context):
         return {'FINISHED'}
 
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width=400)
+        return context.window_manager.invoke_props_dialog(self, width=300)
 
     def draw(self, context):
-        self.layout.prop(context.scene, "key_light_groups", text="")
+        active_strip = context.scene.sequence_editor.active_strip
+
+        self.layout.prop(context.scene, "key_light_groups", text="Groups")
+        self.layout.prop(context.scene, "key_light_channels", text="Channels")
+        self.layout.prop(context.scene, "key_light_submasters", text="Submasters")
+        self.layout.prop(active_strip, "key_light_slow")
      
 class SEQUENCER_OT_rim_groups(Operator):
     bl_idname = "my.rim_groups"
-    bl_label = "Console Groups"
+    bl_label = "Settings"
     bl_description = "Set groups for rim light"
     
     def execute(self, context):
         return {'FINISHED'}
 
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width=400)
+        return context.window_manager.invoke_props_dialog(self, width=300)
 
     def draw(self, context):
-        self.layout.prop(context.scene, "rim_light_groups", text="")
+        active_strip = context.scene.sequence_editor.active_strip
+
+        self.layout.prop(context.scene, "rim_light_groups", text="Groups")
+        self.layout.prop(context.scene, "rim_light_channels", text="Channels")
+        self.layout.prop(context.scene, "rim_light_submasters", text="Submasters")
+        self.layout.prop(active_strip, "rim_light_slow")
               
 class SEQUENCER_OT_fill_groups(Operator):
     bl_idname = "my.fill_groups"
-    bl_label = "Console Groups"
+    bl_label = "Settings"
     bl_description = "Set groups for fill light"
     
     def execute(self, context):
         return {'FINISHED'}
 
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width=400)
+        return context.window_manager.invoke_props_dialog(self, width=300)
 
     def draw(self, context):
-        self.layout.prop(context.scene, "fill_light_groups", text="")
+        active_strip = context.scene.sequence_editor.active_strip
+
+        self.layout.prop(context.scene, "fill_light_groups", text="Groups")
+        self.layout.prop(context.scene, "fill_light_channels", text="Channels")
+        self.layout.prop(context.scene, "fill_light_submasters", text="Submasters")
+        self.layout.prop(active_strip, "fill_light_slow")
              
 class SEQUENCER_OT_texture_groups(Operator):
     bl_idname = "my.texture_groups"
-    bl_label = "Console Groups"
+    bl_label = "Settings"
     bl_description = "Set groups for texture light"
     
     def execute(self, context):
         return {'FINISHED'}
 
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width=400)
+        return context.window_manager.invoke_props_dialog(self, width=300)
 
     def draw(self, context):
-        self.layout.prop(context.scene, "texture_light_groups", text="")
+        active_strip = context.scene.sequence_editor.active_strip
+
+        self.layout.prop(context.scene, "texture_light_groups", text="Groups")
+        self.layout.prop(context.scene, "texture_light_channels", text="Channels")
+        self.layout.prop(context.scene, "texture_light_submasters", text="Submasters")
+        self.layout.prop(active_strip, "texture_light_slow")
              
 class SEQUENCER_OT_band_groups(Operator):
     bl_idname = "my.band_groups"
-    bl_label = "Console Groups"
+    bl_label = "Settings"
     bl_description = "Set groups for band light"
     
     def execute(self, context):
         return {'FINISHED'}
 
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width=400)
+        return context.window_manager.invoke_props_dialog(self, width=300)
 
     def draw(self, context):
-        self.layout.prop(context.scene, "band_light_groups", text="")
+        active_strip = context.scene.sequence_editor.active_strip
+
+        self.layout.prop(context.scene, "band_light_groups", text="Groups")
+        self.layout.prop(context.scene, "band_light_channels", text="Channels")
+        self.layout.prop(context.scene, "band_light_submasters", text="Submasters")
+        self.layout.prop(active_strip, "band_light_slow")
            
 class SEQUENCER_OT_accent_groups(Operator):
     bl_idname = "my.accent_groups"
-    bl_label = "Accent Groups"
+    bl_label = "Settings"
     bl_description = "Set groups for accent light"
     
     def execute(self, context):
         return {'FINISHED'}
 
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width=400)
+        return context.window_manager.invoke_props_dialog(self, width=300)
 
     def draw(self, context):
-        self.layout.prop(context.scene, "accent_light_groups", text="")
+        active_strip = context.scene.sequence_editor.active_strip
+
+        self.layout.prop(context.scene, "accent_light_groups", text="Groups")
+        self.layout.prop(context.scene, "accent_light_channels", text="Channels")
+        self.layout.prop(context.scene, "accent_light_submasters", text="Submasters")
+        self.layout.prop(active_strip, "accent_light_slow")
         
 class SEQUENCER_OT_energy_groups(Operator):
     bl_idname = "my.energy_groups"
-    bl_label = "Energy Groups"
+    bl_label = "Settings"
     bl_description = "Set groups for energy light"
     
     def execute(self, context):
         return {'FINISHED'}
 
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width=400)
+        return context.window_manager.invoke_props_dialog(self, width=300)
 
     def draw(self, context):
-        self.layout.prop(context.scene, "energy_light_groups", text="")
+        active_strip = context.scene.sequence_editor.active_strip
+
+        self.layout.prop(context.scene, "energy_light_groups", text="Groups")
+        self.layout.prop(context.scene, "energy_light_channels", text="Channels")
+        self.layout.prop(context.scene, "energy_light_submasters", text="Submasters")
+        self.layout.prop(active_strip, "energy_light_slow")
         
 class SEQUENCER_OT_gel_one_groups(Operator):
     bl_idname = "my.gel_one_groups"
-    bl_label = "Console Groups"
+    bl_label = "Settings"
     bl_description = "Set groups for gel 1 light"
     
     def execute(self, context):
@@ -720,14 +991,16 @@ class SEQUENCER_OT_gel_one_groups(Operator):
     def invoke(self, context, event):
         scene = context.scene
         if not scene.using_gels_for_cyc:
-            return context.window_manager.invoke_props_dialog(self, width=400)
+            return context.window_manager.invoke_props_dialog(self, width=300)
         else:
             return context.window_manager.invoke_props_dialog(self, width=600)
 
     def draw(self, context):
         scene = context.scene
-        if not scene.using_gels_for_cyc:  
+        if not scene.using_gels_for_cyc:
+            active_strip = context.scene.sequence_editor.active_strip
             self.layout.prop(context.scene, "cyc_light_groups", text="")
+            self.layout.prop(active_strip, "cyc_light_slow")
         else:
             self.layout.prop(context.scene, "cyc_light_groups", text="Gel 1")
             self.layout.prop(context.scene, "cyc_two_light_groups", text="Gel 2")
@@ -738,18 +1011,37 @@ class SEQUENCER_OT_gel_one_groups(Operator):
 cue_builder_operators = [
     SEQUENCER_OT_update_cue_builder,
     SEQUENCER_OT_record_cue,
+
     SEQUENCER_OT_focus_one,
     SEQUENCER_OT_focus_two,
     SEQUENCER_OT_focus_three,
     SEQUENCER_OT_focus_four,
+    SEQUENCER_OT_focus_five,
+    SEQUENCER_OT_focus_six,
+    SEQUENCER_OT_focus_seven,
+    SEQUENCER_OT_focus_eight,
+    SEQUENCER_OT_focus_nine,
+
     SEQUENCER_OT_focus_rim_one,
     SEQUENCER_OT_focus_rim_two,
     SEQUENCER_OT_focus_rim_three,
     SEQUENCER_OT_focus_rim_four,
+    SEQUENCER_OT_focus_rim_five,
+    SEQUENCER_OT_focus_rim_six,
+    SEQUENCER_OT_focus_rim_seven,
+    SEQUENCER_OT_focus_rim_eight,
+    SEQUENCER_OT_focus_rim_nine,
+
     SEQUENCER_OT_focus_fill_one,
     SEQUENCER_OT_focus_fill_two,
     SEQUENCER_OT_focus_fill_three,
     SEQUENCER_OT_focus_fill_four,
+    SEQUENCER_OT_focus_fill_five,
+    SEQUENCER_OT_focus_fill_six,
+    SEQUENCER_OT_focus_fill_seven,
+    SEQUENCER_OT_focus_fill_eight,
+    SEQUENCER_OT_focus_fill_nine,
+
     SEQUENCER_OT_focus_texture_one,
     SEQUENCER_OT_focus_texture_two,
     SEQUENCER_OT_focus_texture_three,
@@ -758,6 +1050,8 @@ cue_builder_operators = [
     SEQUENCER_OT_focus_texture_six,
     SEQUENCER_OT_focus_texture_seven,
     SEQUENCER_OT_focus_texture_eight,
+    SEQUENCER_OT_focus_texture_nine,
+
     SEQUENCER_OT_focus_band_one,
     SEQUENCER_OT_focus_band_two,
     SEQUENCER_OT_focus_band_three,
@@ -766,6 +1060,8 @@ cue_builder_operators = [
     SEQUENCER_OT_focus_band_six,
     SEQUENCER_OT_focus_band_seven,
     SEQUENCER_OT_focus_band_eight,
+    SEQUENCER_OT_focus_band_nine,
+
     SEQUENCER_OT_focus_accent_one,
     SEQUENCER_OT_focus_accent_two,
     SEQUENCER_OT_focus_accent_three,
@@ -774,6 +1070,8 @@ cue_builder_operators = [
     SEQUENCER_OT_focus_accent_six,
     SEQUENCER_OT_focus_accent_seven,
     SEQUENCER_OT_focus_accent_eight,
+    SEQUENCER_OT_focus_accent_nine,
+
     SEQUENCER_OT_focus_cyc_one,
     SEQUENCER_OT_focus_cyc_two,
     SEQUENCER_OT_focus_cyc_three,
@@ -782,13 +1080,25 @@ cue_builder_operators = [
     SEQUENCER_OT_focus_cyc_six,
     SEQUENCER_OT_focus_cyc_seven,
     SEQUENCER_OT_focus_cyc_eight,
+    SEQUENCER_OT_focus_cyc_nine,
+
     SEQUENCER_OT_focus_energy_one,
     SEQUENCER_OT_focus_energy_two,
     SEQUENCER_OT_focus_energy_three,
     SEQUENCER_OT_focus_energy_four,
     SEQUENCER_OT_focus_energy_five,
     SEQUENCER_OT_focus_energy_six,
+    SEQUENCER_OT_focus_energy_seven,
+    SEQUENCER_OT_focus_energy_eight,
+    SEQUENCER_OT_focus_energy_nine,
+    SEQUENCER_OT_focus_energy_ten,
+    SEQUENCER_OT_focus_energy_eleven,
+    SEQUENCER_OT_focus_energy_twelve,
+    SEQUENCER_OT_focus_energy_thirteen,
+    SEQUENCER_OT_focus_energy_fourteen,
+
     SEQUENCER_OT_stop_effect,
+
     SEQUENCER_OT_key_groups,
     SEQUENCER_OT_rim_groups,
     SEQUENCER_OT_fill_groups,
@@ -801,10 +1111,12 @@ cue_builder_operators = [
 
 
 def register():
+    from bpy.utils import register_class
     for cls in cue_builder_operators:
-        bpy.utils.register_class(cls)
+        register_class(cls)
         
 
 def unregister():
+    from bpy.utils import unregister_class
     for cls in reversed(cue_builder_operators):
-        bpy.utils.unregister_class(cls)
+        unregister_class(cls)

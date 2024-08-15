@@ -46,6 +46,11 @@ pcoll.load("preset_one", os.path.join(icons_dir, "preset_one.png"), 'IMAGE')
 pcoll.load("preset_two", os.path.join(icons_dir, "preset_two.png"), 'IMAGE')
 pcoll.load("preset_three", os.path.join(icons_dir, "preset_three.png"), 'IMAGE')
 pcoll.load("preset_four", os.path.join(icons_dir, "preset_four.png"), 'IMAGE')
+pcoll.load("preset_five", os.path.join(icons_dir, "preset_five.png"), 'IMAGE')
+pcoll.load("preset_six", os.path.join(icons_dir, "preset_six.png"), 'IMAGE')
+pcoll.load("preset_seven", os.path.join(icons_dir, "preset_seven.png"), 'IMAGE')
+pcoll.load("preset_eight", os.path.join(icons_dir, "preset_eight.png"), 'IMAGE')
+pcoll.load("preset_nine", os.path.join(icons_dir, "preset_nine.png"), 'IMAGE')
 
 pcoll.load("effect_one", os.path.join(icons_dir, "effect_one.png"), 'IMAGE')
 pcoll.load("effect_two", os.path.join(icons_dir, "effect_two.png"), 'IMAGE')
@@ -53,6 +58,14 @@ pcoll.load("effect_three", os.path.join(icons_dir, "effect_three.png"), 'IMAGE')
 pcoll.load("effect_four", os.path.join(icons_dir, "effect_four.png"), 'IMAGE')
 pcoll.load("effect_five", os.path.join(icons_dir, "effect_five.png"), 'IMAGE')
 pcoll.load("effect_six", os.path.join(icons_dir, "effect_six.png"), 'IMAGE')
+pcoll.load("effect_seven", os.path.join(icons_dir, "effect_seven.png"), 'IMAGE')
+pcoll.load("effect_eight", os.path.join(icons_dir, "effect_eight.png"), 'IMAGE')
+pcoll.load("effect_nine", os.path.join(icons_dir, "effect_nine.png"), 'IMAGE')
+pcoll.load("effect_ten", os.path.join(icons_dir, "effect_ten.png"), 'IMAGE')
+pcoll.load("effect_eleven", os.path.join(icons_dir, "effect_eleven.png"), 'IMAGE')
+pcoll.load("effect_twelve", os.path.join(icons_dir, "effect_twelve.png"), 'IMAGE')
+pcoll.load("effect_thirteen", os.path.join(icons_dir, "effect_thirteen.png"), 'IMAGE')
+pcoll.load("effect_fourteen", os.path.join(icons_dir, "effect_fourteen.png"), 'IMAGE')
 
 
 class SequencerUI:
@@ -306,15 +319,15 @@ class SequencerUI:
             row.operator("my.update_builder", text="", icon='FILE_REFRESH')
         row.operator("my.record_cue", text="", icon='REC')
         row.operator("my.sync_cue", icon_value=orb.icon_id)
-        box.separator()
         row = box.row(align=True)
+        row.scale_y = 2
         row.scale_x = .6
         row.prop(active_strip, "sixty_color", text="")
         row.scale_x = .4
         row.prop(active_strip, "thirty_color", text="")
         row.scale_x = .21
         row.prop(active_strip, "ten_color", text="")
-        
+
 
     def draw_builder_row(box, ops_list, id, active_strip, label, alert_flag, is_color=True, record_prop_name=""):
         pcoll = preview_collections["main"]
@@ -322,20 +335,32 @@ class SequencerUI:
         preset_two = pcoll["preset_two"]
         preset_three = pcoll["preset_three"]
         preset_four = pcoll["preset_four"]
-        event_icons = [preset_one.icon_id, preset_two.icon_id, preset_three.icon_id, preset_four.icon_id]
-        color_icons = ['COLORSET_01_VEC', 'COLORSET_02_VEC', 'COLORSET_03_VEC', 'COLORSET_04_VEC', 
+        preset_five = pcoll["preset_five"]
+        preset_six = pcoll["preset_six"]
+        preset_seven = pcoll["preset_seven"]
+        preset_eight = pcoll["preset_eight"]
+        preset_nine = pcoll["preset_nine"]
+        event_icons = [preset_one.icon_id, preset_two.icon_id, preset_three.icon_id, preset_four.icon_id, preset_five.icon_id, preset_six.icon_id, preset_seven.icon_id, preset_eight.icon_id, preset_nine.icon_id]
+        color_icons = ['COLORSET_01_VEC', 'COLORSET_02_VEC', 'COLORSET_03_VEC', 'COLORSET_04_VEC',
                     'COLORSET_05_VEC', 'COLORSET_06_VEC', 'COLORSET_07_VEC', 'COLORSET_08_VEC']
+        alert_ids = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+
         row = box.row(align=True)
         row.operator(f"my.{id}_groups", text="", icon='PREFERENCES')
         row.prop(active_strip, f"{id}_light", text=label, slider=True)
         row.alert = alert_flag
         row_icons = color_icons if is_color else event_icons
-        for op, icon in zip(ops_list, row_icons):
+        active_alert_id = getattr(active_strip, f"cue_builder_{id}_id")
+        for op, icon, alert_id in zip(ops_list, row_icons, alert_ids):
             if is_color:
+                row.alert = (active_alert_id == alert_id or alert_flag)
                 row.operator(op, text="", icon=icon)
+                row.alert = False
             else:
+                row.alert = (active_alert_id == alert_id or alert_flag)
                 row.operator(op, text="", icon_value=icon)
-        
+                row.alert = False
+
         row.prop(active_strip, record_prop_name, text="", icon='REC')
 
 
@@ -348,31 +373,38 @@ class SequencerUI:
         effect_four = pcoll["effect_four"]
         effect_five = pcoll["effect_five"]
         effect_six = pcoll["effect_six"]
+        effect_seven = pcoll["effect_seven"]
+        effect_eight = pcoll["effect_eight"]
+        effect_nine = pcoll["effect_nine"]
+        effect_ten = pcoll["effect_ten"]
+        effect_eleven = pcoll["effect_eleven"]
+        effect_twelve = pcoll["effect_twelve"]
+        effect_thirteen = pcoll["effect_thirteen"]
+        effect_fourteen = pcoll["effect_fourteen"]
 
-        key_ops = ["my.focus_one", "my.focus_two", "my.focus_three", "my.focus_four"]
+        key_ops = ["my.focus_one", "my.focus_two", "my.focus_three", "my.focus_four", "my.focus_five", "my.focus_six", "my.focus_seven", "my.focus_eight", "my.focus_nine"]
 
-        rim_ops = ["my.focus_rim_one", "my.focus_rim_two", "my.focus_rim_three", "my.focus_rim_four"]
+        rim_ops = ["my.focus_rim_one", "my.focus_rim_two", "my.focus_rim_three", "my.focus_rim_four", "my.focus_rim_five", "my.focus_rim_six", "my.focus_rim_seven", "my.focus_rim_eight", "my.focus_rim_nine"]
 
-        fill_ops = ["my.focus_fill_one", "my.focus_fill_two", "my.focus_fill_three", "my.focus_fill_four"]
+        fill_ops = ["my.focus_fill_one", "my.focus_fill_two", "my.focus_fill_three", "my.focus_fill_four", "my.focus_fill_five", "my.focus_fill_six", "my.focus_fill_seven", "my.focus_fill_eight", "my.focus_fill_nine"]
 
         cyc_ops = ["my.focus_cyc_one", "my.focus_cyc_two", "my.focus_cyc_three", "my.focus_cyc_four",
-                    "my.focus_cyc_five", "my.focus_cyc_six", "my.focus_cyc_seven", "my.focus_cyc_eight"]
+                    "my.focus_cyc_five", "my.focus_cyc_six", "my.focus_cyc_seven", "my.focus_cyc_eight", "my.focus_texture_nine"]
         
         band_ops = ["my.focus_band_one", "my.focus_band_two", "my.focus_band_three", "my.focus_band_four",
-                    "my.focus_band_five", "my.focus_band_six", "my.focus_band_seven", "my.focus_band_eight"]
+                    "my.focus_band_five", "my.focus_band_six", "my.focus_band_seven", "my.focus_band_eight", "my.focus_texture_nine"]
         
         accent_ops = ["my.focus_accent_one", "my.focus_accent_two", "my.focus_accent_three", "my.focus_accent_four",
-                    "my.focus_accent_five", "my.focus_accent_six", "my.focus_accent_seven", "my.focus_accent_eight"]
+                    "my.focus_accent_five", "my.focus_accent_six", "my.focus_accent_seven", "my.focus_accent_eight", "my.focus_texture_nine"]
         
         texture_ops = ["my.focus_texture_one", "my.focus_texture_two", "my.focus_texture_three", "my.focus_texture_four",
-                    "my.focus_texture_five", "my.focus_texture_six", "my.focus_texture_seven", "my.focus_texture_eight"]
+                    "my.focus_texture_five", "my.focus_texture_six", "my.focus_texture_seven", "my.focus_texture_eight", "my.focus_texture_nine"]
         
-        effect_ids = ["1", "2", "3", "4", "5", "6"]
+        effect_ids = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"]
 
-        fx_ops = ["my.focus_energy_one", "my.focus_energy_two", "my.focus_energy_three", "my.focus_energy_four", "my.focus_energy_five", "my.focus_energy_six"]
+        fx_ops = ["my.focus_energy_one", "my.focus_energy_two", "my.focus_energy_three", "my.focus_energy_four", "my.focus_energy_five", "my.focus_energy_six", "my.focus_energy_seven", "my.focus_energy_eight", "my.focus_energy_nine", "my.focus_energy_ten", "my.focus_energy_eleven", "my.focus_energy_twelve", "my.focus_energy_thirteen", "my.focus_energy_fourteen"]
 
-        fx_icons = [effect_one.icon_id, effect_two.icon_id, effect_three.icon_id, effect_four.icon_id, effect_five.icon_id, effect_six.icon_id]
-
+        fx_icons = [effect_one.icon_id, effect_two.icon_id, effect_three.icon_id, effect_four.icon_id, effect_five.icon_id, effect_six.icon_id, effect_seven.icon_id, effect_eight.icon_id, effect_nine.icon_id, effect_ten.icon_id, effect_eleven.icon_id, effect_twelve.icon_id, effect_thirteen.icon_id, effect_fourteen.icon_id]
 
         # Key, Rim, and Fill rows
         SequencerUI.draw_builder_row(box, key_ops, 'key', active_strip, "Key", active_strip.key_is_recording, is_color=0, record_prop_name="key_is_recording")
@@ -388,7 +420,7 @@ class SequencerUI:
             row.prop(active_strip, "background_light_three", text="Cyc 3", slider=True)
             row.prop(active_strip, "background_light_four", text="Cyc 4", slider=True)
         else:
-            SequencerUI.draw_builder_row(box, cyc_ops, 'gel_one', active_strip, "Cyclorama", active_strip.cyc_is_recording, is_color=1, record_prop_name="cyc_is_recording")
+            SequencerUI.draw_builder_row(box, cyc_ops, 'gel_one', active_strip, "Cyc", active_strip.cyc_is_recording, is_color=1, record_prop_name="cyc_is_recording")
 
         # Texture, Band, and Accent rows
         SequencerUI.draw_builder_row(box, texture_ops, 'texture', active_strip, "Texture", active_strip.texture_is_recording, is_color=1, record_prop_name="texture_is_recording")
@@ -400,7 +432,9 @@ class SequencerUI:
         # Energy Intensity row
         row = box.row(align=True)
         row.operator("my.energy_groups", text="", icon='PREFERENCES')
-        row.prop(active_strip, "energy_light", text="Energy Intensity", slider=True)
+        row.prop(active_strip, "energy_light", text="Effect", slider=True)
+        row.prop(active_strip, "energy_speed", text="Speed", slider=True)
+        row.prop(active_strip, "energy_scale", text="Scale", slider=True)
 
         # Effects row
         row = box.row(align=True)
@@ -409,8 +443,6 @@ class SequencerUI:
             row.alert = active_strip.cue_builder_effect_id == effect_id
             row.operator(operator, text="", icon_value=icon)
             row.alert = 0
-        row.prop(active_strip, "energy_speed", text="Speed", slider=True)
-        row.prop(active_strip, "energy_scale", text="Scale", slider=True)
 
         
     @staticmethod    
