@@ -34,8 +34,7 @@ from bpy.types import (
     VIEW3D_HT_header, 
     VIEW3D_HT_tool_header, 
     SEQUENCER_HT_header, 
-    SEQUENCER_MT_add, 
-    WM_MT_region_toggle_pie,
+    SEQUENCER_MT_add,
     DOPESHEET_HT_header,
     NODE_MT_add
     )
@@ -342,7 +341,6 @@ def register():
 
     SEQUENCER_MT_add.append(SequencerUI.draw_sequencer_add_menu)
     SEQUENCER_HT_header.append(SequencerUI.draw_sequencer_cmd_line)
-    WM_MT_region_toggle_pie.append(SequencerUI.draw_sequencer_cmd_line)
 
     DOPESHEET_HT_header.append(SequencerUI.draw_timeline_sync) # This goes on space_time too
 
@@ -361,7 +359,6 @@ def unregister():
 
     SEQUENCER_MT_add.remove(SequencerUI.draw_sequencer_add_menu)
     SEQUENCER_HT_header.remove(SequencerUI.draw_sequencer_cmd_line)
-    WM_MT_region_toggle_pie.remove(SequencerUI.draw_sequencer_cmd_line)
 
     DOPESHEET_HT_header.remove(SequencerUI.draw_timeline_sync)
 
