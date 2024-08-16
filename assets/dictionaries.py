@@ -732,4 +732,4 @@ class Dictionaries:
     effects = ["Effect", "Chase", "Wave", "Ripple", "Flash", "Pulse", "Strobe", "Fade", "Wipe", "Spin", "Zoom", "Rotate", "Pan_Tilt", "Color_Wheel", "Gobo_Wheel"]
     time_and_date = ["Date", "Time", "Year", "Month", "Day", "Hour", "Minute", "Second", "AM", "PM", "Sunrise", "Sunset", "Duration", "Interval", "Countdown"]
     miscellaneous = ["Alert", "Info", "Warning", "Error", "Debug", "Log", "Report", "Status", "State", "Mode", "Setting", "Preference", "Config", "Parameter", "Attribute"]
-    timecode = ["Timecode_Start", "Timecode_Stop", "Timecode_Reset", "Timecode_Set", "Timecode_Jump", "Enable", "Disable"]
+    timecode = ["Enable", "Disable"]

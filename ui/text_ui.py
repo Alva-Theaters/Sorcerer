@@ -58,6 +58,11 @@ class TextUI:
 
         col.separator()
 
+        row = col.row()
+        row.prop(context.scene, "add_underscores", text="Add missing underscores to keywords", slider=True)
+
+        col.separator()
+
         col.label(text="Copy key to clipboard:")
         col.template_list("TEXT_UL_macro_list_all", "macro_buttons_list", context.scene, "macro_buttons", context.scene, "macro_buttons_index")
         

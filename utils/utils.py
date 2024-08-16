@@ -31,6 +31,7 @@ import bpy
 import math
 import mathutils
 import re
+import time
 from bpy.props import FloatProperty, FloatVectorProperty, IntProperty
 from bpy.types import Scene, Object
 
@@ -560,6 +561,13 @@ class Utils:
 
 
     def tokenize_macro_line(input_line):
+        if bpy.context.scene.add_underscores:
+            try:
+                input_line = Utils.add_underscores_to_keywords(input_line)
+            except Exception as e:
+                print(f"An error occurred while adding underscores to keywords: {e}")
+                return None
+
         try:
             tokens = Utils.tokenize(input_line)
         except Exception as e:
@@ -568,10 +576,10 @@ class Utils:
 
         if tokens is None:
             return None
-        
+
         osc_keys = Dictionaries.osc_keys # Already lowercase
         results = []
-        
+
         for token in tokens:
             token_lower = token.lower()  # Convert token to lowercase for comparison
 
@@ -591,11 +599,39 @@ class Utils:
             results.append(("/eos/key/Enter", "0"))
                 
         return results
+    
+
+    def add_underscores_to_keywords(input_string):
+        osc_keys = Dictionaries.osc_keys
+        macro_buttons = Dictionaries.macro_buttons
+
+        keywords_list = set(osc_keys + macro_buttons)
+        
+        for keyword in keywords_list:
+            if not keyword:
+                continue
+
+            if "\\" in keyword:
+                continue
+
+            keyword_no_underscore = keyword.replace("_", " ")
+            
+            try:
+                pattern = re.compile(re.escape(keyword_no_underscore), re.IGNORECASE)
+                input_string = pattern.sub(keyword, input_string)
+            except re.error as e:
+                print(f"Error with keyword '{keyword_no_underscore}': {e}")
+        
+        return input_string
         
         
     def tokenize(input_string):
-        input_string = input_string.replace("[", "").replace("]", "").replace("<", "").replace(">", "")
-        tokens = re.findall(r'\d|[^\d\s]+', input_string)
+        replacements = ["{", "}", "[", "]", "<", ">"]
+        clean_string = input_string
+        for item in replacements:
+            clean_string = clean_string.replace(item, "")
+        
+        tokens = re.findall(r'\d|[^\d\s]+', clean_string)
         return tokens
 
 
@@ -671,3 +707,29 @@ class Utils:
         except:
             print("An error occured while trying to set property to new index.")
         return new_index 
+
+
+    def make_eos_macro(macro_range, int_range, string):
+        from ..spy import SorcererPython as spy
+
+        spy.osc.press_lighting_key("live")
+        for macro, custom_int in zip(range(macro_range[0] - 1, macro_range[1]), range(int_range[0], int_range[1] + 1)):
+            if macro < 100000:
+                spy.osc.press_lighting_key("learn")
+                spy.osc.press_lighting_key("macro")
+                time.sleep(.1)
+                for digit in str(macro+1):
+                    spy.osc.press_lighting_key(f"{digit}")
+                    time.sleep(.1)
+                spy.osc.press_lighting_key("enter")
+                time.sleep(.1)
+
+                formatted_string = string.replace("*", str(custom_int))
+                spy.osc.lighting_command(formatted_string)
+                time.sleep(.1)
+                spy.osc.press_lighting_key("enter")
+                spy.osc.press_lighting_key("learn")
+                time.sleep(.2)
+            else:
+                print("Error: Macro indexes on ETC Eos only go up to 99,999.")
+                return

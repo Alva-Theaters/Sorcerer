@@ -37,7 +37,8 @@ from bpy.types import (
     SEQUENCER_MT_add,
     DOPESHEET_HT_header,
     NODE_MT_add,
-    GRAPH_HT_header
+    GRAPH_HT_header,
+    TEXT_HT_header
     )
 
 from .ui.node_ui import NodeUI
@@ -340,6 +341,8 @@ def register():
 
     GRAPH_HT_header.append(CommonUI.draw_graph_header)
 
+    TEXT_HT_header.append(CommonUI.draw_tool_settings)
+
 
 def unregister():
     from bpy.utils import unregister_class
@@ -359,3 +362,5 @@ def unregister():
     NODE_MT_add.remove(NodeUI.draw_alva_node_menu)
 
     GRAPH_HT_header.remove(CommonUI.draw_graph_header)
+
+    TEXT_HT_header.remove(CommonUI.draw_tool_settings)

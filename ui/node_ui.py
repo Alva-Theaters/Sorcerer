@@ -52,9 +52,9 @@ class NodeUI:
         layout.operator("node.add_motor_node", text="Motor", icon='ANTIALIASED')
         layout.operator("node.add_flash_node", text="Flash", icon='LIGHT_SUN')
         layout.operator("node.add_global_node", text="Global", icon='WORLD_DATA')
-        
+
         layout.separator()
-        
+
         layout.label(text="Specialty Lighting Nodes", icon_value=orb.icon_id)
         layout.operator("node.add_settings_node", text="Settings", icon='PREFERENCES')
         layout.operator("node.add_console_buttons_node", text="Console Buttons", icon='DESKTOP')

@@ -49,6 +49,27 @@ from .assets.sli import SLI
 
 
 class SorcererPython:
+    def make_eos_macros(macro_range, int_range, string):
+        '''
+        spy function that for iterative macro generation on ETC Eos using custom ranges/strings.
+        
+        arguments:
+            macro_range: Something like (1, 10) creates macros 1-10.
+            int_range: Something like (50, 60) lets you make the macros say something like Go_to_Cue 50, 
+                        51, 52...60 with those macros. Use * for this customizable integer in the string.
+            string: This is what you want the macro to do. Instances of * in this string will be replaced 
+                    with the current custom int. So you would make the string be something like 
+                    "Go_to_Cue * Enter"
+
+            returns: Nothing. This creates large quantities of macros on the ETC Eos console via OSC.
+
+        Warning:
+            Uses time.sleep, which freezes up Blender while running. Not currently equipped with press ESC to 
+            cancel functionality. Terminate Blender via Operating Systn if you accidentally tell it to make 
+            99,999 macros, which it will gladly do otherwise.
+        '''
+        Utils.make_eos_macro(macro_range, int_range, string)
+        
     class osc:
         def send_osc_lighting(address, argument):
             '''Use lighting console network patch'''
@@ -82,6 +103,7 @@ class SorcererPython:
         def send_osc_string(osc_addr, addr, port, string):
             '''Use custom network patch'''
             OSC.send_osc_string(osc_addr, addr, port, string)
+
         
     class utils:
         def get_frame_rate(scene):
