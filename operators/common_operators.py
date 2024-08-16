@@ -326,7 +326,7 @@ class TEXT_OT_populate_macros(Operator):
                 item.name = name
 
         return {'FINISHED'}
-
+    
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
 '''SHOW MESSAGE Operator'''

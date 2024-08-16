@@ -863,3 +863,8 @@ class CommonUI:
             
         else:
             layout.label(text="Active controller not found.")
+
+
+    @staticmethod
+    def draw_graph_header(self, context):
+        self.layout.operator("graph.view_selected", text="", icon='VIEWZOOM')

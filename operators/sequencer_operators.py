@@ -1593,7 +1593,7 @@ class TOOL_OT_duplicate_strip_to_above(Operator):
                 duplicated_strips = [seq for seq in sequences if seq.select and seq != active_strip]
                 for new_strip in duplicated_strips:
                     new_strip.channel = max(seq.channel for seq in sequences) + 1
-                    
+
                 if active_strip.my_settings.motif_type_enum == 'option_animation' and len(active_strip.list_group_channels) == 1:
                     new_strip.str_manual_fixture_selection = str(active_strip.list_group_channels[0].chan + 1)
 
@@ -1849,7 +1849,7 @@ class SEQUENCER_OT_base_modal_operator(Operator):
         else:
             frame_rate = Utils.get_frame_rate(context.scene)
             scene = context.scene
-            if hasattr(scene.sequence_editor, "active_strip") and scene.sequence_editor.active_strip is not None and (scene.sequence_editor.active_strip.type == 'SOUND' or scene.sequence_editor.active_strip.my_settings.motif_type_enum == 'option_animation'):
+            if hasattr(scene.sequence_editor, "active_strip") and scene.sequence_editor.active_strip is not None and scene.sequence_editor.active_strip.type == 'SOUND':
                 active_strip = context.scene.sequence_editor.active_strip
                 start_frame = active_strip.frame_start
                 end_frame = active_strip.frame_final_end
