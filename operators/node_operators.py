@@ -46,19 +46,6 @@ class NODE_OT_add_console_buttons(Operator):
         my_node.location = (100, 100)
         
         return {'FINISHED'} 
-          
-        
-class NODE_OT_add_oven(Operator):
-    bl_idname = "node.add_oven_node"
-    bl_label = "Add Oven"
-    bl_description="Create qmeos to store complex animation data directly on the console. Qmeos are like videos, but each frame is a lighting cue"
-
-    def execute(self, context):
-        tree = context.space_data.edit_tree
-        my_node = tree.nodes.new('oven_type')
-        my_node.location = (100, 100)
-        
-        return {'FINISHED'}
         
     
 class NODE_OT_add_settings(Operator):
@@ -267,7 +254,6 @@ class NODE_OT_keyframe_mixer(bpy.types.Operator):
             
 operator_classes = [
     NODE_OT_add_console_buttons,
-    NODE_OT_add_oven,
     NODE_OT_add_settings,
     NODE_OT_add_global,
     NODE_OT_add_presets,

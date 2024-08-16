@@ -394,20 +394,6 @@ class NODE_NT_settings(Node):
         SettingsUI.draw_settings(self, context, layout)
 
 
-class NODE_NT_oven(Node):
-    bl_idname = 'oven_type'
-    bl_label = 'Qmeo Node'
-    bl_icon = 'FILE_MOVIE'
-    bl_width_default = 175
-    bl_description="Create Qmeos to store complex animation data directly on the console. Qmeos are like videos, but each frame is a lighting cue"
-
-    def init(self, context):
-        return
-
-    def draw_buttons(self, context, layout):
-        NodeUI.draw_oven_node(self, context, layout)
-
-
 nodes = [
     NODE_NT_group_controller,
     NODE_NT_mixer,
@@ -417,8 +403,7 @@ nodes = [
     NODE_NT_pan_tilt,
     NODE_NT_global,
     NODE_NT_alva_presets,
-    NODE_NT_settings,
-    NODE_NT_oven
+    NODE_NT_settings
 ]
 
     

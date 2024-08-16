@@ -56,7 +56,6 @@ class NodeUI:
         layout.separator()
         
         layout.label(text="Specialty Lighting Nodes", icon_value=orb.icon_id)
-        layout.operator("node.add_oven_node", text="Renderer", icon='OUTLINER_OB_CAMERA')
         layout.operator("node.add_settings_node", text="Settings", icon='PREFERENCES')
         layout.operator("node.add_console_buttons_node", text="Console Buttons", icon='DESKTOP')
         layout.operator("node.add_presets_node", text="Presets", icon='NONE')
