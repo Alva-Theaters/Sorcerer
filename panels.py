@@ -173,14 +173,6 @@ class SequencerPanel:
                 context.scene.sequence_editor.active_strip) 
 
 
-class SEQUENCER_PT_alva_Animated(Panel, SequencerPanel):
-    '''Scene-level qmeo creator and 3D audio renderer.'''
-    bl_label = "Animated"
-
-    def draw(self, context):
-        SequencerUI.draw_animate_lighting_video_audio(self, context)
-
-
 class SEQUENCER_PT_alva_Lighting(Panel, SequencerPanel):
     '''This is the primary side panel for everything lighting in Sequencer.'''
     bl_label = "Lighting"
@@ -323,7 +315,6 @@ panels = [
     VIEW3D_PT_alva_toolbar,
     SEQUENCER_PT_alva_toolbar,
     NODE_PT_alva_toolbar,
-    SEQUENCER_PT_alva_Animated,
     SEQUENCER_PT_alva_Lighting,
     SEQUENCER_PT_alva_Video,
     SEQUENCER_PT_alva_Audio,

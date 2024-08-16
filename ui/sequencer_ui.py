@@ -605,53 +605,7 @@ class SequencerUI:
 
         row = column.row()
         row.operator("seq.bake_audio_operator", text="Render to Sound Files", icon='FILE_TICK')
-
-
-    @staticmethod
-    def draw_animate_lighting_video_audio(self, context):
-        if context.scene:
-            pcoll = preview_collections["main"]
-            orb = pcoll["orb"]
-            
-            scene = context.scene.scene_props
-            layout = self.layout
-            column = layout.column(align=True)  
-            
-            box = column.box()
-
-            row = box.row()
-            row.label(text="LIGHTING:")
-
-            box = column.box()
-
-            row = box.row()
-            row.alert = scene.is_cue_baking
-            row.operator("my.bake_fcurves_to_cues_operator", text=scene.str_bake_info, icon_value=orb.icon_id)
-            row.operator("my.rerecord_cues_operator", text=scene.str_cue_bake_info, icon_value=orb.icon_id)
-            
-            column.separator()
-            
-            box = column.box()
-
-            row = box.row()
-            row.label(text="VIDEO:")
-
-            box = column.box()
-
-            row = box.row()
-            row.label(text="Coming by end of 2024: Animate PTZ cameras.")
-            
-            column.separator()
-            
-            box = column.box()
-
-            row = box.row()
-            row.label(text="AUDIO:")
-
-            box = column.box()
-
-            row = box.row()
-            row.operator("seq.render_all_audio_objects_operator", text="Render all Audio Objects", icon='FILE_TICK')
+        
 
     # @staticmethod  ## Does this need to be rewritten or deleted?
     # def draw_strip_speaker(self, context, column, active_strip):
