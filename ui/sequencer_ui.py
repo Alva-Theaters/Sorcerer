@@ -605,7 +605,7 @@ class SequencerUI:
 
         row = column.row()
         row.operator("seq.bake_audio_operator", text="Render to Sound Files", icon='FILE_TICK')
-        
+
 
     # @staticmethod  ## Does this need to be rewritten or deleted?
     # def draw_strip_speaker(self, context, column, active_strip):
@@ -854,7 +854,7 @@ class SequencerUI:
             for area in context.screen.areas:
                 if area.type == 'SEQUENCE_EDITOR':
                     sequencer_open = True
-                    if context.scene.sequence_editor.active_strip and context.scene.sequence_editor.active_strip.type == 'SOUND':
+                    if context.scene.sequence_editor.active_strip and context.scene.sequence_editor.active_strip is not None and context.scene.sequence_editor.active_strip.type == 'SOUND':
                         active_strip = True
                         break
 

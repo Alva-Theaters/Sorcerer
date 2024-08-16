@@ -169,7 +169,6 @@ class Orb:
             SLI.SLI_assert_unreachable()
             
             
-            
     def render_strips(self, context, event):
         console_mode = context.scene.scene_props.console_type_enum
         
@@ -181,6 +180,7 @@ class Orb:
             self.report({'INFO'}, "Button not supported for grandMA2 yet.")
         else:
             SLI.SLI_assert_unreachable()
+
         
     class Eos:
         @staticmethod
@@ -438,12 +438,11 @@ class Orb:
             timecode = Utils.frame_to_timecode(active_strip.frame_start)
             yield from Orb.Eos.manipulate_show_control(scene, event_list, start_macro, end_macro, start_cue, end_cue, timecode)
 
-            yield from Orb.Eos.bake_qmeo_generator(scene, event_list, frame_rate, start_frame, end_frame, cue_list)
-
+            yield from Orb.Eos.bake_qmeo_generator(scene, event_list, frame_rate, start_frame, end_frame, cue_list, end_macro)
 
 
         @staticmethod
-        def bake_qmeo_generator(scene, event_list, frame_rate, start_frame, end_frame, cue_list):
+        def bake_qmeo_generator(scene, event_list, frame_rate, start_frame, end_frame, cue_list, end_macro):
             frames = list(range(int(start_frame), int(end_frame)))
             cue_duration = round(1 / frame_rate, 2)
 
@@ -459,6 +458,7 @@ class Orb:
             wm.progress_end()
             bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
 
+            yield Orb.Eos.final_event_stop_clock(event_list, frames[-1], end_macro), "Setting final event to stop clock"
             yield Orb.Eos.reset_cue_list(), "Resetting cue list"
 
         @staticmethod
@@ -497,12 +497,16 @@ class Orb:
             wm.progress_update(i / len(frames) * 100)
             
             # Go ahead and actually send the final command
-            time.sleep(.1)
-            OSC.send_osc_lighting("/eos/newcmd", argument)
+            delay = scene.orb_chill_time
+            Orb.Eos.send_osc_with_delay("/eos/newcmd", argument, delay)
 
         @staticmethod
         def reset_cue_list():
             Orb.Eos.send_osc_with_delay("/eos/newcmd/", "Cue 1 / Enter")
+
+        @staticmethod
+        def final_event_stop_clock(event_list, final_frame, end_macro):
+            Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Event {event_list} / {str(final_frame)} Show_Control_Action Macro {str(end_macro)} Enter")
 
 
         ################

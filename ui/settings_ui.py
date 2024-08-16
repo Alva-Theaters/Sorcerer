@@ -207,6 +207,8 @@ class SettingsUI:
         col2.prop(scene, "orb_records_snapshot", text="Orb records snapshot first", slider=True)
         col2.separator()
         col2.prop(scene, "orb_finish_snapshot", text="Snapshot After Orb:", slider=False)
+        col2.separator()
+        col2.prop(scene, "orb_chill_time", text="Wait Time:", slider=False)
 
         box = column.box()
 
