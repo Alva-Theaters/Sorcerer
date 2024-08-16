@@ -180,7 +180,6 @@ class Utils:
             if not remove:
                 return channels
             else:
-                print(f"Returning {exclusions}")
                 return channels, exclusions
         
         except Exception as e:

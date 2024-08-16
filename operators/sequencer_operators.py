@@ -1593,8 +1593,9 @@ class TOOL_OT_duplicate_strip_to_above(Operator):
                 duplicated_strips = [seq for seq in sequences if seq.select and seq != active_strip]
                 for new_strip in duplicated_strips:
                     new_strip.channel = max(seq.channel for seq in sequences) + 1
-
-            ## This used to increase the animation channel number as well.
+                    
+                if active_strip.my_settings.motif_type_enum == 'option_animation' and len(active_strip.list_group_channels) == 1:
+                    new_strip.str_manual_fixture_selection = str(active_strip.list_group_channels[0].chan + 1)
 
             else:
                 self.report({'WARNING'}, "Please select exactly one strip.")

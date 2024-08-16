@@ -360,7 +360,7 @@ class NODE_NT_flash(Node):
 class NODE_NT_alva_presets(Node):
     bl_idname = 'presets_type'
     bl_label = 'Presets Node'
-    bl_icon = 'LIGHTPROBE_VOLUME'
+    bl_icon = 'NONE'
     bl_width_default = 600
     bl_description="Record and recall console presets"
     

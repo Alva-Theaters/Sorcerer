@@ -59,7 +59,7 @@ class NodeUI:
         layout.operator("node.add_oven_node", text="Renderer", icon='OUTLINER_OB_CAMERA')
         layout.operator("node.add_settings_node", text="Settings", icon='PREFERENCES')
         layout.operator("node.add_console_buttons_node", text="Console Buttons", icon='DESKTOP')
-        layout.operator("node.add_presets_node", text="Presets", icon='LIGHTPROBE_VOLUME')
+        layout.operator("node.add_presets_node", text="Presets", icon='NONE')
         layout.operator("node.add_pan_tilt_node", text="Pan/Tilt", icon='ORIENTATION_GIMBAL')
         
 #        layout.separator()
