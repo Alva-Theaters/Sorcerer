@@ -328,6 +328,8 @@ class RemoveChannelFromGroupOperator(bpy.types.Operator):
             OSC.send_osc_lighting("/eos/newcmd", f"{self.channel} at + 100 Sneak Time .5 Enter")
             time.sleep(.5)
             OSC.send_osc_lighting("/eos/newcmd", f"{self.channel} at + - 100 Sneak Time 1 Enter")
+
+        Utils.update_all_controller_channel_lists(context)
         
         return {'FINISHED'}
     
@@ -1265,7 +1267,6 @@ class RemoveGroupOperator(bpy.types.Operator):
             scene.scene_props.group_data_index = index - 1
         else:
             scene.scene_props.group_data_index = 0
-
         return {'FINISHED'}
 
 

@@ -124,7 +124,7 @@ class Utils:
             versions_of_not = (
                 "not", "minus", "except", "excluding", "casting", "aside", 
                 "without", "leave", "omit", "remove", "other", "than", "delete",
-                "deleting"
+                "deleting", "take"
             )
             versions_of_add = (
                 "add", "adding", "including", "include", 
@@ -203,6 +203,16 @@ class Utils:
         except Exception as e:
             print(f"An error has occured within parse_channels: {e}")
             return None
+
+
+    def update_all_controller_channel_lists(context):
+        from ..cpvia.find import Find
+
+        controllers = Find.find_controllers(context.scene)
+
+        for controller in controllers:
+            controller.str_manual_fixture_selection = controller.str_manual_fixture_selection
+
 
     def get_light_rotation_degrees(light_name):
         """

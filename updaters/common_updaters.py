@@ -180,6 +180,8 @@ class CommonUpdaters:
                 if ch.chan == channel:
                     item.channels_list.remove(i)
                     break
+
+        Utils.update_all_controller_channel_lists(context)
              
 
     @staticmethod    
