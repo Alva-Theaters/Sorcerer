@@ -869,14 +869,20 @@ class SequencerUI:
                 icon = 'IPO_BEZIER' if active_strip.type == 'COLOR' else 'SOUND'
                 row.label(text="", icon=icon)
                 target = active_strip
+
+                row = layout.row(align=True)
+                row.scale_x = 0.5
+                row.prop(target, "str_start_cue", text="")
+                row.prop(target, "str_end_cue", text="")
+
             else:
                 row.label(text="", icon='SCENE_DATA')
                 target = scene
 
-            row = layout.row(align=True)
-            row.scale_x = 0.5
-            row.prop(target, "str_start_cue", text="")
-            row.prop(target, "str_end_cue", text="")
+                row = layout.row(align=True)
+                row.scale_x = 0.75
+                row.prop(target, "int_start_macro", text="")
+                row.prop(target, "int_end_macro", text="")
 
             row = layout.row()
             row.operator("my.bake_fcurves_to_cues_operator", text="", icon_value=orb.icon_id)

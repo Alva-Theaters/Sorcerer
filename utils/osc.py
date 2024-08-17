@@ -50,7 +50,7 @@ class OSC:
         scene = bpy.context.scene.scene_props
         ip_address = scene.str_osc_ip_address
         port = scene.int_osc_port
-        print(argument)
+        #print(argument)
         OSC.send_osc_string(address, ip_address, port, argument)
 
 

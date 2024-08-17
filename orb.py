@@ -188,11 +188,40 @@ class Orb:
             OSC.send_osc_lighting(command, value)
             time.sleep(delay)
 
-        ###################
-        # ANIMATION STRIPS
-        ###################
         @staticmethod
-        def manipulate_show_control(scene, event_list, start_macro, end_macro, start_cue, end_cue, timecode=None):
+        def save_console_file(scene):
+            if not scene.is_armed_turbo:
+                Orb.Eos.send_osc_with_delay("/eos/key/shift")
+                Orb.Eos.send_osc_with_delay("/eos/key/update")
+                Orb.Eos.send_osc_with_delay("/eos/key/shift", "0", 2)
+
+        @staticmethod
+        def record_snapshot(scene):
+            snapshot = str(scene.orb_finish_snapshot)
+            Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Record Snapshot {snapshot} Enter Enter", 0.5)
+
+        @staticmethod
+        def restore_snapshot(scene):
+            snapshot = str(scene.orb_finish_snapshot)
+            Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Snapshot {snapshot} Enter", 0.5)
+      
+        @staticmethod
+        def delete_recreate_macro_enter_edit(macro_number, live=True):
+            if live:
+                Orb.Eos.send_osc_with_delay("/eos/key/live")
+                Orb.Eos.send_osc_with_delay("/eos/key/live", "0", 0.5)
+            Orb.Eos.send_osc_with_delay("/eos/key/macro", "11 Enter", 0)
+            Orb.Eos.send_osc_with_delay("/eos/key/macro", "11 Enter", 0.5)
+            Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Delete {str(macro_number)} Enter Enter", 0.5)
+            Orb.Eos.send_osc_with_delay("/eos/newcmd", f"{str(macro_number)} Enter", 0.5)
+            Orb.Eos.send_osc_with_delay("/eos/softkey/6", "1", 0.1)  # Edit" softkey
+
+
+        #-------------------------------------------------------------------------------------------------------------------------------------------
+        '''Show control'''
+        #-------------------------------------------------------------------------------------------------------------------------------------------
+        @staticmethod
+        def manipulate_show_control(scene, event_list, start_macro, end_macro, start_cue, end_cue, timecode=None, execute_on_cues=True):
             try:
                 yield Orb.Eos.record_snapshot(scene), "Recording snapshot."
                 yield Orb.Eos.save_console_file(scene), "Orb is running."
@@ -202,17 +231,17 @@ class Orb:
                 yield Orb.Eos.type_internal_time(), "Internal Time"
                 yield Orb.Eos.enter_timecode_or_just_enter(timecode), "Typing timecode for sync."
                 yield Orb.Eos.type_event_list_number(event_list), "Typing event list number again."
-                yield Orb.Eos.internal_enable_or_disable_foreground(start_cue, start_macro, "enable"), "Setting to foreground mode."
+                yield Orb.Eos.internal_enable_or_disable_foreground("enable"), "Setting to foreground mode."
 
                 yield Orb.Eos.delete_recreate_macro_enter_edit(end_macro, live=False), "Creating blank macro."
                 yield Orb.Eos.type_event_list_number(event_list), "Typing event list number."
                 yield Orb.Eos.type_internal_time(), "Internal Time"
                 yield Orb.Eos.enter_timecode_or_just_enter(None), "Typing timecode for sync."
                 yield Orb.Eos.type_event_list_number(event_list), "Typing event list number again."
-                yield Orb.Eos.internal_enable_or_disable_foreground(end_cue, end_macro, "disable"), "Setting to foreground mode."
+                yield Orb.Eos.internal_enable_or_disable_foreground("disable"), "Setting to foreground mode."
 
-                yield Orb.Eos.live_and_execute_on_cue(start_cue, start_macro), "Setting start cue executor"
-                yield Orb.Eos.live_and_execute_on_cue(end_cue, end_macro), "Setting end cue executor"
+                yield Orb.Eos.live_and_execute_on_cue(start_cue, start_macro, execute_on_cues), "Setting start cue executor"
+                yield Orb.Eos.live_and_execute_on_cue(end_cue, end_macro, execute_on_cues), "Setting end cue executor"
 
                 yield Orb.Eos.reset_macro_key(), "Resetting macro key."
                 yield Orb.Eos.restore_snapshot(scene), "Restoring your screen setup."
@@ -238,14 +267,12 @@ class Orb:
             for digit in str(event_list_number):
                 Orb.Eos.send_osc_with_delay(f"/eos/key/{digit}", delay=.2)
                 
-                
         @staticmethod    
         def type_internal_time():
             Orb.Eos.send_osc_with_delay("/eos/key/\\", delay=.2)
             Orb.Eos.send_osc_with_delay("/eos/key/internal", delay=.2)
             Orb.Eos.send_osc_with_delay("/eos/key/time", delay=.2)
             
-
         @staticmethod
         def enter_timecode_or_just_enter(timecode, is_delayed=False):
             if timecode:
@@ -256,9 +283,8 @@ class Orb:
                 time.sleep(0.5)
             Orb.Eos.send_osc_with_delay("/eos/key/enter")
 
-
         @staticmethod
-        def internal_enable_or_disable_foreground(cue_number, macro_number, desired_state):
+        def internal_enable_or_disable_foreground(desired_state):
             Orb.Eos.send_osc_with_delay("/eos/key/\\", delay=.2)
             Orb.Eos.send_osc_with_delay("/eos/key/internal", delay=.2)
             Orb.Eos.send_osc_with_delay(f"/eos/key/{desired_state}", delay=.2)
@@ -268,19 +294,20 @@ class Orb:
             Orb.Eos.send_osc_with_delay("/eos/key/enter", delay=.2)
 
         @staticmethod
-        def live_and_execute_on_cue(cue_number, macro_number, live=True):
+        def live_and_execute_on_cue(cue_number, macro_number, execute_on_cues, live=True):
             if live:
                 Orb.Eos.send_osc_with_delay("/eos/key/live", delay=.2)
-            Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Cue {str(cue_number)} Execute Macro {str(macro_number)} Enter Enter")
+            if execute_on_cues:
+                Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Cue {str(cue_number)} Execute Macro {str(macro_number)} Enter Enter")
 
         @staticmethod
         def reset_macro_key():
             Orb.Eos.send_osc_with_delay("/eos/key/macro", "0", delay=.2)
 
 
-        ####################
-        # MULTI-LINE MACROS
-        ####################
+        #-------------------------------------------------------------------------------------------------------------------------------------------
+        '''Text editor macros'''
+        #-------------------------------------------------------------------------------------------------------------------------------------------
         @staticmethod
         def generate_multiline_macro(self, context, scene, macro, text_data):
             try:
@@ -303,7 +330,6 @@ class Orb:
                 logging.error(f"Unexpected error in generate_multiline_macro: {e}")
                 yield None, f"Unexpected error: {e}"
             
-            
         @staticmethod
         def type_tokens(text_data):
             for line in text_data:
@@ -317,9 +343,9 @@ class Orb:
             Orb.Eos.send_osc_with_delay("/eos/key/live", "0", 0.1)
 
 
-        ###########################
-        # SINGLE-LINE STRIP MACROS
-        ###########################
+        #-------------------------------------------------------------------------------------------------------------------------------------------
+        '''Macro strips'''
+        #-------------------------------------------------------------------------------------------------------------------------------------------
         @staticmethod
         def generate_macro_command(context, macro_number, macro_text, first=False, final=False):
             try:
@@ -347,7 +373,6 @@ class Orb:
             except Exception as e:
                 logging.error(f"Unexpected error in generate_macro_command: {e}")
                 yield None, f"Unexpected error: {e}"
-
 
         @staticmethod
         def initiate_macro():
@@ -383,63 +408,36 @@ class Orb:
             
             return round(biased_start_length, 1)
             
-
-        ##################
-        # COMMON UTILITIES
-        ###################
-        @staticmethod
-        def save_console_file(scene):
-            if not scene.is_armed_turbo:
-                Orb.Eos.send_osc_with_delay("/eos/key/shift")
-                Orb.Eos.send_osc_with_delay("/eos/key/update")
-                Orb.Eos.send_osc_with_delay("/eos/key/shift", "0", 2)
-
-        @staticmethod
-        def record_snapshot(scene):
-            snapshot = str(scene.orb_finish_snapshot)
-            Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Record Snapshot {snapshot} Enter Enter", 0.5)
-
-        @staticmethod
-        def restore_snapshot(scene):
-            snapshot = str(scene.orb_finish_snapshot)
-            Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Snapshot {snapshot} Enter", 0.5)
-      
-        @staticmethod
-        def delete_recreate_macro_enter_edit(macro_number, live=True):
-            if live:
-                Orb.Eos.send_osc_with_delay("/eos/key/live")
-                Orb.Eos.send_osc_with_delay("/eos/key/live", "0", 0.5)
-            Orb.Eos.send_osc_with_delay("/eos/key/macro", "11 Enter", 0)
-            Orb.Eos.send_osc_with_delay("/eos/key/macro", "11 Enter", 0.5)
-            Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Delete {str(macro_number)} Enter Enter", 0.5)
-            Orb.Eos.send_osc_with_delay("/eos/newcmd", f"{str(macro_number)} Enter", 0.5)
-            Orb.Eos.send_osc_with_delay("/eos/softkey/6", "1", 0.1)  # Edit" softkey
-            
-        
-        ##############
-        # QMEOS
-        ##############
+                
+        #-------------------------------------------------------------------------------------------------------------------------------------------
+        '''Qmeos'''
+        #-------------------------------------------------------------------------------------------------------------------------------------------
         @staticmethod
         def make_qmeo(scene, frame_rate, start_frame, end_frame):
             if hasattr(scene.sequence_editor, "active_strip") and scene.sequence_editor.active_strip is not None and scene.sequence_editor.active_strip.type == 'SOUND':
                 active_strip = scene.sequence_editor.active_strip
+                execute_on_cues = True
             else:
                 active_strip = scene
+                execute_on_cues = False
 
             event_list = Utils.find_executor(scene, active_strip, 'event_list')
             start_macro = Utils.find_executor(scene, active_strip, 'start_macro')
             end_macro = Utils.find_executor(scene, active_strip, 'end_macro')
             cue_list = Utils.find_executor(scene, active_strip, 'cue_list')
+            timecode = Utils.frame_to_timecode(active_strip.frame_start)
 
             active_strip.str_parent_name = active_strip.name # Allow find_executor() to distinguish duplicates
 
-            start_cue = active_strip.str_start_cue
-            end_cue = active_strip.str_end_cue
-            timecode = Utils.frame_to_timecode(active_strip.frame_start)
-            yield from Orb.Eos.manipulate_show_control(scene, event_list, start_macro, end_macro, start_cue, end_cue, timecode)
+            if execute_on_cues:
+                start_cue = active_strip.str_start_cue
+                end_cue = active_strip.str_end_cue
+            else:
+                start_cue, end_cue = None, None
+
+            yield from Orb.Eos.manipulate_show_control(scene, event_list, start_macro, end_macro, start_cue, end_cue, timecode, execute_on_cues)
 
             yield from Orb.Eos.bake_qmeo_generator(scene, event_list, frame_rate, start_frame, end_frame, cue_list, end_macro)
-
 
         @staticmethod
         def bake_qmeo_generator(scene, event_list, frame_rate, start_frame, end_frame, cue_list, end_macro):
@@ -449,12 +447,15 @@ class Orb:
             if event_list:
                 yield Orb.Eos.delete_recreate_event_list(event_list, end_frame, frame_rate), "Recreating event list"
 
+            if cue_list:
+                yield Orb.Eos.delete_cue_list(cue_list), "Recreating cue list"
+
             wm = bpy.context.window_manager
             wm.progress_begin(0, 100)
 
             for i, frame in enumerate(frames):
                 yield Orb.Eos.qmeo_frame(frame, scene, cue_list, event_list, cue_duration, wm, frames, i), "Making Qmeo"
-            
+
             wm.progress_end()
             bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
 
@@ -467,7 +468,7 @@ class Orb:
             Orb.Eos.send_osc_with_delay("/eos/newcmd/", f"Delete Event {event_list} / Enter Enter", delay=.3)
 
             # Recreate the event list from a blank slate.
-            argument = f"Event {str(event_list)} / 1 Thru {str(end_frame)} Enter"
+            argument = f"Event {str(event_list)} / 1 Thru {str(end_frame - 1)} Enter"
             Orb.Eos.send_osc_with_delay("/eos/newcmd/", argument, delay=.2)
 
             # Set the frame rate based on Blender scene.
@@ -479,6 +480,10 @@ class Orb:
             time.sleep(.2)
 
         @staticmethod
+        def delete_cue_list(cue_list):
+            Orb.Eos.send_osc_with_delay("/eos/newcmd/", f"Delete Cue {cue_list} / Enter Enter", delay=.3)
+
+        @staticmethod
         def qmeo_frame(frame, scene, cue_list, event_list, cue_duration, wm, frames, i):
             # Set current frame and redraw window so user knows what's going on.
             bpy.context.scene.frame_set(frame)
@@ -486,19 +491,20 @@ class Orb:
             
             # Get ready to record cue with the new CPVIA updates.
             current_frame_number = scene.frame_current
-            argument = f"Record Cue {str(cue_list)} / {str(current_frame_number)} Time {str(cue_duration)} Enter Enter"
-            
+            argument_one = f"Record Cue {str(cue_list)} / {str(current_frame_number)} Time {str(cue_duration)} Enter Enter"
+
             # Get ready to record the cue while also binding cue to its event.
             if event_list:
                 timecode = Utils.frame_to_timecode(frame)
-                argument = f"{argument}, Event {event_list} / {str(frame)} Time {str(timecode)} Show_Control_Action Cue {str(frame)} Enter"
+                argument_two = f"Event {event_list} / {str(frame)} Time {str(timecode)} Show_Control_Action Cue {str(frame)} Enter"
 
             # Update progress bar to keep user in the loop.
             wm.progress_update(i / len(frames) * 100)
             
             # Go ahead and actually send the final command
             delay = scene.orb_chill_time
-            Orb.Eos.send_osc_with_delay("/eos/newcmd", argument, delay)
+            Orb.Eos.send_osc_with_delay("/eos/newcmd", argument_one, delay=.1)
+            Orb.Eos.send_osc_with_delay("/eos/newcmd", argument_two, delay)
 
         @staticmethod
         def reset_cue_list():
@@ -506,12 +512,13 @@ class Orb:
 
         @staticmethod
         def final_event_stop_clock(event_list, final_frame, end_macro):
-            Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Event {event_list} / {str(final_frame)} Show_Control_Action Macro {str(end_macro)} Enter")
+            timecode = Utils.frame_to_timecode(final_frame) # Ensure this event has a time component even if something above got skipped
+            Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Event {event_list} / {str(final_frame)} Time {str(timecode)} Show_Control_Action Macro {str(end_macro)} Enter")
 
 
-        ################
-        # RENDER STRIPS
-        ################
+        #-------------------------------------------------------------------------------------------------------------------------------------------
+        '''Render Strips'''
+        #-------------------------------------------------------------------------------------------------------------------------------------------
         @staticmethod
         def render_strips(self, context, event):
             Orb.Eos.record_snapshot(context.scene)
@@ -566,7 +573,5 @@ class Orb:
             OSC.send_osc_lighting("/eos/newcmd", f"Snapshot {snapshot} Enter")
             
             Orb.Eos.restore_snapshot(context.scene)
-
             bpy.ops.screen.animation_play()
-
             return {'FINISHED'}

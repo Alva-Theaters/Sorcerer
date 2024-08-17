@@ -560,6 +560,9 @@ class Utils:
         return address_list
 
 
+    #-------------------------------------------------------------------------------------------------------------------------------------------
+    '''Text editor macros'''
+    #-------------------------------------------------------------------------------------------------------------------------------------------
     def tokenize_macro_line(input_line):
         if bpy.context.scene.add_underscores:
             try:
@@ -599,7 +602,6 @@ class Utils:
             results.append(("/eos/key/Enter", "0"))
                 
         return results
-    
 
     def add_underscores_to_keywords(input_string):
         osc_keys = Dictionaries.osc_keys
@@ -624,7 +626,6 @@ class Utils:
         
         return input_string
         
-        
     def tokenize(input_string):
         replacements = ["{", "}", "[", "]", "<", ">"]
         clean_string = input_string
@@ -635,14 +636,20 @@ class Utils:
         return tokens
 
 
+    #-------------------------------------------------------------------------------------------------------------------------------------------
+    '''Find executor'''
+    #-------------------------------------------------------------------------------------------------------------------------------------------
     def find_executor(scene: Scene, object: Object, executor_type: str) -> int:
         try:
             existing_prop = getattr(object, f"int_{executor_type}")
         except:
             print("An error occured in find_executor because of an invalid object or incorrect registration.")
 
-        if existing_prop != 0 and object.name == object.str_parent_name: # 2nd check filters duplicates
-            return existing_prop
+        if existing_prop != 0 and (object.name == object.str_parent_name or isinstance(object, bpy.types.Scene)): # Middle check filters duplicates
+            if isinstance(object, bpy.types.Scene) and executor_type not in ["start_macro", "end_macro"]:
+                pass # We need to find a new one for Scene's event list and cue list
+            else:
+                return existing_prop # Don't find a new one, use the old one
 
         new_index = Utils.find_new_executor(scene, executor_type)
 
@@ -708,7 +715,9 @@ class Utils:
             print("An error occured while trying to set property to new index.")
         return new_index 
 
-
+    #-------------------------------------------------------------------------------------------------------------------------------------------
+    '''Spy's make Eos macros'''
+    #-------------------------------------------------------------------------------------------------------------------------------------------
     def make_eos_macro(macro_range, int_range, string):
         from ..spy import SorcererPython as spy
 
