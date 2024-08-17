@@ -142,7 +142,7 @@ class VIEW3D_PT_alva_lighting_modifiers(Panel, View3D_Panel):
         
 class VIEW3D_PT_alva_fixture_groups(Panel, View3D_Panel):
     '''Access to scene-level Sorcerer patch for lighting'''
-    bl_label = "Lighting Patch"
+    bl_label = "Fixture Groups"
 
     def draw(self, context):
         CommonUI.draw_fixture_groups(self, context)
