@@ -29,16 +29,20 @@
 
 import bpy
 from bpy.types import Operator
-from bpy.props import StringProperty
+from bpy.props import StringProperty, IntProperty
 
-from ..ui.node_ui import NodeUI # type: ignore
-from ..cpvia.find import Find # type: ignore
+# pyright: reportInvalidTypeForm=false
+
+from ..ui.node_ui import NodeUI
+from ..cpvia.find import Find
+from ..utils.osc import OSC
 
 
 class NODE_OT_add_console_buttons(Operator):
     bl_idname = "node.add_console_buttons_node"
     bl_label = "Add Console Buttons"
     bl_description="Adjust all intensities of group controller nodes on this level"
+    bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -52,6 +56,7 @@ class NODE_OT_add_settings(Operator):
     bl_idname = "node.add_settings_node"
     bl_label = "Add Settings"
     bl_description="Sorcerer node settings"
+    bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -65,6 +70,7 @@ class NODE_OT_add_global(Operator):
     bl_idname = "node.add_global_node"
     bl_label = "Add Global"
     bl_description="Adjust all intensities of group controller nodes on this level"
+    bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -83,6 +89,7 @@ class NODE_OT_add_presets(Operator):
     bl_idname = "node.add_presets_node"
     bl_label = "Add Presets"
     bl_description="Record and recall console presets"
+    bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -96,6 +103,7 @@ class NODE_OT_add_pan_tilt(Operator):
     bl_idname = "node.add_pan_tilt_node"
     bl_label = "Add Pan/Tilt controller for FOH-hung mover"
     bl_description="Intuitive pan/tilt controller only for FOH, forward-facing fixtures"
+    bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -109,6 +117,7 @@ class NODE_OT_add_group_controller(Operator):
     bl_idname = "node.add_group_controller_node"
     bl_label = "Control a group defined in Properties"
     bl_description="Control a group defined in Properties"
+    bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -122,6 +131,7 @@ class NODE_OT_add_mixer(Operator):
     bl_idname = "node.add_mixer_node"
     bl_label = "Mix 3 different parameter choices across a group"
     bl_description="Mix 3 different parameter choices accross a group"
+    bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -135,6 +145,7 @@ class NODE_OT_add_motor(Operator):
     bl_idname = "node.add_motor_node"
     bl_label = "Create oscillations for mixer node progress"
     bl_description="Create oscillations for mixer node progress"
+    bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -148,6 +159,7 @@ class NODE_OT_add_flash(Operator):
     bl_idname = "node.add_flash_node"
     bl_label = "Connect to flash strips in the sequencer"
     bl_description="Autofill the Flash Up and Flash Down fields of flash strips in Sequencer with node settings and noodle links. Intended primarily for pose-based choreography"
+    bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         tree = context.space_data.edit_tree
@@ -155,8 +167,8 @@ class NODE_OT_add_flash(Operator):
         my_node.location = (100, 100)
         
         return {'FINISHED'}
-        
-        
+
+
 class NODE_OT_node_formatter(Operator):
     bl_idname = "nodes.show_node_formatter"
     bl_label = "Node Formatter"
@@ -252,7 +264,7 @@ class NODE_OT_keyframe_mixer(bpy.types.Operator):
         return {'FINISHED'}
 
             
-operator_classes = [
+add_operators = [
     NODE_OT_add_console_buttons,
     NODE_OT_add_settings,
     NODE_OT_add_global,
@@ -266,12 +278,283 @@ operator_classes = [
     NODE_OT_keyframe_mixer
 ]
 
+        
+class AddCustomButton(bpy.types.Operator):
+    '''Add custom button'''
+    bl_idname = "node.add_custom_button"
+    bl_label = "Add Custom Button"
+
+    def execute(self, context):
+        node = context.node
+        new_button = node.custom_buttons.add()
+        new_button.button_label = ""
+        new_button.constant_index = len(node.custom_buttons)
+        return {'FINISHED'}
+
+
+class RemoveCustomButton(bpy.types.Operator):
+    '''Move the custom button's position in the stack vertically'''
+    bl_idname = "node.remove_custom_button"
+    bl_label = "Remove Custom Button"
+
+    button_index: IntProperty()
+
+    def execute(self, context):
+        node = context.node
+
+        if node.custom_buttons and 0 <= self.button_index < len(node.custom_buttons):
+            node.custom_buttons.remove(self.button_index)
+        else:
+            self.report({'WARNING'}, "Invalid button index or no buttons to remove.")
+        return {'FINISHED'}  
+    
+    
+class BumpUpCustomButton(bpy.types.Operator):
+    '''Move the custom button's position in the stack vertically'''
+    bl_idname = "node.bump_up_custom_button"
+    bl_label = "Move Button Up"
+
+    button_index: IntProperty()
+
+    def execute(self, context):
+        node = context.node
+
+        if 0 < self.button_index < len(node.custom_buttons):
+            node.custom_buttons.move(self.button_index, self.button_index - 1)
+        else:
+            self.report({'WARNING'}, "Cannot move the first button up or invalid index.")
+
+        return {'FINISHED'}
+
+
+class BumpDownCustomButton(bpy.types.Operator):
+    bl_idname = "node.bump_down_custom_button"
+    bl_label = "Move Button Down"
+
+    button_index: IntProperty()
+
+    def execute(self, context):
+        node = context.node
+
+        if 0 <= self.button_index < len(node.custom_buttons) - 1:
+            node.custom_buttons.move(self.button_index, self.button_index + 1)
+        else:
+            self.report({'WARNING'}, "Cannot move the last button down or invalid index.")
+
+        return {'FINISHED'}
+
+    
+class CustomButton(bpy.types.Operator):
+    '''Make a custom console button'''
+    bl_idname = "node.custom_button"
+    bl_label = "Custom Button"
+
+    button_index: IntProperty()
+
+    def execute(self, context):
+        node = context.active_node
+
+        argument = node.direct_select_types_enum.replace(" ", "_")
+        for button in node.custom_buttons:
+            button.button_argument = f"{argument} {button.constant_index}"
+
+        this_button = node.custom_buttons[self.button_index]
+
+        OSC.send_osc_lighting(this_button.button_address, this_button.button_argument)
+        return {'FINISHED'}
+
+
+class RecordEffectPresetOperator(bpy.types.Operator):
+    bl_idname = "node.record_effect_preset_operator"
+    bl_label = "Record"
+    bl_description = "Orb will record the node's group into the preset above onto the console using the argument template below"
+
+    node_tree_name: StringProperty()
+    node_name: StringProperty()
+    
+    def execute(self, context):
+        active_node = Find.find_node_by_tree(self.node_name, self.node_tree_name)
+        if not active_node:
+            self.report({'ERROR'}, f"Node '{self.node_name}' not found in '{self.node_tree_name}'.")
+            return {'CANCELLED'}
+              
+        finders = Find
+        up_channels_list, down_channels_list = finders.find_flash_node_channels(self, update_nodes=True)
+        up_channels_str, down_channels_str = finders.join_flash_channels(up_channels_list, down_channels_list)
+        
+        preset_number = active_node.int_start_preset
+        OSC.send_osc_lighting("/eos/newcmd", "Group {str(up_channels_list)} Record Preset {str(preset_number)} Enter Enter")
+        
+        preset_number = active_node.int_end_preset
+        OSC.send_osc_lighting("/eos/newcmd", "Group {str(down_channels_list)} Record Preset {str(preset_number)} Enter Enter")
+        
+        return {'FINISHED'}
+    
+    
+class RecordDownEffectPresetOperator(bpy.types.Operator):  ## I'm pretty sure this was excommunicated?
+    bl_idname = "node.record_down_effect_preset_operator"
+    bl_label = "Record"
+    bl_description = "Orb will record the node's group into the preset above onto the console using the argument template below"
+
+    node_tree_name: StringProperty()  # Property to hold the node tree name
+    node_name: StringProperty()  # Property to hold the node name
+
+    def execute(self, context):
+        node_tree = bpy.data.node_groups.get(self.node_tree_name)
+        if not node_tree:
+            for world in bpy.data.worlds:
+                if world.node_tree and world.node_tree.name == self.node_tree_name:
+                    node_tree = world.node_tree
+                    if not node_tree:
+                        self.report({'ERROR'}, f"Node tree '{self.node_tree_name}' not found.")
+                        return {'CANCELLED'}
+
+        active_node = node_tree.nodes.get(self.node_name)
+        if not active_node:
+            self.report({'ERROR'}, f"Node '{self.node_name}' not found in '{self.node_tree_name}'.")
+            return {'CANCELLED'}
+        
+        if active_node:
+            finders = Find()
+            groups_list = []
+            for input_socket in active_node.inputs:
+                if input_socket.bl_idname == 'FlashDownType':
+                    for link in input_socket.links:
+                        connected_node = link.from_socket.node
+                        if connected_node.bl_idname == "group_controller_type":
+                            groups_list.append(finders.find_channels_list(connected_node))
+                        elif connected_node.bl_idname == "group_driver_type":
+                            for output_socket in connected_node.outputs:
+                                if output_socket.bl_idname == 'GroupOutputType':
+                                    for link in output_socket.links:
+                                        driven_node = link.to_socket.node
+                                        if driven_node.bl_idname == "group_controller_type":
+                                            groups_list.append(finders.find_channels_list(driven_node))    
+                        elif connected_node.bl_idname == "mixer_driver_type":
+                            for output_socket in connected_node.outputs:
+                                if output_socket.bl_idname == 'MixerOutputType':
+                                    for link in output_socket.links:
+                                        driven_node = link.to_socket.node
+                                        if driven_node.bl_idname == "mixer_type":
+                                            groups_list.append(finders.find_channels_list(driven_node))
+                        elif connected_node.bl_idname == 'ShaderNodeGroup':
+                            group_node_tree = connected_node.node_tree
+                            for node in group_node_tree.nodes:
+                                if node.type == 'GROUP_OUTPUT':
+                                    for socket in node.inputs:
+                                        if socket.name == "Flash":
+                                            for inner_link in socket.links:
+                                                interior_connected_node = inner_link.from_node
+                                                if interior_connected_node.bl_idname == 'group_controller_type':
+                                                    groups_list.append(finders.find_channels_list(interior_connected_node))
+                                                elif interior_connected_node.bl_idname == "group_driver_type":
+                                                    for output_socket in interior_connected_node.outputs:
+                                                        if output_socket.bl_idname == 'GroupOutputType':
+                                                            for link in output_socket.links:
+                                                                driven_node = link.to_socket.node
+                                                                if driven_node.bl_idname == "group_controller_type":
+                                                                    groups_list.append(finders.find_channels_list(driven_node))
+                                                    
+        scene = context.scene
+        node = context.active_node
+        group_numbers = ' + Group '.join(groups_list)
+        preset_number = active_node.int_end_preset
+        argument_template = scene.scene_props.str_preset_assignment_argument
+          
+        argument = argument_template.replace("#", str(group_numbers))
+        argument = argument.replace("$", str(preset_number))
+          
+        OSC.send_osc_lighting("/eos/newcmd", argument)
+          
+        for node_tree in bpy.data.node_groups:
+            if node_tree.bl_idname == 'AlvaNodeTree':
+                for node in node_tree.nodes:
+                    if node.bl_idname == "flash_type" and node.flash_motif_names_enum != "":
+                        node.flash_motif_names_enum = node.flash_motif_names_enum
+            if node_tree.bl_idname == 'ShaderNodeTree':
+                for node in world.node_tree.nodes:
+                    if node.bl_idname == "flash_type" and node.flash_motif_names_enum != "":
+                        node.flash_motif_names_enum = node.flash_motif_names_enum
+                          
+        snapshot = str(context.scene.orb_finish_snapshot)
+        OSC.send_osc_lighting("/eos/newcmd", f"Snapshot {snapshot} Enter")
+                          
+        return {'FINISHED'}
+    
+    
+def find_node_by_name(node_name):
+    for node_tree in bpy.data.node_groups:
+        if node_name in node_tree.nodes:
+            return node_tree.nodes[node_name]
+    for world in bpy.data.worlds:
+        if world.node_tree and node_name in world.node_tree.nodes:
+            return world.node_tree.nodes[node_name]
+    return None
+    
+    
+class FlashPresetSearchOperator(bpy.types.Operator):
+    bl_idname = "node.flash_preset_search_operator"
+    bl_label = "Search"
+    bl_description = "Search for unused preset. Warning: does not poll the console."
+
+    node_name: StringProperty(default="")
+    node_group_name: StringProperty(default="")
+
+    def execute(self, context):
+        used_presets = set()
+
+        for node_tree in bpy.data.node_groups:
+            if node_tree.bl_idname == 'AlvaNodeTree' or node_tree.bl_idname == 'ShaderNodeTree':
+                for node in node_tree.nodes:
+                    if node.bl_idname == "flash_type":
+                        used_presets.add(node.int_start_preset)
+                        used_presets.add(node.int_end_preset)
+        for world in bpy.data.worlds:
+            if world.use_nodes:
+                for node in world.node_tree.nodes:
+                    if node.bl_idname == "flash_type":
+                        used_presets.add(node.int_start_preset)
+                        used_presets.add(node.int_end_preset)
+                        
+        result_one = 1
+        result_two = 2 
+
+        while result_one in used_presets or result_two in used_presets:
+            result_one += 1
+            result_two = result_one + 1
+
+        active_node = find_node_by_name(self.node_name)
+        
+        if active_node and active_node.bl_idname == "flash_type":
+            active_node.int_start_preset = result_one
+            active_node.int_end_preset = result_two
+        else:
+            self.report({'WARNING'}, "Active node is not a valid 'flash_type' node.")
+
+        return {'FINISHED'}
+    
+
+others = [
+    RemoveCustomButton,
+    CustomButton,
+    BumpUpCustomButton,
+    BumpDownCustomButton,
+    AddCustomButton,
+    RecordEffectPresetOperator,
+    RecordDownEffectPresetOperator,
+    FlashPresetSearchOperator,
+]
+
 
 def register():
-    for cls in operator_classes:
+    for cls in add_operators:
+        bpy.utils.register_class(cls)
+    for cls in others:
         bpy.utils.register_class(cls)
 
 
 def unregister():
-    for cls in reversed(operator_classes):
+    for cls in reversed(add_operators):
+        bpy.utils.unregister_class(cls)
+    for cls in reversed(others):
         bpy.utils.unregister_class(cls)

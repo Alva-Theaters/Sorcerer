@@ -76,7 +76,7 @@ class CommonUI:
         scene = context.scene.scene_props
         
         if space_type == 'SEQUENCE_EDITOR' and scene.view_sequencer_toolbar:
-            flow.operator("my.add_macro", icon='REC', text="Macro" if region_width > 200 else "")
+            flow.operator("my.add_macro", icon='FILE_TEXT', text="Macro" if region_width > 200 else "")
             flow.operator("my.add_cue", icon='PLAY', text="Cue" if region_width > 200 else "")
             flow.operator("my.add_flash", icon='LIGHT_SUN', text="Flash" if region_width > 200 else "")
             flow.operator("my.add_animation", icon='IPO_BEZIER', text="Animation" if region_width > 200 else "")

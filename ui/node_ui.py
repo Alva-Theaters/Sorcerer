@@ -49,15 +49,15 @@ class NodeUI:
         layout.label(text="Primary Lighting Nodes", icon_value=orb.icon_id)
         layout.operator("node.add_group_controller_node", text="Group Controller", icon='STICKY_UVS_LOC')
         layout.operator("node.add_mixer_node", text="Mixer", icon='OPTIONS')
-        layout.operator("node.add_motor_node", text="Motor", icon='ANTIALIASED')
-        layout.operator("node.add_flash_node", text="Flash", icon='LIGHT_SUN')
-        layout.operator("node.add_global_node", text="Global", icon='WORLD_DATA')
+        layout.operator("node.add_console_buttons_node", text="Console Buttons", icon='DESKTOP')
 
         layout.separator()
 
         layout.label(text="Specialty Lighting Nodes", icon_value=orb.icon_id)
         layout.operator("node.add_settings_node", text="Settings", icon='PREFERENCES')
-        layout.operator("node.add_console_buttons_node", text="Console Buttons", icon='DESKTOP')
+        layout.operator("node.add_motor_node", text="Motor", icon='ANTIALIASED')
+        layout.operator("node.add_flash_node", text="Flash", icon='LIGHT_SUN')
+        layout.operator("node.add_global_node", text="Global", icon='WORLD_DATA')
         layout.operator("node.add_presets_node", text="Presets", icon='NONE')
         layout.operator("node.add_pan_tilt_node", text="Pan/Tilt", icon='ORIENTATION_GIMBAL')
         
@@ -111,9 +111,9 @@ class NodeUI:
         if active_node.bl_idname == "group_controller_type":
             row = column.row()
             row.prop(active_node, "influence", text="Influence")
-            
+
             column.separator()
-            
+
     @staticmethod
     def draw_node_formatter_mixer(self, context, active_node): ## This whole thing needs update
         row = self.layout.row(align=True)
@@ -122,15 +122,51 @@ class NodeUI:
         row.prop(active_node, "parameters_enum", text="")
         if active_node.parameters_enum == 'option_color':
             row.prop(active_node, "color_profile_enum", text="")
-    
+
     @staticmethod
     def draw_node_formatter_footer(self, context, active_node):
         row = self.layout.row()
+        if active_node.bl_idname == 'NodeFrame':
+            row.prop(active_node, "shrink", slider=True)
+            row = self.layout.row()
+            row.prop(active_node, "label_size", text="Label size")
+            row = self.layout.row()
         row.prop(active_node, "label", text="Label")
         row = self.layout.row()
         row.prop(active_node, "use_custom_color", text="", icon='HIDE_ON' if not active_node.use_custom_color else 'HIDE_OFF')
-        row.prop(active_node, "color", text="")
+        row.template_color_picker(active_node, "color", value_slider=True)
+
+    @staticmethod
+    def draw_node_header(self, context, active_node=None):
+        if not active_node:
+            try:
+                active_node = context.space_data.edit_tree.nodes.active
+            except:
+                return
+            if not active_node:
+                return
+
+        col = self.layout.column()
+
+        if active_node.bl_idname == 'console_buttons_type':
+            col = self.layout.column()
+            col.prop(active_node, "expand_settings", icon='PREFERENCES', text="", emboss=True)
+
+        col = self.layout.column()
+        col.prop(active_node, "label", text="Label")
+
+        col = self.layout.column()
+        col.prop(active_node, "use_custom_color", text="", icon='HIDE_ON' if not active_node.use_custom_color else 'HIDE_OFF')
         
+        col = self.layout.column()
+        col.scale_x = .5
+        col.prop(active_node, "color", text="")
+
+        col = self.layout.column()
+        col.scale_x = .8
+        if hasattr(active_node, "scale"):
+            col.prop(active_node, "scale", text="Scale")
+
     @staticmethod    
     def draw_node_mixer(self, context, layout):
         space_type = context.space_data.type
@@ -339,46 +375,62 @@ class NodeUI:
             row.prop(context.scene.scene_props, "str_preset_assignment_argument", text="")
 
         layout.separator()
-        
-        
+
+
     @staticmethod
     def draw_console_node(self, context, layout):
-        counter = 0
-        box = layout.box()
-        row = box.row()
-        
-        for index, button in enumerate(self.custom_buttons):
-            if counter == 0:
-                row.prop(self, "expand_settings", icon='PREFERENCES', text="", emboss=True)
-            if counter % self.number_of_columns == 0 and counter != 0:
-                row = box.row()
-            op = row.operator("node.custom_button", text=button.button_label)
-            op.button_index = index
+        num_buttons = len(self.custom_buttons)
+        num_columns = self.number_of_columns
+        num_rows = (num_buttons + num_columns - 1) // num_columns
 
-            counter += 1
-        
+        if self.direct_select_types_enum == 'Macro':
+            layout.prop(context.scene.scene_props, 'view3d_command_line', text="")
+
+        # Lay out the buttons row by row
+        for row_index in range(num_rows):
+            row = layout.row(align=True)
+            
+            for col_index in range(num_columns):
+                button_index = row_index * num_columns + col_index
+                if button_index < num_buttons:
+                    button = self.custom_buttons[button_index]
+                    colon = ":" if button.button_label != "" else ""
+
+                    if not self.expand_settings:
+                        row.scale_y = self.scale * 1.5 # Boosting this because the box in other mode boosts it, we want them to stay in same spot between modes
+                        row.operator("node.custom_button", text=f"{button.constant_index}{colon} {button.button_label}").button_index = button_index
+                    else:
+                        box = row.box()
+                        
+                        sub_row = box.row(align=True)
+                        sub_row.scale_y = self.scale / 2
+                        sub_row.operator("node.bump_up_custom_button", icon='TRIA_LEFT', text="").button_index = button_index
+                        sub_row.prop(button, "constant_index", text="")
+                        sub_row.operator("node.bump_down_custom_button", icon='TRIA_RIGHT', text="").button_index = button_index
+
+                        sub_row = box.row(align=True)
+                        sub_row.scale_y = self.scale / 2
+                        sub_row.prop(button, "button_label", text="")
+                        op_remove = sub_row.operator("node.remove_custom_button", icon='X', text="")
+
+
         if self.expand_settings:
             counter_two = 0
-            for index, button in enumerate(self.custom_buttons):
-                if counter_two == 0:
-                    box = layout.box()
-                row = box.row()
-                op_up = row.operator("node.bump_up_custom_button", icon='TRIA_UP', text="")
-                op_up.button_index = index
-
-                op_down = row.operator("node.bump_down_custom_button", icon='TRIA_DOWN', text="")
-                op_down.button_index = index
-                row.prop(button, "button_label", text="", icon='INFO')
-                row.prop(button, "button_address", text="", icon='RNA_ADD')
-                row.prop(button, "button_argument", text="", icon='MOD_HUE_SATURATION')
-                
-                op_remove = row.operator("node.remove_custom_button", icon='X', text="")
-                op_remove.button_index = index 
-                counter_two += 1
+            column = layout.column()
+            box = column.box()
 
             row = box.row()
-            row.operator("node.add_custom_button", icon='ADD', text="Add Custom Button")
-            row.prop(self, "number_of_columns", icon='CENTER_ONLY', text="# of Columns")
+            row.prop(self, "direct_select_types_enum", expand=True, icon_only=True)
+            row.label(text=f" {self.direct_select_types_enum} Buttons")
+
+            box.separator()
+
+            row = box.row()
+            row.scale_y = 1.5
+            row.operator("node.add_custom_button", icon='ADD', text="")
+            row.prop(self, "number_of_columns", icon='CENTER_ONLY', text="Columns")
+            row.prop(self, "scale", text="Scale")
+            row.prop(self, "boost_index", text="Boost #'s by")
             
             
     @staticmethod

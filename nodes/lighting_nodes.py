@@ -310,15 +310,24 @@ class NODE_NT_console_buttons(Node):
 
     custom_buttons: CollectionProperty(type=CustomButtonPropertyGroupSubClass) # type: ignore
     active_button_index: IntProperty() # type: ignore
-    number_of_columns: IntProperty(default=3) # type: ignore
+    number_of_columns: IntProperty(default=3, max=9, name="Num. Columns", description="Change how many buttons should be in each row, or in other words how many columns there should be") # type: ignore
+    scale: FloatProperty(default=2, max=5, min=.2, name="Scale", description="Change the scale of the buttons") # type: ignore
     expand_settings: BoolProperty(default=True) # type: ignore
+    direct_select_types_enum: EnumProperty(
+        name="Types",
+        description="List of supported direct select types",
+        items=AlvaItems.direct_select_types,
+        default=0,
+        update=NodeUpdaters.direct_select_types_updater
+    ) # type: ignore
+    boost_index: IntProperty(name="Boost", description="Boost all the index numbers of the buttons", min=-99999, max=99999, update=NodeUpdaters.boost_index_updater) # type: ignore
 
     def init(self, context):
         return
-    
+
     def draw_buttons(self, context, layout):
         NodeUI.draw_console_node(self, context, layout)
-        
+
 
 class NODE_NT_flash(Node):
     bl_idname = 'flash_type'

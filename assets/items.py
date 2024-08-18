@@ -361,11 +361,24 @@ class Items:
         ]
         return items
     
+
+    def direct_select_types(self, context):
+        items = [
+            ('Preset', "Preset", "Trigger or record presets", 'OUTLINER_OB_IMAGE', 0),
+            ('Intensity Palette', "Intensity", "Trigger or record intensity palettes", 'OUTLINER_OB_LIGHT', 1),
+            ('Color Palette', "Color", "Trigger or record color palettes", 'COLOR', 2),
+            ('Focus Palette', "Focus", "Trigger or record focus palettes", 'ORIENTATION_GIMBAL', 3),
+            ('Beam Palette', "Beam", "Trigger or record beam palettes", 'OUTLINER_DATA_POINTCLOUD', 4),
+            ('Effect', "FX", "Trigger or record effects", 'SORTBYEXT', 5),
+            ('Group', "Group", "Select or record groups", 'OUTLINER_COLLECTION', 6),
+            ('Macro', "Macro", "Trigger or record macros", 'FILE_TEXT', 7)
+        ]
+        return items
+    
     
     def enum_items(self, context):
-
         items = [
-            ('option_eos_macro', "", "Build and fire macros based on strip length", 'REC', 0),
+            ('option_eos_macro', "", "Build and fire macros based on strip length", 'FILE_TEXT', 0),
             ('option_eos_cue', "", "Use strip length to define cue duration", 'PLAY', 1),
             ('option_eos_flash', "", "Flash intensity up and down with strip length", 'LIGHT_SUN', 2),
             ('option_animation', "", "Use keyframes, or inverted cues, to control parameters", 'IPO_BEZIER', 3),

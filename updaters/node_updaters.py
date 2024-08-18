@@ -217,3 +217,21 @@ class NodeUpdaters:
         for param in self.parameters:
             param.node_tree_pointer = self.id_data
             param.node_name = self.name
+
+
+    @staticmethod
+    def boost_index_updater(self, context):
+        for item in self.custom_buttons:
+            item.constant_index += self.boost_index
+
+
+    @staticmethod
+    def direct_select_types_updater(self, context):
+        argument = self.direct_select_types_enum.replace(" ", "_")
+        for button in self.custom_buttons:
+            button.button_argument = f"{argument} {button.constant_index}"
+
+
+    @staticmethod
+    def constant_index_updater(self, context):
+        return # This needs to fire direct_select_types_updater without losing track of the parent node. Maybe store the enum value on the button?

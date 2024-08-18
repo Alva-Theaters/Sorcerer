@@ -154,7 +154,7 @@ class SequencerUI:
         row = column.row(align=True)
         if lighting_icons:
             strip_type = active_strip.my_settings.motif_type_enum
-            row.prop(scene.my_tool, "motif_names_enum", text="", icon='REC' if strip_type == "option_eos_macro" else 'PLAY' if strip_type == "option_eos_cue" else 'OUTLINER_OB_LIGHT' if strip_type == "option_eos_flash" else 'IPO_BEZIER' if strip_type == "option_animation" else 'SETTINGS', icon_only=True)
+            row.prop(scene.my_tool, "motif_names_enum", text="", icon='FILE_TEXT' if strip_type == "option_eos_macro" else 'PLAY' if strip_type == "option_eos_cue" else 'OUTLINER_OB_LIGHT' if strip_type == "option_eos_flash" else 'IPO_BEZIER' if strip_type == "option_animation" else 'SETTINGS', icon_only=True)
         else:
             row.prop(scene.my_tool, "motif_names_enum", text="", icon='COLOR', icon_only=True)
         
@@ -165,7 +165,7 @@ class SequencerUI:
             row.alert = 0
         
         # Add buttons.
-        row.operator("my.add_macro", text="", icon='REC')
+        row.operator("my.add_macro", text="", icon='FILE_TEXT')
         row.operator("my.add_cue", text="", icon='PLAY')
         row.operator("my.add_flash", text="", icon='LIGHT_SUN')
         row.operator("my.add_animation", text="", icon='IPO_BEZIER')
@@ -578,7 +578,7 @@ class SequencerUI:
 
         row = box.row(align=True)
         row.prop(active_strip, 'offset_channels', text="")
-        row.prop(active_strip, "use_macro", text="", icon='REC')
+        row.prop(active_strip, "use_macro", text="", icon='FILE_TEXT')
         row.operator("my.generate_offset_macro", text="", icon_value=orb.icon_id)
         
         box.separator(factor=.01)
@@ -821,7 +821,7 @@ class SequencerUI:
         layout = self.layout
         layout.separator()
         layout.label(text="Alva Sorcerer", icon_value=orb.icon_id)
-        layout.operator("my.add_macro", text="Macro", icon='REC')
+        layout.operator("my.add_macro", text="Macro", icon='FILE_TEXT')
         layout.operator("my.add_cue", text="Cue", icon='PLAY')
         layout.operator("my.add_flash", text="Flash", icon='LIGHT_SUN')
         layout.operator("my.add_animation", text="Animation", icon='IPO_BEZIER')

@@ -42,7 +42,7 @@ class SceneProperties(PropertyGroup):
 
     add_channel_ids: StringProperty(name="Add channel ID's", update=CommonUpdaters.channel_ids_updater)     # type: ignore
     
-    view3d_command_line: StringProperty(name="Lighting Console Command Line", default="", update=CommonUpdaters.view3d_cmd_line_updater) # type: ignore
+    view3d_command_line: StringProperty(name="Lighting Console Command Line Input", default="", update=CommonUpdaters.view3d_cmd_line_updater) # type: ignore
 
     str_osc_ip_address: StringProperty(default="192.168.1.1", description="This should be the IP address of the console. This must set for anything to work. Press the About key on the console to find the console's IP address. Console must be on same local network", update=CommonUpdaters.network_settings_updater) # type: ignore
     int_osc_port: IntProperty(min=0, max=65535, description="On the console, Displays > Setup > System Settings > Show Control > OSC > (enable OSC RX and make the port number there on the left match the one in this field in Alva. OSC TX = transmit and OSC RX = receive. We want receive", default=8000, update=CommonUpdaters.network_settings_updater) # type: ignore

@@ -227,8 +227,14 @@ class CommonUpdaters:
 
 
     def view3d_cmd_line_updater(self, context):
-        if context.scene.scene_props.view3d_command_line != "":
-            OSC.send_osc_lighting("/eos/cmd", f"{context.scene.scene_props.view3d_command_line} Enter")
+        original = context.scene.scene_props.view3d_command_line
+        
+        if original != "":
+            try:
+                with_underscores = Utils.add_underscores_to_keywords(original)
+                OSC.send_osc_lighting("/eos/cmd", f"{with_underscores} Enter")
+            except:
+                OSC.send_osc_lighting("/eos/cmd", f"{original} Enter")
             context.scene.scene_props.view3d_command_line = ""
         else:
             OSC.press_lighting_key("enter")

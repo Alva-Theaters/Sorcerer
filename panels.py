@@ -37,6 +37,7 @@ from bpy.types import (
     SEQUENCER_MT_add,
     DOPESHEET_HT_header,
     NODE_MT_add,
+    NODE_HT_header,
     GRAPH_HT_header,
     TEXT_HT_header
     )
@@ -338,6 +339,7 @@ def register():
     DOPESHEET_HT_header.append(SequencerUI.draw_timeline_sync) # This goes on space_time too
 
     NODE_MT_add.append(NodeUI.draw_alva_node_menu)
+    NODE_HT_header.append(NodeUI.draw_node_header)
 
     GRAPH_HT_header.append(CommonUI.draw_graph_header)
 
@@ -360,6 +362,7 @@ def unregister():
     DOPESHEET_HT_header.remove(SequencerUI.draw_timeline_sync)
 
     NODE_MT_add.remove(NodeUI.draw_alva_node_menu)
+    NODE_HT_header.remove(NodeUI.draw_node_header)
 
     GRAPH_HT_header.remove(CommonUI.draw_graph_header)
 

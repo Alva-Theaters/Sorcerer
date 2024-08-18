@@ -283,12 +283,14 @@ class LightingModifier(PropertyGroup):
     reds: IntProperty(name="Reds", default=0, min = -100, max = 100, description="") # type: ignore # type: ignore
     greens: IntProperty(name="Greens", default=0, min = -100, max = 100, description="") # type: ignore
     blues: IntProperty(name="Blues", default=0, min = -100, max = 100, description="") # type: ignore
-    
-  
+
+
 class CustomButtonPropertyGroup(PropertyGroup):
     button_label: StringProperty(name="Label", default="Button Label") # type: ignore # type: ignore
-    button_address: StringProperty(default="/eos/newcmd", description="OSC Address") # type: ignore
-    button_argument: StringProperty(default="Go_to_Cue Out Enter", description="OSC Argument") # type: ignore
+    button_address: StringProperty(default="/eos/cmd") # type: ignore
+    button_argument: StringProperty(default="") # type: ignore
+    from ..updaters.node_updaters import NodeUpdaters
+    constant_index: IntProperty(name="Index", description="Number of the item on the console", update=NodeUpdaters.constant_index_updater) # type: ignore
 
 
 class MixerParameters(PropertyGroup):
