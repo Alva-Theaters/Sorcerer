@@ -47,7 +47,7 @@ This is the ONLY place to check lighting console type inside operators. All
 
 class Orb:
     @staticmethod
-    def generate_macros_to_cues(self, context, strip='sound', enable=True):
+    def initiate_orb(self, context, strip='sound', enable=True):
         scene = context.scene
         console_mode = scene.scene_props.console_type_enum
         if hasattr(scene.sequence_editor, "active_strip") and scene.sequence_editor.active_strip is not None:

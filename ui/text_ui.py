@@ -59,7 +59,10 @@ class TextUI:
         col.separator()
 
         row = col.row()
-        row.prop(context.scene, "add_underscores", text="Add missing underscores to keywords", slider=True)
+        row.prop(context.scene, "add_underscores", text="Add underscores", slider=True)
+
+        row = col.row()
+        row.prop(context.scene, "add_enter", text="Add Enter", slider=True)
 
         col.separator()
 

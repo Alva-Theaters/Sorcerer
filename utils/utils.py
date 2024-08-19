@@ -574,7 +574,8 @@ class Utils:
     '''Text editor macros'''
     #-------------------------------------------------------------------------------------------------------------------------------------------
     def tokenize_macro_line(input_line):
-        if bpy.context.scene.add_underscores:
+        scene = bpy.context.scene
+        if scene.add_underscores:
             try:
                 input_line = Utils.add_underscores_to_keywords(input_line)
             except Exception as e:
@@ -607,7 +608,7 @@ class Utils:
                 results.append(("/eos/newcmd", str(token)))
                 
         # Check if the last token is "enter" and add it if it's not
-        if tokens[-1].lower() != "enter":
+        if tokens[-1].lower() != "enter" and scene.add_enter:
             results.append(("/eos/key/Enter", "1"))
             results.append(("/eos/key/Enter", "0"))
                 

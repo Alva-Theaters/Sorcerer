@@ -49,7 +49,7 @@ class NodeUI:
         layout.label(text="Primary Lighting Nodes", icon_value=orb.icon_id)
         layout.operator("node.add_group_controller_node", text="Group Controller", icon='STICKY_UVS_LOC')
         layout.operator("node.add_mixer_node", text="Mixer", icon='OPTIONS')
-        layout.operator("node.add_console_buttons_node", text="Console Buttons", icon='DESKTOP')
+        layout.operator("node.add_direct_selects_node", text="Direct Selects", icon='DESKTOP')
 
         layout.separator()
 
@@ -379,6 +379,11 @@ class NodeUI:
 
     @staticmethod
     def draw_console_node(self, context, layout):
+        st = context.space_data.type
+        node_tree = context.space_data.node_tree
+        node_name = self.name
+        node_tree_name = node_tree.name
+
         num_buttons = len(self.custom_buttons)
         num_columns = self.number_of_columns
         num_rows = (num_buttons + num_columns - 1) // num_columns
@@ -386,7 +391,6 @@ class NodeUI:
         if self.direct_select_types_enum == 'Macro':
             layout.prop(context.scene.scene_props, 'view3d_command_line', text="")
 
-        # Lay out the buttons row by row
         for row_index in range(num_rows):
             row = layout.row(align=True)
             
@@ -398,7 +402,12 @@ class NodeUI:
 
                     if not self.expand_settings:
                         row.scale_y = self.scale * 1.5 # Boosting this because the box in other mode boosts it, we want them to stay in same spot between modes
-                        row.operator("node.custom_button", text=f"{button.constant_index}{colon} {button.button_label}").button_index = button_index
+                        op = row.operator("node.custom_button", text=f"{button.constant_index}{colon} {button.button_label}")
+                        op.button_index = button_index
+                        op.space_type = st
+                        op.node_name = node_name
+                        op.node_tree_name = node_tree_name
+
                     else:
                         box = row.box()
                         
@@ -412,7 +421,6 @@ class NodeUI:
                         sub_row.scale_y = self.scale / 2
                         sub_row.prop(button, "button_label", text="")
                         op_remove = sub_row.operator("node.remove_custom_button", icon='X', text="")
-
 
         if self.expand_settings:
             counter_two = 0

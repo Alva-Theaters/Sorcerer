@@ -303,7 +303,7 @@ class NODE_NT_motor(Node):
             
 class NODE_NT_console_buttons(Node):
     bl_idname = 'console_buttons_type'
-    bl_label = 'Console Buttons Node'
+    bl_label = 'Direct Selects Node'
     bl_icon = 'DESKTOP'
     bl_width_default = 400
     bl_description="Create console buttons with custom OSC syntax"

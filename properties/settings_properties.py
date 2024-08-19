@@ -83,7 +83,8 @@ def register():
     Scene.orb_presets_start = IntProperty(default=8888, max=9998, min=1, name="Range Start", description="Orb will use this range to create the background presets it needs. If Orb runs out, it will ask for a larger range.")
     Scene.orb_presets_end = IntProperty(default=9999, max=9999, min=1, name="Range End", description="Orb will use this range to create the background presets it needs. If Orb runs out, it will ask for a larger range.")
 
-    Scene.add_underscores = BoolProperty(default=True, name="Add underscores", description="Orb will try to add underscores to known keywords if they are missing")
+    Scene.add_underscores = BoolProperty(default=True, name="Add Underscores", description="Orb will try to add underscores to known keywords if they are missing")
+    Scene.add_enter = BoolProperty(default=True, name="Add Enter", description="Orb will automatically add Enter to the end of each line if you forgot to. Turn this off if you want to leave the commandline open, for example if this macro works with other macros or the user to add multiple things to the commandline at once")
 
     # Lighting
     Scene.osc_receive_port = IntProperty(min=0, max=65535)  

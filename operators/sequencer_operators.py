@@ -33,9 +33,9 @@ from bpy.props import IntProperty
 import time
 
 from ..ui.sequencer_ui import SequencerUI # type: ignore
-from ..orb import Orb
 from ..utils.utils import Utils # type: ignore
 from ..utils.osc import OSC
+from ..orb import Orb
 
 # Custom icon stuff
 import bpy.utils.previews
@@ -1832,217 +1832,6 @@ misc_operators = [
 ]
 
 
-#################
-# Orb Operators
-#################
-class SEQUENCER_OT_base_modal_operator(Operator):
-    bl_idname = "my.base_modal_operator"
-    bl_label = ""
-    bl_description = "Base class for modal operators"
-
-    cancel_key = 'ESC'
-
-    def execute(self, context):
-        self._cancel = False
-        if self.strip != 'qmeo':
-            self._generator = self.generate_macros_to_cues(context, strip=self.strip, enable=self.enable)
-        else:
-            frame_rate = Utils.get_frame_rate(context.scene)
-            scene = context.scene
-            if hasattr(scene.sequence_editor, "active_strip") and scene.sequence_editor.active_strip is not None and scene.sequence_editor.active_strip.type == 'SOUND':
-                active_strip = context.scene.sequence_editor.active_strip
-                start_frame = active_strip.frame_start
-                end_frame = active_strip.frame_final_end
-            else:
-                start_frame = context.scene.frame_start
-                end_frame = context.scene.frame_end
-            
-            self._generator = self.make_qmeo(context.scene, frame_rate, start_frame, end_frame)
-
-        wm = context.window_manager
-        self._timer = wm.event_timer_add(0.1, window=context.window)
-        wm.modal_handler_add(self)
-        return {'RUNNING_MODAL'}
-
-    def modal(self, context, event):
-        if event.type == self.cancel_key and event.value == 'PRESS':
-            self._cancel = True
-            self.cancel(context)
-            self.report({'INFO'}, "Operation cancelled")
-            return {'CANCELLED'}
-
-        if event.type == 'TIMER':
-            try:
-                func, msg = next(self._generator)
-                if func:
-                    func()
-                if msg:
-                    self.report({'INFO'}, msg)
-            except StopIteration:
-                self.report({'INFO'}, "Operation completed")
-                self.cancel(context)
-                return {'FINISHED'}
-
-        return {'RUNNING_MODAL'}
-
-    def generate_macros_to_cues(self, context, strip='sound', enable=True):
-        yield from Orb.generate_macros_to_cues(self, context, strip=strip, enable=enable)
-
-    def make_qmeo(self, scene, frame_rate, start_frame, end_frame):
-        yield from Orb.Eos.make_qmeo(scene, frame_rate, start_frame, end_frame)
-
-    def cancel(self, context):
-        wm = context.window_manager
-        wm.event_timer_remove(self._timer)
-        OSC.send_osc_lighting("/eos/key/escape", "1")
-        OSC.send_osc_lighting("/eos/key/escape", "0")
-        OSC.send_osc_lighting("/eos/newcmd", "")
-        Orb.Eos.reset_macro_key()
-        Orb.Eos.restore_snapshot(context.scene)
-        
-
-class SEQUENCER_OT_execute_sound_on_cue(SEQUENCER_OT_base_modal_operator):
-    bl_idname = "my.execute_on_cue_operator"
-    bl_label = ""
-    bl_description = "Orb executes sound on cue"
-
-    def execute(self, context):
-        self.strip = 'sound'
-        self.enable = True
-        return super().execute(context)
-
-
-class SEQUENCER_OT_disable_sound_on_cue(SEQUENCER_OT_base_modal_operator):
-    bl_idname = "my.disable_on_cue_operator"
-    bl_label = ""
-    bl_description = "Orb disables sound on cue"
-
-    def execute(self, context):
-        self.strip = 'sound'
-        self.enable = False
-        return super().execute(context)
-
-
-class SEQUENCER_OT_execute_animation_on_cue(SEQUENCER_OT_base_modal_operator):
-    bl_idname = "my.execute_animation_on_cue_operator"
-    bl_label = ""
-    bl_description = "Orb executes animation on cue"
-
-    def execute(self, context):
-        self.strip = 'animation'
-        self.enable = True
-        return super().execute(context)
-
-
-class SEQUENCER_OT_disable_animation_on_cue(SEQUENCER_OT_base_modal_operator):
-    bl_idname = "my.disable_animation_on_cue_operator"
-    bl_label = ""
-    bl_description = "Orb disables animation on cue"
-
-    def execute(self, context):
-        self.strip = 'animation'
-        self.enable = False
-        return super().execute(context)
-
-
-class SEQUENCER_OT_generate_start_frame_macro(SEQUENCER_OT_base_modal_operator):
-    bl_idname = "my.generate_start_frame_macro"
-    bl_label = ""
-    bl_description = "Orb generates start frame macro"
-
-    def execute(self, context):
-        self.strip = 'macro'
-        self.enable = True
-        return super().execute(context)
-
-
-class SEQUENCER_OT_generate_end_frame_macro(SEQUENCER_OT_base_modal_operator):
-    bl_idname = "my.generate_end_frame_macro"
-    bl_label = ""
-    bl_description = "Orb generates end frame macro"
-
-    def execute(self, context):
-        self.strip = 'macro'
-        self.enable = False
-        return super().execute(context)
-
-
-class SEQUENCER_OT_build_flash_macros(SEQUENCER_OT_base_modal_operator):
-    bl_idname = "my.build_flash_macros"
-    bl_label = ""
-    bl_description = "Orb builds flash macros"
-
-    def execute(self, context):
-        self.strip = 'flash'
-        self.enable = True
-        return super().execute(context)
-    
-    
-class SEQUENCER_OT_generate_offset_macro(SEQUENCER_OT_base_modal_operator):
-    bl_idname = "my.generate_offset_macro"
-    bl_label = ""
-    bl_description = "Orb generates offset macro"
-
-    def execute(self, context):
-        self.strip = 'offset'
-        self.enable=True
-        return super().execute(context)
-    
-    
-class SEQUENCER_OT_bake_curves_to_cues(SEQUENCER_OT_base_modal_operator):
-    bl_idname = "my.bake_fcurves_to_cues_operator"
-    bl_label = "Bake F-curves To Cues"
-    bl_description = "Orb will create a qmeo. A qmeo is like a video, only each frame is a lighting cue. Use it to store complex animation data on the lighting console" 
-
-    def execute(self, context):
-        self.strip = 'qmeo'
-        self.enable=True
-        return super().execute(context)
- 
- 
-class SEQUENCER_OT_only_cues(Operator):
-    bl_idname = "my.rerecord_cues_operator"
-    bl_label = "Re-record Cues"
-    bl_description = "Orb will re-record the cues. Use this instead of the left button if you already used that button, updated the animation without changing its length, and just want to re-record the existing cues. This is far shorter" 
-    
-    def execute(self, context):
-        active_strip = context.scene.sequence_editor.active_strip
-        frame_rate = Utils.get_frame_rate(context.scene)
-        start_frame = active_strip.frame_start
-        end_frame = active_strip.frame_final_end
-        cue_list = active_strip.int_cue_list
-        
-        Orb.Eos.make_qmeo(context.scene, frame_rate, start_frame, end_frame, cue_list, None)
-        return {'FINISHED'}
-    
-    
-class TEXT_OT_generate_text_macro(SEQUENCER_OT_base_modal_operator):
-    bl_idname = "text.generate_text_macro"
-    bl_label = ""
-    bl_description = "Orb generates macro from text block"
-
-    def execute(self, context):
-        self.strip = 'text'
-        self.enable = True
-        return super().execute(context)
-    
-    
-orb_operators = [
-    SEQUENCER_OT_base_modal_operator,
-    SEQUENCER_OT_execute_sound_on_cue,
-    SEQUENCER_OT_disable_sound_on_cue,
-    SEQUENCER_OT_execute_animation_on_cue,
-    SEQUENCER_OT_disable_animation_on_cue,
-    SEQUENCER_OT_generate_start_frame_macro,
-    SEQUENCER_OT_generate_end_frame_macro,
-    SEQUENCER_OT_build_flash_macros,
-    SEQUENCER_OT_generate_offset_macro,
-    SEQUENCER_OT_bake_curves_to_cues,
-    SEQUENCER_OT_only_cues,
-    TEXT_OT_generate_text_macro
-]
-   
-
 ######################
 # Add Strip Operators
 ######################
@@ -2240,8 +2029,6 @@ def register():
         bpy.utils.register_class(cls)
     for cls in misc_operators:
         bpy.utils.register_class(cls)
-    for cls in orb_operators:
-        bpy.utils.register_class(cls)
     for cls in add_strip_operators:
         bpy.utils.register_class(cls)
     for cls in three_dee_audio_operators:
@@ -2253,8 +2040,6 @@ def unregister():
     for cls in reversed(macro_operators):
         bpy.utils.unregister_class(cls)
     for cls in reversed(misc_operators):
-        bpy.utils.unregister_class(cls)
-    for cls in reversed(orb_operators):
         bpy.utils.unregister_class(cls)
     for cls in reversed(add_strip_operators):
         bpy.utils.unregister_class(cls)

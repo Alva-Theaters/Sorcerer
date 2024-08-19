@@ -39,8 +39,8 @@ from ..utils.osc import OSC
 
 
 class NODE_OT_add_console_buttons(Operator):
-    bl_idname = "node.add_console_buttons_node"
-    bl_label = "Add Console Buttons"
+    bl_idname = "node.add_direct_selects_node"
+    bl_label = "Add Direct Selects"
     bl_description="Adjust all intensities of group controller nodes on this level"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -351,14 +351,25 @@ class CustomButton(bpy.types.Operator):
 
     button_index: IntProperty()
 
+    space_type: bpy.props.StringProperty() # type: ignore
+    node_name: bpy.props.StringProperty() # type: ignore
+    node_tree_name: bpy.props.StringProperty() # type: ignore
+
     def execute(self, context):
-        node = context.active_node
-
-        argument = node.direct_select_types_enum.replace(" ", "_")
-        for button in node.custom_buttons:
-            button.button_argument = f"{argument} {button.constant_index}"
-
+        finders = Find
+        node = finders.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
+        if not node:
+            return {'CANCELLED'}
+        
         this_button = node.custom_buttons[self.button_index]
+        argument = node.direct_select_types_enum.replace(" ", "_")
+
+        if argument == "Macro":
+            this_button.button_address = "/eos/macro/fire"
+            this_button.button_argument = str(this_button.constant_index)
+        else:
+            this_button.button_address = "/eos/cmd"
+            this_button.button_argument = f"{argument} {this_button.constant_index}"
 
         OSC.send_osc_lighting(this_button.button_address, this_button.button_argument)
         return {'FINISHED'}

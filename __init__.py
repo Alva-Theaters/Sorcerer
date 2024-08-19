@@ -102,6 +102,11 @@ except ImportError as e:
     print(f"Failed to import sequencer_operators: {e}")
 
 try:
+    from .operators.orb_operators import register as orb_operators_register, unregister as orb_operators_unregister
+except ImportError as e:
+    print(f"Failed to import orb_operators: {e}")
+
+try:
     from .operators.common_operators import register as common_operators_register, unregister as common_operators_unregister
 except ImportError as e:
     print(f"Failed to import common_operators: {e}")
@@ -199,6 +204,11 @@ def register():
         print("Failed to register sequencer_operators:", e)
 
     try:
+        orb_operators_register()
+    except Exception as e:
+        print("Failed to register orb_operators:", e)
+
+    try:
         common_operators_register()
     except Exception as e:
         print("Failed to register common_operators:", e)
@@ -286,6 +296,11 @@ def unregister():
         common_operators_unregister()
     except Exception as e:
         print("Failed to unregister common_operators:", e)
+
+    try:
+        orb_operators_unregister()
+    except Exception as e:
+        print("Failed to unregister orb_operators:", e)
 
     try:
         sequencer_operators_unregister()

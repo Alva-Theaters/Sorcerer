@@ -231,6 +231,9 @@ class NodeUpdaters:
         for button in self.custom_buttons:
             button.button_argument = f"{argument} {button.constant_index}"
 
+            if argument == "Macro":
+                button.button_argument = f"{button.button_argument} Enter"
+
 
     @staticmethod
     def constant_index_updater(self, context):
