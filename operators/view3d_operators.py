@@ -860,10 +860,14 @@ class ToggleObjectMuteOperator(bpy.types.Operator):
     bl_label = "Mute OSC"
     bl_description = "Disable object's OSC output"
 
+    space_type: StringProperty() # type: ignore
+    node_name: StringProperty() # type: ignore
+    node_tree_name: StringProperty() # type: ignore
+
     def execute(self, context):
-        active_object = context.active_object
-        active_object.mute = not active_object.mute
-    
+        finders = Find
+        active_controller = finders.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
+        active_controller.mute = not active_controller.mute
         return {'FINISHED'}
     
     

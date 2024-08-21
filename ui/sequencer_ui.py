@@ -260,7 +260,6 @@ class SequencerUI:
     def draw_color_subheader(self, context, column, active_strip, console_context):
         box = column.box()
         row = box.row(align=True)
-        row.operator("my.mute_button", icon='HIDE_OFF' if not active_strip.mute else 'HIDE_ON')
         my_settings = active_strip.my_settings
         row.prop(my_settings, "motif_type_enum", expand=True)
         SequencerUI.draw_strip_type_label(console_context, row)

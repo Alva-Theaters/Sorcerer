@@ -50,7 +50,7 @@ class CPVIAFinders:
         Parameters:
         self: The object from which this function is called.
         p: Parameter.
-        
+
         Returns:
         c: Channel list
         v: Values list
@@ -106,7 +106,7 @@ class CPVIAFinders:
             elif parent.type == 'COLOR':  # Color strip
                 return "strip"
             
-            elif parent.type == 'CUSTOM':
+            elif parent.type == 'CUSTOM': # Nodes
                 controller_types = {
                 'group_controller_type': "group",
                 'mixer_type': "mixer",

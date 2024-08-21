@@ -33,15 +33,12 @@ from bpy.app.handlers import persistent
 from .utils.event_utils import EventUtils as Utils
 from .utils.utils import Utils as NormalUtils
 from .cpvia.find import Find
-from .cpvia.cpvia_finders import CPVIAFinders
-from .assets.sli import SLI
 from .utils.osc import OSC
 from .cpvia.harmonizer import Harmonizer
 from .utils.sequencer_mapping import StripMapping
 from .assets.dictionaries import Dictionaries
 
 
-change_requests = []
 stored_channels = set()
 
 
@@ -359,7 +356,6 @@ class EventManager:
         '''DOCUMENTATION CODE A2'''
         '''A2:1'''
         from .cpvia.publish import change_requests
-        print(change_requests)
 
         '''A2:2'''
         no_duplicates = Harmonizer.remove_duplicates(change_requests)
@@ -375,11 +371,11 @@ class EventManager:
         for request in simplified:
             address, argument = publisher.form_osc(*request)  # Should return 2 strings
             '''A2:4'''
-            OSC.send_osc_lighting(address, argument) 
-        
+            OSC.send_osc_lighting(address, argument)
+
         if not scene.scene_props.is_playing:
             scene.scene_props.in_frame_change = False
-            
+
         '''A2:5'''
         publisher.clear_requests()
         

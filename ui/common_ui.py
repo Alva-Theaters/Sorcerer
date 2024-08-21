@@ -267,7 +267,10 @@ class CommonUI:
         row = box.row(align=True)
         
         # MUTE
-        row.operator("object.toggle_object_mute_operator", icon='HIDE_OFF' if active_object.mute else 'HIDE_ON', text="")
+        op_mute = row.operator("object.toggle_object_mute_operator", icon='HIDE_ON' if active_object.mute else 'HIDE_OFF', text="")
+        op_mute.space_type = space_type
+        op_mute.node_name = node_name
+        op_mute.node_tree_name = node_tree_name
 
         # HOME
         op_home = row.operator("node.home_group", icon='HOME', text="")

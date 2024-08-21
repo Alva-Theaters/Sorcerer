@@ -32,6 +32,7 @@ from functools import partial
 from ..cpvia.find import Find # type: ignore
 from ..cpvia.cpvia_finders import CPVIAFinders # type: ignore
 from ..cpvia.split_color import ColorSplitter # type: ignore
+from ..cpvia.flags import check_flags
 
 
 '''
@@ -69,6 +70,9 @@ class CPVIAGenerator:
         mode = p
         parent = finders.find_parent(self)
         c, p, v, type = find_function(parent, p)  # Should return 3 lists and a string. find_function() is find_my_channels_and_values().
+
+        if not check_flags(context, parent, c, p, v, type):
+            return
 
         if mode == "color":
             color_splitter = ColorSplitter()
