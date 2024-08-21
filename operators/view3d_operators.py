@@ -101,143 +101,147 @@ class PatchGroupOperator(bpy.types.Operator):
     bl_description = "Patch group on console"
 
     def execute(self, context):
-        space = context.space_data.edit_tree.nodes
-        
-        if hasattr(space, "active"):
+        active_node = None
+        try:
             active_node = context.space_data.edit_tree.nodes.active
+        except:
+            pass
+        
+        scene = context.scene
+        array_modifier = None
+        if scene.scene_props.array_modifier_enum in context.active_object.modifiers:
+            address = "/eos/newcmd"
             
-            scene = context.scene
-            array_modifier = None
-            if scene.scene_props.array_modifier_enum in context.active_object.modifiers:
-                address = "/eos/newcmd"
-                
-                array_modifier = context.active_object.modifiers[scene.scene_props.array_modifier_enum]
-                
-                if scene.scene_props.array_curve_enum != "NONE":
-                    curve_modifier = context.active_object.modifiers[scene.scene_props.array_curve_enum]
-                
-                bpy.ops.object.modifier_apply(modifier=array_modifier.name)
-                
-                if context.object.mode != 'OBJECT':
-                    bpy.ops.object.mode_set(mode='OBJECT')
-                    
-                if scene.scene_props.array_curve_enum != "NONE":   
-                    bpy.ops.object.modifier_apply(modifier=curve_modifier.name)
-                
-                bpy.ops.object.editmode_toggle()
-                bpy.ops.mesh.separate(type='LOOSE')
+            array_modifier = context.active_object.modifiers[scene.scene_props.array_modifier_enum]
+            
+            if scene.scene_props.array_curve_enum != "NONE":
+                curve_modifier = context.active_object.modifiers[scene.scene_props.array_curve_enum]
+            
+            bpy.ops.object.modifier_apply(modifier=array_modifier.name)
+            
+            if context.object.mode != 'OBJECT':
                 bpy.ops.object.mode_set(mode='OBJECT')
-                for obj in context.selected_objects:
-                    if obj.type == 'MESH':
-                        context.view_layer.objects.active = obj
-                        bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS')
                 
-                starting_channel = scene.scene_props.int_array_start_channel
-                group_number = scene.scene_props.int_array_group_index
-                group_label = scene.scene_props.str_array_group_name
-                starting_universe = scene.scene_props.int_array_universe
-                start_address = scene.scene_props.int_array_start_address
-                channels_to_add = scene.scene_props.int_array_channel_mode
-                total_lights = len([chan for chan in bpy.data.objects if chan.select_get()])
-                addresses_list = Utils.find_addresses(starting_universe, start_address, channels_to_add, total_lights)
-                
-                OSC.send_osc_lighting("/eos/key/live", "1")
-                OSC.send_osc_lighting("/eos/key/live", "0")
-                
-                relevant_channels = []
+            if scene.scene_props.array_curve_enum != "NONE":   
+                bpy.ops.object.modifier_apply(modifier=curve_modifier.name)
             
-                for i, chan in enumerate([obj for obj in bpy.data.objects if obj.select_get()]):
-                    OSC.send_osc_lighting(address, "Patch Enter")
-                    time.sleep(.3)
-                    
-                    chan.int_fixture_index = scene.scene_props.int_array_start_channel
-                    current_universe, current_address = addresses_list[i]
-                    
-                    position_x = round(chan.location.x / .3048)
-                    position_y = round(chan.location.y / .3048)
-                    position_z = round(chan.location.z / .3048)
-                    
-                    # Rotate by 180 degrees (pi in radians) since cone facing up is the same as a light facing down.
-                    orientation_x = round(math.degrees(chan.rotation_euler.x + math.pi))
-                    orientation_y = round(math.degrees(chan.rotation_euler.y))
-                    orientation_z = round(math.degrees(chan.rotation_euler.z))
-                    OSC.send_osc_lighting(address, f"Chan {chan.int_fixture_index} Type {scene.scene_props.str_array_group_maker} {scene.scene_props.str_array_group_type} Enter, Chan {chan.int_fixture_index} Position {position_x} / {position_y} / {position_z} Enter, Chan {chan.int_fixture_index} Orientation {orientation_x} / {orientation_y} / {orientation_z} Enter, Chan {chan.int_fixture_index} at {str(current_universe)} / {str(current_address)} Enter")
-                    channel_number = chan.int_fixture_index
-                    relevant_channels.append(channel_number)
-                    scene.scene_props.int_array_start_channel += 1
-                    time.sleep(.5)
-                
-                scene.scene_props.int_array_start_channel = chan.int_fixture_index + 1
-                scene.scene_props.int_array_start_address = current_address + channels_to_add
-                scene.scene_props.int_array_universe = current_universe
-                scene.scene_props.int_array_group_index += 1
-                
-                # Create the group.
-                OSC.send_osc_lighting("/eos/key/group", "1")
-                time.sleep(.1)
-                OSC.send_osc_lighting("/eos/key/group", "0")
-                time.sleep(.1)
-                OSC.send_osc_lighting("/eos/key/group", "1")
-                time.sleep(.1)
-                OSC.send_osc_lighting("/eos/key/group", "0")
-                
-                time.sleep(1)
-                
-                OSC.send_osc_lighting("/eos/newcmd", f"Group {group_number} Enter")
-                
-                time.sleep(1)
-                
-                OSC.send_osc_lighting("/eos/newcmd", f"Group {group_number} Label {group_label}")
-                
-                time.sleep(1)
-                
-                OSC.send_osc_lighting("/eos/key/enter", "1")
-                time.sleep(.1)
-                OSC.send_osc_lighting("/eos/key/enter", "0")
-                time.sleep(.1)
-                OSC.send_osc_lighting("/eos/key/enter", "1")
-                time.sleep(.1)
-                OSC.send_osc_lighting("/eos/key/enter", "0")
-                
-                time.sleep(1)
-                
-                argument = "Chan "
-                if len(relevant_channels) != 0: 
-                    for light in relevant_channels:
-                        argument += f"{light} "
-                    argument += "Enter Enter"
-                    
-                OSC.send_osc_lighting("/eos/newcmd", f"Group {group_number} Enter, Chan {argument}")
-                
-                time.sleep(1)
-                
+            bpy.ops.object.editmode_toggle()
+            bpy.ops.mesh.separate(type='LOOSE')
+            bpy.ops.object.mode_set(mode='OBJECT')
+            for obj in context.selected_objects:
+                if obj.type == 'MESH':
+                    context.view_layer.objects.active = obj
+                    bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS')
+            
+            starting_channel = scene.scene_props.int_array_start_channel
+            group_number = scene.scene_props.int_array_group_index
+            group_label = scene.scene_props.str_array_group_name
+            starting_universe = scene.scene_props.int_array_universe
+            start_address = scene.scene_props.int_array_start_address
+            channels_to_add = scene.scene_props.int_array_channel_mode
+            total_lights = len([chan for chan in bpy.data.objects if chan.select_get()])
+            addresses_list = Utils.find_addresses(starting_universe, start_address, channels_to_add, total_lights)
+            
+            OSC.send_osc_lighting("/eos/key/live", "1")
+            OSC.send_osc_lighting("/eos/key/live", "0")
+            
+            relevant_channels = []
+        
+            for i, chan in enumerate([obj for obj in bpy.data.objects if obj.select_get()]):
                 OSC.send_osc_lighting(address, "Patch Enter")
                 time.sleep(.3)
                 
-                OSC.send_osc_lighting("/eos/newcmd", f"{argument}")
-                
-                time.sleep(1)
-                
-                # Select the new lights on the console for highlight visibility.
-                OSC.send_osc_lighting(address, argument)
+                chan_num = scene.scene_props.int_array_start_channel
 
-                bpy.ops.object.editmode_toggle()
-                bpy.ops.object.editmode_toggle()
+                chan.str_manual_fixture_selection = str(chan_num)
+                current_universe, current_address = addresses_list[i]
                 
-                scene.scene_props.array_cone_enum = "NONE"
-                scene.scene_props.array_modifier_enum = "NONE"
-                scene.scene_props.array_curve_enum = "NONE"
+                position_x = round(chan.location.x / .3048)
+                position_y = round(chan.location.y / .3048)
+                position_z = round(chan.location.z / .3048)
                 
-                #################################
-                # Begin to add controller
-                #################################
-                new_group = scene.scene_group_data.add()
-                new_group.name = group_label
-                for channel in relevant_channels:
-                    new_channel = new_group.channels_list.add()
-                    new_channel.chan = channel
+                # Rotate by 180 degrees (pi in radians) since cone facing up is the same as a light facing down.
+                orientation_x = round(math.degrees(chan.rotation_euler.x + math.pi))
+                orientation_y = round(math.degrees(chan.rotation_euler.y))
+                orientation_z = round(math.degrees(chan.rotation_euler.z))
+                OSC.send_osc_lighting(address, f"Chan {chan_num} Type {scene.scene_props.str_array_group_maker} {scene.scene_props.str_array_group_type} Enter, Chan {chan_num} Position {position_x} / {position_y} / {position_z} Enter, Chan {chan_num} Orientation {orientation_x} / {orientation_y} / {orientation_z} Enter, Chan {chan_num} at {str(current_universe)} / {str(current_address)} Enter")
+                channel_number = chan_num
+                relevant_channels.append(channel_number)
+                scene.scene_props.int_array_start_channel += 1
+                time.sleep(.5)
+            
+            scene.scene_props.int_array_start_channel = chan_num + 1
+            scene.scene_props.int_array_start_address = current_address + channels_to_add
+            scene.scene_props.int_array_universe = current_universe
+            scene.scene_props.int_array_group_index += 1
+            
+            # Create the group.
+            OSC.send_osc_lighting("/eos/key/group", "1")
+            time.sleep(.1)
+            OSC.send_osc_lighting("/eos/key/group", "0")
+            time.sleep(.1)
+            OSC.send_osc_lighting("/eos/key/group", "1")
+            time.sleep(.1)
+            OSC.send_osc_lighting("/eos/key/group", "0")
+            
+            time.sleep(1)
+            
+            OSC.send_osc_lighting("/eos/newcmd", f"Group {group_number} Enter")
+            
+            time.sleep(1)
+            
+            OSC.send_osc_lighting("/eos/newcmd", f"Group {group_number} Label {group_label}")
+            
+            time.sleep(1)
+            
+            OSC.send_osc_lighting("/eos/key/enter", "1")
+            time.sleep(.1)
+            OSC.send_osc_lighting("/eos/key/enter", "0")
+            time.sleep(.1)
+            OSC.send_osc_lighting("/eos/key/enter", "1")
+            time.sleep(.1)
+            OSC.send_osc_lighting("/eos/key/enter", "0")
+            
+            time.sleep(1)
+            
+            argument = "Chan "
+            if len(relevant_channels) != 0: 
+                for light in relevant_channels:
+                    argument += f"{light} "
+                argument += "Enter Enter"
                 
-                # Begin adding controller.
+            OSC.send_osc_lighting("/eos/newcmd", f"Group {group_number} Enter, Chan {argument}")
+            
+            time.sleep(1)
+            
+            OSC.send_osc_lighting(address, "Patch Enter")
+            time.sleep(.3)
+            
+            OSC.send_osc_lighting("/eos/newcmd", f"{argument}")
+            
+            time.sleep(1)
+            
+            # Select the new lights on the console for highlight visibility.
+            OSC.send_osc_lighting(address, argument)
+
+            bpy.ops.object.editmode_toggle()
+            bpy.ops.object.editmode_toggle()
+            
+            scene.scene_props.array_cone_enum = "NONE"
+            scene.scene_props.array_modifier_enum = "NONE"
+            scene.scene_props.array_curve_enum = "NONE"
+            
+            #################################
+            # Begin to add controller
+            #################################
+            new_group = scene.scene_group_data.add()
+            new_group.name = group_label
+            for channel in relevant_channels:
+                new_channel = new_group.channels_list.add()
+                new_channel.chan = channel
+            
+            # Begin adding controller.
+            if active_node:
                 tree = context.space_data.edit_tree
                 new_controller = tree.nodes.new('group_controller_type')
                 new_controller.selected_group_enum = group_label
@@ -252,9 +256,9 @@ class PatchGroupOperator(bpy.types.Operator):
                 new_controller.zoom_is_on = scene.scene_props.zoom_is_on
             
                 new_controller.label = new_controller.str_group_label
-                
-                self.report({'INFO'}, "Orb complete.")
-                        
+            
+            self.report({'INFO'}, "Orb complete.")
+                    
         return {'FINISHED'}
     
 
@@ -790,7 +794,7 @@ class SendUSITTASCIITo3DOperator(bpy.types.Operator):
             bpy.ops.mesh.primitive_cone_add(location=position)
             light_object = bpy.context.active_object
             light_object.name = str(channel_number)
-            light_object.int_fixture_index = channel_number
+            light_object.str_maual_fixture_selection = str(channel_number)
 
             # Find the orientation for the current channel.
             orientation = next((orient for chan, orient in channel_orientations if chan == channel_number), None)
@@ -869,7 +873,7 @@ class PullFixtureSelectionOperator(bpy.types.Operator):
     bl_description = "Pull current selection from 3D view"
 
     def execute(self, context):
-        channels = [str(obj.int_fixture_index) for obj in context.selected_objects]
+        channels = [obj.str_manual_fixture_selection for obj in context.selected_objects]
         new_list = ", ".join(channels)
         active_object = context.active_object
         active_object.str_manual_fixture_selection = new_list

@@ -205,11 +205,10 @@ class CommonUpdaters:
             relevant_channels = [channel.chan for channel in item.channels_list]
             relevant_objects = []
             for obj in bpy.data.objects:
-                obj_index = obj.int_fixture_index
-                obj_name_as_int = Utils.try_parse_int(obj.name)
-                
-                if obj_index in relevant_channels or (obj_name_as_int is not None and obj_name_as_int in relevant_channels):
-                    relevant_objects.append(obj)
+                if len(obj.list_group_channels) == 1:
+                    obj_index = obj.list_group_channels[0].chan
+                    if obj_index in relevant_channels:
+                        relevant_objects.append(obj_index)
                     
             # Create a string of relevant channels separated by commas
             channels_list = " + ".join(map(str, relevant_channels))
@@ -228,7 +227,7 @@ class CommonUpdaters:
 
     def view3d_cmd_line_updater(self, context):
         original = context.scene.scene_props.view3d_command_line
-        
+
         if original != "":
             try:
                 with_underscores = Utils.add_underscores_to_keywords(original)
@@ -356,7 +355,7 @@ class CommonUpdaters:
     @staticmethod
     def cone_enum_updater(self,context):
         '''IDK. Something about Patch Generator I think???'''
-        space = context.space_data.edit_tree.nodes
+        '''I still don't know what this does. I see what it's doing but I don't know why it's doing it.'''
         if context.mode != 'OBJECT':
             bpy.ops.object.mode_set(mode='OBJECT')
             
