@@ -34,6 +34,23 @@ from ..cpvia.cpvia_finders import CPVIAFinders # type: ignore
 from ..cpvia.split_color import ColorSplitter # type: ignore
 
 
+'''
+The CPVIA system is essentially a communication protocol similar to DMX used only in Sorcerer.
+
+A CPVIA request is a tuple containing Channel, Parameter, Value, Influence, Argument. 
+
+A CPVIA request is made any time a single controller wishes to make a parameter change on the console.
+We use the CPVIA protocol to standardize how all parameter change requests are made no matter the 
+controller type, no matter the space_type. In frame change and during playback, CPVIA requests are
+compared to one another for common simplifcation and harminization to avoid spamming contradictory 
+messages and to batch commands together.
+
+The cpvia_generator function is responsible for building each CPVIA request using an army of helper 
+functions. Effort should be taken to keep as much logic out of the cpvia_generator itself to keep 
+it readable and easy to debug.
+'''
+
+
 class CPVIAGenerator:
     @staticmethod
     def cpvia_generator(self, context, property_name, find_function):
@@ -65,7 +82,7 @@ class CPVIAGenerator:
             i.append(influence)
             a.append(argument)
 
-        from ..event_manager import Publisher # type: ignore ## TEMPORARY
+        from .publish import Publisher 
         publisher = Publisher()
         for chan, param, val, inf, arg in zip(c, p, v, i, a):
             if param in ["intensity", "raise_intensity", "lower_intensity"]:

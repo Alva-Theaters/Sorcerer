@@ -155,7 +155,10 @@ class Publisher:
             
     def find_objects(self, chan):
         relevant_objects = []
-        ## DELETE THIS CODE AND REPLACE WITH STUFF INSIDE OTHER SCRIPT
+        for obj in bpy.data.objects:
+            if obj.object_identities_enum == "Fixture":
+                relevant_objects.append(obj)
+                pass
         return relevant_objects
             
             
@@ -268,3 +271,8 @@ class Publisher:
 
         else:
             SLI.SLI_assert_unreachable()
+
+
+    def clear_requests(self):
+        global change_requests
+        change_requests = []
