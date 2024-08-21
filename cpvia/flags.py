@@ -28,6 +28,10 @@
 
 
 def check_flags(context, parent, c, p, v, type):
+    if not parent or not type or not p or not c or not v:
+        print(f"Caught invalid CPVIA: {parent, type, c, p, v}")
+        return False
+    
     if hasattr(parent, "mute") and parent.mute:
         return False
 
@@ -43,11 +47,10 @@ def check_flags(context, parent, c, p, v, type):
         'mixer': scene.nodes_enabled,
         'strip': scene.strips_enabled,
     }
-    
-    if type in type_checks and not type_checks[type]:
-        return False
-    elif not type:
-        return False
+
+    if type in type_checks:
+        if not type_checks[type]:
+            return False
     elif not scene.objects_enabled:
         return False
 
@@ -66,9 +69,11 @@ def check_flags(context, parent, c, p, v, type):
         'prism': parent.gobo_is_on,
     }
 
-    if p == 'intensity':
-        return True
-    elif p in param_flags and not param_flags[p]:
+    if p in param_flags and not param_flags[p]:
         return False
+    
+    if scene.has_solos and (scene.is_playing or scene.in_frame_change):
+        if not parent.alva_solo:
+            return False
         
     return True

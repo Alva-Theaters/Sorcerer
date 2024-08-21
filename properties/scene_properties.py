@@ -154,6 +154,8 @@ class SceneProperties(PropertyGroup):
     strips_enabled: BoolProperty(default=True, name="Enable Strips", description="Enable sequencer strips OSC output") # type: ignore # type: ignore
     objects_enabled: BoolProperty(default=True, name="Enable Objects", description="Enable 3D view OSC output") # type: ignore
     
+    has_solos: BoolProperty() # type: ignore
+
     core_enabled: BoolProperty(default=True, description="Enable Core for lighting, video, and audio") # type: ignore
     use_alva_core: BoolProperty(default=False, name="In-house Mode", description="Commandeer your local Alva theater") # type: ignore
 

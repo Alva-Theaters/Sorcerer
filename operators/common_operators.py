@@ -173,6 +173,21 @@ class COMMON_OT_gobo_props(Operator):
         finders = Find
         active_controller = finders.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
         CommonUI.draw_gobo_settings(self, context, active_controller)
+
+
+class COMMON_OT_alva_clear_solo(Operator):
+    '''Turns off the solo on all controllers'''
+    bl_idname = "common.alva_clear_solo"
+    bl_label = "Clear Solos"
+
+    def execute(self, context):
+        all_controllers = Find.find_controllers(context.scene)
+        for controller in all_controllers:
+            if hasattr(controller, 'alva_solo') and controller.alva_solo:
+                controller.alva_solo = False
+
+        context.scene.scene_props.has_solos = False
+        return {'FINISHED'}
         
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -359,6 +374,7 @@ operator_classes = [
     COMMON_OT_zoom_iris_props,
     COMMON_OT_edge_diffusion_props,
     COMMON_OT_gobo_props,
+    COMMON_OT_alva_clear_solo,
     TOPBAR_OT_splash_screen,
     TOOL_OT_ghost_out,
     TOOL_OT_displays,

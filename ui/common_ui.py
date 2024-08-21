@@ -122,6 +122,12 @@ class CommonUI:
             row.prop(scene, "video_enabled", text="", icon='VIEW_CAMERA' if scene.video_enabled else 'OUTLINER_DATA_CAMERA', emboss=1)
             row.prop(scene, "audio_enabled", text="", icon='OUTLINER_OB_SPEAKER' if scene.audio_enabled else 'OUTLINER_DATA_SPEAKER', emboss=1)
 
+            col = layout.column()
+            row = col.row()
+            row.alert = scene.has_solos
+            row.operator("common.alva_clear_solo", text="", icon='SOLO_OFF')
+
+
 
     @staticmethod
     def draw_tool_settings(self, context):
@@ -271,6 +277,9 @@ class CommonUI:
         op_mute.space_type = space_type
         op_mute.node_name = node_name
         op_mute.node_tree_name = node_tree_name
+
+        # SOLO
+        row.prop(active_object, "alva_solo", text="", icon='SOLO_OFF' if not active_object.alva_solo else 'SOLO_ON')
 
         # HOME
         op_home = row.operator("node.home_group", icon='HOME', text="")

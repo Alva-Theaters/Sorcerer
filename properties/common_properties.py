@@ -258,6 +258,11 @@ class CommonProperties:
             name="Color Profile",
             description="Choose a color profile for the mesh based on the patch in the lighting console",
             items=AlvaItems.color_profiles,
+        )),
+        ('alva_solo', BoolProperty(
+            name="Solo",
+            description="Mute all controllers but this one, and any others with solo also turned on. Clear all solos with the button on the top bar",
+            update=CommonUpdaters.solo_updater
         ))
     ]
 
@@ -454,7 +459,7 @@ class CommonProperties:
         ('gobo_is_on', BoolProperty(name="Gobo Toggle", default=False, description="Gobo ID is enabled when checked")),
         ('prism_is_on', BoolProperty(name="Prism Toggle", default=False, description="Prism is enabled when checked")),
     ]
-        
+
     special_arguments = [
         ('str_enable_strobe_argument', StringProperty(
             name="Enable Strobe Argument", 
