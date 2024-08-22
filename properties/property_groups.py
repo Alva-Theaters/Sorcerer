@@ -177,39 +177,8 @@ class GroupData(PropertyGroup):
         items=AlvaItems.color_profiles
     ) # type: ignore
     
-    # This provides user full use of the slider at all times.
-    pan_min: IntProperty(default=-270, description="Minimum value for pan") # type: ignore # type: ignore
-    pan_max: IntProperty(default=270, description="Maximum value for pan") # type: ignore
-    tilt_min: IntProperty(default=-135, description="Minimum value for tilt") # type: ignore
-    tilt_max: IntProperty(default=135, description="Maximum value for tilt") # type: ignore
-    zoom_min: IntProperty(default=1, description="Minimum value for zoom") # type: ignore # type: ignore
-    zoom_max: IntProperty(default=100, description="Maximum value for zoom")      # type: ignore
-    gobo_speed_min: IntProperty(default=-200, description="Minimum value for speed") # type: ignore
-    gobo_speed_max: IntProperty(default=200, description="Maximum value for speed") # type: ignore
+    # Others registered in register section
     
-    # Toggles for turning off visibility to unneeded parameters.
-    influence_is_on: BoolProperty(name="Influence", default=False, description="Influence is enabled when checked") # type: ignore
-    intensity_is_on: BoolProperty(name="Intensity", default=True, description="Intensity is enabled when checked") # type: ignore
-    pan_tilt_is_on: BoolProperty(name="Pan/Tilt", default=False, description="Pan/Tilt is enabled when checked")     # type: ignore
-    color_is_on: BoolProperty(name="Color", default=False, description="Color is enabled when checked") # type: ignore
-    diffusion_is_on: BoolProperty(name="Diffusion", default=False, description="Diffusion is enabled when checked") # type: ignore
-    strobe_is_on: BoolProperty(name="Strobe", default=False, description="Strobe is enabled when checked") # type: ignore
-    zoom_is_on: BoolProperty(name="Zoom", default=False, description="Zoom is enabled when checked") # type: ignore
-    iris_is_on: BoolProperty(name="Iris", default=False, description="Iris is enabled when checked") # type: ignore
-    edge_is_on: BoolProperty(name="Edge", default=False, description="Edge is enabled when checked") # type: ignore
-    gobo_is_on: BoolProperty(name="Gobo", default=False, description="Gobo ID is enabled when checked") # type: ignore
-    prism_is_on: BoolProperty(name="Prism", default=False, description="Prism is enabled when checked") # type: ignore
-
-    # OSC argument templates for properties specific to the fixture type. For example, strobe, not intensity.
-    str_enable_strobe_argument: StringProperty(default="# Strobe_Mode 127 Enter", description="Add # for group ID") # type: ignore # type: ignore
-    str_disable_strobe_argument: StringProperty(default="# Strobe_Mode 76 Enter", description="Add # for group ID") # type: ignore
-    str_enable_gobo_speed_argument: StringProperty(default="# Gobo_Mode 191 Enter", description="Add # for group ID") # type: ignore
-    str_disable_gobo_speed_argument: StringProperty(default="# Gobo_Mode 63 Enter", description="Add # for group ID") # type: ignore
-    str_gobo_id_argument: StringProperty(default="# Gobo_Select $ Enter", description="Add # for group ID and $ for value") # type: ignore
-    str_gobo_speed_value_argument: StringProperty(default="# Gobo_Index/Speed at $ Enter", description="Add $ for animation data and # for fixture/group ID") # type: ignore
-    str_enable_prism_argument: StringProperty(default="# Beam_Fx_Select 02 Enter", description="Add # for group ID") # type: ignore
-    str_disable_prism_argument: StringProperty(default="# Beam_Fx_Select 01 Enter", description="Add # for group ID")     # type: ignore
-
 
 class AudioObjectSettings(PropertyGroup):
     from ..assets.items import Items as AlvaItems
@@ -336,6 +305,9 @@ def register():
     from ..utils.utils import Utils
     from .common_properties import CommonProperties
     Utils.register_properties(MixerParameters, CommonProperties.common_parameters)
+    Utils.register_properties(GroupData, CommonProperties.mins_maxes)
+    Utils.register_properties(GroupData, CommonProperties.special_arguments)
+    Utils.register_properties(GroupData, CommonProperties.parameter_toggles)
 
     # This stuff has to be here for the start sequence to work.
     if not hasattr(Sequence, "my_settings"):
@@ -376,6 +348,9 @@ def unregister():
     from ..utils.utils import Utils
     from .common_properties import CommonProperties
     Utils.register_properties(MixerParameters, CommonProperties.common_parameters, register=False)
+    Utils.register_properties(GroupData, CommonProperties.mins_maxes, register=False)
+    Utils.register_properties(GroupData, CommonProperties.special_arguments, register=False)
+    Utils.register_properties(GroupData, CommonProperties.parameter_toggles, register=False)
 
     for cls in reversed(prop_groups):
         bpy.utils.unregister_class(cls)

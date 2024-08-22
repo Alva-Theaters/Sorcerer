@@ -29,15 +29,14 @@
 
 def check_flags(context, parent, c, p, v, type):
     if not parent or not type or not p or not c or not v:
-        print(f"Caught invalid CPVIA: {parent, type, c, p, v}")
         return False
-    
+
     if hasattr(parent, "mute") and parent.mute:
         return False
 
     scene = context.scene.scene_props
     p = p[0]
-    
+
     if not scene.lighting_enabled:
         return False
     

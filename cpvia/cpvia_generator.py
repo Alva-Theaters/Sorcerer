@@ -81,8 +81,8 @@ class CPVIAGenerator:
         i = []
         a = []
         influence = parent.influence
-        for chan, param in zip(c, p):
-            argument = finders.find_my_argument_template(parent, chan, param, type)
+        for chan, param, val in zip(c, p, v):
+            argument = finders.find_my_argument_template(parent, type, chan, param, val)
             i.append(influence)
             a.append(argument)
 

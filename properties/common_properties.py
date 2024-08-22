@@ -250,7 +250,7 @@ class CommonProperties:
         )),
         ('selected_profile_enum', EnumProperty(
             name="Profile to Apply",
-            description="Choose a fixture profile to apply to this fixture and any other selected fixtures. Build profiles in Blender's Properties viewport under World",
+            description="Choose a fixture profile to apply to this fixture and any other selected fixtures. Build profiles in Blender's Properties viewport under World. To copy settings directly from another light, select just the light and this light, only those 2, and then select the Dynamic option here",
             items=AlvaItems.scene_groups,
             update=CommonUpdaters.group_profile_updater
         )),
@@ -401,6 +401,16 @@ class CommonProperties:
     ]
         
     mins_maxes = [
+        ('strobe_min', IntProperty(
+            name="Stobe Min", 
+            default=0, 
+            description="Minimum value for strobe"
+        )),
+        ('strobe_max', IntProperty(
+            name="Strobe Max", 
+            default=20, 
+            description="Maximum value for strobe"
+        )),
         ('pan_min', IntProperty(
             name="Pan Min", 
             default=-270, 

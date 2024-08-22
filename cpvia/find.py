@@ -35,9 +35,22 @@ from ..utils.utils import Utils # type: ignore
 
 
 class Find:
-    def find_my_argument_template(self, parent, chan, param, type):
+    def find_my_argument_template(self, parent, type, chan, param, value):
         if bpy.context.scene.scene_props.console_type_enum == "option_eos":
-            return Dictionaries.eos_arguments_dict.get(f"str_{param}_argument", "Unknown Argument")
+            argument = Dictionaries.eos_arguments_dict.get(f"str_{param}_argument", "Unknown Argument")
+
+            needs_special = False
+            if param == 'strobe':
+                needs_special = True
+                if value == 0:
+                    special_argument = self.find_my_patch(parent, chan, type, "str_disable_strobe_argument")
+                else: special_argument = self.find_my_patch(parent, chan, type, "str_enable_strobe_argument")
+
+            if needs_special:
+                argument = f"{special_argument}, {argument}"
+
+        return argument
+                
 
 
     def find_my_patch(self, parent, chan, type, desired_property):
@@ -267,36 +280,36 @@ class Find:
     # Find object, strip, and node controllers.
     def find_controllers(scene):
         controllers = []
-        
+
         if scene.scene_props.objects_enabled:
             controllers = Find.find_objects(scene)
         if scene.scene_props.strips_enabled:
             controllers = Find.find_strips(scene, controllers)
         if scene.scene_props.nodes_enabled:
             controllers = Find.find_nodes(scene, controllers)
-        
+
         return controllers
 
     def find_objects(scene):
         if not scene.scene_props.objects_enabled:
             return []
-        
+
         return [obj for obj in scene.objects]
 
     def find_strips(scene, controllers):
         if not scene.scene_props.strips_enabled or not hasattr(scene, "sequence_editor"):
             return controllers
-        
+
         for strip in scene.sequence_editor.sequences_all:
             if strip.type == 'COLOR' and strip.my_settings.motif_type_enum == 'option_animation':
                 controllers.append(strip)
-                
+
         return controllers
 
     def find_nodes(scene, controllers):
         if not scene.scene_props.nodes_enabled:
             return controllers
-        
+
         node_trees = set()
         
         if bpy.context.scene.world and bpy.context.scene.world.node_tree:

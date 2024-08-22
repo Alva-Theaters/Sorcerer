@@ -82,8 +82,6 @@ class CommonUpdaters:
             
     @staticmethod
     def group_profile_updater(self, context):
-        profile = bpy.context.scene.scene_group_data.get(self.selected_profile_enum)
-
         # List of properties to update
         properties = [
             "pan_min", "pan_max", "tilt_min", "tilt_max", "zoom_min", "zoom_max", 
@@ -96,10 +94,37 @@ class CommonUpdaters:
             "str_enable_prism_argument", "str_disable_prism_argument", "color_profile_enum"
         ]
 
-        for prop in properties:
-            setattr(self, prop, getattr(profile, prop))
+        profile = None
+        if self.selected_profile_enum != 'Dynamic': # Normal operation, use Fixture Groups data
+            profile = context.scene.scene_group_data.get(self.selected_profile_enum)
+            for prop in properties:
+                setattr(self, prop, getattr(profile, prop))
+        else: # Secondary mode, use the second selected object's settings directly
+            if context.space_data.type == 'VIEW_3D' and len(context.selected_objects) == 2:
+                for obj in context.selected_objects:
+                    if obj != self:
+                        for prop in properties:
+                            setattr(self, prop, getattr(obj, prop))
 
+            elif context.space_data.type == 'NODE_EDITOR':
+                if len(context.selected_nodes) == 2:
+                    for node in context.selected_nodes:
+                        if node != self:
+                            if node.bl_idname in ['group_controller_type', 'mixer_type']:
+                                for prop in properties:
+                                    setattr(self, prop, getattr(node, prop))
+                            break
 
+            elif context.space_data.type == 'SEQUENCE_EDITOR':
+                if len(context.selected_sequences) == 2:
+                    for strip in context.selected_sequences:
+                        if strip != self:
+                            if strip.type == 'COLOR':
+                                for prop in properties:
+                                    setattr(self, prop, getattr(strip, prop))
+                            break 
+
+        
     @staticmethod
     def solo_updater(self, context):
         from ..cpvia.find import Find

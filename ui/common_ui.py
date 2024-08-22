@@ -296,29 +296,49 @@ class CommonUI:
         # INTENSITY
         row.prop(active_object, "float_intensity", slider=True, text="Intensity")
         
-        # STROBE
-        if active_object.strobe_is_on:
-            row_one = row.column(align=True)
-            row_one.scale_x = 1
-            op = row_one.operator("my.view_strobe_props", icon='OUTLINER_OB_LIGHTPROBE', text="")
-            op.space_type = space_type
-            op.node_name = node_name
-            op.node_tree_name = node_tree_name
-        
-        # COLOR
-        if active_object.color_is_on:
-            sub = row.column(align=True)
-            sub.scale_x = 0.3
-            sub.prop(active_object, "float_vec_color", text="")
-            if hasattr(active_object, "object_identities_enum") and object_type == "Influencer":
-                sub_two = row.column(align=True)
-                sub_two.scale_x = .3
-                sub_two.prop(active_object, "float_vec_color_restore", text="")
-            sub_two = row.column(align=True)
-            # Do not allow students/volunteers to mess up the color profile setting.
-            if not context.scene.scene_props.school_mode_enabled:
-                sub_two.scale_x = 0.8
-                sub_two.prop(active_object, "color_profile_enum", text="", icon='COLOR', icon_only=True)
+        # # STROBE
+        # if active_object.strobe_is_on:
+        #     row_one = row.column(align=True)
+        #     row_one.scale_x = 1
+        #     op = row_one.operator("my.view_strobe_props", icon='OUTLINER_OB_LIGHTPROBE', text="")
+        #     op.space_type = space_type
+        #     op.node_name = node_name
+        #     op.node_tree_name = node_tree_name
+
+        # # COLOR
+        # if active_object.color_is_on:
+        #     sub = row.column(align=True)
+        #     sub.scale_x = 0.3
+        #     sub.prop(active_object, "float_vec_color", text="")
+        #     if hasattr(active_object, "object_identities_enum") and object_type == "Influencer":
+        #         sub_two = row.column(align=True)
+        #         sub_two.scale_x = .3
+        #         sub_two.prop(active_object, "float_vec_color_restore", text="")
+        #     sub_two = row.column(align=True)
+        #     # Do not allow students/volunteers to mess up the color profile setting.
+        #     if not context.scene.scene_props.school_mode_enabled:
+        #         sub_two.scale_x = 0.8
+        #         sub_two.prop(active_object, "color_profile_enum", text="", icon='COLOR', icon_only=True)
+
+        # STROBE/COLOR
+        if active_object.strobe_is_on or active_object.color_is_on:
+            row = box.row(align=True)
+
+            if active_object.strobe_is_on:
+                op = row.operator("my.view_strobe_props", icon='OUTLINER_OB_LIGHTPROBE', text="")
+                op.space_type = space_type
+                op.node_name = node_name
+                op.node_tree_name = node_tree_name
+
+                row.prop(active_object, "float_strobe", text="Strobe", slider = True)
+
+            if active_object.color_is_on:
+                row.prop(active_object, "float_vec_color", text="")
+                if hasattr(active_object, "object_identities_enum") and object_type == "Influencer":
+                    row.prop(active_object, "float_vec_color_restore", text="")
+                # Do not allow students/volunteers to mess up the color profile setting.
+                if not context.scene.scene_props.school_mode_enabled:
+                    row.prop(active_object, "color_profile_enum", text="", icon='COLOR', icon_only=True)
         
         # SOUND
         if object_type == "Stage Object" and active_object.audio_is_on:
@@ -580,6 +600,9 @@ class CommonUI:
             row.label(text="Shutter Strobe", icon='OUTLINER_DATA_LIGHTPROBE')
             box = col.box()
             row = box.row()
+            row.prop(item, "strobe_min", text="Strobe Min")
+            row.prop(item, "strobe_max", text="Max")
+            row = box.row()
             row.label(text="Strobe Enable Argument:")
             row.prop(item, "str_enable_strobe_argument", text="")
             row = box.row()
@@ -763,15 +786,13 @@ class CommonUI:
         column = layout.row()
 
         if active_controller:
-            split = layout.split(factor=0.5)
-            row = split.column()
-            row.label(text="Strobe Value", icon='OUTLINER_DATA_LIGHTPROBE')
-            row = split.column()
-            row.prop(active_controller, "float_strobe", text="", slider=True)
-
-            layout.separator()
-
             if hasattr(active_controller, "str_enable_strobe_argument"):
+                row = layout.row()
+                row.prop(active_controller, "strobe_min", text="Strobe Min")
+                row.prop(active_controller, "strobe_max", text="Max")
+
+                layout.separator()
+
                 split = layout.split(factor=0.5)
                 row = split.column()
                 row.label(text="Enable Strobe Argument")
@@ -790,13 +811,13 @@ class CommonUI:
         
         if active_controller:
             row = layout.row()
-            row.prop(active_controller, "pan_min", text="Pan Min:")
-            row.prop(active_controller, "pan_max", text="Max:")
+            row.prop(active_controller, "pan_min", text="Pan Min")
+            row.prop(active_controller, "pan_max", text="Max")
             
             row = layout.row()
             
-            row.prop(active_controller, "tilt_min", text="Tilt Min:")
-            row.prop(active_controller, "tilt_max", text="Max:")
+            row.prop(active_controller, "tilt_min", text="Tilt Min")
+            row.prop(active_controller, "tilt_max", text="Max")
         else:
             layout.label(text="Active controller not found.")
     
@@ -806,8 +827,8 @@ class CommonUI:
         
         if active_controller:
             row = layout.row()
-            row.prop(active_controller, "zoom_min", text="Zoom Min:")
-            row.prop(active_controller, "zoom_max", text="Max:")
+            row.prop(active_controller, "zoom_min", text="Zoom Min")
+            row.prop(active_controller, "zoom_max", text="Max")
 
         else:
             layout.label(text="Active controller not found.")

@@ -140,7 +140,7 @@ class CPVIAFinders:
             unmapped_value = getattr(parent, attribute_name)
             if p == "color":
                 unmapped_value = Utils.color_object_to_tuple_and_scale_up(unmapped_value)
-            elif p in ["pan", "tilt", "zoom", "gobo_speed"]:  # NOT "pan_graph" or "tilt_graph" since that is mapped by the node updater
+            elif p in ["strobe", "pan", "tilt", "zoom", "gobo_speed"]:  # NOT "pan_graph" or "tilt_graph" since that is mapped by the node updater
                 mapping = Mapping()
                 try: 
                     value = mapping.map_value(parent, chan, p, unmapped_value, type)
@@ -185,7 +185,7 @@ class CPVIAFinders:
             for channel in channels_list:
                 c.append(channel)
                 param.append(p)
-                if p in ["pan", "tilt", "zoom", "gobo_speed", "pan_tilt"]:
+                if p in ["strobe", "pan", "tilt", "zoom", "gobo_speed", "pan_tilt"]:
                     value_to_add = mapping.map_value(parent, channel, p, new_value, type)
                     v.append(value_to_add)
                 else:
