@@ -52,7 +52,7 @@ def draw_alva_topbar(self, context):
         layout = self.layout
         col = layout.column()
         row = col.row(align=True)
-        row.operator("alva_topbar.alva_preferences", text="", icon_value=orb.icon_id, emboss=1)
+        row.operator("alva_topbar.preferences", text="", icon_value=orb.icon_id, emboss=1)
         row.prop(scene, "lighting_enabled", text="", icon='OUTLINER_OB_LIGHT' if scene.lighting_enabled else 'LIGHT_DATA', emboss=1)
         row.prop(scene, "video_enabled", text="", icon='VIEW_CAMERA' if scene.video_enabled else 'OUTLINER_DATA_CAMERA', emboss=1)
         row.prop(scene, "audio_enabled", text="", icon='OUTLINER_OB_SPEAKER' if scene.audio_enabled else 'OUTLINER_DATA_SPEAKER', emboss=1)
@@ -71,7 +71,7 @@ def draw_alva_edit(self, context):
         hasattr(context.scene, "scene_props")): # Avoid unregistration error
         layout = self.layout
         layout.separator()
-        layout.operator("alva_topbar.alva_preferences", text="Sorcerer Preferences", icon_value=orb.icon_id)
+        layout.operator("alva_topbar.preferences", text="Sorcerer Preferences", icon_value=orb.icon_id)
 
 
 def draw_alva_render(self, context):

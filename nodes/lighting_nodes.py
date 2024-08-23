@@ -32,11 +32,20 @@ from bpy.types import NodeSocket, Node, PropertyGroup
 from bpy.props import *
 
 from ..assets.items import Items as AlvaItems # type: ignore
-from ..as_ui.space_common import CommonUI # type: ignore
-from ..as_ui.space_alvapref import SettingsUI
 from ..updaters.node_updaters import NodeUpdaters # type: ignore
-from ..as_ui.space_node import NodeUI # type: ignore
 from ..utils.utils import Utils # type: ignore
+
+from ..as_ui.space_common import draw_text_or_group_input, draw_parameters, draw_footer_toggles
+from ..as_ui.space_alvapref import draw_settings
+from ..as_ui.space_node import (
+    draw_node_mixer, 
+    draw_pan_tilt_node, 
+    draw_global_node, 
+    draw_motor_node, 
+    draw_console_node, 
+    draw_flash_node, 
+    draw_presets_node
+)
 
 
 MixerParametersSubClass = Utils.find_subclass_by_name(PropertyGroup, "MixerParameters")
@@ -170,9 +179,9 @@ class NODE_NT_group_controller(Node):
         column = layout.column()
         row = column.row()
         
-        CommonUI.draw_text_or_group_input(self, context, row, self, object=False)
-        CommonUI.draw_parameters(self, context, column, column, self)
-        CommonUI.draw_footer_toggles(self, context, column, self, box=False)
+        draw_text_or_group_input(self, context, row, self, object=False)
+        draw_parameters(self, context, column, column, self)
+        draw_footer_toggles(self, context, column, self, box=False)
 
     
 class NODE_NT_mixer(Node):
@@ -221,7 +230,7 @@ class NODE_NT_mixer(Node):
         return
 
     def draw_buttons(self, context, layout):  
-        NodeUI.draw_node_mixer(self, context, layout)
+        draw_node_mixer(self, context, layout)
         
         
 class NODE_NT_pan_tilt(Node):
@@ -238,7 +247,7 @@ class NODE_NT_pan_tilt(Node):
         return
     
     def draw_buttons(self, context, layout):
-        NodeUI.draw_pan_tilt_node(self, context, layout)
+        draw_pan_tilt_node(self, context, layout)
         
         
 class NODE_NT_global(Node):
@@ -261,7 +270,7 @@ class NODE_NT_global(Node):
         return
 
     def draw_buttons(self, context, layout):
-        NodeUI.draw_global_node(self, context, layout)
+        draw_global_node(self, context, layout)
              
 
 class NODE_NT_motor(Node):
@@ -298,7 +307,7 @@ class NODE_NT_motor(Node):
         return
     
     def draw_buttons(self, context, layout):
-        NodeUI.draw_motor_node(self, context, layout)
+        draw_motor_node(self, context, layout)
 
             
 class NODE_NT_console_buttons(Node):
@@ -326,7 +335,7 @@ class NODE_NT_console_buttons(Node):
         return
 
     def draw_buttons(self, context, layout):
-        NodeUI.draw_console_node(self, context, layout)
+        draw_console_node(self, context, layout)
 
 
 class NODE_NT_flash(Node):
@@ -363,7 +372,7 @@ class NODE_NT_flash(Node):
         return
     
     def draw_buttons(self, context, layout):
-        NodeUI.draw_flash_node(self, context, layout)
+        draw_flash_node(self, context, layout)
         
         
 class NODE_NT_alva_presets(Node):
@@ -385,7 +394,7 @@ class NODE_NT_alva_presets(Node):
         return
 
     def draw_buttons(self, context, layout):
-        NodeUI.draw_presets_node(self, context, layout)
+        draw_presets_node(self, context, layout)
         return
 
 
@@ -393,14 +402,14 @@ class NODE_NT_settings(Node):
     bl_idname = 'settings_type'
     bl_label = 'Settings Node'
     bl_icon = 'PREFERENCES'
-    bl_width_default = 400
+    bl_width_default = 500
     bl_description="Sorcerer node settings"
 
     def init(self, context):
         return
 
     def draw_buttons(self, context, layout):
-        SettingsUI.draw_settings(self, context, layout)
+        draw_settings(self, context, layout)
 
 
 nodes = [

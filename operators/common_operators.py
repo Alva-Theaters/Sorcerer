@@ -33,7 +33,7 @@ from bpy.props import StringProperty
 
 from ..utils.osc import OSC as osc # type: ignore
 from ..utils.utils import Utils
-from ..as_ui.space_alvapref import SettingsUI # type: ignore
+from ..as_ui.space_alvapref import draw_settings # type: ignore
 from ..cpvia.find import Find # type: ignore
 from ..assets.dictionaries import Dictionaries
 from ..as_ui.space_wm import (
@@ -45,13 +45,52 @@ from ..as_ui.space_wm import (
     draw_splash
 )
 
+
+#-------------------------------------------------------------------------------------------------------------------------------------------
+'''TOPBAR Operators'''
+#-------------------------------------------------------------------------------------------------------------------------------------------   
+class TOPBAR_OT_alva_settings(Operator):
+    '''Pop-up for Sorcerer Settings menu'''
+    bl_idname = "alva_topbar.preferences"
+    bl_label = "Sorcerer Settings"
+    bl_options = {'REGISTER', 'UNDO'}
+    
+    @classmethod
+    def poll(cls, context):
+        return (context.scene is not None) and (context.scene.sequence_editor is not None)
+
+    def execute(self, context):
+        return {'FINISHED'}
+    
+    def invoke(self, context, event):
+        wm = context.window_manager
+        return wm.invoke_props_dialog(self, width=500)
+    
+    def draw(self, context):
+        draw_settings(self, context)
+
+
+class TOPBAR_OT_splash_screen(Operator):
+    bl_idname = "alva_topbar.splash"
+    bl_label = "Alva Sorcerer Splash"
+    
+    def execute(self, context):
+        return {'FINISHED'}
+    
+    def invoke(self, context, event):
+        width = 375
+        return context.window_manager.invoke_props_dialog(self, width=width)
+
+    def draw(self, context):
+        draw_splash(self, context)
+
         
 #-------------------------------------------------------------------------------------------------------------------------------------------
 '''CONTROLLER Operators'''
 #-------------------------------------------------------------------------------------------------------------------------------------------
 class HomeControllerButton(Operator):
-    bl_idname = "node.home_group"
-    bl_label = "Home Group"
+    bl_idname = "alva_node.home"
+    bl_label = "Home"
 
     space_type: StringProperty() # type: ignore # type: ignore
     node_name: StringProperty() # type: ignore
@@ -65,8 +104,8 @@ class HomeControllerButton(Operator):
 
 
 class UpdateControllerButton(Operator):
-    bl_idname = "node.update_group"
-    bl_label = "Update Group"
+    bl_idname = "alva_node.update"
+    bl_label = "Update"
 
     space_type: StringProperty() # type: ignore
     node_name: StringProperty() # type: ignore
@@ -80,7 +119,7 @@ class UpdateControllerButton(Operator):
     
     
 class COMMON_OT_strobe_props(Operator):
-    bl_idname = "my.view_strobe_props"
+    bl_idname = "alva_common.strobe_properties"
     bl_label = "View Strobe Properties"
     
     space_type: StringProperty() # type: ignore
@@ -100,7 +139,7 @@ class COMMON_OT_strobe_props(Operator):
 
 
 class COMMON_OT_pan_tilt_props(Operator):
-    bl_idname = "my.view_pan_tilt_props"
+    bl_idname = "alva_common.pan_tilt_properties"
     bl_label = "Pan/Tilt Properties"
     bl_description = "Access pan and tilt min and max settings"
 
@@ -121,9 +160,9 @@ class COMMON_OT_pan_tilt_props(Operator):
        
     
 class COMMON_OT_zoom_iris_props(Operator):
-    bl_idname = "my.view_zoom_iris_props"
-    bl_label = "Zoom Properties"
-    bl_description = "Access zoom min and max settings"
+    bl_idname = "alva_common.zoom_iris_properties"
+    bl_label = "Zoom/Iris Properties"
+    bl_description = "Access min and max settings"
 
     space_type: StringProperty() # type: ignore
     node_name: StringProperty() # type: ignore
@@ -142,7 +181,7 @@ class COMMON_OT_zoom_iris_props(Operator):
         
 
 class COMMON_OT_edge_diffusion_props(Operator):
-    bl_idname = "my.view_edge_diffusion_props"
+    bl_idname = "alva_common.edge_diffusion_properties"
     bl_label = "Edge/Diffusion Properties"
     
     space_type: StringProperty() # type: ignore # type: ignore
@@ -162,7 +201,7 @@ class COMMON_OT_edge_diffusion_props(Operator):
     
        
 class COMMON_OT_gobo_props(Operator):
-    bl_idname = "my.view_gobo_props"
+    bl_idname = "alva_common.gobo_properties"
     bl_label = "View Gobo Properties"
     bl_description = "Access gobo-related settings"
 
@@ -198,29 +237,11 @@ class COMMON_OT_alva_clear_solo(Operator):
         
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
-'''SPLASH Operators'''
-#-------------------------------------------------------------------------------------------------------------------------------------------   
-class TOPBAR_OT_splash_screen(Operator):
-    bl_idname = "wm.sorcerer_splash"
-    bl_label = "Alva Sorcerer Splash"
-    
-    def execute(self, context):
-        return {'FINISHED'}
-    
-    def invoke(self, context, event):
-        width = 375
-        return context.window_manager.invoke_props_dialog(self, width=width)
-
-    def draw(self, context):
-        draw_splash(self, context)
-        
-        
-#-------------------------------------------------------------------------------------------------------------------------------------------
 '''TOOLBAR Operators'''
 #-------------------------------------------------------------------------------------------------------------------------------------------      
 class TOOL_OT_ghost_out(Operator):
-    bl_idname = "my.go_to_cue_out_operator"
-    bl_label = "Ghost out"
+    bl_idname = "alva_tool.ghost_out"
+    bl_label = "Ghost Out"
     bl_description = "Presses Go_to Cue Out on the console"
     
     def execute(self, context):
@@ -239,7 +260,7 @@ class TOOL_OT_ghost_out(Operator):
         return {'FINISHED'}
     
 class TOOL_OT_displays(Operator):
-    bl_idname = "my.displays_operator"
+    bl_idname = "alva_tool.displays"
     bl_label = "Displays"
     bl_description = "Presses Displays on the console"
     
@@ -251,7 +272,7 @@ class TOOL_OT_displays(Operator):
         return {'FINISHED'}
     
 class TOOL_OT_about(Operator):
-    bl_idname = "my.about_operator"
+    bl_idname = "alva_tool.about"
     bl_label = "About"
     bl_description = "Presses About on the console"
     
@@ -260,7 +281,7 @@ class TOOL_OT_about(Operator):
         return {'FINISHED'}
 
 class TOOL_OT_stop_clocks(Operator):
-    bl_idname = "my.disable_all_clocks_operator"
+    bl_idname = "alva_tool.disable_clocks"
     bl_label = "Disable All Clocks"
     bl_description = "Disables all timecode clocks in ETC Eos"
     
@@ -276,7 +297,7 @@ class TOOL_OT_stop_clocks(Operator):
         return {'FINISHED'}
      
 class TOOL_OT_copy_various_to_selected(Operator):
-    bl_idname = "my.copy_above_to_selected"
+    bl_idname = "alva_tool.copy"
     bl_label = "Copy to Selected"
     bl_description = "Copy some properties of the active strip to all the other selected strips"
 
@@ -295,30 +316,12 @@ class TOOL_OT_copy_various_to_selected(Operator):
         return {'FINISHED'}
 
 
-class TOOL_OT_alva_settings(Operator):
-    '''Pop-up for Sorcerer Settings menu'''
-    bl_idname = "alva_topbar.alva_preferences"
-    bl_label = "Sorcerer Settings"
-    bl_options = {'REGISTER', 'UNDO'}
-    
-    @classmethod
-    def poll(cls, context):
-        return (context.scene is not None) and (context.scene.sequence_editor is not None)
-
-    def execute(self, context):
-        return {'FINISHED'}
-    
-    def invoke(self, context, event):
-        wm = context.window_manager
-        return wm.invoke_props_dialog(self, width=500)
-    
-    def draw(self, context):
-        SettingsUI.draw_settings(self, context)
-
-
+#-------------------------------------------------------------------------------------------------------------------------------------------
+'''TEXT Operator'''
+#------------------------------------------------------------------------------------------------------------------------------------------- 
 class TEXT_OT_populate_macros(Operator):
     '''Pop-up for Sorcerer Settings menu'''
-    bl_idname = "text.alva_populate_macros"
+    bl_idname = "alva_text.populate_macros"
     bl_label = "Populate Macro Buttons"
 
     filter_group: StringProperty()  # type: ignore
@@ -356,7 +359,7 @@ class TEXT_OT_populate_macros(Operator):
 class WM_OT_show_message(bpy.types.Operator):
     '''DO NOT DELETE. This is for showing error messages with updaters,
        where access to self.report is not allowed.'''
-    bl_idname = "wm.show_message"
+    bl_idname = "alva_wm.show_message"
     bl_label = "Alva Sorcerer"
     
     message: StringProperty(name="Message", default="") # type: ignore
@@ -374,6 +377,8 @@ class WM_OT_show_message(bpy.types.Operator):
         
         
 operator_classes = [
+    TOPBAR_OT_alva_settings,
+    TOPBAR_OT_splash_screen,
     HomeControllerButton,
     UpdateControllerButton,
     COMMON_OT_strobe_props,
@@ -382,13 +387,11 @@ operator_classes = [
     COMMON_OT_edge_diffusion_props,
     COMMON_OT_gobo_props,
     COMMON_OT_alva_clear_solo,
-    TOPBAR_OT_splash_screen,
     TOOL_OT_ghost_out,
     TOOL_OT_displays,
     TOOL_OT_about,
     TOOL_OT_stop_clocks,
     TOOL_OT_copy_various_to_selected,
-    TOOL_OT_alva_settings,
     WM_OT_show_message,
     TEXT_OT_populate_macros
 ]

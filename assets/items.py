@@ -33,14 +33,14 @@ import bpy
 class Items:
     def preferences(self, context):
         items = [
-            ('option_network', "Network", "Network settings for audio, lighting, and video."),
-            ('option_sequencer', "Sequencer", "Settings for video sequencer area."),
-            ('option_sync', "Sync", "Settings for timecode synchronization."),
-            ('option_orb', "Orb", "Settings for node editor area."),
-            ('option_st_sequencer', "S-T", "OSC Settings for Show-Start Sequencer (Properties viewer under Scene)."),
-            ('option_system', "System", "System-wide general settings.")
+            ('network', "Network", "Network settings for audio, lighting, and video."),
+            ('sequencer', "Sequencer", "Settings for video sequencer area."),
+            ('orb', "Orb", "Settings for Orb automation assistant."),
+            ('stage_manager', "Stage Manager", "OSC Settings for Stage Manager (Properties viewer under Scene)."),
+            ('system', "System", "System-wide general settings.")
         ]
         return items
+    
     
     def color_profiles(self, context):
         items = [

@@ -96,3 +96,42 @@ def draw_timeline_sync(self, context):
 
         row = layout.row()
         row.operator("alva_orb.render_qmeo", text="", icon_value=orb.icon_id)
+
+
+def draw_properties_sync(self, context):
+    pcoll = preview_collections["main"]
+    orb = pcoll["orb"]
+
+    if (hasattr(context.scene, "sync_timecode") and
+        hasattr(context.scene, "timecode_expected_lag") and
+        context.scene.scene_props.view_time_orb):
+        scene = context.scene
+
+        sequencer_open = False
+        active_strip = False
+
+        for area in context.screen.areas:
+            if area.type == 'SEQUENCE_EDITOR':
+                sequencer_open = True
+                if context.scene.sequence_editor.active_strip and context.scene.sequence_editor.active_strip is not None and context.scene.sequence_editor.active_strip.type == 'SOUND':
+                    active_strip = True
+                    break
+
+        layout = self.layout
+        col = layout.column()
+        row = col.row(align=True)
+
+        if sequencer_open and active_strip:
+            active_strip = context.scene.sequence_editor.active_strip
+            icon = 'IPO_BEZIER' if active_strip.type == 'COLOR' else 'SOUND'
+            row.label(text="", icon=icon)
+            target = active_strip
+            row.prop(target, "str_start_cue", text="")
+            row.prop(target, "str_end_cue", text="")
+        else:
+            row.label(text="", icon='SCENE_DATA')
+            target = scene
+            row.prop(target, "int_start_macro", text="")
+            row.prop(target, "int_end_macro", text="")
+
+        row.operator("alva_orb.render_qmeo", text="", icon_value=orb.icon_id)

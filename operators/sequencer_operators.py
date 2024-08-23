@@ -32,7 +32,14 @@ from bpy.types import Operator
 from bpy.props import IntProperty
 import time
 
-from ..as_ui.space_sequencer import SequencerUI # type: ignore
+from ..as_ui.space_sequencer import (
+    draw_strip_media, 
+    determine_contexts, 
+    draw_strip_formatter_color, 
+    draw_strip_formatter_sound, 
+    draw_strip_formatter_video_audio, 
+    draw_strip_formatter_generator
+)
 from ..utils.utils import Utils # type: ignore
 from ..utils.osc import OSC
 from ..orb import Orb
@@ -574,23 +581,23 @@ class SEQUENCER_OT_format_strip(Operator):
             sequence_editor = scene.sequence_editor
             if hasattr(sequence_editor, "active_strip") and sequence_editor.active_strip:
                 active_strip = sequence_editor.active_strip
-                alva_context, console_context = SequencerUI.determine_contexts(sequence_editor, active_strip)
+                alva_context, console_context = determine_contexts(sequence_editor, active_strip)
             else:
                 alva_context = "none_relevant"
                 console_context = "none"
                 
             column = layout.column(align=True)
             if alva_context == "only_color":
-                SequencerUI.draw_strip_formatter_color(self, context, column, scene, sequence_editor, active_strip)
+                draw_strip_formatter_color(self, context, column, scene, sequence_editor, active_strip)
 
             elif alva_context == "only_sound":
-                SequencerUI.draw_strip_formatter_sound(self, context, column, active_strip)
+                draw_strip_formatter_sound(self, context, column, active_strip)
                 
             elif alva_context == "one_video_one_audio":
-                SequencerUI.draw_strip_formatter_video_audio(self, context, column, active_strip, sequence_editor)
+                draw_strip_formatter_video_audio(self, context, column, active_strip, sequence_editor)
                 
             else:
-                SequencerUI.draw_strip_formatter_generator(self, context, column, scene)
+                draw_strip_formatter_generator(self, context, column, scene)
                
                
 class SEQUENCER_OT_strip_media(Operator):
@@ -611,7 +618,7 @@ class SEQUENCER_OT_strip_media(Operator):
     
     def draw(self, context):
         scene = context.scene
-        SequencerUI.draw_strip_media(self, context, scene, bake_panel=False)
+        draw_strip_media(self, context, scene, bake_panel=False)
     
     
 class SEQUENCER_OT_left_five(Operator):

@@ -35,28 +35,33 @@ from bpy.types import (
     TOPBAR_MT_render,
     TOPBAR_MT_window,
     TOPBAR_MT_help,
+
     VIEW3D_HT_header, 
     VIEW3D_HT_tool_header, 
     VIEW3D_MT_view,
-    SEQUENCER_HT_header, 
-    SEQUENCER_MT_add,
-    SEQUENCER_MT_view,
+
+    PROPERTIES_HT_header,
+    PROPERTIES_PT_navigation_bar, 
+    RENDER_PT_context,
+
     DOPESHEET_HT_header,
     TIME_MT_view,
+
+    SEQUENCER_MT_view,
+    SEQUENCER_MT_add,
+    SEQUENCER_MT_strip,
+    SEQUENCER_HT_header, 
+
     NODE_MT_add,
     NODE_HT_header,
     NODE_MT_view,
+
     GRAPH_HT_header,
+
     TEXT_HT_header,
     TEXT_MT_view,
-    PROPERTIES_HT_header
     )
 
-from .as_ui.space_node import NodeUI
-from .as_ui.space_sequencer import SequencerUI
-from .as_ui.space_view3d import View3DUI
-from .as_ui.space_common import CommonUI
-from .as_ui.properties_scene import PropertiesUI
 from .as_ui.space_topbar import (
     draw_alva_topbar, 
     draw_alva_edit, 
@@ -64,56 +69,50 @@ from .as_ui.space_topbar import (
     draw_alva_window, 
     draw_alva_help
 )
+from .as_ui.space_view3d import (
+    draw_tool_settings,
+    draw_speaker, 
+    draw_object_header, 
+    draw_lighting_modifiers,
+    draw_alva_view_3d_view,
+    draw_view3d_cmd_line,
+    draw_tool_settings,
+)
+from .as_ui.properties_scene import (
+    draw_alva_stage_manager, 
+    draw_alva_cue_switcher, 
+    draw_alva_properties_navigation,
+    draw_alva_properties_sync
+)
 from .as_ui.space_dopesheet import draw_timeline_sync, draw_alva_time_view
+from .as_ui.space_sequencer import (
+    draw_strip_sound_object, 
+    draw_strip_speaker, 
+    draw_strip_video, 
+    draw_strip_media, 
+    draw_alva_sequencer_add_menu, 
+    draw_alva_sequencer_cmd_line,
+    draw_alva_sequencer_view,
+    draw_alva_sequencer_strip
+)
+from .as_ui.space_node import (
+    draw_node_formatter, 
+    draw_alva_node_menu, 
+    draw_node_header, 
+    draw_alva_node_view
+)
 from .as_ui.space_graph import draw_graph_header
 from .as_ui.space_text import draw_import_usitt_ascii, draw_macro_generator
-from .as_ui.space_tool import draw_alva_toolbar
 from .as_ui.space_text import draw_text_view
 
-
-#-------------------------------------------------------------------------------------------------------------------------------------------
-'''NODE Panels'''
-#-------------------------------------------------------------------------------------------------------------------------------------------
-class NodePanel:
-    bl_space_type = 'NODE_EDITOR'
-    bl_region_type = 'UI'
-    bl_category = 'Alva Sorcerer'
-    
-    @classmethod
-    def poll(cls, context):
-        return (context.space_data.tree_type == 'ShaderNodeTree' and 
-                context.space_data.id == context.scene.world)
-
-
-class NODE_PT_alva_node_formatter(Panel, NodePanel):
-    '''Control color, label, etc. of our nodes in pop-up menu'''
-    bl_label = "Node Formatter"
-
-    @classmethod
-    def poll(cls, context):
-        return (context.space_data.tree_type == 'ShaderNodeTree' and
-                context.space_data.id == context.scene.world and
-                hasattr(context.space_data.edit_tree, 'nodes') and
-                context.space_data.edit_tree.nodes.active)
-
-    def draw(self, context):
-        NodeUI.draw_node_formatter(self, context)
-
-
-class NODE_PT_alva_fixture_generator(Panel, NodePanel):
-    """Automation tools for rapidly creating lighting fixtures"""
-    bl_label = "Generate Fixtures"
-
-    def draw(self, context):
-        CommonUI.draw_generate_fixtures(self, context)
-        
-        
-class NODE_PT_alva_fixture_groups(Panel, NodePanel):
-    '''Change the fixture groups found in the controller drop downs.'''
-    bl_label = "Fixture Groups"
-
-    def draw(self, context):
-        CommonUI.draw_fixture_groups(self, context)
+from .as_ui.space_tool import draw_alva_toolbar
+from .as_ui.space_common import (
+    draw_generate_fixtures, 
+    draw_fixture_groups, 
+    draw_parameters, 
+    draw_footer_toggles, 
+    draw_volume_monitor
+)
              
     
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -144,12 +143,12 @@ class VIEW3D_PT_alva_object_controller(Panel, View3D_Panel):
         active_object = context.active_object
         
         if active_object.type == 'MESH':
-            box, column = View3DUI.draw_object_header(self, context, scene, active_object)
-            CommonUI.draw_parameters(self, context, column, box, active_object)
-            CommonUI.draw_footer_toggles(self, context, column, active_object)
+            box, column = draw_object_header(self, context, scene, active_object)
+            draw_parameters(self, context, column, box, active_object)
+            draw_footer_toggles(self, context, column, active_object)
         
         if active_object.type == 'SPEAKER':
-            View3DUI.draw_speaker(self, context, active_object)
+            draw_speaker(self, context, active_object)
         
         
 class VIEW3D_PT_alva_lighting_modifiers(Panel, View3D_Panel):
@@ -157,7 +156,7 @@ class VIEW3D_PT_alva_lighting_modifiers(Panel, View3D_Panel):
     bl_label = "Lighting Modifiers (Global)"
 
     def draw(self, context):
-        View3DUI.draw_lighting_modifiers(self, context)
+        draw_lighting_modifiers(self, context)
         
         
 class VIEW3D_PT_alva_fixture_groups(Panel, View3D_Panel):
@@ -165,7 +164,7 @@ class VIEW3D_PT_alva_fixture_groups(Panel, View3D_Panel):
     bl_label = "Fixture Groups"
 
     def draw(self, context):
-        CommonUI.draw_fixture_groups(self, context)
+        draw_fixture_groups(self, context)
             
             
 class VIEW3D_PT_alva_fixture_generator(Panel, View3D_Panel):
@@ -173,7 +172,34 @@ class VIEW3D_PT_alva_fixture_generator(Panel, View3D_Panel):
     bl_label = "Generate Fixtures"
 
     def draw(self, context):
-        CommonUI.draw_generate_fixtures(self, context)
+        draw_generate_fixtures(self, context)
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------------
+'''PROPERTIES Panels'''
+#-------------------------------------------------------------------------------------------------------------------------------------------                  
+class PropertiesPanel:
+    bl_space_type = "PROPERTIES"
+    bl_region_type = 'WINDOW'
+    bl_context = "scene"
+    bl_category = 'Alva Sorcerer'
+    
+
+class SCENE_PT_alva_cue_switcher(Panel, PropertiesPanel):
+    '''Live video switcher type system but for lighting cues'''
+    bl_label = "ALVA M/E 1 Lighting Cue Switcher"
+
+    def draw(self, context):
+        draw_alva_cue_switcher(self, context)
+
+
+class SCENE_PT_alva_stage_manager(Panel, PropertiesPanel):
+    '''Stage manager tool for sequencing show operations, similar
+       to Go-No-Go software used in rocket launches.'''
+    bl_label = "ALVA Stage Manager"
+
+    def draw(self, context):
+        draw_alva_stage_manager(self, context)
             
             
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -203,7 +229,7 @@ class SEQUENCER_PT_alva_Lighting(Panel, SequencerPanel):
         return context.scene
 
     def draw(self, context):
-        SequencerUI.draw_strip_media(self, context, context.scene)
+        draw_strip_media(self, context, context.scene)
         
         
 class SEQUENCER_PT_alva_Video(Panel, SequencerPanel):
@@ -211,7 +237,7 @@ class SEQUENCER_PT_alva_Video(Panel, SequencerPanel):
     bl_label = "Video"
 
     def draw(self, context):
-        SequencerUI.draw_strip_video(self, context)
+        draw_strip_video(self, context)
         
 
 class SEQUENCER_PT_alva_Audio(Panel, SequencerPanel):
@@ -226,38 +252,56 @@ class SEQUENCER_PT_alva_Audio(Panel, SequencerPanel):
 
         if active_strip.type == 'SOUND':
             if active_strip.audio_type_enum == "option_object":
-                SequencerUI.draw_strip_sound_object(self, context, column, active_strip)
-                CommonUI.draw_volume_monitor(self, context, sequence_editor)
+                draw_strip_sound_object(self, context, column, active_strip)
+                draw_volume_monitor(self, context, sequence_editor)
             elif active_strip.audio_type_enum == "option_speaker":
-                SequencerUI.draw_strip_seaker(self, context, column, active_strip)
-                CommonUI.draw_volume_monitor(self, context)
+                draw_strip_speaker(self, context, column, active_strip)
+                draw_volume_monitor(self, context)
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
-'''PROPERTIES Panels'''
-#-------------------------------------------------------------------------------------------------------------------------------------------                  
-class PropertiesPanel:
-    bl_space_type = "PROPERTIES"
-    bl_region_type = 'WINDOW'
-    bl_context = "scene"
+'''NODE Panels'''
+#-------------------------------------------------------------------------------------------------------------------------------------------
+class NodePanel:
+    bl_space_type = 'NODE_EDITOR'
+    bl_region_type = 'UI'
     bl_category = 'Alva Sorcerer'
     
+    @classmethod
+    def poll(cls, context):
+        return (context.space_data.tree_type == 'ShaderNodeTree' and 
+                context.space_data.id == context.scene.world)
 
-class SCENE_PT_alva_cue_switcher(Panel, PropertiesPanel):
-    '''Live video switcher type system but for lighting cues'''
-    bl_label = "ALVA M/E 1 Lighting Cue Switcher"
+
+class NODE_PT_alva_node_formatter(Panel, NodePanel):
+    '''Control color, label, etc. of our nodes in pop-up menu'''
+    bl_label = "Node Formatter"
+
+    @classmethod
+    def poll(cls, context):
+        return (context.space_data.tree_type == 'ShaderNodeTree' and
+                context.space_data.id == context.scene.world and
+                hasattr(context.space_data.edit_tree, 'nodes') and
+                context.space_data.edit_tree.nodes.active)
 
     def draw(self, context):
-        PropertiesUI.draw_cue_switcher(self, context)
+        draw_node_formatter(self, context)
 
 
-class SCENE_PT_alva_show_sequencer(Panel, PropertiesPanel):
-    '''Stage manager tool for sequencing show operations, similar
-       to Go-No-Go software used in rocket launches.'''
-    bl_label = "ALVA Show-Start Sequencer"
+class NODE_PT_alva_fixture_generator(Panel, NodePanel):
+    """Automation tools for rapidly creating lighting fixtures"""
+    bl_label = "Generate Fixtures"
 
     def draw(self, context):
-        PropertiesUI.draw_show_sequencer(self, context)
+        draw_generate_fixtures(self, context)
+        
+        
+class NODE_PT_alva_fixture_groups(Panel, NodePanel):
+    '''Change the fixture groups found in the controller drop downs.'''
+    bl_label = "Fixture Groups"
+
+    def draw(self, context):
+        draw_fixture_groups(self, context)
         
         
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -322,23 +366,28 @@ class NODE_PT_alva_toolbar(Panel, ToolbarPanel):
         
         
 panels = [
-    NODE_PT_alva_node_formatter,
-    NODE_PT_alva_fixture_generator,
-    NODE_PT_alva_fixture_groups,
     VIEW3D_PT_alva_object_controller,
     VIEW3D_PT_alva_lighting_modifiers,
     VIEW3D_PT_alva_fixture_groups,
     VIEW3D_PT_alva_fixture_generator,
+
     SCENE_PT_alva_cue_switcher,
-    SCENE_PT_alva_show_sequencer,
-    TEXT_PT_alva_macro_generator,
-    TEXT_PT_alva_import_patch,
-    VIEW3D_PT_alva_toolbar,
-    SEQUENCER_PT_alva_toolbar,
-    NODE_PT_alva_toolbar,
+    SCENE_PT_alva_stage_manager,
+
     SEQUENCER_PT_alva_Lighting,
     SEQUENCER_PT_alva_Video,
     SEQUENCER_PT_alva_Audio,
+
+    NODE_PT_alva_node_formatter,
+    NODE_PT_alva_fixture_generator,
+    NODE_PT_alva_fixture_groups,
+
+    TEXT_PT_alva_macro_generator,
+    TEXT_PT_alva_import_patch,
+
+    VIEW3D_PT_alva_toolbar,
+    SEQUENCER_PT_alva_toolbar,
+    NODE_PT_alva_toolbar,
 ]
 
 
@@ -353,28 +402,31 @@ def register():
     TOPBAR_MT_window.append(draw_alva_window)
     TOPBAR_MT_help.append(draw_alva_help)
 
-    VIEW3D_HT_header.append(View3DUI.draw_view3d_cmd_line)
-    VIEW3D_HT_tool_header.prepend(View3DUI.draw_tool_settings)
-    VIEW3D_MT_view.append(View3DUI.draw_alva_view_3d_view)
+    VIEW3D_MT_view.append(draw_alva_view_3d_view)
+    VIEW3D_HT_header.append(draw_view3d_cmd_line)
+    VIEW3D_HT_tool_header.prepend(draw_tool_settings)
 
-    SEQUENCER_MT_add.append(SequencerUI.draw_sequencer_add_menu)
-    SEQUENCER_HT_header.append(SequencerUI.draw_sequencer_cmd_line)
-    SEQUENCER_MT_view.append(SequencerUI.draw_alva_sequencer_view)
+    PROPERTIES_HT_header.append(draw_tool_settings)
+    PROPERTIES_PT_navigation_bar.prepend(draw_alva_properties_navigation)
+    RENDER_PT_context.prepend(draw_alva_properties_sync)
 
     DOPESHEET_HT_header.append(draw_timeline_sync) # This goes on space_time too
     TIME_MT_view.append(draw_alva_time_view)
 
-    NODE_MT_add.append(NodeUI.draw_alva_node_menu)
-    NODE_HT_header.append(NodeUI.draw_node_header)
-    NODE_MT_view.append(NodeUI.draw_alva_node_view)
+    SEQUENCER_MT_view.append(draw_alva_sequencer_view)
+    SEQUENCER_MT_add.append(draw_alva_sequencer_add_menu)
+    SEQUENCER_MT_strip.append(draw_alva_sequencer_strip)
+    SEQUENCER_HT_header.append(draw_alva_sequencer_cmd_line)
+
+    NODE_MT_add.append(draw_alva_node_menu)
+    NODE_HT_header.append(draw_node_header)
+    NODE_MT_view.append(draw_alva_node_view)
 
     GRAPH_HT_header.append(draw_graph_header)
 
-    TEXT_HT_header.append(View3DUI.draw_tool_settings)
+    TEXT_HT_header.append(draw_tool_settings)
     TEXT_MT_view.append(draw_text_view)
-
-    PROPERTIES_HT_header.append(View3DUI.draw_tool_settings)
-
+    
 
 def unregister():
     from bpy.utils import unregister_class
@@ -386,27 +438,28 @@ def unregister():
     TOPBAR_MT_render.remove(draw_alva_render)
     TOPBAR_MT_window.remove(draw_alva_window)
     TOPBAR_MT_help.remove(draw_alva_help)
-    
-    TOPBAR_MT_help.remove(draw_alva_help)
 
-    VIEW3D_HT_header.remove(View3DUI.draw_view3d_cmd_line)
-    VIEW3D_HT_tool_header.remove(View3DUI.draw_tool_settings)
-    VIEW3D_MT_view.remove(View3DUI.draw_alva_view_3d_view)
+    VIEW3D_MT_view.remove(draw_alva_view_3d_view)
+    VIEW3D_HT_header.remove(draw_view3d_cmd_line)
+    VIEW3D_HT_tool_header.remove(draw_tool_settings)
 
-    SEQUENCER_MT_add.remove(SequencerUI.draw_sequencer_add_menu)
-    SEQUENCER_HT_header.remove(SequencerUI.draw_sequencer_cmd_line)
-    SEQUENCER_MT_view.remove(SequencerUI.draw_alva_sequencer_view)
+    PROPERTIES_HT_header.remove(draw_tool_settings)
+    PROPERTIES_PT_navigation_bar.remove(draw_alva_properties_navigation)
+    RENDER_PT_context.remove(draw_alva_properties_sync)
 
-    DOPESHEET_HT_header.remove(draw_timeline_sync)
+    DOPESHEET_HT_header.remove(draw_timeline_sync) # This goes on space_time too
     TIME_MT_view.remove(draw_alva_time_view)
 
-    NODE_MT_add.remove(NodeUI.draw_alva_node_menu)
-    NODE_HT_header.remove(NodeUI.draw_node_header)
-    NODE_MT_view.remove(NodeUI.draw_alva_node_view)
+    SEQUENCER_MT_view.remove(draw_alva_sequencer_view)
+    SEQUENCER_MT_add.remove(draw_alva_sequencer_add_menu)
+    SEQUENCER_MT_strip.remove(draw_alva_sequencer_strip)
+    SEQUENCER_HT_header.remove(draw_alva_sequencer_cmd_line)
+
+    NODE_MT_add.remove(draw_alva_node_menu)
+    NODE_HT_header.remove(draw_node_header)
+    NODE_MT_view.remove(draw_alva_node_view)
 
     GRAPH_HT_header.remove(draw_graph_header)
 
-    TEXT_HT_header.remove(View3DUI.draw_tool_settings)
+    TEXT_HT_header.remove(draw_tool_settings)
     TEXT_MT_view.remove(draw_text_view)
-
-    PROPERTIES_HT_header.remove(View3DUI.draw_tool_settings)

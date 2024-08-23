@@ -33,7 +33,7 @@ from bpy.props import StringProperty, IntProperty
 
 # pyright: reportInvalidTypeForm=false
 
-from ..as_ui.space_node import NodeUI
+from ..as_ui.space_node import draw_node_formatter_footer, draw_node_formatter_group, draw_node_formatter_mixer
 from ..cpvia.find import Find
 from ..utils.osc import OSC
 
@@ -196,12 +196,12 @@ class NODE_OT_node_formatter(Operator):
             active_node = context.space_data.edit_tree.nodes.active
 
             if active_node and (active_node.bl_idname == "group_controller_type" or active_node.bl_idname == "group_driver_type" or active_node.bl_idname == "master_type"):
-                NodeUI.draw_node_formatter_group(self, context, active_node)
+                draw_node_formatter_group(self, context, active_node)
                     
             elif active_node and active_node.bl_idname == "mixer_type" or active_node.bl_idname == "mixer_driver_type":
-                NodeUI.draw_node_formatter_mixer(self, context, active_node)
+                draw_node_formatter_mixer(self, context, active_node)
 
-            NodeUI.draw_node_formatter_footer(self, context, active_node)
+            draw_node_formatter_footer(self, context, active_node)
             
             
 class NODE_OT_keyframe_mixer(bpy.types.Operator):

@@ -83,9 +83,9 @@ def draw_macro_generator(self, context):
     
     for i, option in enumerate(filter_options):
         if i % 2 == 0:
-            op = col1.operator("text.alva_populate_macros", text=option)
+            op = col1.operator("alva_text.populate_macros", text=option)
         else:
-            op = col2.operator("text.alva_populate_macros", text=option)
+            op = col2.operator("alva_text.populate_macros", text=option)
         op.filter_group = option
 
     

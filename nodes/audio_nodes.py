@@ -754,6 +754,8 @@ nodes = [
     MADIOutputsNode,
     AES50AOutputsNode,
     AES50BOutputsNode,
+    USBInputsNode,
+    USBOutputsNode,
     PhysicalInputsNode,
     DanteInputsNode,
     MADIInputsNode,
