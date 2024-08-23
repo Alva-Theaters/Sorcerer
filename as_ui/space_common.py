@@ -59,175 +59,6 @@ pcoll.load("gobo_dark", os.path.join(icons_dir, "gobo_dark.svg"), 'IMAGE')
 
 
 class CommonUI:   
-    @staticmethod                
-    def draw_toolbar(self, context):
-        pcoll = preview_collections["main"]
-        orb = pcoll["orb"]
-        
-        layout = self.layout
-        region_width = context.region.width
-
-        num_columns = 1
-
-        flow = layout.grid_flow(row_major=True, columns=num_columns, even_columns=True, even_rows=False, align=True)
-        flow.scale_y = 2
-        
-        space_type = context.space_data.type
-        scene = context.scene.scene_props
-        
-        if space_type == 'SEQUENCE_EDITOR' and scene.view_sequencer_toolbar:
-            flow.operator("my.add_macro", icon='FILE_TEXT', text="Macro" if region_width > 200 else "")
-            flow.operator("my.add_cue", icon='PLAY', text="Cue" if region_width > 200 else "")
-            flow.operator("my.add_flash", icon='LIGHT_SUN', text="Flash" if region_width > 200 else "")
-            flow.operator("my.add_animation", icon='IPO_BEZIER', text="Animation" if region_width > 200 else "")
-            flow.operator("my.add_offset_strip", icon='UV_SYNC_SELECT', text="Offset" if region_width > 200 else "")
-            flow.operator("my.add_trigger", icon='SETTINGS', text="Trigger" if region_width > 200 else "")
-            flow.separator()
-            flow.operator("seq.render_strips_operator", icon_value=orb.icon_id, text="Render" if region_width > 200 else "")
-            flow.operator("my.add_strip_operator", icon='ADD', text="Add Strip" if region_width > 200 else "", emboss=True)
-            flow.operator("my.go_to_cue_out_operator", icon='GHOST_ENABLED', text="Cue 0" if region_width > 200 else "")
-            flow.operator("my.displays_operator", icon='MENU_PANEL', text="Displays" if region_width > 200 else "")
-            flow.operator("my.about_operator", icon='INFO', text="About" if region_width > 200 else "")
-            flow.operator("my.copy_above_to_selected", icon='COPYDOWN', text="Disable Clocks" if region_width > 200 else "")
-            flow.operator("my.disable_all_clocks_operator", icon='MOD_TIME', text="Disable Clocks" if region_width > 200 else "")
-
-        elif space_type == 'NODE_EDITOR' and scene.view_node_toolbar:
-            flow.operator("node.add_group_controller_node", icon='ADD', text="Add Group" if region_width >= 200 else "", emboss=True)
-            flow.operator("my.go_to_cue_out_operator", icon='GHOST_ENABLED', text="Cue 0" if region_width >= 200 else "")
-            flow.operator("my.displays_operator", icon='MENU_PANEL', text="Displays" if region_width >= 200 else "")
-            flow.operator("my.about_operator", icon='INFO', text="About" if region_width >= 200 else "")
-            flow.operator("my.disable_all_clocks_operator", icon='MOD_TIME', text="Disable Clocks" if region_width >= 200 else "")
-
-        elif space_type == 'VIEW_3D' and scene.view_viewport_toolbar:
-            flow.operator("node.add_group_controller_node", icon='ADD', text="Add Group" if region_width >= 200 else "", emboss=True)
-            flow.operator("my.go_to_cue_out_operator", icon='GHOST_ENABLED', text="Cue 0" if region_width >= 200 else "")
-            flow.operator("my.displays_operator", icon='MENU_PANEL', text="Displays" if region_width >= 200 else "")
-            flow.operator("my.about_operator", icon='INFO', text="About" if region_width >= 200 else "")
-            flow.operator("my.disable_all_clocks_operator", icon='MOD_TIME', text="Disable Clocks" if region_width >= 200 else "")
-
-
-    @staticmethod
-    def draw_topbar(self, context):
-        pcoll = preview_collections["main"]
-        orb = pcoll["orb"]
-
-        if (hasattr(context, "scene") and 
-            hasattr(context.scene, "scene_props")): # Avoid unregistration error
-            scene = context.scene.scene_props
-            layout = self.layout
-            col = layout.column()
-            row = col.row(align=True)
-            row.operator("seq.show_sequencer_settings", text="", icon_value=orb.icon_id, emboss=1)
-            row.prop(scene, "lighting_enabled", text="", icon='OUTLINER_OB_LIGHT' if scene.lighting_enabled else 'LIGHT_DATA', emboss=1)
-            row.prop(scene, "video_enabled", text="", icon='VIEW_CAMERA' if scene.video_enabled else 'OUTLINER_DATA_CAMERA', emboss=1)
-            row.prop(scene, "audio_enabled", text="", icon='OUTLINER_OB_SPEAKER' if scene.audio_enabled else 'OUTLINER_DATA_SPEAKER', emboss=1)
-
-            col = layout.column()
-            row = col.row()
-            row.alert = scene.has_solos
-            row.operator("common.alva_clear_solo", text="", icon='SOLO_OFF')
-
-
-
-    @staticmethod
-    def draw_tool_settings(self, context):
-        '''The way this is written is extremely dumb. The issue is the stupid, stupid, stupid 
-           context.scene vs context.scene.scene_props stupidity. Need to eventually put 100%
-           of scene-registered properties on the scene_props, but haven't yet because doing so
-           would introduce hundreds of bugs throughout the codebase.'''
-        if (hasattr(context, "scene") and 
-            hasattr(context.scene, "scene_props")): # Avoid unregistration error
-            scene = context.scene.scene_props
-            layout = self.layout
-            row = layout.row(align=True)
-            row.prop(context.scene, "lock_ip_settings", text="", icon='LOCKED' if context.scene.lock_ip_settings else 'UNLOCKED')
-            row.prop(context.scene, "ip_address_view_options", text="", expand=True)
-
-            if context.scene.ip_address_view_options == 'option_lighting':
-                ip = scene.str_osc_ip_address
-                port = scene.int_osc_port
-                if context.scene.lock_ip_settings:
-                    row = layout.row()
-                    row.label(text=f"{ip}:{port}")
-                else:
-                    row = layout.row()
-                    row.prop(scene, "str_osc_ip_address", text="")
-                    row = layout.row()
-                    row.scale_x = .8
-                    row.prop(scene, "int_osc_port", text=":")
-
-            elif context.scene.ip_address_view_options == 'option_video':
-                ip = context.scene.str_video_ip_address
-                port = context.scene.int_video_port
-                if context.scene.lock_ip_settings:
-                    row = layout.row()
-                    row.label(text=f"{ip}:{port}")
-                else:
-                    row = layout.row()
-                    row.prop(context.scene, "str_video_ip_address", text="")
-                    row = layout.row()
-                    row.scale_x = .9
-                    row.prop(context.scene, "int_video_port", text=":")
-
-            else:
-                ip = context.scene.str_audio_ip_address
-                port = context.scene.int_audio_port
-                if context.scene.lock_ip_settings:
-                    row = layout.row()
-                    row.label(text=f"{ip}:{port}")
-                else:
-                    row = layout.row()
-                    row.prop(context.scene, "str_audio_ip_address", text="")
-                    row = layout.row()
-                    row.scale_x = .9
-                    row.prop(context.scene, "int_audio_port", text=":")
-
-        
-
-    @staticmethod
-    def draw_splash(self, context):
-        pcoll = preview_collections["main"]
-        orb = pcoll["orb"]
-
-        from .. import bl_info, as_info
-        version = bl_info["version"]
-        primary = version[0]
-        if len(version) > 1:
-            secondary = version[1]
-        else: secondary = 0
-
-        if len(version) > 2:
-            tertiary = version[2]
-        else: tertiary = 0
-
-        version = f"v{primary}.{secondary}.{tertiary}"
-        restrictions = as_info["restrictions_url"]
-
-        layout = self.layout
-        box = layout.box()
-
-        row = box.row()
-        row.scale_y = 3
-        row.label(text=f"Alva Sorcerer {version}", icon_value=orb.icon_id)
-        row = box.row()
-        row.label(text="Today I'm just a baby, but one day I'll grow big and strong!")
-        box.separator()
-
-        if as_info["alpha"]:
-            row = box.row()
-            row.alert = 1
-            row.label(text="Warning: Many features do not work in this alpha version.")
-            row.alert = 0
-        elif as_info["beta"]:
-            row = box.row()
-            row.label(text="Warning: Some features may not work in this beta version.")
-        
-        row = box.row()
-        if restrictions != "":
-            row.operator("wm.url_open", text="See Restrictions").url = restrictions
-        row.operator("wm.url_open", text="Learn More").url = "https://www.alvatheaters.com/alva-sorcerer"
-
-
     @staticmethod
     def draw_text_or_group_input(self, context, row_or_box, active_object, object=False):
         if object:
@@ -296,49 +127,52 @@ class CommonUI:
         # INTENSITY
         row.prop(active_object, "float_intensity", slider=True, text="Intensity")
         
-        # # STROBE
-        # if active_object.strobe_is_on:
-        #     row_one = row.column(align=True)
-        #     row_one.scale_x = 1
-        #     op = row_one.operator("my.view_strobe_props", icon='OUTLINER_OB_LIGHTPROBE', text="")
-        #     op.space_type = space_type
-        #     op.node_name = node_name
-        #     op.node_tree_name = node_tree_name
-
-        # # COLOR
-        # if active_object.color_is_on:
-        #     sub = row.column(align=True)
-        #     sub.scale_x = 0.3
-        #     sub.prop(active_object, "float_vec_color", text="")
-        #     if hasattr(active_object, "object_identities_enum") and object_type == "Influencer":
-        #         sub_two = row.column(align=True)
-        #         sub_two.scale_x = .3
-        #         sub_two.prop(active_object, "float_vec_color_restore", text="")
-        #     sub_two = row.column(align=True)
-        #     # Do not allow students/volunteers to mess up the color profile setting.
-        #     if not context.scene.scene_props.school_mode_enabled:
-        #         sub_two.scale_x = 0.8
-        #         sub_two.prop(active_object, "color_profile_enum", text="", icon='COLOR', icon_only=True)
-
-        # STROBE/COLOR
-        if active_object.strobe_is_on or active_object.color_is_on:
-            row = box.row(align=True)
-
+        # SHORTENED STROBE/COLOR
+        if not context.scene.scene_props.expand_strobe:
+            # STROBE
             if active_object.strobe_is_on:
-                op = row.operator("my.view_strobe_props", icon='OUTLINER_OB_LIGHTPROBE', text="")
+                row_one = row.column(align=True)
+                row_one.scale_x = 1
+                op = row_one.operator("my.view_strobe_props", icon='OUTLINER_OB_LIGHTPROBE', text="")
                 op.space_type = space_type
                 op.node_name = node_name
                 op.node_tree_name = node_tree_name
 
-                row.prop(active_object, "float_strobe", text="Strobe", slider = True)
-
+            # COLOR
             if active_object.color_is_on:
-                row.prop(active_object, "float_vec_color", text="")
+                sub = row.column(align=True)
+                sub.scale_x = 0.3
+                sub.prop(active_object, "float_vec_color", text="")
                 if hasattr(active_object, "object_identities_enum") and object_type == "Influencer":
-                    row.prop(active_object, "float_vec_color_restore", text="")
+                    sub_two = row.column(align=True)
+                    sub_two.scale_x = .3
+                    sub_two.prop(active_object, "float_vec_color_restore", text="")
+                sub_two = row.column(align=True)
                 # Do not allow students/volunteers to mess up the color profile setting.
                 if not context.scene.scene_props.school_mode_enabled:
-                    row.prop(active_object, "color_profile_enum", text="", icon='COLOR', icon_only=True)
+                    sub_two.scale_x = 0.8
+                    sub_two.prop(active_object, "color_profile_enum", text="", icon='COLOR', icon_only=True)
+
+        else:
+            # EXPANDED STROBE/COLOR
+            if active_object.strobe_is_on or active_object.color_is_on:
+                row = box.row(align=True)
+
+                if active_object.strobe_is_on:
+                    op = row.operator("my.view_strobe_props", icon='OUTLINER_OB_LIGHTPROBE', text="")
+                    op.space_type = space_type
+                    op.node_name = node_name
+                    op.node_tree_name = node_tree_name
+
+                    row.prop(active_object, "float_strobe", text="Strobe", slider = True)
+
+                if active_object.color_is_on:
+                    row.prop(active_object, "float_vec_color", text="")
+                    if hasattr(active_object, "object_identities_enum") and object_type == "Influencer":
+                        row.prop(active_object, "float_vec_color_restore", text="")
+                    # Do not allow students/volunteers to mess up the color profile setting.
+                    if not context.scene.scene_props.school_mode_enabled:
+                        row.prop(active_object, "color_profile_enum", text="", icon='COLOR', icon_only=True)
         
         # SOUND
         if object_type == "Stage Object" and active_object.audio_is_on:
@@ -380,12 +214,12 @@ class CommonUI:
             op.space_type = space_type
             op.node_name = node_name
             op.node_tree_name = node_tree_name
-            
+
             if active_object.edge_is_on:
                 row.prop(active_object, "float_edge", slider=True, text="Edge")
             if active_object.diffusion_is_on:
                 row.prop(active_object, "float_diffusion", slider=True, text="Diffusion")
-        
+
         # GOBO
         if active_object.gobo_is_on:
             row = box.row(align=True)
@@ -393,12 +227,12 @@ class CommonUI:
             op.space_type = space_type
             op.node_name = node_name
             op.node_tree_name = node_tree_name
-            
+
             row.prop(active_object, "int_gobo_id", text="Gobo")
             row.prop(active_object, "float_gobo_speed", slider=True, text="Speed")
             row.prop(active_object, "int_prism", slider=True, text="Prism")
-    
-    
+
+
     @staticmethod    
     def draw_footer_toggles(self, context, column, active_object, box=True, vertical=False):
         pcoll = preview_collections["main"]
@@ -540,6 +374,7 @@ class CommonUI:
         row.operator("screen.keyframe_jump", text="", icon='NEXT_KEYFRAME').next = True
         row.operator("screen.frame_jump", text="", icon='FF').end = True
 
+
     @staticmethod    
     def draw_fixture_groups(self, context):
         layout = self.layout
@@ -675,12 +510,6 @@ class CommonUI:
             row_two = split_two.column(align=True)
             row_two.prop(item, "gobo_speed_max", text="Max")
             
-            split = box.split(factor=.5)
-            row = split.column()
-            row.label(text="Disable Gobo Speed Argument")
-            row = split.column()
-            row.prop(item, "str_disable_gobo_speed_argument", text="", icon='CHECKBOX_DEHLT')
-            
             layout.separator()
             
             split = box.split(factor=.5)
@@ -700,6 +529,7 @@ class CommonUI:
         add = row.operator("patch.apply_patch_to_objects", text="Apply to Meshes Matching Channels", icon='SHADERFX')
         add.group_id = item.name
         
+
     @staticmethod
     def draw_generate_fixtures(self, context):
         scene = context.scene
@@ -778,126 +608,3 @@ class CommonUI:
 #            row.operator("array.patch_group_operator", text="", icon='FORWARD')
 #            
 #            box.separator()
-
-
-    @staticmethod
-    def draw_strobe_settings(self, context, active_controller):
-        layout = self.layout
-        column = layout.row()
-
-        if active_controller:
-            if hasattr(active_controller, "str_enable_strobe_argument"):
-                row = layout.row()
-                row.prop(active_controller, "strobe_min", text="Strobe Min")
-                row.prop(active_controller, "strobe_max", text="Max")
-
-                layout.separator()
-
-                split = layout.split(factor=0.5)
-                row = split.column()
-                row.label(text="Enable Strobe Argument")
-                row = split.column()
-                row.prop(active_controller, "str_enable_strobe_argument", text="", icon='OUTLINER_DATA_LIGHTPROBE')
-                
-                split = layout.split(factor=0.5)
-                row = split.column()
-                row.label(text="Disable Strobe Argument")
-                row = split.column()
-                row.prop(active_controller, "str_disable_strobe_argument", text="", icon='PANEL_CLOSE')
-
-    @staticmethod    
-    def draw_pan_tilt_settings(self, context, active_controller):
-        layout = self.layout
-        
-        if active_controller:
-            row = layout.row()
-            row.prop(active_controller, "pan_min", text="Pan Min")
-            row.prop(active_controller, "pan_max", text="Max")
-            
-            row = layout.row()
-            
-            row.prop(active_controller, "tilt_min", text="Tilt Min")
-            row.prop(active_controller, "tilt_max", text="Max")
-        else:
-            layout.label(text="Active controller not found.")
-    
-    @staticmethod    
-    def draw_zoom_settings(self, context, active_controller):
-        layout = self.layout
-        
-        if active_controller:
-            row = layout.row()
-            row.prop(active_controller, "zoom_min", text="Zoom Min")
-            row.prop(active_controller, "zoom_max", text="Max")
-
-        else:
-            layout.label(text="Active controller not found.")
-    
-    @staticmethod 
-    def draw_edge_diffusion_settings(self, context, active_controller):   
-        layout = self.layout
-        
-        if active_controller:
-            row = layout.row()
-            row.label(text="Nothing to adjust here.")
-        else:
-            layout.label(text="Active controller not found.")
-    
-    @staticmethod    
-    def draw_gobo_settings(self, context, active_controller):
-        layout = self.layout
-
-        if active_controller:
-            split = layout.split(factor=.5)
-            row = split.column()
-            row.label(text="Gobo ID Argument")
-            row = split.column()
-            row.prop(active_controller, "str_gobo_id_argument", text="", icon='POINTCLOUD_DATA')
-            
-            layout.separator()
-            
-            split = layout.split(factor=.5)
-            row = split.column()
-            row.label(text="Gobo Speed Value Argument")
-            row = split.column()
-            row.prop(active_controller, "str_gobo_speed_value_argument", text="", icon='CON_ROTLIKE')
-            split = layout.split(factor=.5)
-            row = split.column()
-            row.label(text="Enable Gobo Speed Argument")
-            row = split.column()
-            row.prop(active_controller, "str_enable_gobo_speed_argument", text="", icon='CHECKBOX_HLT')
-            split_two = layout.split(factor=.51, align=True)
-            row_two = split_two.column()
-            row_two.label(text="")
-            row_two = split_two.column(align=True)
-            row_two.prop(active_controller, "gobo_speed_min", text="Min")
-            row_two = split_two.column(align=True)
-            row_two.prop(active_controller, "gobo_speed_max", text="Max")
-            
-            split = layout.split(factor=.5)
-            row = split.column()
-            row.label(text="Disable Gobo Speed Argument")
-            row = split.column()
-            row.prop(active_controller, "str_disable_gobo_speed_argument", text="", icon='CHECKBOX_DEHLT')
-            
-            layout.separator()
-            
-            split = layout.split(factor=.5)
-            row = split.column()
-            row.label(text="Enable Prism Argument")
-            row = split.column()
-            row.prop(active_controller, "str_enable_prism_argument", text="", icon='TRIA_UP')
-            
-            split = layout.split(factor=.5)
-            row = split.column()
-            row.label(text="Disable Prism Argument")
-            row = split.column()
-            row.prop(active_controller, "str_disable_prism_argument", text="", icon='PANEL_CLOSE')
-            
-        else:
-            layout.label(text="Active controller not found.")
-
-
-    @staticmethod
-    def draw_graph_header(self, context):
-        self.layout.operator("graph.view_selected", text="", icon='VIEWZOOM')

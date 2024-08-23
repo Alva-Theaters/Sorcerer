@@ -37,9 +37,9 @@ def register():
 
     # Sequencer
     Scene.is_armed_livemap = BoolProperty(
-        default=True, name="Arm Livemap", description="Arm livemap to automatically jump to correct cue on playback from middle")
+        default=True, name="Livemap", description="Automatically jump to correct cue on playback from middle")
     Scene.is_armed_release = BoolProperty(
-        default=False, name="Arm Add Extra Strip on Release of O", description="Arm this to add a second strip when O as in Oscar key is released. This is to activate kick and snare with a single finger")
+        default=False, name="Add Up Strip", description="Arm this to add a second strip when Z as in zebra key is released. This is to activate kick and snare with a single motion")
     Scene.add_strip_type_default = StringProperty(default='option_eos_flash')
     Scene.strip_end_macros = BoolProperty(default=False, name="Strip End Macros", description="Create an extra macro option on the end frame of macro strips")
 

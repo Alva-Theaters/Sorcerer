@@ -35,11 +35,9 @@ class Items:
         items = [
             ('option_network', "Network", "Network settings for audio, lighting, and video."),
             ('option_sequencer', "Sequencer", "Settings for video sequencer area."),
-            ('option_3d', "3D", "Settings for 3D view area."),
-            ('option_nodes', "Nodes", "Settings for node editor area."),
+            ('option_sync', "Sync", "Settings for timecode synchronization."),
             ('option_orb', "Orb", "Settings for node editor area."),
-            ('option_ui', "UI", "Toggle visibility of select UI components. Use Blender Preferences for other customizations."),
-            ('option_st_sequencer', "S-T", "OSC Settings for Show-Start Sequencer (Properties viewer under Scene)"),
+            ('option_st_sequencer', "S-T", "OSC Settings for Show-Start Sequencer (Properties viewer under Scene)."),
             ('option_system', "System", "System-wide general settings.")
         ]
         return items

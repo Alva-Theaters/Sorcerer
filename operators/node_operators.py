@@ -33,7 +33,7 @@ from bpy.props import StringProperty, IntProperty
 
 # pyright: reportInvalidTypeForm=false
 
-from ..ui.node_ui import NodeUI
+from ..as_ui.space_node import NodeUI
 from ..cpvia.find import Find
 from ..utils.osc import OSC
 

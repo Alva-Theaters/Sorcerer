@@ -32,7 +32,7 @@ from bpy.types import Operator
 from bpy.props import IntProperty
 import time
 
-from ..ui.sequencer_ui import SequencerUI # type: ignore
+from ..as_ui.space_sequencer import SequencerUI # type: ignore
 from ..utils.utils import Utils # type: ignore
 from ..utils.osc import OSC
 from ..orb import Orb

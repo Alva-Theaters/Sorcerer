@@ -82,7 +82,7 @@ class CPVIAFinders:
             c, p, v = mixing.mix_my_values(parent, p)
             return c, p, v, controller_type
                     
-        else: SLI.SLI_assert_unreachable()
+        else: return None, None, None, None
         
         
     def _find_my_controller_type(self, parent, pan_tilt_node=False):
@@ -130,8 +130,8 @@ class CPVIAFinders:
         """
         match = re.search(r'\d+', string)
         return int(match.group()) if match else NUMBER_TO_ADD_IF_NULL
-            
-            
+
+
     def _find_my_value(self, parent, p, type, chan):
         """Recieves a bpy object mesh (parent), and parameter, and returns integers in a [list]
            This is for single fixtures."""

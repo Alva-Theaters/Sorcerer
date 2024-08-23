@@ -42,48 +42,71 @@ pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
 pcoll = preview_collections["main"]
 orb = pcoll["orb"]
 
+
 class NodeUI:
     @staticmethod
-    def draw_alva_node_menu(self, layout):
+    def draw_alva_node_view(self, layout):
+        pcoll = preview_collections["main"]
+        orb = pcoll["orb"]
+
         layout = self.layout
-        layout.label(text="Primary Lighting Nodes", icon_value=orb.icon_id)
-        layout.operator("node.add_group_controller_node", text="Group Controller", icon='STICKY_UVS_LOC')
-        layout.operator("node.add_mixer_node", text="Mixer", icon='OPTIONS')
-        layout.operator("node.add_direct_selects_node", text="Direct Selects", icon='DESKTOP')
-
         layout.separator()
+        layout.label(text="Alva Sorcerer", icon_value=orb.icon_id)
+        layout.prop (bpy.context.scene.scene_props, "view_node_add_lighting", text="Add (Lighting)")
+        layout.prop (bpy.context.scene.scene_props, "view_node_add_audio", text="Add (Audio)")
+        layout.prop(bpy.context.scene.scene_props, "view_node_toolbar", text="Toolbar")
+        layout.prop(bpy.context.scene.scene_props, "view_node_formatter", text="Formatter")
+        layout.prop(bpy.context.scene.scene_props, "expand_strobe", text="Expand Strobe")
 
-        layout.label(text="Specialty Lighting Nodes", icon_value=orb.icon_id)
-        layout.operator("node.add_settings_node", text="Settings", icon='PREFERENCES')
-        layout.operator("node.add_motor_node", text="Motor", icon='ANTIALIASED')
-        layout.operator("node.add_flash_node", text="Flash", icon='LIGHT_SUN')
-        layout.operator("node.add_global_node", text="Global", icon='WORLD_DATA')
-        layout.operator("node.add_presets_node", text="Presets", icon='NONE')
-        layout.operator("node.add_pan_tilt_node", text="Pan/Tilt", icon='ORIENTATION_GIMBAL')
-        
-#        layout.separator()
-#        
-#        layout.label(text="Audio Nodes", icon='SPEAKER')
-#        layout.operator("node.add_physical_inputs_node", text="Physical Inputs Node", icon='FORWARD')
-#        layout.operator("node.add_aes50_a_inputs_node", text="AES50-A Inputs Node", icon='FORWARD')
-#        layout.operator("node.add_aes50_b_inputs_node", text="AES50-B Inputs Node", icon='FORWARD')
-#        layout.operator("node.add_usb_inputs_node", text="USB Inputs Node", icon='FORWARD')
-#        layout.operator("node.add_madi_inputs_node", text="MADI Inputs Node", icon='FORWARD')
-#        layout.operator("node.add_dante_inputs_node", text="Dante Inputs Node", icon='FORWARD')
-#        layout.operator("node.add_physical_outputs_node", text="Physical Outputs Node", icon='BACK')
-#        layout.operator("node.add_aes50_outputs_node", text="AES50 Outputs Node", icon='BACK')
-#        layout.operator("node.add_usb_outputs_node", text="USB Outputs Node", icon='BACK')
-#        layout.operator("node.add_madi_outputs_node", text="MADI Outputs Node", icon='BACK')
-#        layout.operator("node.add_dante_outputs_node", text="Dante Outputs Node", icon='BACK')
-#        layout.operator("node.add_fader_bank_node", text="Fader Bank Node", icon='EMPTY_SINGLE_ARROW')
-#        layout.operator("node.add_buses_node", text="Buses Node", icon='OUTLINER_OB_ARMATURE')
-#        layout.operator("node.add_matrix_node", text="Matrix Node", icon='NETWORK_DRIVE')
-#        layout.operator("node.add_dcas_node", text="DCAs Node", icon='VIEW_CAMERA')
-#        layout.operator("node.add_eq_node", text="EQ Node", icon='SHARPCURVE')
-#        layout.operator("node.add_compressor_node", text="Compressor Node", icon='MOD_DYNAMICPAINT')
-#        layout.operator("node.add_gate_node", text="Gate Node", icon='IPO_EXPO')
-#        layout.operator("node.add_reverb_node", text="Reverb Node", icon='IPO_BOUNCE') 
-#        
+
+    @staticmethod
+    def draw_alva_node_menu(self, layout):
+        if bpy.context.scene.scene_props.view_node_add_lighting:
+            layout = self.layout
+            layout.separator()
+            layout.label(text="Primary Lighting Nodes", icon_value=orb.icon_id)
+            layout.operator("node.add_group_controller_node", text="Group Controller", icon='STICKY_UVS_LOC')
+            layout.operator("node.add_mixer_node", text="Mixer", icon='OPTIONS')
+            layout.operator("node.add_direct_selects_node", text="Direct Selects", icon='DESKTOP')
+
+            layout.separator()
+
+            layout.label(text="Specialty Lighting Nodes", icon_value=orb.icon_id)
+            layout.operator("node.add_settings_node", text="Settings", icon='PREFERENCES')
+            layout.operator("node.add_motor_node", text="Motor", icon='ANTIALIASED')
+            layout.operator("node.add_flash_node", text="Flash", icon='LIGHT_SUN')
+            layout.operator("node.add_global_node", text="Global", icon='WORLD_DATA')
+            layout.operator("node.add_presets_node", text="Presets", icon='NONE')
+            layout.operator("node.add_pan_tilt_node", text="Pan/Tilt", icon='ORIENTATION_GIMBAL')
+            
+        if bpy.context.scene.scene_props.view_node_add_audio:
+           layout = self.layout
+           if bpy.context.scene.scene_props.view_node_add_lighting:
+            layout.separator()
+           
+           layout.label(text="Audio Nodes", icon_value=orb.icon_id)
+           layout.operator("node.add_physical_inputs_node", text="Physical Inputs Node", icon='FORWARD')
+           layout.operator("node.add_aes50_a_inputs_node", text="AES50-A Inputs Node", icon='FORWARD')
+           layout.operator("node.add_aes50_b_inputs_node", text="AES50-B Inputs Node", icon='FORWARD')
+           layout.operator("node.add_usb_inputs_node", text="USB Inputs Node", icon='FORWARD')
+           layout.operator("node.add_madi_inputs_node", text="MADI Inputs Node", icon='FORWARD')
+           layout.operator("node.add_dante_inputs_node", text="Dante Inputs Node", icon='FORWARD')
+           layout.operator("node.add_physical_outputs_node", text="Physical Outputs Node", icon='BACK')
+           layout.operator("node.add_aes50_a_outputs_node", text="AES50 Outputs Node", icon='BACK')
+           layout.operator("node.add_aes50_b_outputs_node", text="AES50 Outputs Node", icon='BACK')
+           layout.operator("node.add_usb_outputs_node", text="USB Outputs Node", icon='BACK')
+           layout.operator("node.add_madi_outputs_node", text="MADI Outputs Node", icon='BACK')
+           layout.operator("node.add_dante_outputs_node", text="Dante Outputs Node", icon='BACK')
+           layout.operator("node.add_fader_bank_node", text="Fader Bank Node", icon='EMPTY_SINGLE_ARROW')
+           layout.operator("node.add_buses_node", text="Buses Node", icon='OUTLINER_OB_ARMATURE')
+           layout.operator("node.add_matrix_node", text="Matrix Node", icon='NETWORK_DRIVE')
+           layout.operator("node.add_dcas_node", text="DCAs Node", icon='VIEW_CAMERA')
+           layout.operator("node.add_eq_node", text="EQ Node", icon='SHARPCURVE')
+           layout.operator("node.add_compressor_node", text="Compressor Node", icon='MOD_DYNAMICPAINT')
+           layout.operator("node.add_gate_node", text="Gate Node", icon='IPO_EXPO')
+           layout.operator("node.add_reverb_node", text="Reverb Node", icon='IPO_BOUNCE') 
+
+
     @staticmethod
     def draw_node_formatter_group(self, context, active_node):
         layout = self.layout
@@ -114,6 +137,7 @@ class NodeUI:
 
             column.separator()
 
+
     @staticmethod
     def draw_node_formatter_mixer(self, context, active_node): ## This whole thing needs update
         row = self.layout.row(align=True)
@@ -122,6 +146,7 @@ class NodeUI:
         row.prop(active_node, "parameters_enum", text="")
         if active_node.parameters_enum == 'option_color':
             row.prop(active_node, "color_profile_enum", text="")
+
 
     @staticmethod
     def draw_node_formatter_footer(self, context, active_node):
@@ -135,6 +160,7 @@ class NodeUI:
         row = self.layout.row()
         row.prop(active_node, "use_custom_color", text="", icon='HIDE_ON' if not active_node.use_custom_color else 'HIDE_OFF')
         row.template_color_picker(active_node, "color", value_slider=True)
+
 
     @staticmethod
     def draw_node_header(self, context, active_node=None):
@@ -673,7 +699,7 @@ class NodeUI:
 
         col.separator()
         col.alert = scene.is_cue_baking
-        col.operator("my.bake_fcurves_to_cues_operator", text=scene.str_bake_info, icon_value=orb.icon_id)
+        col.operator("alva_orb.render_qmeo", text=scene.str_bake_info, icon_value=orb.icon_id)
         col.separator()
         col.operator("my.rerecord_cues_operator", text=scene.str_cue_bake_info, icon_value=orb.icon_id)
         col.separator()

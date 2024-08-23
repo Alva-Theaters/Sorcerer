@@ -29,7 +29,7 @@
 
 import bpy
 
-from ..ui.common_ui import CommonUI as CommonUI
+from .space_common import CommonUI
 
 # Custom icon stuff
 import bpy.utils.previews
@@ -69,6 +69,49 @@ pcoll.load("effect_fourteen", os.path.join(icons_dir, "effect_fourteen.png"), 'I
 
 
 class SequencerUI:
+    @staticmethod
+    def draw_alva_sequencer_view(self, layout):
+        pcoll = preview_collections["main"]
+        orb = pcoll["orb"]
+
+        layout = self.layout
+        layout.separator()
+        layout.label(text="Alva Sorcerer", icon_value=orb.icon_id)
+        layout.prop(bpy.context.scene.scene_props, "view_sequencer_add", text="Add")
+        layout.prop(bpy.context.scene.scene_props, "view_sequencer_toolbar", text="Toolbar")
+        layout.prop(bpy.context.scene.scene_props, "view_sequencer_command_line", text="Command Line")
+        layout.prop(bpy.context.scene.scene_props, "expand_strobe", text="Expand Strobe")
+    
+
+    @staticmethod    
+    def draw_sequencer_add_menu(self, layout):
+        if bpy.context.scene.scene_props.view_sequencer_add:
+            pcoll = preview_collections["main"]
+            orb = pcoll["orb"]
+
+            layout = self.layout
+            layout.separator()
+            layout.label(text="Alva Sorcerer", icon_value=orb.icon_id)
+            layout.operator("my.add_macro", text="Macro", icon='FILE_TEXT')
+            layout.operator("my.add_cue", text="Cue", icon='PLAY')
+            layout.operator("my.add_flash", text="Flash", icon='LIGHT_SUN')
+            layout.operator("my.add_animation", text="Animation", icon='IPO_BEZIER')
+            layout.operator("my.add_offset_strip", text="Offset", icon='UV_SYNC_SELECT')
+            layout.operator("my.add_trigger", text="Trigger", icon='SETTINGS')
+
+
+    @staticmethod        
+    def draw_sequencer_cmd_line(self, context):
+        if (hasattr(context.scene, "scene_props") and
+            context.scene.scene_props.view_sequencer_command_line):
+            layout = self.layout
+            scene = context.scene
+            layout.prop(context.scene, "is_armed_livemap", text="", icon='PLAY')
+            if context.scene.is_armed_livemap:
+                layout.label(text=scene.livemap_label)
+            layout.label(text=scene.command_line_label)
+
+
     @staticmethod
     def draw_strip_media(self, context, scene, bake_panel=True):
         layout = self.layout
@@ -810,81 +853,6 @@ class SequencerUI:
         row.operator("my.add_color_strip", icon='COLOR')  
 
         column.separator()
-    
-
-    @staticmethod    
-    def draw_sequencer_add_menu(self, layout):
-        pcoll = preview_collections["main"]
-        orb = pcoll["orb"]
-
-        layout = self.layout
-        layout.separator()
-        layout.label(text="Alva Sorcerer", icon_value=orb.icon_id)
-        layout.operator("my.add_macro", text="Macro", icon='FILE_TEXT')
-        layout.operator("my.add_cue", text="Cue", icon='PLAY')
-        layout.operator("my.add_flash", text="Flash", icon='LIGHT_SUN')
-        layout.operator("my.add_animation", text="Animation", icon='IPO_BEZIER')
-        layout.operator("my.add_offset_strip", text="Offset", icon='UV_SYNC_SELECT')
-        layout.operator("my.add_trigger", text="Trigger", icon='SETTINGS')
-
-
-    @staticmethod        
-    def draw_sequencer_cmd_line(self, context):
-        if (hasattr(context.scene, "command_line_label") and
-            hasattr(context.scene, "livemap_label")):
-            layout = self.layout
-            scene = context.scene
-            layout.label(text=scene.livemap_label)
-            layout.label(text=scene.command_line_label)
-
-
-    @staticmethod
-    def draw_timeline_sync(self, context):
-        pcoll = preview_collections["main"]
-        orb = pcoll["orb"]
-
-        if (hasattr(context.scene, "sync_timecode") and
-            hasattr(context.scene, "timecode_expected_lag")):
-            scene = context.scene
-
-            sequencer_open = False
-            active_strip = False
-
-            for area in context.screen.areas:
-                if area.type == 'SEQUENCE_EDITOR':
-                    sequencer_open = True
-                    if context.scene.sequence_editor.active_strip and context.scene.sequence_editor.active_strip is not None and context.scene.sequence_editor.active_strip.type == 'SOUND':
-                        active_strip = True
-                        break
-
-            layout = self.layout
-            row = layout.row()
-            row.prop(scene, "sync_timecode", text="", icon='LINKED' if scene.sync_timecode else 'UNLINKED')
-
-            row = layout.row()
-
-            if sequencer_open and active_strip:
-                active_strip = context.scene.sequence_editor.active_strip
-                icon = 'IPO_BEZIER' if active_strip.type == 'COLOR' else 'SOUND'
-                row.label(text="", icon=icon)
-                target = active_strip
-
-                row = layout.row(align=True)
-                row.scale_x = 0.5
-                row.prop(target, "str_start_cue", text="")
-                row.prop(target, "str_end_cue", text="")
-
-            else:
-                row.label(text="", icon='SCENE_DATA')
-                target = scene
-
-                row = layout.row(align=True)
-                row.scale_x = 0.75
-                row.prop(target, "int_start_macro", text="")
-                row.prop(target, "int_end_macro", text="")
-
-            row = layout.row()
-            row.operator("my.bake_fcurves_to_cues_operator", text="", icon_value=orb.icon_id)
 
 
     def determine_contexts(sequence_editor, active_strip):

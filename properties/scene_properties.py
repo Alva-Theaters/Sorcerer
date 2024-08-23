@@ -102,7 +102,7 @@ class SceneProperties(PropertyGroup):
     
     int_core_port: IntProperty(name="Theater Port", default=0) # type: ignore # type: ignore
     
-    int_argument_size: IntProperty(name="Maximum Argument Size", default=40, min=1, max=65, description="How many consecutive command line commands can be added to one OSC packet.") # type: ignore
+    int_argument_size: IntProperty(name="Maximum Argument Size", default=40, min=1, max=65, description="How many consecutive command line commands can be batched onto one OSC packet.") # type: ignore
 
     is_baking: BoolProperty(default=False, description="Sorcerer is currently baking") # type: ignore # type: ignore
     
@@ -129,6 +129,7 @@ class SceneProperties(PropertyGroup):
     school_mode_enabled: BoolProperty(default=False, description="Reduces potential for students or volunteers to break things") # type: ignore # type: ignore
 
     restrict_network: BoolProperty(name="Network", default=True, description="When school mode is enabled, you can't change network settings.") # type: ignore # type: ignore
+    restrict_sync: BoolProperty(name="Sync", default=False, description="When school mode is enabled, you can't change sync settings.") # type: ignore # type: ignore
     restrict_patch: BoolProperty(name="Patch", default=True, description="When school mode is enabled, you can't change patch settings.") # type: ignore # type: ignore
     restrict_house_lights: BoolProperty(name="House Lights", default=True, description="When school mode is enabled, you can't change house lights settings.") # type: ignore
     restrict_strip_media: BoolProperty(name="Controller Settings", default=False, description="When school mode is enabled, you can't change controller settings.") # type: ignore
@@ -138,12 +139,19 @@ class SceneProperties(PropertyGroup):
     restrict_pan_tilts: BoolProperty(name="Pan/Tilts", default=True, description="When school mode is enabled, stage pan_tilt objects are disabled") # type: ignore # type: ignore
     restrict_brushes: BoolProperty(name="Brushes", default=False, description="When school mode is enabled, brushes are disabled") # type: ignore # type: ignore
 
-    view_ip_address_tool: BoolProperty(name="Viewport IP Address Tool Header", default=True, description="Draw the IP Address box in Viewport tool settings area") # type: ignore
+    view_ip_address_tool: BoolProperty(name="IP Address", default=True, description="Draw the IP Address box in Tool Settings or Header area") # type: ignore
     view_sequencer_add: BoolProperty(name="Sequencer Add", default=True, description="Draw the Add menu on the Sequencer") # type: ignore
-    view_node_add: BoolProperty(name="Node Add", default=True, description="Draw the Add menu on the Node Editor") # type: ignore
+    view_time_orb: BoolProperty(name="Sync/Orb", default=True, description="Draw sync and Orb settings in header") # type: ignore
+    view_node_add_lighting: BoolProperty(name="Node Add (Lighting)", default=True, description="Draw the Add menu on the Node Editor for lighting") # type: ignore
+    view_node_add_audio: BoolProperty(name="Node Add (Audio)", default=False, description="Draw the Add menu on the Node Editor for audio. (Experimental)") # type: ignore
     view_node_toolbar: BoolProperty(name="Node Toolbar", default=True, description="Draw Alva toolbar in node editor") # type: ignore
     view_sequencer_toolbar: BoolProperty(name="Sequencer Toolbar", default=True, description="Draw Alva toolbar in sequencer") # type: ignore
     view_viewport_toolbar: BoolProperty(name="Viewport Toolbar", default=True, description="Draw Alva toolbar in viewport") # type: ignore
+    view_topbar: BoolProperty(name="Viewport Topbar", default=True, description="Draw Alva topbar section on the very top of Blender on the right") # type: ignore
+    view_sequencer_command_line: BoolProperty(name="Command Line", default=True, description="Draw the sequencer's internal command line") # type: ignore
+    view_viewport_command_line: BoolProperty(name="Command Line", default=True, description="Draw the viewport's command line for Eos") # type: ignore
+    view_node_formatter: BoolProperty(name="Header Formatter", default=True, description="Draw the node formatter in the header") # type: ignore
+    expand_strobe: BoolProperty(name="Expand Strobe", default=True, description="Draw the Strobe slider in its own row as opposed to only within the popup. This must be checked to animate strobe") # type: ignore
 
     auto_update_event_list: BoolProperty(default=False, description="Automatically update events in the console's event list when things change without the need to press Shift+Spacebar") # type: ignore
 
@@ -156,7 +164,7 @@ class SceneProperties(PropertyGroup):
     
     has_solos: BoolProperty() # type: ignore
 
-    core_enabled: BoolProperty(default=True, description="Enable Core for lighting, video, and audio") # type: ignore
+    core_enabled: BoolProperty(name="Enable Core", default=True, description="Enable Renegade's core") # type: ignore
     use_alva_core: BoolProperty(default=False, name="In-house Mode", description="Commandeer your local Alva theater") # type: ignore
 
     ghost_out_time: IntProperty(default=1, name="Ghost Out Time", description="This does not impact the lighting console's own Go_to_Cue time") # type: ignore

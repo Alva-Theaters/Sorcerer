@@ -33,6 +33,10 @@ from ..assets.dictionaries import Dictionaries # type: ignore
 from ..assets.sli import SLI # type: ignore
 from ..utils.utils import Utils # type: ignore
 
+import logging
+from ..maintenance.logging import alva_logging
+alva_logging()
+
 
 class Find:
     def find_my_argument_template(self, parent, type, chan, param, value):
@@ -109,6 +113,9 @@ class Find:
         Returns:
             parent: A bpy object that may be a node, strip, or object
         """
+        logger = logging.getLogger(__name__)
+        logger.debug("This is a debug message")
+
         from ..updaters.node_updaters import NodeUpdaters # type: ignore
         
         if not isinstance(object, bpy.types.PropertyGroup):

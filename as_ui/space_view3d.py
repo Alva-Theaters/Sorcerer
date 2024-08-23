@@ -29,10 +29,99 @@
 
 import bpy
 
-from ..ui.common_ui import CommonUI
+from .space_common import CommonUI
+
+# Custom icon stuff
+import bpy.utils.previews
+import os
+
+preview_collections = {}
+pcoll = bpy.utils.previews.new()
+preview_collections["main"] = pcoll
+
+addon_dir = os.path.dirname(__file__)
+pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
 
 
 class View3DUI:
+    @staticmethod
+    def draw_alva_view_3d_view(self, layout):
+        pcoll = preview_collections["main"]
+        orb = pcoll["orb"]
+
+        layout = self.layout
+        layout.separator()
+        layout.label(text="Alva Sorcerer", icon_value=orb.icon_id)
+        layout.prop(bpy.context.scene.scene_props, "view_viewport_toolbar", text="Toolbar")
+        layout.prop(bpy.context.scene.scene_props, "view_ip_address_tool", text="Network")
+        layout.prop(bpy.context.scene.scene_props, "view_viewport_command_line", text="Command Line")
+        layout.prop(bpy.context.scene.scene_props, "expand_strobe", text="Expand Strobe")
+
+
+    @staticmethod
+    def draw_view3d_cmd_line(self, context):
+        if (hasattr(context.scene, "scene_props") and
+            context.scene.scene_props.view_viewport_command_line):
+            
+            row = self.layout.row()
+            row.scale_x = 2
+            row.prop(context.scene.scene_props, 'view3d_command_line', text="")
+
+
+    @staticmethod
+    def draw_tool_settings(self, context):
+        '''The way this is written is extremely dumb. The issue is the stupid, stupid, stupid 
+           context.scene vs context.scene.scene_props stupidity. Need to eventually put 100%
+           of scene-registered properties on the scene_props, but haven't yet because doing so
+           would introduce hundreds of bugs throughout the codebase.'''
+        if (hasattr(context, "scene") and 
+            hasattr(context.scene, "scene_props") and context.scene.scene_props.view_ip_address_tool):
+            scene = context.scene.scene_props
+            layout = self.layout
+            row = layout.row(align=True)
+            row.prop(context.scene, "lock_ip_settings", text="", icon='LOCKED' if context.scene.lock_ip_settings else 'UNLOCKED')
+            row.prop(context.scene, "ip_address_view_options", text="", expand=True)
+
+            if context.scene.ip_address_view_options == 'option_lighting':
+                ip = scene.str_osc_ip_address
+                port = scene.int_osc_port
+                if context.scene.lock_ip_settings:
+                    row = layout.row()
+                    row.label(text=f"{ip}:{port}")
+                else:
+                    row = layout.row()
+                    row.prop(scene, "str_osc_ip_address", text="")
+                    row = layout.row()
+                    row.scale_x = .8
+                    row.prop(scene, "int_osc_port", text=":")
+
+            elif context.scene.ip_address_view_options == 'option_video':
+                ip = context.scene.str_video_ip_address
+                port = context.scene.int_video_port
+                if context.scene.lock_ip_settings:
+                    row = layout.row()
+                    row.label(text=f"{ip}:{port}")
+                else:
+                    row = layout.row()
+                    row.prop(context.scene, "str_video_ip_address", text="")
+                    row = layout.row()
+                    row.scale_x = .9
+                    row.prop(context.scene, "int_video_port", text=":")
+
+            else:
+                ip = context.scene.str_audio_ip_address
+                port = context.scene.int_audio_port
+                if context.scene.lock_ip_settings:
+                    row = layout.row()
+                    row.label(text=f"{ip}:{port}")
+                else:
+                    row = layout.row()
+                    row.prop(context.scene, "str_audio_ip_address", text="")
+                    row = layout.row()
+                    row.scale_x = .9
+                    row.prop(context.scene, "int_audio_port", text=":")
+                    
+
     def draw_speaker(self, context, active_object):
         ao = active_object
         layout = self.layout
@@ -133,9 +222,3 @@ class View3DUI:
                     col.prop(mod, "highlights", slider=True)
                     col.prop(mod, "shadows", slider=True)
                     col.prop(mod, "blacks", slider=True)
-
-    @staticmethod
-    def draw_view3d_cmd_line(self, context):
-        row = self.layout.row()
-        row.scale_x = 2
-        row.prop(context.scene.scene_props, 'view3d_command_line', text="")

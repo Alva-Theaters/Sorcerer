@@ -32,10 +32,10 @@ from bpy.types import NodeSocket, Node, PropertyGroup
 from bpy.props import *
 
 from ..assets.items import Items as AlvaItems # type: ignore
-from ..ui.common_ui import CommonUI # type: ignore
-from ..ui.settings_ui import SettingsUI
+from ..as_ui.space_common import CommonUI # type: ignore
+from ..as_ui.space_alvapref import SettingsUI
 from ..updaters.node_updaters import NodeUpdaters # type: ignore
-from ..ui.node_ui import NodeUI # type: ignore
+from ..as_ui.space_node import NodeUI # type: ignore
 from ..utils.utils import Utils # type: ignore
 
 

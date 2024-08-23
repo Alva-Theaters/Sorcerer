@@ -28,26 +28,47 @@
 
 
 import bpy
-from bpy.types import Panel, Scene
+from bpy.types import Panel
 from bpy.types import (
     TOPBAR_HT_upper_bar, 
+    TOPBAR_MT_edit,
+    TOPBAR_MT_render,
+    TOPBAR_MT_window,
+    TOPBAR_MT_help,
     VIEW3D_HT_header, 
     VIEW3D_HT_tool_header, 
+    VIEW3D_MT_view,
     SEQUENCER_HT_header, 
     SEQUENCER_MT_add,
+    SEQUENCER_MT_view,
     DOPESHEET_HT_header,
+    TIME_MT_view,
     NODE_MT_add,
     NODE_HT_header,
+    NODE_MT_view,
     GRAPH_HT_header,
-    TEXT_HT_header
+    TEXT_HT_header,
+    TEXT_MT_view,
+    PROPERTIES_HT_header
     )
 
-from .ui.node_ui import NodeUI
-from .ui.sequencer_ui import SequencerUI
-from .ui.view3d_ui import View3DUI
-from .ui.common_ui import CommonUI
-from .ui.properties_ui import PropertiesUI
-from .ui.text_ui import TextUI
+from .as_ui.space_node import NodeUI
+from .as_ui.space_sequencer import SequencerUI
+from .as_ui.space_view3d import View3DUI
+from .as_ui.space_common import CommonUI
+from .as_ui.properties_scene import PropertiesUI
+from .as_ui.space_topbar import (
+    draw_alva_topbar, 
+    draw_alva_edit, 
+    draw_alva_render, 
+    draw_alva_window, 
+    draw_alva_help
+)
+from .as_ui.space_dopesheet import draw_timeline_sync, draw_alva_time_view
+from .as_ui.space_graph import draw_graph_header
+from .as_ui.space_text import draw_import_usitt_ascii, draw_macro_generator
+from .as_ui.space_tool import draw_alva_toolbar
+from .as_ui.space_text import draw_text_view
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -121,8 +142,6 @@ class VIEW3D_PT_alva_object_controller(Panel, View3D_Panel):
     def draw(self, context):
         scene = bpy.context.scene.scene_props
         active_object = context.active_object
-
-        #if active
         
         if active_object.type == 'MESH':
             box, column = View3DUI.draw_object_header(self, context, scene, active_object)
@@ -259,7 +278,7 @@ class TEXT_PT_alva_macro_generator(Panel, TextPanel):
     bl_label = "Macro Generator"
     
     def draw(self, context):
-        TextUI.draw_macro_generator(self, context)
+        draw_macro_generator(self, context)
         
         
 class TEXT_PT_alva_import_patch(Panel, TextPanel):
@@ -267,7 +286,7 @@ class TEXT_PT_alva_import_patch(Panel, TextPanel):
     bl_label = "Import USITT ASCII"
     
     def draw(self, context):
-        TextUI.draw_import_usitt_ascii(self, context)
+        draw_import_usitt_ascii(self, context)
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -283,7 +302,7 @@ class VIEW3D_PT_alva_toolbar(Panel, ToolbarPanel):
     bl_space_type = 'VIEW_3D'
 
     def draw(self, context):
-        CommonUI.draw_toolbar(self, context)
+        draw_alva_toolbar(self, context)
         
         
 class SEQUENCER_PT_alva_toolbar(Panel, ToolbarPanel):
@@ -291,7 +310,7 @@ class SEQUENCER_PT_alva_toolbar(Panel, ToolbarPanel):
     bl_space_type = 'SEQUENCE_EDITOR'
     
     def draw(self, context):
-        CommonUI.draw_toolbar(self, context)
+        draw_alva_toolbar(self, context)
         
         
 class NODE_PT_alva_toolbar(Panel, ToolbarPanel):
@@ -299,7 +318,7 @@ class NODE_PT_alva_toolbar(Panel, ToolbarPanel):
     bl_space_type = 'NODE_EDITOR'
             
     def draw(self, context):
-        CommonUI.draw_toolbar(self, context)
+        draw_alva_toolbar(self, context)
         
         
 panels = [
@@ -328,22 +347,33 @@ def register():
     for cls in panels:
         register_class(cls)
     
-    TOPBAR_HT_upper_bar.append(CommonUI.draw_topbar)
+    TOPBAR_HT_upper_bar.append(draw_alva_topbar)
+    TOPBAR_MT_edit.append(draw_alva_edit)
+    TOPBAR_MT_render.prepend(draw_alva_render)
+    TOPBAR_MT_window.append(draw_alva_window)
+    TOPBAR_MT_help.append(draw_alva_help)
 
     VIEW3D_HT_header.append(View3DUI.draw_view3d_cmd_line)
-    VIEW3D_HT_tool_header.prepend(CommonUI.draw_tool_settings)
+    VIEW3D_HT_tool_header.prepend(View3DUI.draw_tool_settings)
+    VIEW3D_MT_view.append(View3DUI.draw_alva_view_3d_view)
 
     SEQUENCER_MT_add.append(SequencerUI.draw_sequencer_add_menu)
     SEQUENCER_HT_header.append(SequencerUI.draw_sequencer_cmd_line)
+    SEQUENCER_MT_view.append(SequencerUI.draw_alva_sequencer_view)
 
-    DOPESHEET_HT_header.append(SequencerUI.draw_timeline_sync) # This goes on space_time too
+    DOPESHEET_HT_header.append(draw_timeline_sync) # This goes on space_time too
+    TIME_MT_view.append(draw_alva_time_view)
 
     NODE_MT_add.append(NodeUI.draw_alva_node_menu)
     NODE_HT_header.append(NodeUI.draw_node_header)
+    NODE_MT_view.append(NodeUI.draw_alva_node_view)
 
-    GRAPH_HT_header.append(CommonUI.draw_graph_header)
+    GRAPH_HT_header.append(draw_graph_header)
 
-    TEXT_HT_header.append(CommonUI.draw_tool_settings)
+    TEXT_HT_header.append(View3DUI.draw_tool_settings)
+    TEXT_MT_view.append(draw_text_view)
+
+    PROPERTIES_HT_header.append(View3DUI.draw_tool_settings)
 
 
 def unregister():
@@ -351,19 +381,32 @@ def unregister():
     for cls in panels:
         unregister_class(cls)
     
-    TOPBAR_HT_upper_bar.remove(CommonUI.draw_topbar)
+    TOPBAR_HT_upper_bar.remove(draw_alva_topbar)
+    TOPBAR_MT_edit.remove(draw_alva_edit)
+    TOPBAR_MT_render.remove(draw_alva_render)
+    TOPBAR_MT_window.remove(draw_alva_window)
+    TOPBAR_MT_help.remove(draw_alva_help)
+    
+    TOPBAR_MT_help.remove(draw_alva_help)
 
     VIEW3D_HT_header.remove(View3DUI.draw_view3d_cmd_line)
-    VIEW3D_HT_tool_header.remove(CommonUI.draw_tool_settings)
+    VIEW3D_HT_tool_header.remove(View3DUI.draw_tool_settings)
+    VIEW3D_MT_view.remove(View3DUI.draw_alva_view_3d_view)
 
     SEQUENCER_MT_add.remove(SequencerUI.draw_sequencer_add_menu)
     SEQUENCER_HT_header.remove(SequencerUI.draw_sequencer_cmd_line)
+    SEQUENCER_MT_view.remove(SequencerUI.draw_alva_sequencer_view)
 
-    DOPESHEET_HT_header.remove(SequencerUI.draw_timeline_sync)
+    DOPESHEET_HT_header.remove(draw_timeline_sync)
+    TIME_MT_view.remove(draw_alva_time_view)
 
     NODE_MT_add.remove(NodeUI.draw_alva_node_menu)
     NODE_HT_header.remove(NodeUI.draw_node_header)
+    NODE_MT_view.remove(NodeUI.draw_alva_node_view)
 
-    GRAPH_HT_header.remove(CommonUI.draw_graph_header)
+    GRAPH_HT_header.remove(draw_graph_header)
 
-    TEXT_HT_header.remove(CommonUI.draw_tool_settings)
+    TEXT_HT_header.remove(View3DUI.draw_tool_settings)
+    TEXT_MT_view.remove(draw_text_view)
+
+    PROPERTIES_HT_header.remove(View3DUI.draw_tool_settings)

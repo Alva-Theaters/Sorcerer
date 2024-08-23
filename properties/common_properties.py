@@ -383,8 +383,8 @@ class CommonProperties:
         ('float_gobo_speed', FloatProperty(
             name="Gobo Speed",
             default=0.0,
-            min=-300.0,
-            max=300.0,
+            min=-100.0,
+            max=100.0,
             description="Rotation of individual gobo speed",
             options={'ANIMATABLE'},
             update=CPVIAGenerator.gobo_speed_updater

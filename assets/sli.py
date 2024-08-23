@@ -43,20 +43,21 @@ class SLI:
         caller_file = caller_frame.f_code.co_filename
         caller_line = caller_frame.f_lineno
         
-        # Get the basename of the file to avoid showing the full path
         caller_file = os.path.basename(caller_file)
         
         message = f"Error found at {caller_file}:{caller_line}\n" \
-                    f"Code marked as unreachable has been executed. Please report bug to Alva Theaters."
+                    f"Code marked as unreachable has been executed. Please report bug to Alva Theaters, not Blender."
                     
         print(message)
         
-    def find_restrictions(scene):
+
+    def SLI_find_restrictions(scene):
         if not scene.scene_props.school_mode_enabled:
             return []
         
         restriction_properties = [
             'restrict_network', 
+            'restrict_sync',
             'restrict_patch', 
             'restrict_house_lights', 
             'restrict_strip_media', 

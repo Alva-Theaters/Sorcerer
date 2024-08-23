@@ -1045,8 +1045,8 @@ class VIEW3D_OT_object_controller(Operator):
     def draw(self, context):
         scene = bpy.context.scene.scene_props
         active_object = context.active_object
-        from ..ui.common_ui import CommonUI
-        from ..ui.view3d_ui import View3DUI
+        from ..as_ui.space_common import CommonUI
+        from ..as_ui.space_view3d import View3DUI
         
         if active_object.type == 'MESH':
             box, column = View3DUI.draw_object_header(self, context, scene, active_object)

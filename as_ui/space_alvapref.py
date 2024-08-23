@@ -65,28 +65,26 @@ class SettingsUI:
         mode = context.scene.scene_props.preferences_enum
         scene = context.scene
         sequence_editor = context.scene.sequence_editor
-        restrictions = SLI.find_restrictions(scene)
+        restrictions = SLI.SLI_find_restrictions(scene)
         
         col2 = split.column(align=True)
         
         if mode == 'option_network' and 'network' not in restrictions:
             SettingsUI.draw_network(self, context, col2)
+
+        elif mode == 'option_sync' and not scene.scene_props.school_mode_enabled:
+            if 'sync' not in restrictions:
+                SettingsUI.draw_sync(self, context, col2)
+
+            if not scene.scene_props.school_mode_enabled:
+                SettingsUI.draw_fps(self, context, col2)
             
         elif mode == 'option_sequencer':
-            if 'sequencer' not in restrictions:
-                SettingsUI.draw_sync(self, context, col2)
             if 'house_lights' not in restrictions:
                 SettingsUI.draw_house_lights(self, context, col2)
             if 'sequencer' not in restrictions:
                 SettingsUI.draw_sequencer(self, context, col2)
                 SettingsUI.draw_cue_builder(self, context, col2)
-            
-        elif mode == 'option_3d' and 'patch' not in restrictions:
-            SettingsUI.draw_patch(self, context, col2)
-            
-        elif mode == 'option_nodes':
-            row = col2.row()
-            row.label(text="Nothing to display here yet.")
 
         elif mode == 'option_st_sequencer':
             row = col2.row()
@@ -95,13 +93,7 @@ class SettingsUI:
         elif mode == 'option_orb':
             SettingsUI.draw_orb(self, context, col2)
             
-        elif mode == 'option_ui' and not scene.scene_props.school_mode_enabled:
-            SettingsUI.draw_ui(self, context, col2)
-            
-        elif mode == 'option_system':
-            if not scene.scene_props.school_mode_enabled:
-                SettingsUI.draw_fps(self, context, col2)
-                
+        elif mode == 'option_system': 
             SettingsUI.draw_school_mode(self, context, col2)
             
     @staticmethod
@@ -152,10 +144,10 @@ class SettingsUI:
         col1 = split.column()
         col1.enabled = not is_restricted
         col1.prop(scene, "restrict_network")
+        col1.prop(scene, "restrict_sync")
         col1.prop(scene, "restrict_sequencer")
         col1.prop(scene, "restrict_house_lights")
         col1.prop(scene, "restrict_influencers")
-        col1.prop(scene, "restrict_stage_objects")
         
         col2 = split.column()
         col2.enabled = not is_restricted
@@ -163,6 +155,7 @@ class SettingsUI:
         col2.prop(scene, "restrict_strip_media")
         col2.prop(scene, "restrict_pan_tilts")
         col2.prop(scene, "restrict_brushes")
+        col2.prop(scene, "restrict_stage_objects")
 
         column.separator()
         column.separator()
@@ -182,7 +175,7 @@ class SettingsUI:
             row.prop(context.scene, "int_event_list", text="Default clock:")
 
         row = box.row()
-        row.prop(context.scene.scene_props, "auto_update_event_list", slider=True, text="Automatically update event list")
+        row.prop(context.scene, "is_armed_livemap", text="Livemap", slider=True)  
         column.separator()
         column.separator()
     
@@ -191,24 +184,22 @@ class SettingsUI:
         scene = context.scene
         box = column.box()
         row = box.row()
-        row.label(text="Livemap and Orb:")
+        row.label(text="Orb:")
         box = column.box()
         
         split = box.split(factor=.5)
         
         col1 = split.column()
-        col1.prop(scene, "is_armed_livemap", text="Livemap", slider=True)   
-        col1.separator()
         col1.prop(scene, "is_armed_turbo", text="Orb skips Shift+Update", slider=True)
         col1.separator()
         col1.prop(context.scene.scene_props, "ghost_out_time", text="Ghost Out Time:")
+        col1.separator()
+        col1.prop(scene, "orb_chill_time", text="Wait Time:", slider=False)
 
         col2 = split.column()
         col2.prop(scene, "orb_records_snapshot", text="Orb records snapshot first", slider=True)
         col2.separator()
         col2.prop(scene, "orb_finish_snapshot", text="Snapshot After Orb:", slider=False)
-        col2.separator()
-        col2.prop(scene, "orb_chill_time", text="Wait Time:", slider=False)
 
         box = column.box()
 
@@ -329,37 +320,13 @@ class SettingsUI:
         row.label(text="Adjust House Lights on Play/Stop:")
         box = column.box()
         row = box.row()
-        row.label(text="OSC Address: ")
-        row.prop(context.scene, "house_prefix", text="")
-        row = box.row()
-        row.prop(context.scene, "house_down_on_play", text="House Down on Play", slider=True)
+        row.prop(context.scene, "house_down_on_play", text="On Play", slider=True)
         row.prop(context.scene, "house_down_argument", text="")
-        row = box.row()
-        row.prop(context.scene, "house_up_on_stop", text="House Up on Stop", slider=True)
+        row.prop(context.scene, "house_up_on_stop", text="On Stop", slider=True)
         row.prop(context.scene, "house_up_argument", text="")
         column.separator()
         column.separator()
         
-    @staticmethod
-    def draw_ui(self, context, column):
-        scene = context.scene.scene_props
-        
-        box = column.box()
-        row = box.row()
-        row.label(text="Draw:")
-        box = column.box()
-        
-        split = box.split(factor=.5)
-        
-        col1 = split.column()
-        col1.prop(scene, "view_ip_address_tool", text="IP address in viewport", slider=True) 
-        col1.prop(scene, "view_node_add", text="Node editor add menu", slider=True)
-        col1.prop(scene, "view_sequencer_toolbar", text="Sequencer toolbar", slider=True)  
-        
-        col2 = split.column()
-        col2.prop(scene, "view_sequencer_add", text="Sequencer add menu", slider=True)
-        col2.prop(scene, "view_node_toolbar", text="Node editor toolbar", slider=True) 
-        col2.prop(scene, "view_viewport_toolbar", text="Viewport toolbar", slider=True)   
         
     @staticmethod
     def draw_network(self, context, column):

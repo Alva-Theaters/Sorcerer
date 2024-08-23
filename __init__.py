@@ -57,7 +57,7 @@ except ImportError as e:
     print(f"Failed to import strip_formatter_ops: {e}")
 
 try:
-    from .ui.ui_lists import register as ui_lists_register, unregister as ui_lists_unregister
+    from .as_ui.ui_lists import register as ui_lists_register, unregister as ui_lists_unregister
 except ImportError as e:
     print(f"Failed to import ui_lists: {e}")
 
@@ -109,7 +109,7 @@ except ImportError as e:
 try:
     from .operators.common_operators import register as common_operators_register, unregister as common_operators_unregister
 except ImportError as e:
-    
+
     print(f"Failed to import common_operators: {e}")
 
 try:
@@ -123,7 +123,7 @@ except ImportError as e:
     print(f"Failed to import settings_properties: {e}")
 
 try:
-    from .properties.sequencer_props import register as sequencer_props_register, unregister as sequencer_props_unregister
+    from .properties.sequencer_properties import register as sequencer_props_register, unregister as sequencer_props_unregister
 except ImportError as e:
     print(f"Failed to import sequencer_props: {e}")
 

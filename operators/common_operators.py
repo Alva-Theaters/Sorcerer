@@ -33,11 +33,18 @@ from bpy.props import StringProperty
 
 from ..utils.osc import OSC as osc # type: ignore
 from ..utils.utils import Utils
-from ..ui.common_ui import CommonUI # type: ignore
-from ..ui.settings_ui import SettingsUI # type: ignore
+from ..as_ui.space_alvapref import SettingsUI # type: ignore
 from ..cpvia.find import Find # type: ignore
 from ..assets.dictionaries import Dictionaries
-        
+from ..as_ui.space_wm import (
+    draw_edge_diffusion_settings, 
+    draw_gobo_settings, 
+    draw_pan_tilt_settings, 
+    draw_strobe_settings, 
+    draw_zoom_settings, 
+    draw_splash
+)
+
         
 #-------------------------------------------------------------------------------------------------------------------------------------------
 '''CONTROLLER Operators'''
@@ -89,7 +96,7 @@ class COMMON_OT_strobe_props(Operator):
     def draw(self, context):
         finders = Find
         active_controller = finders.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
-        CommonUI.draw_strobe_settings(self, context, active_controller)
+        draw_strobe_settings(self, context, active_controller)
 
 
 class COMMON_OT_pan_tilt_props(Operator):
@@ -110,7 +117,7 @@ class COMMON_OT_pan_tilt_props(Operator):
     def draw(self, context):
         finders = Find
         active_controller = finders.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
-        CommonUI.draw_pan_tilt_settings(self, context, active_controller)
+        draw_pan_tilt_settings(self, context, active_controller)
        
     
 class COMMON_OT_zoom_iris_props(Operator):
@@ -131,7 +138,7 @@ class COMMON_OT_zoom_iris_props(Operator):
     def draw(self, context):
         finders = Find
         active_controller = finders.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
-        CommonUI.draw_zoom_settings(self, context, active_controller)
+        draw_zoom_settings(self, context, active_controller)
         
 
 class COMMON_OT_edge_diffusion_props(Operator):
@@ -151,7 +158,7 @@ class COMMON_OT_edge_diffusion_props(Operator):
     def draw(self, context):
         finders = Find
         active_controller = finders.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
-        CommonUI.draw_edge_diffusion_settings(self, context, active_controller)
+        draw_edge_diffusion_settings(self, context, active_controller)
     
        
 class COMMON_OT_gobo_props(Operator):
@@ -172,12 +179,12 @@ class COMMON_OT_gobo_props(Operator):
     def draw(self, context):
         finders = Find
         active_controller = finders.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
-        CommonUI.draw_gobo_settings(self, context, active_controller)
+        draw_gobo_settings(self, context, active_controller)
 
 
 class COMMON_OT_alva_clear_solo(Operator):
     '''Turns off the solo on all controllers'''
-    bl_idname = "common.alva_clear_solo"
+    bl_idname = "alva_topbar.clear_solos"
     bl_label = "Clear Solos"
 
     def execute(self, context):
@@ -205,7 +212,7 @@ class TOPBAR_OT_splash_screen(Operator):
         return context.window_manager.invoke_props_dialog(self, width=width)
 
     def draw(self, context):
-        CommonUI.draw_splash(self, context)
+        draw_splash(self, context)
         
         
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -290,7 +297,7 @@ class TOOL_OT_copy_various_to_selected(Operator):
 
 class TOOL_OT_alva_settings(Operator):
     '''Pop-up for Sorcerer Settings menu'''
-    bl_idname = "seq.show_sequencer_settings"
+    bl_idname = "alva_topbar.alva_preferences"
     bl_label = "Sorcerer Settings"
     bl_options = {'REGISTER', 'UNDO'}
     

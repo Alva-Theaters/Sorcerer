@@ -188,7 +188,7 @@ class SEQUENCER_OT_generate_offset_macro(SEQUENCER_OT_base_modal_operator):
     
     
 class SEQUENCER_OT_bake_curves_to_cues(SEQUENCER_OT_base_modal_operator):
-    bl_idname = "my.bake_fcurves_to_cues_operator"
+    bl_idname = "alva_orb.render_qmeo"
     bl_label = "Bake F-curves To Cues"
     bl_description = "Orb will create a qmeo. A qmeo is like a video, only each frame is a lighting cue. Use it to store complex animation data on the lighting console" 
 
