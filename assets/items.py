@@ -1,4 +1,4 @@
-# This file is part of Alva ..
+# This file is part of Alva Sorcerer
 # Copyright (C) 2024 Alva Theaters
 
 # This program is free software: you can redistribute it and/or modify
@@ -41,7 +41,7 @@ class Items:
         ]
         return items
     
-    
+
     def color_profiles(self, context):
         items = [
             ('option_rgb', "RGB", "Red, Green, Blue"),

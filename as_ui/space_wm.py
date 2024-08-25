@@ -1,4 +1,4 @@
-# This file is part of Alva ..
+# This file is part of Alva Sorcerer
 # Copyright (C) 2024 Alva Theaters
 
 # This program is free software: you can redistribute it and/or modify
@@ -202,7 +202,10 @@ def draw_gobo_settings(self, context, active_controller):
 
 
 def draw_alva_right_click(self, context):
-    prop = context.button_prop
+    try:
+        prop = context.button_prop
+    except:
+        return
     if prop.identifier != 'float_vec_color':
         return
     

@@ -1,4 +1,4 @@
-# This file is part of Alva ..
+# This file is part of Alva Sorcerer
 # Copyright (C) 2024 Alva Theaters
 
 # This program is free software: you can redistribute it and/or modify
@@ -308,8 +308,8 @@ class NODE_PT_alva_fixture_groups(Panel, NodePanel):
 
     def draw(self, context):
         draw_fixture_groups(self, context)
-        
-        
+
+
 #-------------------------------------------------------------------------------------------------------------------------------------------
 '''TEXT Panels'''
 #-------------------------------------------------------------------------------------------------------------------------------------------

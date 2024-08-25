@@ -1,4 +1,4 @@
-# This file is part of Alva ..
+# This file is part of Alva Sorcerer
 # Copyright (C) 2024 Alva Theaters
 
 # This program is free software: you can redistribute it and/or modify
@@ -51,7 +51,7 @@ from .assets.sli import SLI
 class SorcererPython:
     def make_eos_macros(macro_range, int_range, string):
         '''
-        spy function that for iterative macro generation on ETC Eos using custom ranges/strings.
+        spy function for iterative macro generation on ETC Eos using custom ranges/strings.
         
         arguments:
             macro_range: Something like (1, 10) creates macros 1-10.

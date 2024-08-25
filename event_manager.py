@@ -1,4 +1,4 @@
-# This file is part of Alva ..
+# This file is part of Alva Sorcerer
 # Copyright (C) 2024 Alva Theaters
 
 # This program is free software: you can redistribute it and/or modify
@@ -185,7 +185,7 @@ class EventManager:
             if isinstance(update.id, bpy.types.Object):
                 obj = update.id
 
-                if obj.object_identities_enum in {"Influencer", "Brush", "Stage Object"}:
+                if obj.object_identities_enum in {"Influencer", "Brush", "Stage Object", "Fixture"}:
                     if update.is_updated_transform:
                         Utils.trigger_special_update(obj)
 

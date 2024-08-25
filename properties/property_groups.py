@@ -1,4 +1,4 @@
-# This file is part of Alva ..
+# This file is part of Alva Sorcerer
 # Copyright (C) 2024 Alva Theaters
 
 # This program is free software: you can redistribute it and/or modify
@@ -178,7 +178,7 @@ class GroupData(PropertyGroup):
     ) # type: ignore
     
     # Others registered in register section
-    
+
 
 class AudioObjectSettings(PropertyGroup):
     from ..assets.items import Items as AlvaItems
