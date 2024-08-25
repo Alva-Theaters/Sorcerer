@@ -29,7 +29,7 @@
 
 import bpy
 
-from ..as_ui.space_dopesheet import draw_properties_sync
+from .space_time import draw_properties_sync
 
 # Custom icon stuff
 import bpy.utils.previews
@@ -52,18 +52,13 @@ def draw_alva_properties_navigation(self, context): # To indicate to user that S
     orb = pcoll["orb"]
 
     layout = self.layout
-    layout.separator()
-    layout.label(text="", icon_value=orb.icon_id)
+    row = layout.row()
+    row.alignment = 'RIGHT'
+    row.label(text="", icon_value=orb.icon_id)
 
 
 def draw_alva_properties_sync(self, context):
-    scene = context.scene
-    col = self.layout.column()
-    row = col.row(align=True)
-    row.prop(context.scene, "timecode_expected_lag", text="Expected Lag")
-    row.prop(scene, "sync_timecode", text="", icon='LINKED' if scene.sync_timecode else 'UNLINKED')
-
-    draw_properties_sync(self, context)
+    return
 
 
 def draw_alva_cue_switcher(self, context):

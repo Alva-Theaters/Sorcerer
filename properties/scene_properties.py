@@ -38,9 +38,9 @@ LightingModifierSubClass = Utils.find_subclass_by_name(PropertyGroup, "LightingM
 
 class SceneProperties(PropertyGroup):
     group_data_index: IntProperty(name="Index", default=0, update=CommonUpdaters.highlight_mode_updater) # type: ignore
-    expand_toggles: BoolProperty(name="Parameter toggle position", default=True, description="Choose whether to draw the toggles beside group name or off to the side") # type: ignore
+    expand_toggles: BoolProperty(name="Parameter Toggle Position", default=True, description="Choose whether to draw the toggles beside group name or off to the side") # type: ignore
 
-    add_channel_ids: StringProperty(name="Add channel ID's", update=CommonUpdaters.channel_ids_updater)     # type: ignore
+    add_channel_ids: StringProperty(name="Add Channels", description="Just type in the channels you want or don't want in plain English", update=CommonUpdaters.channel_ids_updater)     # type: ignore
     
     view3d_command_line: StringProperty(name="Lighting Console Command Line Input", default="", update=CommonUpdaters.view3d_cmd_line_updater) # type: ignore
 
@@ -153,14 +153,12 @@ class SceneProperties(PropertyGroup):
     view_node_formatter: BoolProperty(name="Header Formatter", default=True, description="Draw the node formatter in the header") # type: ignore
     expand_strobe: BoolProperty(name="Expand Strobe", default=True, description="Draw the Strobe slider in its own row as opposed to only within the popup. This must be checked to animate strobe") # type: ignore
 
-    auto_update_event_list: BoolProperty(default=False, description="Automatically update events in the console's event list when things change without the need to press Shift+Spacebar") # type: ignore
-
-    lighting_enabled: BoolProperty(default=True, description="Enable OSC for lighting") # type: ignore # type: ignore
-    video_enabled: BoolProperty(default=False, description="Enable OSC for video") # type: ignore
-    audio_enabled: BoolProperty(default=True, description="Enable OSC for audio") # type: ignore
-    nodes_enabled: BoolProperty(default=True, name="Enable Nodes", description="Enable nodes OSC output") # type: ignore # type: ignore
-    strips_enabled: BoolProperty(default=True, name="Enable Strips", description="Enable sequencer strips OSC output") # type: ignore # type: ignore
-    objects_enabled: BoolProperty(default=True, name="Enable Objects", description="Enable 3D view OSC output") # type: ignore
+    enable_lighting: BoolProperty(name="Enable Lighting", default=True, description="Enable OSC for lighting") # type: ignore # type: ignore
+    enable_video: BoolProperty(name="Enable Video", default=False, description="Enable OSC for video") # type: ignore
+    enable_audio: BoolProperty(name="Enable Audio", default=True, description="Enable OSC for audio") # type: ignore
+    enable_nodes: BoolProperty(name="Enable Nodes", default=True, description="Enable nodes OSC output") # type: ignore # type: ignore
+    enable_strips: BoolProperty(name="Enable Strips", default=True, description="Enable sequencer strips OSC output") # type: ignore # type: ignore
+    enable_objects: BoolProperty(name="Enable Objects", default=True, description="Enable 3D view OSC output") # type: ignore
     
     has_solos: BoolProperty() # type: ignore
 

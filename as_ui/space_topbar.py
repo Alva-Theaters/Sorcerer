@@ -48,19 +48,11 @@ def draw_alva_topbar(self, context):
     if (hasattr(context, "scene") and 
         hasattr(context.scene, "scene_props") and 
         context.scene.scene_props.view_topbar):
-        scene = context.scene.scene_props
         layout = self.layout
         col = layout.column()
         row = col.row(align=True)
-        row.operator("alva_topbar.preferences", text="", icon_value=orb.icon_id, emboss=1)
-        row.prop(scene, "lighting_enabled", text="", icon='OUTLINER_OB_LIGHT' if scene.lighting_enabled else 'LIGHT_DATA', emboss=1)
-        row.prop(scene, "video_enabled", text="", icon='VIEW_CAMERA' if scene.video_enabled else 'OUTLINER_DATA_CAMERA', emboss=1)
-        row.prop(scene, "audio_enabled", text="", icon='OUTLINER_OB_SPEAKER' if scene.audio_enabled else 'OUTLINER_DATA_SPEAKER', emboss=1)
-
-        col = layout.column()
-        row = col.row()
-        row.alert = scene.has_solos
-        row.operator("alva_topbar.clear_solos", text="", icon='SOLO_OFF')
+        row.operator("alva_topbar.preferences", text="", icon_value=orb.icon_id, emboss=0)
+        layout.label(text=" +")
 
 
 def draw_alva_edit(self, context):

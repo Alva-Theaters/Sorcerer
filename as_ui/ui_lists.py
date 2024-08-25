@@ -30,8 +30,6 @@
 import bpy
 from bpy.types import UIList
 
-from ..assets.dictionaries import Dictionaries
-
 
 class COMMON_UL_group_data_list(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
@@ -46,11 +44,11 @@ class COMMON_UL_group_data_list(UIList):
                 row.prop(item, "name", text="", emboss=False)
                 return
             else:
-                row = layout.row()
+                row = layout.row(align=True)
                 row.prop(item, "name", text="", emboss=False)
                  
             if context.scene.scene_props.expand_toggles:
-                row.scale_x = .8
+                row.scale_x = .9
                 row.prop(item, "strobe_is_on", text="", icon='OUTLINER_DATA_LIGHTPROBE' if item.strobe_is_on else 'ADD', emboss=False)
                 row.prop(item, "color_is_on", text="", icon='COLOR' if item.color_is_on else 'ADD', emboss=False)
                 row.prop(item, "pan_tilt_is_on", text="", icon='ORIENTATION_GIMBAL' if item.pan_tilt_is_on else 'ADD', emboss=False)

@@ -135,3 +135,20 @@ def draw_properties_sync(self, context):
             row.prop(target, "int_end_macro", text="")
 
         row.operator("alva_orb.render_qmeo", text="", icon_value=orb.icon_id)
+
+
+def draw_time_playback(self, context):
+    pcoll = preview_collections["main"]
+    orb = pcoll["orb"]
+    scene = context.scene.scene_props
+
+    layout = self.layout
+    layout.use_property_split = True
+    layout.use_property_decorate = False
+    
+    layout.operator("alva_playback.clear_solos", text="Clear OSC Solos", icon='SOLO_OFF')
+    layout.prop(context.scene, "timecode_expected_lag", text="Expected Lag")
+    col = layout.column(heading="OSC")
+    col.prop(scene, "enable_objects", text="Objects")
+    col.prop(scene, "enable_strips", text="Strips")
+    col.prop(scene, "enable_nodes", text="Nodes")

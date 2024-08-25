@@ -205,3 +205,28 @@ def draw_gobo_settings(self, context, active_controller):
         
     else:
         layout.label(text="Active controller not found.")
+
+
+def draw_alva_right_click(self, context):
+    prop = context.button_prop
+    if prop.identifier != 'float_vec_color':
+        return
+    
+    pcoll = preview_collections["main"]
+    orb = pcoll["orb"]
+
+    space_type = context.space_data.type
+    
+    if space_type == 'NODE_EDITOR':
+        node_tree = context.space_data.node_tree
+        node_name = self.name # will this work?
+        node_tree_name = node_tree.name
+    else:
+        node_name = ""
+        node_tree_name = ""
+
+    self.layout.separator()
+    op = self.layout.operator("alva_common.white_balance", icon_value=orb.icon_id, text="Set White Balance")
+    op.space_type = space_type
+    op.node_name = node_name
+    op.node_tree_name = node_tree_name

@@ -37,20 +37,20 @@ def check_flags(context, parent, c, p, v, type):
     scene = context.scene.scene_props
     p = p[0]
 
-    if not scene.lighting_enabled:
+    if not scene.enable_lighting:
         return False
     
     # Check type-related flags
     type_checks = {
-        'group': scene.nodes_enabled,
-        'mixer': scene.nodes_enabled,
-        'strip': scene.strips_enabled,
+        'group': scene.enable_nodes,
+        'mixer': scene.enable_nodes,
+        'strip': scene.enable_strips,
     }
 
     if type in type_checks:
         if not type_checks[type]:
             return False
-    elif not scene.objects_enabled:
+    elif not scene.enable_objects:
         return False
 
     # Check parameter-related flags

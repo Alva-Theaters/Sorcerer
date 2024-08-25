@@ -73,7 +73,7 @@ def draw_text_or_group_input(self, context, row_or_box, active_object, object=Fa
     row.prop(active_object, "str_manual_fixture_selection", text = "")
 
     if object:
-        row.operator("object.pull_selection_operator", text="", icon='SHADERFX')
+        row.operator("object.pull_selection_operator", text="", icon='VIEW3D')
 
 
 def find_audio_type(enum_option):
@@ -374,7 +374,7 @@ def draw_play_bar(self, context, layout):
 def draw_fixture_groups(self, context):
     layout = self.layout
     scene = context.scene
-    
+
     row = layout.row()
     row.template_list("COMMON_UL_group_data_list", "", scene, "scene_group_data", scene.scene_props, "group_data_index")
 
@@ -398,8 +398,6 @@ def draw_fixture_groups(self, context):
     
     if item.separator or item.label:
         return
-    
-    draw_footer_toggles(self, context, col, item, box=False, vertical=True)
         
     col = layout.column(align=True)
     box = col.box()
@@ -521,7 +519,7 @@ def draw_fixture_groups(self, context):
         
     row = layout.row()
 
-    add = row.operator("patch.apply_patch_to_objects", text="Apply to Meshes Matching Channels", icon='SHADERFX')
+    add = row.operator("alva_common.patch_to_selected", text="Apply to Selected Objects", icon='SHADERFX')
     add.group_id = item.name
     
 

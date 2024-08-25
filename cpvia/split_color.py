@@ -151,6 +151,26 @@ class ColorSplitter:
         yellow = int((1 - min(blue_scaled + tolerance, 1)) * 100)
 
         return cyan, magenta, yellow
+    
+
+    def balance_white(self, parent, converted_values, is_subtractive=False):
+        from ..utils.utils import Utils
+        white_balance = Utils.color_object_to_tuple_and_scale_up(parent.alva_white_balance)
+
+        if white_balance != (100, 100, 100): # Must balance
+            if is_subtractive:
+                balanced_values = tuple(
+                    min(max(100 - ((100 - cv) * wb / 100), 0), 100)
+                    for cv, wb in zip(converted_values, white_balance)
+                )
+            else:
+                balanced_values = tuple(
+                    int(cv * wb / 100) for cv, wb in zip(converted_values, white_balance)
+                )
+            return balanced_values
+            
+        else: # No need to balance
+            return converted_values
 
         
     def split_color(self, parent, c, p, v, type):
@@ -163,6 +183,8 @@ class ColorSplitter:
         find_my_argument() function, ensuring that the correct argument is formed based 
         on the received v tuple. The updated parameter p indirectly reflects the 
         color_profile choice, allowing the publisher to interpret the v tuple correctly.
+
+        Also processes wwhite balance.
         
         Parameters:
             parent: The parent controller object.
@@ -212,16 +234,20 @@ class ColorSplitter:
             publisher = Publisher()
             publisher.send_value_to_three_dee(parent, chan, corrected_key, val)
 
-            if corrected_key in ['rgb', 'raise_rgb', 'lower_rgb']:
+            is_subtractive = corrected_key in ['cmy', 'raise_cmy', 'lower_cmy']
+
+            if corrected_key in ['rgb', 'raise_rgb', 'lower_rgb']: # No need to split
+                balanced = self.balance_white(parent, val, is_subtractive)
                 new_p.append(corrected_key)
-                new_v.append(val)
+                new_v.append(balanced)
                 
-            elif corrected_key in profile_converters:
+            elif corrected_key in profile_converters: # Must split
                 converter, num_values = profile_converters[corrected_key]
                 converted_values = converter(*val[:3])
+                balanced = self.balance_white(parent, converted_values, is_subtractive)
                 
                 new_p.append(corrected_key)
-                new_v.append(converted_values[:num_values])
+                new_v.append(balanced[:num_values])
             else: raise ValueError(f"Unknown color profile: {corrected_key}")
 
         return new_p, new_v

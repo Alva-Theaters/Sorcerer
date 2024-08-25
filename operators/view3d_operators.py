@@ -276,26 +276,21 @@ class AddChannelToGroupOperator(bpy.types.Operator):
     
     
 class ApplyPatchToObjectsOperator(bpy.types.Operator):
-    bl_idname = "patch.apply_patch_to_objects"
+    '''Apply to selected objects'''
+    bl_idname = "alva_common.patch_to_selected"
     bl_label = "Apply Settings"
-    bl_description = "Apply Patch to Objects"
     
     group_id: StringProperty()
     
     def execute(self, context):
-        item = context.scene.scene_props.scene_group_data.get(self.group_id)  # Get the object by name
+        item = context.scene.scene_group_data.get(self.group_id)  # Get the object by name
         if item is None:
             self.report({'ERROR'}, "Group not found")
             return {'CANCELLED'}
         
-        channels = [chan.chan for chan in item.channels_list]
-        
-        for obj in bpy.data.objects:
+        for obj in context.selected_objects:
             try:
-                if obj.object_identities_enum == "Fixture":
-                    if obj.list_group_channels[0].chan in channels:
-                        apply_patch(item, obj)
-                
+                apply_patch(item, obj)
             except: pass
           
         return {'FINISHED'}

@@ -122,29 +122,21 @@ def draw_network(self, context, column):
     # Lighting
     elif vt == 'option_lighting' and not core:
         row.enabled = not scene.scene_props.use_alva_core
-        row.prop(scene.scene_props, "console_type_enum", text="Lighting Console")
-        row.prop(scene.scene_props, "lighting_enabled", expand=True, text="")
+        row.prop(scene.scene_props, "console_type_enum", text="Console")
+        row.prop(scene.scene_props, "enable_lighting", expand=True, text="")
 
         row = box.row()
         row.enabled = not scene.scene_props.use_alva_core
         row.prop(scene.scene_props, "str_osc_ip_address", text="")
         row.prop(scene.scene_props, "int_osc_port", text=":")
         row.prop(scene.scene_props, "int_argument_size", text="x")
-
-        box.separator()
-
-        row = box.row()
-        row.prop(scene.scene_props, 'strips_enabled', text="Enable OSC from strips", slider=True)
-        row.prop(scene.scene_props, 'objects_enabled', text="Enable OSC from meshes", slider=True)
-        row = box.row()
-        row.prop(scene.scene_props, 'nodes_enabled', text="Enable OSC from nodes", slider=True)
     
     # Video &
     elif vt == 'option_video' and not core:
         row.enabled=False
         row.label(text="Video Switcher:")
         row.label(text="Coming soon.")
-        row.prop(scene.scene_props, "video_enabled", expand=True, text="")
+        row.prop(scene.scene_props, "enable_video", expand=True, text="")
         row = box.row()
         row.enabled=False
         row.prop(scene, "str_video_ip_address", text="")
@@ -153,8 +145,8 @@ def draw_network(self, context, column):
     # Audio
     elif vt == 'option_audio' and not core:
         row.enabled = not scene.scene_props.use_alva_core
-        row.prop(scene.scene_props, "mixer_type_enum", text="Audio Mixer")
-        row.prop(scene.scene_props, "audio_enabled", expand=True, text="")
+        row.prop(scene.scene_props, "mixer_type_enum", text="Mixer")
+        row.prop(scene.scene_props, "enable_audio", expand=True, text="")
         row = box.row()
         row.enabled = not scene.scene_props.use_alva_core
         row.prop(scene, "str_audio_ip_address", text="")
@@ -241,7 +233,6 @@ def draw_sequencer(self, context, column):
             
 
 def draw_fps(self, context, column):
-    column = self.layout.column()
     # Label section
     box = column.box()
     row = box.row()

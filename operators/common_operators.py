@@ -120,7 +120,7 @@ class UpdateControllerButton(Operator):
     
 class COMMON_OT_strobe_props(Operator):
     bl_idname = "alva_common.strobe_properties"
-    bl_label = "View Strobe Properties"
+    bl_label = "View Strobe and Color Properties"
     
     space_type: StringProperty() # type: ignore
     node_name: StringProperty() # type: ignore
@@ -223,7 +223,7 @@ class COMMON_OT_gobo_props(Operator):
 
 class COMMON_OT_alva_clear_solo(Operator):
     '''Turns off the solo on all controllers'''
-    bl_idname = "alva_topbar.clear_solos"
+    bl_idname = "alva_playback.clear_solos"
     bl_label = "Clear Solos"
 
     def execute(self, context):
@@ -233,6 +233,21 @@ class COMMON_OT_alva_clear_solo(Operator):
                 controller.alva_solo = False
 
         context.scene.scene_props.has_solos = False
+        return {'FINISHED'}
+    
+
+class COMMON_OT_alva_white_balance(Operator):
+    '''Set the current value as white. This is like setting your white balance on a camera'''
+    bl_idname = "alva_common.white_balance"
+    bl_label = "Set White Balance"
+
+    space_type: StringProperty() # type: ignore
+    node_name: StringProperty() # type: ignore
+    node_tree_name: StringProperty() # type: ignore
+
+    def execute(self, context):
+        active_controller = Find.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
+        active_controller.alva_white_balance = active_controller.float_vec_color
         return {'FINISHED'}
         
 
@@ -387,6 +402,7 @@ operator_classes = [
     COMMON_OT_edge_diffusion_props,
     COMMON_OT_gobo_props,
     COMMON_OT_alva_clear_solo,
+    COMMON_OT_alva_white_balance,
     TOOL_OT_ghost_out,
     TOOL_OT_displays,
     TOOL_OT_about,

@@ -288,23 +288,23 @@ class Find:
     def find_controllers(scene):
         controllers = []
 
-        if scene.scene_props.objects_enabled:
+        if scene.scene_props.enable_objects:
             controllers = Find.find_objects(scene)
-        if scene.scene_props.strips_enabled:
+        if scene.scene_props.enable_strips:
             controllers = Find.find_strips(scene, controllers)
-        if scene.scene_props.nodes_enabled:
+        if scene.scene_props.enable_nodes:
             controllers = Find.find_nodes(scene, controllers)
 
         return controllers
 
     def find_objects(scene):
-        if not scene.scene_props.objects_enabled:
+        if not scene.scene_props.enable_objects:
             return []
 
         return [obj for obj in scene.objects]
 
     def find_strips(scene, controllers):
-        if not scene.scene_props.strips_enabled or not hasattr(scene, "sequence_editor"):
+        if not scene.scene_props.enable_strips or not hasattr(scene, "sequence_editor"):
             return controllers
 
         for strip in scene.sequence_editor.sequences_all:
@@ -314,7 +314,7 @@ class Find:
         return controllers
 
     def find_nodes(scene, controllers):
-        if not scene.scene_props.nodes_enabled:
+        if not scene.scene_props.enable_nodes:
             return controllers
 
         node_trees = set()

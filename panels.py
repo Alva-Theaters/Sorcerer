@@ -28,9 +28,9 @@
 
 
 import bpy
-from bpy.types import Panel
+from bpy.types import Panel, Menu
 from bpy.types import (
-    TOPBAR_HT_upper_bar, 
+    TOPBAR_MT_editor_menus,
     TOPBAR_MT_edit,
     TOPBAR_MT_render,
     TOPBAR_MT_window,
@@ -45,6 +45,7 @@ from bpy.types import (
     RENDER_PT_context,
 
     DOPESHEET_HT_header,
+    TIME_PT_playback,
     TIME_MT_view,
 
     SEQUENCER_MT_view,
@@ -59,7 +60,7 @@ from bpy.types import (
     GRAPH_HT_header,
 
     TEXT_HT_header,
-    TEXT_MT_view,
+    TEXT_MT_view
     )
 
 from .as_ui.space_topbar import (
@@ -84,11 +85,15 @@ from .as_ui.properties_scene import (
     draw_alva_properties_navigation,
     draw_alva_properties_sync
 )
-from .as_ui.space_dopesheet import draw_timeline_sync, draw_alva_time_view
+from .as_ui.space_time import (
+    draw_timeline_sync, 
+    draw_alva_time_view, 
+    draw_time_playback
+)
 from .as_ui.space_sequencer import (
     draw_strip_sound_object, 
     draw_strip_speaker, 
-    draw_strip_video, 
+    draw_strip_video,
     draw_strip_media, 
     draw_alva_sequencer_add_menu, 
     draw_alva_sequencer_cmd_line,
@@ -113,6 +118,7 @@ from .as_ui.space_common import (
     draw_footer_toggles, 
     draw_volume_monitor
 )
+from .as_ui.space_wm import draw_alva_right_click
              
     
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -363,6 +369,16 @@ class NODE_PT_alva_toolbar(Panel, ToolbarPanel):
             
     def draw(self, context):
         draw_alva_toolbar(self, context)
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------------
+'''RIGHT CLICK'''
+#-------------------------------------------------------------------------------------------------------------------------------------------
+class WM_MT_button_context(Menu):
+    bl_label = ""
+
+    def draw(self, context):
+        pass
         
         
 panels = [
@@ -388,6 +404,8 @@ panels = [
     VIEW3D_PT_alva_toolbar,
     SEQUENCER_PT_alva_toolbar,
     NODE_PT_alva_toolbar,
+
+    WM_MT_button_context
 ]
 
 
@@ -396,7 +414,7 @@ def register():
     for cls in panels:
         register_class(cls)
     
-    TOPBAR_HT_upper_bar.append(draw_alva_topbar)
+    TOPBAR_MT_editor_menus.prepend(draw_alva_topbar)
     TOPBAR_MT_edit.append(draw_alva_edit)
     TOPBAR_MT_render.prepend(draw_alva_render)
     TOPBAR_MT_window.append(draw_alva_window)
@@ -411,6 +429,7 @@ def register():
     RENDER_PT_context.prepend(draw_alva_properties_sync)
 
     DOPESHEET_HT_header.append(draw_timeline_sync) # This goes on space_time too
+    TIME_PT_playback.append(draw_time_playback)
     TIME_MT_view.append(draw_alva_time_view)
 
     SEQUENCER_MT_view.append(draw_alva_sequencer_view)
@@ -426,14 +445,16 @@ def register():
 
     TEXT_HT_header.append(draw_tool_settings)
     TEXT_MT_view.append(draw_text_view)
-    
+
+    WM_MT_button_context.append(draw_alva_right_click)
+
 
 def unregister():
     from bpy.utils import unregister_class
     for cls in panels:
         unregister_class(cls)
     
-    TOPBAR_HT_upper_bar.remove(draw_alva_topbar)
+    TOPBAR_MT_editor_menus.remove(draw_alva_topbar)
     TOPBAR_MT_edit.remove(draw_alva_edit)
     TOPBAR_MT_render.remove(draw_alva_render)
     TOPBAR_MT_window.remove(draw_alva_window)
@@ -448,6 +469,7 @@ def unregister():
     RENDER_PT_context.remove(draw_alva_properties_sync)
 
     DOPESHEET_HT_header.remove(draw_timeline_sync) # This goes on space_time too
+    TIME_PT_playback.remove(draw_time_playback)
     TIME_MT_view.remove(draw_alva_time_view)
 
     SEQUENCER_MT_view.remove(draw_alva_sequencer_view)
@@ -463,3 +485,5 @@ def unregister():
 
     TEXT_HT_header.remove(draw_tool_settings)
     TEXT_MT_view.remove(draw_text_view)
+
+    WM_MT_button_context.remove(draw_alva_right_click)

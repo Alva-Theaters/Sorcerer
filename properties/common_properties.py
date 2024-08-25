@@ -239,7 +239,7 @@ class CommonProperties:
     common_header = [
         ('str_manual_fixture_selection', StringProperty(
             name="Selected Light",
-            description="Instead of the group selector to the left, simply type in what you wish to control here",
+            description="Instead of the group selector to the left, simply type in what you wish to control here. Just type in the channels you want or don't want in plain English",
             update=CommonUpdaters.controller_ids_updater
         )),
         ('selected_group_enum', EnumProperty(
@@ -261,7 +261,7 @@ class CommonProperties:
         )),
         ('alva_solo', BoolProperty(
             name="Solo",
-            description="Mute all controllers but this one, and any others with solo also turned on. Clear all solos with the button on the top bar",
+            description="Mute all controllers but this one, and any others with solo also turned on. Clear all solos with the button on the Playback menu in the Timeline header",
             update=CommonUpdaters.solo_updater
         ))
     ]
@@ -410,6 +410,15 @@ class CommonProperties:
             name="Strobe Max", 
             default=20, 
             description="Maximum value for strobe"
+        )),
+        ('alva_white_balance', FloatVectorProperty(
+            name="White Balance",
+            subtype='COLOR',
+            size=3,
+            default=(1.0, 1.0, 1.0),
+            min=0.0,
+            max=1.0,
+            description='If the natural white is not truly white, make it be white here and then white on the Blender color picker will actually be white',
         )),
         ('pan_min', IntProperty(
             name="Pan Min", 

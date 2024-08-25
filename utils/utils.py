@@ -485,6 +485,7 @@ class Utils:
     def color_object_to_tuple_and_scale_up(v):
         if type(v) == mathutils.Color:
             return (v.r * 100, v.g * 100, v.b * 100)
+
         
         else: 
             r, g, b = v
