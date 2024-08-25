@@ -30,6 +30,7 @@
 import bpy
 from bpy.types import Operator
 from bpy.props import StringProperty
+import time
 
 from ..utils.osc import OSC as osc # type: ignore
 from ..utils.utils import Utils
@@ -248,6 +249,8 @@ class COMMON_OT_alva_white_balance(Operator):
     def execute(self, context):
         active_controller = Find.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
         active_controller.alva_white_balance = active_controller.float_vec_color
+        time.sleep(.2)
+        active_controller.float_vec_color = (1.0, 1.0, 1.0)
         return {'FINISHED'}
         
 
@@ -280,8 +283,6 @@ class TOOL_OT_displays(Operator):
     bl_description = "Presses Displays on the console"
     
     def execute(self, context):
-        ip_address = context.scene.scene_props.str_osc_ip_address
-        port = context.scene.scene_props.int_osc_port
         osc.send_osc_lighting("/eos/key/displays", "1")
         osc.send_osc_lighting("/eos/key/displays", "0")
         return {'FINISHED'}
@@ -301,8 +302,6 @@ class TOOL_OT_stop_clocks(Operator):
     bl_description = "Disables all timecode clocks in ETC Eos"
     
     def execute(self, context):
-        ip_address = context.scene.scene_props.str_osc_ip_address
-        port = context.scene.scene_props.int_osc_port
         clock_number = 1
         
         while clock_number <= 100:
@@ -366,7 +365,7 @@ class TEXT_OT_populate_macros(Operator):
                 item.name = name
 
         return {'FINISHED'}
-    
+
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
 '''SHOW MESSAGE Operator'''

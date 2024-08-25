@@ -502,3 +502,18 @@
 2024-08-25 13:33:22,202 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
  * Running on http://127.0.0.1:6474
 2024-08-25 13:33:22,203 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2024-08-25 13:47:22,016 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:7970
+2024-08-25 13:47:22,017 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2024-08-25 14:07:57,056 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8086
+2024-08-25 14:07:57,056 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2024-08-25 14:08:44,269 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:9512
+2024-08-25 14:08:44,272 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2024-08-25 14:10:17,290 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3573
+2024-08-25 14:10:17,291 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2024-08-25 14:13:44,279 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3080
+2024-08-25 14:13:44,279 - werkzeug - INFO - [33mPress CTRL+C to quit[0m

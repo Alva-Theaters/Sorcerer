@@ -153,10 +153,7 @@ class ColorSplitter:
         return cyan, magenta, yellow
     
 
-    def balance_white(self, parent, converted_values, is_subtractive=False):
-        from ..utils.utils import Utils
-        white_balance = Utils.color_object_to_tuple_and_scale_up(parent.alva_white_balance)
-
+    def balance_white(self, white_balance, converted_values, is_subtractive=False):
         if white_balance != (100, 100, 100): # Must balance
             if is_subtractive:
                 balanced_values = tuple(
@@ -236,15 +233,19 @@ class ColorSplitter:
 
             is_subtractive = corrected_key in ['cmy', 'raise_cmy', 'lower_cmy']
 
+            wb = finders.find_my_patch(parent, chan, type, "alva_white_balance")
+            from ..utils.utils import Utils
+            white_balance = Utils.color_object_to_tuple_and_scale_up(wb)
+
             if corrected_key in ['rgb', 'raise_rgb', 'lower_rgb']: # No need to split
-                balanced = self.balance_white(parent, val, is_subtractive)
+                balanced = self.balance_white(white_balance, val, is_subtractive)
                 new_p.append(corrected_key)
                 new_v.append(balanced)
                 
             elif corrected_key in profile_converters: # Must split
                 converter, num_values = profile_converters[corrected_key]
                 converted_values = converter(*val[:3])
-                balanced = self.balance_white(parent, converted_values, is_subtractive)
+                balanced = self.balance_white(white_balance, converted_values, is_subtractive)
                 
                 new_p.append(corrected_key)
                 new_v.append(balanced[:num_values])
