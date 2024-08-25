@@ -10,11 +10,11 @@ Alva Theaters wants to be the Apple of technical theater. When you walk into an 
 
 By standardizing our theaters, we can attract artistically minded professionals and enhance the quality of art.
 
-"Freedom of construction" is the ability of a show or tour to build their entire show from the ground up every time with all their own custom gear every time. Alva Theater's approach contends that damage done by restricting freedom of construction is dramatically overshadowed by the artistic advantages granted through mass-standardization. Namely, the elimination of nearly every single part of a production that is not artistic. Paperwork, patching, gear rental, gear logistics, power distribution, data distribution, show file setup, etc. At an Alva theater, massive shows can be done entirely with the built-in gear. While this type of venue is not for everyone and is certainly not for every show or tour, it will **radically redefine extraordinary** in theatre design.
+"Freedom of construction" is the ability of a show or tour to build their entire show from the ground up every time with all their own custom gear every time. Alva Theaters' approach contends that damage done by restricting freedom of construction is dramatically overshadowed by the artistic advantages granted through mass-standardization. Namely, the elimination of nearly every single part of a production that is not artistic. Paperwork, patching, gear rental, gear logistics, power distribution, data distribution, show file setup, etc. At an Alva theater, massive shows can be done entirely with the built-in gear. While this type of venue is not for everyone and is certainly not for every show or tour, it will **radically redefine extraordinary** in theatre design.
 
 **Question the Requirements:**
 -----------------------------------------------------------------------------------
-Here are the conventiona requirements that nearly all existing FOH hardware is constrained by:
+Here are the conventional requirements that nearly all existing FOH hardware is constrained by:
 
 - Transportability: Not required at Alva Theaters.
 - Compatibility with external systems: Not required at Alva Theaters.
@@ -42,11 +42,11 @@ The life blood of the Alva way is animation, or keyframes. The lifeblood of trad
 
 **Cues:** These are requests to start doing something and do not a require a timecode clock to be running. These work best when humans are responsible for initiating control events.
 
-**Keyframes:** These are iron chains that shackle a parameter to a certain value at a certain time on a clock. They require a timecode clock to be running. These work best for extremely precise control authority with respect to time.
+**Keyframes:** These are iron chains that shackle a parameter to a certain value at a certain time on a clock. They require a timecode clock. These work best for extremely precise control authority with respect to time.
 
 Control via animation/keyframes is different from control via cues because keyframes offer a vastly superior degree of precision compared to cues. But the drawback is that they need a timecode clock to function. 
 
-Alva Theaters prefers animation over cues because of the vastly superior precision that animation provides. One way to describe the precision is to watch any professional 3D animated film from a major studio like Walt Disney Animation Studios, Pixar, or Dreamworks. Think of the level of control precision they need to be able to make those 3D models come to life the way they do. You need a ludicrous amount of precision to make those models seem like they are alive and have feelings. Alva Sorcerer's job is to allow us to start using those same tools in technical theatre. And not just for lighting, but for the whole thing. That's why Alva stands for Animated Lighting, Video, and Audio. The goal is to make an External Multi-disciplinary Animation Renderer that can make people think the theater itself is alive and has feelings. For such is the perfection of technical theatre.
+Alva Theaters prefers animation over cues because of the vastly superior precision that animation provides. One way to describe the precision is to watch any professional 3D animated film from a major studio like Walt Disney Animation Studios, Pixar, or Dreamworks. You need a ludicrous amount of precision to make those models seem like they are alive and have feelings. Alva Sorcerer's job is to allow us to start using those same tools in technical theatre. And not just for lighting, but for the whole thing. That's why Alva stands for Animated Lighting, Video, and Audio. The goal is to make an External Multi-disciplinary Animation Renderer (EMAR) that can make people think the theater itself is alive and has feelings. For such is the perfection of technical theatre.
 
 
 **Technical Overview for Developers:**
@@ -58,7 +58,7 @@ Sorcerer is kind of like a mixture between TouchOSC, common free sequence based 
 
 Sorcerer is different from all of those because you don't have to build your own controllers like in TouchOSC, because it's not DMX software, and because using Sorcerer is far more like using standalone DMX software than it is like using a typical remote control app. 
 
-Sorcerer is most akin to Qlab. Like Qlab, it uses netwrok communication to remote control a plethora of other FOH hardware devices. However, unlike Qlab, Sorcerer thrives on keyframes and animation and curve graphs, not on cues. For this reason, QLab is best for simple sequences that rely on human cues, while Sorcerer is best for extremely complicated timecode sequences. This however is not to say that Sorcerer is not useful for extremely tasks as well.
+Sorcerer is most akin to Qlab. Like Qlab, it uses network communication to remote control a plethora of other FOH hardware devices. However, unlike Qlab, Sorcerer thrives on keyframes, animation and curve graphs, not on cues. For this reason, QLab is best for simple sequences that rely on human cues, while Sorcerer is best for extremely complicated timecode sequences.
 
 Sorcerer is internally designated as an External Multi-disciplinary Animation Renderer (EMAR). This means that:
  - it externally remote-controls existing FOH hardware
@@ -68,7 +68,7 @@ Sorcerer is internally designated as an External Multi-disciplinary Animation Re
 
 Alva Theaters is not aware of any other softwares that can claim the EMAR title. We hope that this changes, since this is an extremely exciting software category that needs competition. You know a software is an EMAR if it can commandeer and produce deliverables for an entire theater and if it primarily uses animation to do it.
 
-In the future, Sorcerer will output .dtp files (Digital Theater Package files) that can be played back by the Renegade platform. Such .dtp files will contain ALVA designs (Animated Lighting, Video, and Audio).
+In the future, Sorcerer will output .dtp files (Digital Theater Package files) that can be played back by the Renegade tech theatre platform. Such .dtp files will contain ALVA designs (Animated Lighting, Video, and Audio).
 
 We'll start by delving into the lighting side. Please note that this documentation is very much a work in progress.
 
@@ -85,7 +85,7 @@ Think of Sorcerer’s non-oscillating effects like a stationary sculpture. It’
 
 Sorcerer’s non-oscillating effects are powered by Blender’s animation system, consisting of keyframes and its graph editor, non-linear action editor, and dope sheet screens. Blender’s animation system provides the organic, flowing precision needed to make 3D objects on a computer screen walk naturally, make people cry, and seem like real beings with real emotions. Sorcerer connects theatrical lighting consoles to the tools that provide that precision. 
 
-The way we get that precision to the console itself is one of 2 ways: we can stream the data in real time over OSC, or we can record the animation onto the console frame by frame, cue by cue. Streaming in real-time at full speed via OSC can be slow and laggy, especially if the console can’t handle the bandwidth. That’s why we need to go slow, and often frame by frame. To playback at full speed at full strength, Sorcerer’s Orb feature allows us to create a Qmeo, defined above, with the press of a button. The non-oscillating effect is now stored on the console as an event list/cue list pair where each cue in the cue list represents a frame of the animation, while the event list is responsible for for firing the cues/frames in time with the correct frame rate. Now, a Sorcerer-created non-oscillating effect can be played back on the console like a normal effect. However, note that it is next to impossible to make meaningful changes to the qmeo without deleting and recreating the qmeo with Sorcerer.
+The way we get that precision to the console itself is one of 2 ways: we can stream the data in real time over OSC, or we can record the animation onto the console frame by frame, cue by cue. Streaming in real-time at full speed via OSC can be slow and laggy, especially if the console can’t handle the bandwidth. That’s why we need to go slow, and often frame by frame. To playback at full speed at full strength, Sorcerer’s Orb feature allows us to create a "qmeo", with the press of a button. The non-oscillating effect is now stored on the console as an event-list/cue-list pair where each cue in the cue list represents a frame of the animation, while the event list is responsible for firing the cues/frames in time with the correct frame rate. Now, a Sorcerer-created non-oscillating effect can be played back on the console like a normal effect. However, note that it is next to impossible to make meaningful changes to the qmeo without deleting and recreating the qmeo with Sorcerer.
 
 
 
@@ -108,10 +108,12 @@ A method in a class starts with the argument self and is written as def some_met
 **Now for the .py’s and folders.**
 ----------------------------------------------------------
 
-**__init__.py:** Sorcerer’s __init__.py does not contain any runtime logic. It’s just the start sequencer. Its only job is to manage the linear dependency graph of the start sequence. It imports the register() functions from each script that has one as unique names and fires  them in the correct sequence. If you are trying to develop Sorcerer from the text editor and you are getting “not registered” errors, ensure that you are running each script in the exact order specified by the __init__.py. 
+You will notice several logic-containing .py's at the top level of sorcerer. Those are there to give you a quick, basic understanding of how Sorcerer works without needing to dive into other folders. Scan through those and they will show you the basic scope and functionality of Sorcerer.
+
+**__init__.py:** Sorcerer’s __init__.py does not contain any runtime logic. It’s just the start sequencer. Its only job is to manage the linear dependency graph of the start sequence. It imports the register() functions from each script (that has one) as unique names and fires  them in the correct sequence. If you are trying to build your own Sorcerer and you are getting “not registered” errors, ensure that you are running each script in the exact order specified by the __init__.py. 
 
 
-**panels.py:**  Sorcerer is a heavyweight addon. Its UI encompasses 6 different space_types across Blender at the time of writing this. It has about 15 different UI panels and hundreds of operators. Here, you will see that every UI draw uses custom helper draw functions. This allows us to reuse common UI elements in many different panels and popups without repeating code. Many of these custom helper draw functions have optional Boolean arguments for selectively making minor changes to how the element should be drawn in each context. These are very similar to the UI draw functions built into bpy, which also have these optional arguments (row.prop() for example). The ones Sorcerer has are just one layer of abstraction above that.
+**panels.py:**  Sorcerer is a heavyweight addon. Its UI encompasses about 9 different space_types across Blender at the time of writing this. It has about 15 different UI panels and hundreds of operators. Here, you will see that every UI draw uses custom helper draw functions. This allows us to reuse common UI elements in many different panels and popups without repeating code. Many of these custom helper draw functions have optional Boolean arguments for selectively making minor changes to how the element should be drawn in each context. These are very similar to the UI draw functions built into bpy, which also have these optional arguments (row.prop() for example). The ones Sorcerer has are just one layer of abstraction above that.
 
 At the end of this script, you will find a register section that appends draw functions to various non-panel UI elements. To avoid appending the same custom element many times in a coding session, we use background checker properties to keep track of whether the element has already been added.
 
@@ -137,18 +139,26 @@ Once all the CPVIA’s have been harmonized and simplified, we send them all to 
 
 **spy.py:** spy, or SorcererPython, is a sort of API here to make it easier for casual users to interact with Sorcerer functions programmatically. Inspired by Blender's bpy. Look for the spy documentation below. Also, note that spy is supposed to be registered directly to bpy. Remember that this spy.py script is purely an abstraction layer and should not itself contain runtime logic like calculations.
 
+**/cpvia/:** CPVIA stands for Channel, Parameter, Value, Influence, Argument. CPVIA is an internal communication protocol within Sorcerer that is somewhat similar to DMX. Basically, if a group controller wants to make a certain parameter change, it needs to create a request in the cpvia format. The code that creates, formats, harmonizes, and publishes these requests is inside the CPVIA folder. This includes logic for color splitting, mixing (gradients), and min/max mapping. This is the folder where all the behind the scenes magic happens.
 
-**/utils/:** Contains common functions/methods that do stuff and return stuff. In here you will find a lot of the logic used for generating OSC syntax, for example the script that converts Blender’s RGB color profile to the color profile the fixture uses. You will also find the logic that makes the mixer nodes tick. 
+**/utils/:** Contains common functions/methods that do stuff and return stuff. If a certain task will be used by multiple scripts, it will probably end up here.
 
 **/assets/:** This contains things like common dictionaries, UI Lists, “get_items” functions, property groups, and the like. It stores most everything that is just stuff that doesn’t do stuff on its own.
 
-**/nodes/:** Something that separates Sorcerer’s custom nodes from other addon nodes is that Sorcerer’s nodes don’t live in a custom node tree, they live in the primary shader node tree in World. This is because we want node groups! If we polled them to only appear in a custom node tree, the way Blender wants us to do it, then node groups wouldn’t work anymore. Blender can become unstable when reloading Sorcerer scripts while working on nodes. Blender crashes a lot. However, the crashing is strictly limited to development, when scripts are constantly being reloaded and reloaded and reloaded. If we learn that the crashing does persist into normal use for the end user, we will switch it over to a custom node tree. But until then, node groups, node groups, node groups!
+**/nodes/:** Something that separates Sorcerer’s custom nodes from other addon nodes is that Sorcerer’s nodes don’t live in a custom node tree, they live in the primary shader node tree in World. This is because we want node groups! If we polled them to only appear in a custom node tree (the way Blender wants us to do it), then node groups wouldn’t work anymore. As a result, Blender can become unstable when reloading Sorcerer scripts while working on nodes. Blender crashes a lot. However, the crashing is strictly limited to development, when scripts are constantly being reloaded and reloaded and reloaded. If we learn that the crashing does persist into normal use for the end user, we will switch it over to a custom node tree. But until then, node groups, node groups, node groups!
 
 **/audio/:** Doesn't exist yet. This houses most of Sorcerer’s 3D audio system and experimental Midas M32/Behringer X32 node-based sound design system. Sorcerer’s 3D sound system is quickly becoming the holy grail of 3D sound design for live performances. That means a system that fades completely into the background, whereby you forget you’re even using a 3D sound renderer. You just link sound strips to  objects in 3D view and you animate the objects however you want, and it just works.
 
 The experimental Midas M32/Behringer X32 node-based sound design system is intended to allow Sorcerer to remote-control common live sound mixers the same way it already commandeers lighting consoles. 
 
 TBC
+
+
+**External Sorcerer Add-ons** 
+----------------------------------------------------------
+
+There are plans to add functionality to spy that will allow other developers to create their own add-ons for Sorcerer. This would theoretically allow you to add your own parameter and strip types to the existing Sorcerer system without needing to write an entire CPVIA system from scratch. This does not exist yet, however.
+
 
 API Reference (from bpy import spy)
 =============================================================
