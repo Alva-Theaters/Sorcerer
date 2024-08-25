@@ -183,12 +183,6 @@ def draw_gobo_settings(self, context, active_controller):
         row_two = split_two.column(align=True)
         row_two.prop(active_controller, "gobo_speed_max", text="Max")
         
-        split = layout.split(factor=.5)
-        row = split.column()
-        row.label(text="Disable Gobo Speed Argument")
-        row = split.column()
-        row.prop(active_controller, "str_disable_gobo_speed_argument", text="", icon='CHECKBOX_DEHLT')
-        
         layout.separator()
         
         split = layout.split(factor=.5)

@@ -44,14 +44,17 @@ class Find:
             argument = Dictionaries.eos_arguments_dict.get(f"str_{param}_argument", "Unknown Argument")
 
             needs_special = False
-            if param == 'strobe':
+            if param in ['strobe', 'prism']:
                 needs_special = True
                 if value == 0:
-                    special_argument = self.find_my_patch(parent, chan, type, "str_disable_strobe_argument")
-                else: special_argument = self.find_my_patch(parent, chan, type, "str_enable_strobe_argument")
+                    special_argument = self.find_my_patch(parent, chan, type, f"str_disable_{param}_argument")
+                else: special_argument = self.find_my_patch(parent, chan, type, f"str_enable_{param}_argument")
 
             if needs_special:
-                argument = f"{special_argument}, {argument}"
+                if param == 'strobe':
+                    argument = f"{special_argument}, {argument}"
+                else:
+                    argument = special_argument
 
         return argument
                 
