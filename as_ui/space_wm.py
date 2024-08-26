@@ -206,24 +206,32 @@ def draw_alva_right_click(self, context):
         prop = context.button_prop
     except:
         return
-    if prop.identifier != 'float_vec_color':
+    if prop.identifier not in ['float_vec_color', 'float_intensity']:
         return
     
     pcoll = preview_collections["main"]
     orb = pcoll["orb"]
 
-    space_type = context.space_data.type
-    
-    if space_type == 'NODE_EDITOR':
-        node_tree = context.space_data.node_tree
-        node_name = self.name # will this work?
-        node_tree_name = node_tree.name
-    else:
-        node_name = ""
-        node_tree_name = ""
+    st = context.space_data.type
+    has_separated = False
 
-    self.layout.separator()
-    op = self.layout.operator("alva_common.white_balance", icon_value=orb.icon_id, text="Set White Balance")
-    op.space_type = space_type
-    op.node_name = node_name
-    op.node_tree_name = node_tree_name
+    if prop.identifier == 'float_vec_color':
+        if st == 'NODE_EDITOR':
+            node_tree = context.space_data.node_tree
+            node_name = self.name # will this work? What is self?
+            node_tree_name = node_tree.name
+        else:
+            node_name = ""
+            node_tree_name = ""
+
+        self.layout.separator()
+        has_separated = True
+        op = self.layout.operator("alva_common.white_balance", icon_value=orb.icon_id, text="Set White Balance")
+        op.space_type = st
+        op.node_name = node_name
+        op.node_tree_name = node_tree_name
+
+    if prop.identifier == 'float_intensity' and st == 'VIEW_3D':
+        if not has_separated:
+            self.layout.separator()
+        self.layout.operator("alva_common.add_driver", text="Add Driver", icon_value=orb.icon_id)

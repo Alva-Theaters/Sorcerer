@@ -46,13 +46,19 @@ stored_channels = set()
 __________________________________________________________________________________ 
 DOCUMENTATION CODE A1
 Sequence of events when frame changes BEGINS and we are NOT in playback:
-    
-    A1:1. We look for ALVA controllers in the scene...
-    
-    A1:2. We look for updates in parameters on those controllers...
-       
+
     A1:3. We bind the publisher to the harmonizer so that any conflicts 
           throughout the entire scene can be harmonized...
+
+    A1:3.1 We trigger any drivers that may need to run, since Blender
+           doesn't automatically fire their updaters.
+
+    A1:3.2 We trigger any objects set to Dynamic that may need to run, 
+           since Blender doesn't automatically fire their updaters.
+    
+    A1:1. We look for normal ALVA controllers in the scene...
+    
+    A1:2. We look for updates in parameters on those controllers...
        
     A1:4. We trigger the cpvia generator for those parameters...
     
@@ -227,6 +233,18 @@ class EventManager:
 
     def fire_parameter_updaters(self, scene):
         '''DOCUMENTATION CODE A1'''
+        '''A1:3'''
+        Utils.use_harmonizer(True)
+
+        '''A1:3.1'''
+        objects_with_drivers = {obj for obj in scene.objects if obj.animation_data and obj.animation_data.drivers}
+        Utils.check_and_trigger_drivers(objects_with_drivers)
+
+        '''A1:3.2'''
+        dynamic_objects = {obj for obj in scene.objects if obj.animation_data and obj.object_identities_enum in ["Influencer", "Brush"]}
+        for obj in dynamic_objects:
+            Utils.trigger_special_update(obj)
+
         if not scene.scene_props.is_playing or not self.controllers:
             '''A1:1 and B1:3'''
             self.controllers = Find.find_controllers(scene)
@@ -237,8 +255,7 @@ class EventManager:
         '''A1:2'''
         updates = Utils.find_updates(self.old_graph, new_graph)
         
-        '''A1:3,4,6'''
-        Utils.use_harmonizer(True)
+        '''A1:4,6'''
         Utils.fire_updaters(updates)
         Utils.use_harmonizer(False)
         
@@ -248,6 +265,7 @@ class EventManager:
             '''A1:7'''
             self.controllers = []
             
+
     def update_livemap(self, scene):
         context = bpy.context
         if not context.screen or bpy.context.screen.is_animation_playing:

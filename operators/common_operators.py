@@ -252,6 +252,40 @@ class COMMON_OT_alva_white_balance(Operator):
         time.sleep(.2)
         active_controller.float_vec_color = (1.0, 1.0, 1.0)
         return {'FINISHED'}
+    
+
+class COMMON_OT_alva_add_driver(Operator):
+    '''Create a Sorcerer driver to control parameters with movement in 3D View'''
+    bl_idname = "alva_common.add_driver"
+    bl_label = "Add Driver"
+
+    def execute(self, context):
+        ao = context.active_object
+        try:
+            prop = context.button_prop
+        except:
+            return
+        
+        # Lock x and y
+        ao.lock_location[0] = True
+        ao.lock_location[1] = True
+
+        # Add driver
+        fcurve = ao.driver_add(prop.identifier)
+        driver = fcurve.driver
+
+        # Set driver properties
+        var = driver.variables.new()
+        var.name = "var"
+        var.type = 'TRANSFORMS'
+        var.targets[0].id = ao
+        var.targets[0].transform_type = 'LOC_Z'
+        var.targets[0].transform_space = 'WORLD_SPACE'
+        driver.expression = "(var * 50) - 50"
+
+        # Ensure "Tweak" is selected in toolbar for instant grabbing (TWSS)
+        bpy.ops.wm.tool_set_by_id(name="builtin.select")
+        return {'FINISHED'}
         
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -402,6 +436,7 @@ operator_classes = [
     COMMON_OT_gobo_props,
     COMMON_OT_alva_clear_solo,
     COMMON_OT_alva_white_balance,
+    COMMON_OT_alva_add_driver,
     TOOL_OT_ghost_out,
     TOOL_OT_displays,
     TOOL_OT_about,

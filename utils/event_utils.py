@@ -140,20 +140,12 @@ class EventUtils:
     @staticmethod
     def check_and_trigger_drivers(updated_objects):
         evaluated_to_original = [obj.name for obj in updated_objects]
-        
         for obj in bpy.data.objects:
-            if obj.object_identities_enum == "Stage Object":
+            if hasattr(obj, "object_identities_enum"):
                 if obj.animation_data:
                     for driver in obj.animation_data.drivers:
                         data_path = driver.data_path
                         try:
-                            if '"' in data_path:
-                                # Quoted property
-                                prop_name = data_path.split('"')[1]
-                            else:
-                                # Unquoted property (like float_intensity)
-                                prop_name = data_path.split('.')[-1]
-                            
                             for var in driver.driver.variables:
                                 for target in var.targets:
                                     if target.id.name in evaluated_to_original:
