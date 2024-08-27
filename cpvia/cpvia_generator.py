@@ -26,13 +26,13 @@
 
 ## Double hashtag indicates notes for future development requiring some level of attention
 
-
 from functools import partial
 
 from ..cpvia.find import Find # type: ignore
 from ..cpvia.cpvia_finders import CPVIAFinders # type: ignore
 from ..cpvia.split_color import ColorSplitter # type: ignore
 from ..cpvia.flags import check_flags
+from ..utils.utils import is_rendered_mode
 
 
 '''
@@ -86,11 +86,13 @@ class CPVIAGenerator:
             i.append(influence)
             a.append(argument)
 
-        from .publish import Publisher 
+        from .publish import Publisher
         publisher = Publisher()
+        #is_rendering = is_rendered_mode()
+        is_rendering = False # Until Blender fixes their stuff. Can't enable render mode without immediately crashing.
         for chan, param, val, inf, arg in zip(c, p, v, i, a):
-            if param in ["intensity", "raise_intensity", "lower_intensity"]:
-                publisher.send_value_to_three_dee(parent, chan, param, val)
+            if param in ["intensity", "raise_intensity", "lower_intensity", "color", "raise_color", "lower_color"] and is_rendering:
+                publisher.render_in_viewport(parent, chan, param, val)
             publisher.send_cpvia(chan, param, val, inf, arg)
 
 

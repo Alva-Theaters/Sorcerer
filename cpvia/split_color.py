@@ -29,6 +29,7 @@
 
 from ..cpvia.publish import Publisher # type: ignore
 from ..cpvia.find import Find # type: ignore
+from ..utils.utils import is_rendered_mode
 
 
 class ColorSplitter:
@@ -228,8 +229,10 @@ class ColorSplitter:
             mode = pf.replace("option_", "")
             corrected_key = p[0].replace("color", mode)
             
-            publisher = Publisher()
-            publisher.send_value_to_three_dee(parent, chan, corrected_key, val)
+            is_rendering = is_rendered_mode()
+            if is_rendering:
+                publisher = Publisher()
+                publisher.render_in_viewport(parent, chan, corrected_key, val)
 
             is_subtractive = corrected_key in ['cmy', 'raise_cmy', 'lower_cmy']
 

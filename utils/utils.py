@@ -754,3 +754,13 @@ class Utils:
             else:
                 print("Error: Macro indexes on ETC Eos only go up to 99,999.")
                 return
+            
+
+def is_rendered_mode():
+    for screen in bpy.data.screens:
+        for area in screen.areas:
+            if area.type == 'VIEW_3D':
+                for space in area.spaces:
+                    if space.type == 'VIEW_3D' and space.shading.type == 'RENDERED':
+                        return True
+    return False

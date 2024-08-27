@@ -162,7 +162,7 @@ class Publisher:
         return relevant_objects
             
             
-    def send_value_to_three_dee(self, parent, chan, param, val):
+    def render_in_viewport(self, parent, chan, param, val):
         """
         Adds material to relevant objects in 3d scene and sets material as that intensity or color.
 
@@ -232,6 +232,7 @@ class Publisher:
                 elif val < 0:
                     val = 0
                     
+                print(f"Val: {val}")
                 input.default_value = val
 
         elif val_type == "color":
@@ -268,6 +269,8 @@ class Publisher:
                 # Set the color value
                 scaled_val = tuple(component * 0.01 for component in val)
                 emission.inputs['Color'].default_value = (*scaled_val, 1)  # Assuming val is an (R, G, B) tuple
+
+                print(f"Color: {(*scaled_val, 1)}")
 
         else:
             SLI.SLI_assert_unreachable()
