@@ -143,6 +143,11 @@ except ImportError as e:
     print(f"Failed to import panels: {e}")
 
 try:
+    from .as_ui.menus import register as menus_register, unregister as menus_unregister
+except ImportError as e:
+    print(f"Failed to import menus: {e}")
+
+try:
     from .event_manager import register as event_manager_register, unregister as event_manager_unregister
 except ImportError as e:
     print(f"Failed to import event_manager: {e}")
@@ -245,6 +250,11 @@ def register():
         print("Failed to register panels:", e)
 
     try:
+        menus_register()
+    except Exception as e:
+        print("Failed to register menus:", e)
+
+    try:
         event_manager_register()
     except Exception as e:
         print("Failed to register event_manager:", e)
@@ -267,6 +277,11 @@ def unregister():
         event_manager_unregister()
     except Exception as e:
         print("Failed to unregister event_manager:", e)
+
+    try:
+        menus_unregister()
+    except Exception as e:
+        print("Failed to unregister menus:", e)
 
     try:
         panels_unregister()

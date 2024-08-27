@@ -82,8 +82,7 @@ class CommonUpdaters:
             
     @staticmethod
     def group_profile_updater(self, context):
-        # List of properties to update
-        properties = [
+        all_properties = [
             "pan_min", "pan_max", "tilt_min", "tilt_max", "zoom_min", "zoom_max", 
             "gobo_speed_min", "gobo_speed_max", "influence_is_on", "intensity_is_on", 
             "pan_tilt_is_on", "color_is_on", "diffusion_is_on", "strobe_is_on", 
@@ -93,36 +92,45 @@ class CommonUpdaters:
             "str_gobo_id_argument", "str_gobo_speed_value_argument", 
             "str_enable_prism_argument", "str_disable_prism_argument", "color_profile_enum"
         ]
+        toggle_properties = [ 
+            "pan_tilt_is_on", "color_is_on", "diffusion_is_on", "strobe_is_on", 
+            "zoom_is_on", "iris_is_on", "edge_is_on", "gobo_is_on", "prism_is_on"
+        ]
 
-        profile = None
-        if self.selected_profile_enum != 'Dynamic': # Normal operation, use Fixture Groups data
-            profile = context.scene.scene_group_data.get(self.selected_profile_enum)
-            for prop in properties:
-                setattr(self, prop, getattr(profile, prop))
-        else: # Secondary mode, use the second selected object's settings directly
-            if context.space_data.type == 'VIEW_3D' and len(context.selected_objects) == 2:
+        if self.selected_profile_enum == 'Dynamic': 
+            properties = all_properties
+            st = context.space_data.type
+
+            if st == 'VIEW_3D' and len(context.selected_objects) > 1:
                 for obj in context.selected_objects:
                     if obj != self:
-                        for prop in properties:
-                            setattr(self, prop, getattr(obj, prop))
+                        CommonUpdaters._update_properties(self, obj, properties)
 
-            elif context.space_data.type == 'NODE_EDITOR':
-                if len(context.selected_nodes) == 2:
-                    for node in context.selected_nodes:
-                        if node != self:
-                            if node.bl_idname in ['group_controller_type', 'mixer_type']:
-                                for prop in properties:
-                                    setattr(self, prop, getattr(node, prop))
-                            break
+            elif st == 'NODE_EDITOR' and len(context.selected_nodes) > 1:
+                for node in context.selected_nodes:
+                    if node != self and node.bl_idname in ['group_controller_type', 'mixer_type']:
+                        CommonUpdaters._update_properties(self, node, properties)
 
-            elif context.space_data.type == 'SEQUENCE_EDITOR':
-                if len(context.selected_sequences) == 2:
-                    for strip in context.selected_sequences:
-                        if strip != self:
-                            if strip.type == 'COLOR':
-                                for prop in properties:
-                                    setattr(self, prop, getattr(strip, prop))
-                            break 
+            elif st == 'SEQUENCE_EDITOR' and len(context.selected_sequences) > 1:
+                for strip in context.selected_sequences:
+                    if strip != self and strip.type == 'COLOR':
+                        CommonUpdaters._update_properties(self, strip, properties)
+
+        else:
+            properties = toggle_properties
+            profile = context.scene.scene_group_data.get(self.selected_profile_enum)
+            
+            if not profile:
+                return
+            
+            CommonUpdaters._update_properties(profile, self, properties)
+
+    def _update_properties(source, target, properties):
+        for prop in properties:
+            setattr(target, prop, getattr(source, prop))
+
+        # Fire the object type updater so the UI isn't wonkified.
+        setattr(target, "str_manual_fixture_selection", getattr(target, "str_manual_fixture_selection"))
 
         
     @staticmethod
@@ -188,15 +196,16 @@ class CommonUpdaters:
     @staticmethod
     def channel_ids_updater(self, context):
         index = context.scene.scene_props.group_data_index
-        item = context.scene.scene_group_data[index]  # Get the object by index
+        item = context.scene.scene_group_data[index]
 
         if item is None:
-            self.report({'ERROR'}, "Group not found")
-            return {'CANCELLED'}
+            return
+        
         channels_to_add, channels_to_remove = Utils.parse_channels(context.scene.scene_props.add_channel_ids, remove=True) # returns list of ints
+        
         if len(channels_to_add) == 0 and len(channels_to_remove) == 0:
-            self.report({'WARNING'}, "Nothing to add or remove")
-            return{'CANCELLED'}
+            return
+        
         i = 0
         if len(channels_to_add) > 0:
             for channel in channels_to_add:
@@ -204,14 +213,12 @@ class CommonUpdaters:
                 if any(ch.chan == channel for ch in item.channels_list):
                     continue
                 
-                # Add the new channel
                 new_channel = item.channels_list.add()
                 new_channel.chan = channel
                 i += 1
             
         if i == 0 and len(channels_to_remove) == 0:
-            self.report({'WARNING'}, "Nothing to add or remove")
-            return{'CANCELLED'}
+            return
         
         for channel in channels_to_remove:
             for i, ch in enumerate(item.channels_list):
@@ -246,7 +253,7 @@ class CommonUpdaters:
                 if len(obj.list_group_channels) == 1:
                     obj_index = obj.list_group_channels[0].chan
                     if obj_index in relevant_channels:
-                        relevant_objects.append(obj_index)
+                        relevant_objects.append(obj)
                     
             # Create a string of relevant channels separated by commas
             channels_list = " + ".join(map(str, relevant_channels))

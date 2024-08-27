@@ -169,7 +169,7 @@ class GroupData(PropertyGroup):
         name="Highlight or Remove",
         description="Choose whether to use this to briefly highlight fixtures or to remove fixtures from the group",
         items=AlvaItems.highlight_or_remove,
-        default=1
+        default=0
     ) # type: ignore
     color_profile_enum: EnumProperty(
         name="Color Profile",

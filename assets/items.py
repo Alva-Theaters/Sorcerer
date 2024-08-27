@@ -173,6 +173,16 @@ class Items:
         ]
         
         return items
+    
+
+    def freezing_modes(self, context):
+        items = [
+            ('option_all', "On All", "Changing parameters update console on every frames during playback"),
+            ('option_seconds', "On Seconds", "Changing parameters update console on every other frame during playback"),
+            ('option_thirds', "On Thirds", "Changing parameters update console on every third frame during playback"),
+        ]
+        
+        return items
 
 
     def object_identities(self, context):

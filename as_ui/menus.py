@@ -29,6 +29,9 @@
 
 import bpy
 
+from bpy.types import Menu
+from bpy.app.translations import contexts as i18n_contexts
+
 # Custom icon stuff
 import bpy.utils.previews
 import os
@@ -37,3 +40,26 @@ pcoll = bpy.utils.previews.new()
 preview_collections["main"] = pcoll
 addon_dir = os.path.dirname(__file__)
 pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
+
+
+class TIME_MT_alva_time_flags(Menu): # This currently does absolutely nothing.
+    bl_idname = "TIME_MT_alva_time_flags"
+    bl_label = ""
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator_context = 'INVOKE_DEFAULT'
+        layout.popover(
+            panel="TIME_PT_alva_flags",
+            text="Flags",
+        )
+
+
+def register():
+    from bpy.utils import register_class
+    register_class(TIME_MT_alva_time_flags)
+
+
+def unregister():
+    from bpy.utils import unregister_class
+    unregister_class(TIME_MT_alva_time_flags)

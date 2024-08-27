@@ -398,189 +398,60 @@ def draw_fixture_groups(self, context):
     
     if item.separator or item.label:
         return
-        
-    col = layout.column(align=True)
-    box = col.box()
-    row = box.row()
-    row.label(text="Channels:", icon='CONE')
-    box = col.box()
-    row = box.row()
     
     sorted_channels = sorted(item.channels_list, key=lambda ch: ch.chan)
 
+    layout.separator()
+    col = layout.column()
+
+    has_channels = False
     if len(sorted_channels) != 0:
-        flow = box.grid_flow(row_major=True, columns=4, align=True)
+        has_channels = True
+        flow = col.grid_flow(row_major=True, columns=4, align=True)
         for channel in sorted_channels:
-            operator = flow.operator("patch.remove_channel", text=str(channel.chan), icon='TRASH' if item.highlight_or_remove_enum == 'option_remove' else 'OUTLINER_OB_LIGHT')
+            operator = flow.operator("alva_common.channel_remove_or_highlight", text=str(channel.chan), icon='TRASH' if item.highlight_or_remove_enum == 'option_remove' else 'OUTLINER_OB_LIGHT')
             operator.group_id = item.name
             operator.channel = channel.chan
-    else: 
-        row.label(text="No channels.")
-        row.separator()
-    row = box.row(align=True)
-    row.prop(item, "highlight_or_remove_enum", expand=True, text="")
+    else:
+        col.label(text="Add channels by typing them below.")
+
+    layout.separator()
+
+    row = layout.row(align=True)
+    if has_channels:
+        row.prop(item, "highlight_or_remove_enum", expand=True, text="")
     row.prop(scene.scene_props, "add_channel_ids", text="")
-    
-    if item.strobe_is_on:
-        col.separator()
-        box = col.box()
-        row = box.row()
-        row.label(text="Shutter Strobe", icon='OUTLINER_DATA_LIGHTPROBE')
-        box = col.box()
-        row = box.row()
-        row.prop(item, "strobe_min", text="Strobe Min")
-        row.prop(item, "strobe_max", text="Max")
-        row = box.row()
-        row.label(text="Strobe Enable Argument:")
-        row.prop(item, "str_enable_strobe_argument", text="")
-        row = box.row()
-        row.label(text="Strobe Disable Argument:")
-        row.prop(item, "str_disable_strobe_argument", text="")
-    
-    if item.color_is_on:
-        col.separator()
-        box = col.box()
-        row = box.row()
-        row.label(text="Color", icon='COLOR')
-        box = col.box()
-        row = box.row()
-        row.label(text="Color Profile:")
-        row.prop(item, "color_profile_enum", text="")
-    
-    if item.pan_tilt_is_on:
-        col.separator()
-        box = col.box()
-        row = box.row()
-        row.label(text="Pan/Tilt", icon='ORIENTATION_GIMBAL')
-        box = col.box()
-        row = box.row()
-        row.prop(item, "pan_min", text="Pan Min:")
-        row.prop(item, "pan_max", text="Max:")
-        row = box.row()
-        row.prop(item, "tilt_min", text="Tilt Min:")
-        row.prop(item, "tilt_max", text="Max:")
-
-    if item.zoom_is_on:
-        col.separator()
-        box = col.box()
-        row = box.row()
-        row.label(text="Zoom", icon='LINCURVE')
-        box = col.box()
-        row = box.row()
-        row.prop(item, "zoom_min", text="Zoom Min:")
-        row.prop(item, "zoom_max", text="Max:")
-    
-    if item.gobo_is_on:
-        col.separator()
-        box = col.box()
-        row = box.row()
-        row.label(text="Gobo", icon='POINTCLOUD_DATA')
-        box = col.box()
-        row = box.row()
-        split = box.split(factor=.5)
-        row = split.column()
-        row.label(text="Gobo ID Argument")
-        row = split.column()
-        row.prop(item, "str_gobo_id_argument", text="", icon='POINTCLOUD_DATA')
-        
-        box.separator()
-        
-        split = box.split(factor=.5)
-        row = split.column()
-        row.label(text="Gobo Speed Value Argument")
-        row = split.column()
-        row.prop(item, "str_gobo_speed_value_argument", text="", icon='CON_ROTLIKE')
-        split = box.split(factor=.5)
-        row = split.column()
-        row.label(text="Enable Gobo Speed Argument")
-        row = split.column()
-        row.prop(item, "str_enable_gobo_speed_argument", text="", icon='CHECKBOX_HLT')
-        split_two = box.split(factor=.51, align=True)
-        row_two = split_two.column()
-        row_two.label(text="")
-        row_two = split_two.column(align=True)
-        row_two.prop(item, "gobo_speed_min", text="Min")
-        row_two = split_two.column(align=True)
-        row_two.prop(item, "gobo_speed_max", text="Max")
-        
-        layout.separator()
-        
-        split = box.split(factor=.5)
-        row = split.column()
-        row.label(text="Enable Prism Argument")
-        row = split.column()
-        row.prop(item, "str_enable_prism_argument", text="", icon='TRIA_UP')
-        
-        split = box.split(factor=.5)
-        row = split.column()
-        row.label(text="Disable Prism Argument")
-        row = split.column()
-        row.prop(item, "str_disable_prism_argument", text="", icon='PANEL_CLOSE')
-        
-    row = layout.row()
-
-    add = row.operator("alva_common.patch_to_selected", text="Apply to Selected Objects", icon='SHADERFX')
-    add.group_id = item.name
     
 
 def draw_generate_fixtures(self, context):
     scene = context.scene
     layout = self.layout
-    
-    box = layout.box()
-    row = box.row()
-    row.label(text="Import USITT ASCII:")
-    row = box.row(align=True)
-    row.prop_search(context.scene.scene_props, "selected_text_block_name", bpy.data, "texts", text="")
-    row.operator("my.send_usitt_ascii_to_3d", text="", icon='SHADERFX')
-    box.separator()
+
+    layout.use_property_split = True
+    layout.use_property_decorate = False
 
     if scene.scene_props.console_type_enum == 'option_eos' and not scene.scene_props.school_mode_enabled:
-        threshold_width = 610
-        show_label = context.region.width <= threshold_width
-        
-        box = layout.box()
-        row = box.row()
-        row.label(text="Patch console remotely:")
-        row = box.row()
-        row.prop(scene.scene_props, "array_cone_enum", text="", icon='MESH_CONE', icon_only=show_label)
-        row.prop(scene.scene_props, "array_modifier_enum", text="", icon='MOD_ARRAY', icon_only=show_label)
-        if scene.scene_props.array_curve_enum !="":
-            row.prop(scene.scene_props, "array_curve_enum", text="", icon='CURVE_BEZCURVE', icon_only=show_label)
-            row = box.row()
+        layout.column(heading="Array").prop(scene.scene_props, "array_modifier_enum", text="Array", icon='MOD_ARRAY')
+        if scene.scene_props.array_curve_enum != "":
+            layout.column(heading="Array").prop(scene.scene_props, "array_curve_enum", text="Curve", icon='CURVE_BEZCURVE')
             
         layout.separator()
 
-        split = box.split(factor=.4)
-        col = split.column()
-        col.label(text="Group #:" if not show_label else "Group:", icon='STICKY_UVS_LOC')
-        col.label(text="Start Chan #:" if not show_label else "Chan:", icon='OUTLINER_OB_LIGHT')
-        col.label(text="Group Label:" if not show_label else "Label:", icon='INFO')
-        col.separator()
-        col.label(text="Maker:")
-        col.label(text="Type:")
-        col.label(text="Universe #:")
-        col.label(text="Start Addr. #:" if not show_label else "Addr.:")
-        col.label(text="Channel Mode:" if not show_label else "Chan Mode:")
-        
-        col2 = split.column()
-        col2.prop(scene.scene_props, "int_array_group_index", text="")
-        col2.prop(scene.scene_props, "int_array_start_channel", text="")
-        col2.prop(scene.scene_props, "str_array_group_name", text="")
-        col2.separator()
-        col2.prop(scene.scene_props, "str_array_group_maker", text="")
-        col2.prop(scene.scene_props, "str_array_group_type", text="")
-        col2.prop(scene.scene_props, "int_array_universe", text="")
-        col2.prop(scene.scene_props, "int_array_start_address", text="")
-        col2.prop(scene.scene_props, "int_array_channel_mode", text="")
+        layout.use_property_split = True
+        layout.use_property_decorate = False
 
-        column = box.column()
-        draw_footer_toggles(self, context, column, scene.scene_props, box=False)
+        layout.column().prop(scene.scene_props, "int_array_start_channel", text="Channel")
+        layout.column().prop(scene.scene_props, "int_array_universe", text="Universe")
+        layout.column().prop(scene.scene_props, "int_array_start_address", text="Address")
+        layout.separator()
+        layout.column().prop(scene.scene_props, "int_array_channel_mode", text="Channel Mode")
+
+        layout.separator()
         
         pcoll = preview_collections["main"]
         orb = pcoll["orb"]
         
-        box.operator("array.patch_group_operator", text="Generate Fixtures", icon_value=orb.icon_id)
+        layout.operator("array.patch_group_operator", text="Generate Fixtures", icon_value=orb.icon_id)
         
 # Slated for next release
 

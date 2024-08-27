@@ -141,7 +141,7 @@ class SceneProperties(PropertyGroup):
 
     view_ip_address_tool: BoolProperty(name="IP Address", default=True, description="Draw the IP Address box in Tool Settings or Header area") # type: ignore
     view_sequencer_add: BoolProperty(name="Sequencer Add", default=True, description="Draw the Add menu on the Sequencer") # type: ignore
-    view_time_orb: BoolProperty(name="Sync/Orb", default=True, description="Draw sync and Orb settings in header") # type: ignore
+    view_alva_time_header: BoolProperty(name="View Header", default=True, description="Draw sync and Orb settings in header") # type: ignore
     view_node_add_lighting: BoolProperty(name="Node Add (Lighting)", default=True, description="Draw the Add menu on the Node Editor for lighting") # type: ignore
     view_node_add_audio: BoolProperty(name="Node Add (Audio)", default=False, description="Draw the Add menu on the Node Editor for audio. (Experimental)") # type: ignore
     view_node_toolbar: BoolProperty(name="Node Toolbar", default=True, description="Draw Alva toolbar in node editor") # type: ignore
@@ -159,6 +159,8 @@ class SceneProperties(PropertyGroup):
     enable_nodes: BoolProperty(name="Enable Nodes", default=True, description="Enable nodes OSC output") # type: ignore # type: ignore
     enable_strips: BoolProperty(name="Enable Strips", default=True, description="Enable sequencer strips OSC output") # type: ignore # type: ignore
     enable_objects: BoolProperty(name="Enable Objects", default=True, description="Enable 3D view OSC output") # type: ignore
+    enable_seconds: BoolProperty(name="Freeze Secondaries", default=True, description="Controllers set to On Seconds will only be rendered every other frame (right click them to set)") # type: ignore # type: ignore
+    enable_thirds: BoolProperty(name="Freeze Tertiaries", default=True, description="Controllers set to On Thirds will only be rendered every third frame (right click them to set)") # type: ignore
     
     has_solos: BoolProperty() # type: ignore
 

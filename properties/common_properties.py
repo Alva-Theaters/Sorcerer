@@ -240,6 +240,7 @@ class CommonProperties:
         ('str_manual_fixture_selection', StringProperty(
             name="Selected Light",
             description="Instead of the group selector to the left, simply type in what you wish to control here. Just type in the channels you want or don't want in plain English",
+            default="1",
             update=CommonUpdaters.controller_ids_updater
         )),
         ('selected_group_enum', EnumProperty(
@@ -250,7 +251,7 @@ class CommonProperties:
         )),
         ('selected_profile_enum', EnumProperty(
             name="Profile to Apply",
-            description="Choose a fixture profile to apply to this fixture and any other selected fixtures. Build profiles in Blender's Properties viewport under World. To copy settings directly from another light, select just the light and this light, only those 2, and then select the Dynamic option here",
+            description="Choose a fixture profile to apply to this fixture and any other selected fixtures. To copy settings directly from another light, select the lights you want to copy to, then select the light you wish to copy from, and then select the Dynamic option here",
             items=AlvaItems.scene_groups,
             update=CommonUpdaters.group_profile_updater
         )),
@@ -263,7 +264,12 @@ class CommonProperties:
             name="Solo",
             description="Mute all controllers but this one, and any others with solo also turned on. Clear all solos with the button on the Playback menu in the Timeline header",
             update=CommonUpdaters.solo_updater
-        ))
+        )),
+        ('freezing_mode_enum', EnumProperty(
+            name="Freezing",
+            description="Choose whether to render on all frames, every other frame, or every third frame",
+            items=AlvaItems.freezing_modes,
+        )),
     ]
 
     common_parameters = [
@@ -551,9 +557,9 @@ class CommonProperties:
         
         ('int_start_macro', IntProperty(
             name="Start Macro", 
-            min=0, 
+            min=0,
             max=99999, 
-            default=0, 
+            default=1, 
             description="Universal macro used for various starting activities")),
         
         ('int_end_macro', IntProperty(

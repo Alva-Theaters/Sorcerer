@@ -60,7 +60,10 @@ from bpy.types import (
     GRAPH_HT_header,
 
     TEXT_HT_header,
-    TEXT_MT_view
+    TEXT_MT_view, 
+
+    VIEW3D_MT_object_context_menu,
+    SEQUENCER_MT_context_menu
     )
 
 from .as_ui.space_topbar import (
@@ -86,9 +89,10 @@ from .as_ui.properties_scene import (
     draw_alva_properties_sync
 )
 from .as_ui.space_time import (
-    draw_timeline_sync, 
+    draw_alva_time_header, 
     draw_alva_time_view, 
-    draw_time_playback
+    draw_alva_time_playback,
+    draw_alva_time_flags
 )
 from .as_ui.space_sequencer import (
     draw_strip_sound_object, 
@@ -136,7 +140,7 @@ class View3D_Panel:
 
 class VIEW3D_PT_alva_object_controller(Panel, View3D_Panel):
     '''Main controller for object parameters in 3D view'''
-    bl_label = "Object Controller"
+    bl_label = "Control Specific Lights"
 
     @classmethod
     def poll(cls, context):
@@ -159,7 +163,7 @@ class VIEW3D_PT_alva_object_controller(Panel, View3D_Panel):
         
 class VIEW3D_PT_alva_lighting_modifiers(Panel, View3D_Panel):
     '''Modifiers for changing all lights as one'''
-    bl_label = "Lighting Modifiers (Global)"
+    bl_label = "Modify All Lights at Once"
 
     def draw(self, context):
         draw_lighting_modifiers(self, context)
@@ -167,7 +171,7 @@ class VIEW3D_PT_alva_lighting_modifiers(Panel, View3D_Panel):
         
 class VIEW3D_PT_alva_fixture_groups(Panel, View3D_Panel):
     '''Access to scene-level Sorcerer patch for lighting'''
-    bl_label = "Fixture Groups"
+    bl_label = "Make Groups"
 
     def draw(self, context):
         draw_fixture_groups(self, context)
@@ -175,7 +179,7 @@ class VIEW3D_PT_alva_fixture_groups(Panel, View3D_Panel):
             
 class VIEW3D_PT_alva_fixture_generator(Panel, View3D_Panel):
     """Automation tools for rapidly creating lighting fixtures"""
-    bl_label = "Generate Fixtures"
+    bl_label = "Patch Console Remotely"
 
     def draw(self, context):
         draw_generate_fixtures(self, context)
@@ -206,6 +210,20 @@ class SCENE_PT_alva_stage_manager(Panel, PropertiesPanel):
 
     def draw(self, context):
         draw_alva_stage_manager(self, context)
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------------
+'''TIME Panel'''
+#-------------------------------------------------------------------------------------------------------------------------------------------
+class TIME_PT_alva_flags(Panel):
+    bl_idname = "TIME_PT_alva_flags"
+    bl_label = "Render"
+    bl_space_type = 'DOPESHEET_EDITOR'
+    bl_region_type = 'HEADER'
+    bl_ui_units_x = 10
+
+    def draw(self, context):
+        draw_alva_time_flags(self, context)
             
             
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -390,6 +408,8 @@ panels = [
     SCENE_PT_alva_cue_switcher,
     SCENE_PT_alva_stage_manager,
 
+    TIME_PT_alva_flags,
+
     SEQUENCER_PT_alva_Lighting,
     SEQUENCER_PT_alva_Video,
     SEQUENCER_PT_alva_Audio,
@@ -428,8 +448,8 @@ def register():
     PROPERTIES_PT_navigation_bar.prepend(draw_alva_properties_navigation)
     RENDER_PT_context.prepend(draw_alva_properties_sync)
 
-    DOPESHEET_HT_header.append(draw_timeline_sync) # This goes on space_time too
-    TIME_PT_playback.append(draw_time_playback)
+    DOPESHEET_HT_header.append(draw_alva_time_header) # This goes on space_time too
+    TIME_PT_playback.prepend(draw_alva_time_playback)
     TIME_MT_view.append(draw_alva_time_view)
 
     SEQUENCER_MT_view.append(draw_alva_sequencer_view)
@@ -447,6 +467,8 @@ def register():
     TEXT_MT_view.append(draw_text_view)
 
     WM_MT_button_context.append(draw_alva_right_click)
+    VIEW3D_MT_object_context_menu.append(draw_alva_right_click)
+    SEQUENCER_MT_context_menu.append(draw_alva_right_click)
 
 
 def unregister():
@@ -468,8 +490,8 @@ def unregister():
     PROPERTIES_PT_navigation_bar.remove(draw_alva_properties_navigation)
     RENDER_PT_context.remove(draw_alva_properties_sync)
 
-    DOPESHEET_HT_header.remove(draw_timeline_sync) # This goes on space_time too
-    TIME_PT_playback.remove(draw_time_playback)
+    DOPESHEET_HT_header.remove(draw_alva_time_header) # This goes on space_time too
+    TIME_PT_playback.remove(draw_alva_time_playback)
     TIME_MT_view.remove(draw_alva_time_view)
 
     SEQUENCER_MT_view.remove(draw_alva_sequencer_view)
@@ -487,3 +509,5 @@ def unregister():
     TEXT_MT_view.remove(draw_text_view)
 
     WM_MT_button_context.remove(draw_alva_right_click)
+    VIEW3D_MT_object_context_menu.remove(draw_alva_right_click)
+    SEQUENCER_MT_context_menu.remove(draw_alva_right_click)

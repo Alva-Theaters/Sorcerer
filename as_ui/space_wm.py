@@ -202,20 +202,25 @@ def draw_gobo_settings(self, context, active_controller):
 
 
 def draw_alva_right_click(self, context):
+    print("Running")
+    is_property = False
     try:
         prop = context.button_prop
+        is_property = True
     except:
-        return
-    if prop.identifier not in ['float_vec_color', 'float_intensity']:
+        pass
+
+    if is_property and prop.identifier not in ['float_vec_color', 'float_intensity']:
         return
     
     pcoll = preview_collections["main"]
     orb = pcoll["orb"]
 
     st = context.space_data.type
+    layout = self.layout
     has_separated = False
 
-    if prop.identifier == 'float_vec_color':
+    if is_property and prop.identifier == 'float_vec_color':
         if st == 'NODE_EDITOR':
             node_tree = context.space_data.node_tree
             node_name = self.name # will this work? What is self?
@@ -231,7 +236,29 @@ def draw_alva_right_click(self, context):
         op.node_name = node_name
         op.node_tree_name = node_tree_name
 
-    if prop.identifier == 'float_intensity' and st == 'VIEW_3D':
+    if is_property and prop.identifier == 'float_intensity' and st == 'VIEW_3D':
         if not has_separated:
             self.layout.separator()
-        self.layout.operator("alva_common.add_driver", text="Add Driver", icon_value=orb.icon_id)
+        layout.operator("alva_common.add_driver", text="Add Driver", icon_value=orb.icon_id)
+
+    in_viewport = context.area.type == 'VIEW_3D' and context.region.type == 'WINDOW'
+    has_selected_object = context.object is not None
+
+    if in_viewport and has_selected_object:
+        # Right-clicked in viewport with an object selected
+        layout.separator()
+        has_separated = True
+        layout.label(text="Render Freezing:", icon_value=orb.icon_id)
+        layout.prop(context.object, "freezing_mode_enum", text="")
+
+    in_sequencer = context.area.type == 'SEQUENCE_EDITOR'
+    has_selected_strip = hasattr(context.scene.sequence_editor, "active_strip") and context.scene.sequence_editor.active_strip is not None
+
+    if in_sequencer and has_selected_strip:
+        print("Here")
+        active_strip = context.scene.sequence_editor.active_strip
+        if active_strip.my_settings.motif_type_enum == 'option_animation':
+            layout.separator()
+            has_separated = True
+            layout.label(text="Render Freezing:", icon_value=orb.icon_id)
+            layout.prop(active_strip, "freezing_mode_enum", text="")

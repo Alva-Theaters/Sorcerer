@@ -65,6 +65,7 @@ def draw_alva_toolbar(self, context):
         flow.operator("my.add_offset_strip", icon='UV_SYNC_SELECT', text="Offset" if region_width > 200 else "")
         flow.operator("my.add_trigger", icon='SETTINGS', text="Trigger" if region_width > 200 else "")
         flow.separator()
+        flow.operator("alva_playback.clear_solos", icon='SOLO_OFF', text="Clear Solos" if region_width >= 200 else "")
         flow.operator("seq.render_strips_operator", icon_value=orb.icon_id, text="Render" if region_width > 200 else "")
         flow.operator("my.add_strip_operator", icon='ADD', text="Add Strip" if region_width > 200 else "", emboss=True)
         flow.operator("alva_tool.ghost_out", icon='GHOST_ENABLED', text="Cue 0" if region_width > 200 else "")
@@ -74,6 +75,7 @@ def draw_alva_toolbar(self, context):
         flow.operator("alva_tool.disable_clocks", icon='MOD_TIME', text="Disable Clocks" if region_width > 200 else "")
 
     elif space_type == 'NODE_EDITOR' and scene.view_node_toolbar:
+        flow.operator("alva_playback.clear_solos", icon='SOLO_OFF', text="Clear Solos" if region_width >= 200 else "")
         flow.operator("node.add_group_controller_node", icon='ADD', text="Add Group" if region_width >= 200 else "", emboss=True)
         flow.operator("alva_tool.ghost_out", icon='GHOST_ENABLED', text="Cue 0" if region_width >= 200 else "")
         flow.operator("alva_tool.displays", icon='MENU_PANEL', text="Displays" if region_width >= 200 else "")
@@ -81,6 +83,7 @@ def draw_alva_toolbar(self, context):
         flow.operator("alva_tool.disable_clocks", icon='MOD_TIME', text="Disable Clocks" if region_width >= 200 else "")
 
     elif space_type == 'VIEW_3D' and scene.view_viewport_toolbar:
+        flow.operator("alva_playback.clear_solos", icon='SOLO_OFF', text="Clear Solos" if region_width >= 200 else "")
         flow.operator("alva_tool.ghost_out", icon='GHOST_ENABLED', text="Cue 0" if region_width >= 200 else "")
         flow.operator("alva_tool.displays", icon='MENU_PANEL', text="Displays" if region_width >= 200 else "")
         flow.operator("alva_tool.about", icon='INFO', text="About" if region_width >= 200 else "")

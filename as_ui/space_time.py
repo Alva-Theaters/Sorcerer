@@ -39,23 +39,13 @@ addon_dir = os.path.dirname(__file__)
 pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
 
 
-def draw_alva_time_view(self, layout):
-    pcoll = preview_collections["main"]
-    orb = pcoll["orb"]
-
-    layout = self.layout
-    layout.separator()
-    layout.label(text="Alva Sorcerer", icon_value=orb.icon_id)
-    layout.prop (bpy.context.scene.scene_props, "view_time_orb", text="Sync/Orb")
-
-
-def draw_timeline_sync(self, context):
+def draw_alva_time_header(self, context):
     pcoll = preview_collections["main"]
     orb = pcoll["orb"]
 
     if (hasattr(context.scene, "sync_timecode") and
         hasattr(context.scene, "timecode_expected_lag") and
-        context.scene.scene_props.view_time_orb):
+        context.scene.scene_props.view_alva_time_header):
         scene = context.scene
 
         sequencer_open = False
@@ -69,11 +59,17 @@ def draw_timeline_sync(self, context):
                     break
 
         layout = self.layout
+
         row = layout.row()
+        from ..panels import TIME_PT_alva_flags
+        row.popover(
+            panel=TIME_PT_alva_flags.bl_idname,
+            text="Render OSC",
+        )
+
         row.prop(scene, "sync_timecode", text="", icon='LINKED' if scene.sync_timecode else 'UNLINKED')
 
         row = layout.row()
-
         if sequencer_open and active_strip:
             active_strip = context.scene.sequence_editor.active_strip
             icon = 'IPO_BEZIER' if active_strip.type == 'COLOR' else 'SOUND'
@@ -84,71 +80,54 @@ def draw_timeline_sync(self, context):
             row.scale_x = 0.5
             row.prop(target, "str_start_cue", text="")
             row.prop(target, "str_end_cue", text="")
-
         else:
             row.label(text="", icon='SCENE_DATA')
             target = scene
 
             row = layout.row(align=True)
             row.scale_x = 0.75
-            row.prop(target, "int_start_macro", text="")
-            row.prop(target, "int_end_macro", text="")
+            row.prop(target, "int_start_macro", text="Macro")
 
         row = layout.row()
         row.operator("alva_orb.render_qmeo", text="", icon_value=orb.icon_id)
 
 
-def draw_properties_sync(self, context):
+def draw_alva_time_view(self, layout):
     pcoll = preview_collections["main"]
     orb = pcoll["orb"]
 
-    if (hasattr(context.scene, "sync_timecode") and
-        hasattr(context.scene, "timecode_expected_lag") and
-        context.scene.scene_props.view_time_orb):
-        scene = context.scene
-
-        sequencer_open = False
-        active_strip = False
-
-        for area in context.screen.areas:
-            if area.type == 'SEQUENCE_EDITOR':
-                sequencer_open = True
-                if context.scene.sequence_editor.active_strip and context.scene.sequence_editor.active_strip is not None and context.scene.sequence_editor.active_strip.type == 'SOUND':
-                    active_strip = True
-                    break
-
-        layout = self.layout
-        col = layout.column()
-        row = col.row(align=True)
-
-        if sequencer_open and active_strip:
-            active_strip = context.scene.sequence_editor.active_strip
-            icon = 'IPO_BEZIER' if active_strip.type == 'COLOR' else 'SOUND'
-            row.label(text="", icon=icon)
-            target = active_strip
-            row.prop(target, "str_start_cue", text="")
-            row.prop(target, "str_end_cue", text="")
-        else:
-            row.label(text="", icon='SCENE_DATA')
-            target = scene
-            row.prop(target, "int_start_macro", text="")
-            row.prop(target, "int_end_macro", text="")
-
-        row.operator("alva_orb.render_qmeo", text="", icon_value=orb.icon_id)
+    layout = self.layout
+    layout.separator()
+    layout.label(text="Alva Sorcerer", icon_value=orb.icon_id)
+    layout.prop (bpy.context.scene.scene_props, "view_alva_time_header", text="Header")
 
 
-def draw_time_playback(self, context):
-    pcoll = preview_collections["main"]
-    orb = pcoll["orb"]
-    scene = context.scene.scene_props
-
+def draw_alva_time_playback(self, context):
     layout = self.layout
     layout.use_property_split = True
     layout.use_property_decorate = False
     
-    layout.operator("alva_playback.clear_solos", text="Clear OSC Solos", icon='SOLO_OFF')
-    layout.prop(context.scene, "timecode_expected_lag", text="Expected Lag")
-    col = layout.column(heading="OSC")
-    col.prop(scene, "enable_objects", text="Objects")
-    col.prop(scene, "enable_strips", text="Strips")
-    col.prop(scene, "enable_nodes", text="Nodes")
+    layout.prop(context.scene, "timecode_expected_lag", text="OSC Lag")
+
+
+def draw_alva_time_flags(self, context):
+    scene = context.scene.scene_props
+    layout = self.layout
+
+    layout.use_property_split = True
+    layout.use_property_decorate = False
+
+    layout.column(heading="Methods").prop(scene, "enable_lighting", text="Lighting")
+    layout.prop(scene, "enable_video", text="Video")
+    layout.prop(scene, "enable_audio", text="Audio")
+
+    layout.separator()
+
+    layout.column(heading="Controllers").prop(scene, "enable_objects", text="Objects")
+    layout.prop(scene, "enable_strips", text="Strips")
+    layout.prop(scene, "enable_nodes", text="Nodes")
+
+    layout.separator()
+
+    layout.column(heading="Freezing").prop(scene, "enable_seconds", text="Seconds")
+    layout.prop(scene, "enable_thirds", text="Thirds")

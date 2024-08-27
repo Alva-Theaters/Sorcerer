@@ -29,8 +29,6 @@
 
 import bpy
 
-from .space_time import draw_properties_sync
-
 # Custom icon stuff
 import bpy.utils.previews
 import os
