@@ -259,9 +259,9 @@ class ApplyPatchToObjectsOperator(bpy.types.Operator):
     
     
 class RemoveChannelFromGroupOperator(bpy.types.Operator):
-    bl_idname = "alva_common.channel_remove_or_highlight"
-    bl_label = "Remove Channel from Group"
-    bl_description = "Remove Channel from Group"
+    bl_idname = "alva_common.remove_or_highlight_channel"
+    bl_label = "Highlight or Remove"
+    bl_description = "Highlight or remove channel, depending on selection below"
     
     group_id: StringProperty()
     channel: IntProperty()

@@ -409,13 +409,14 @@ def draw_fixture_groups(self, context):
         has_channels = True
         flow = col.grid_flow(row_major=True, columns=4, align=True)
         for channel in sorted_channels:
-            operator = flow.operator("alva_common.channel_remove_or_highlight", text=str(channel.chan), icon='TRASH' if item.highlight_or_remove_enum == 'option_remove' else 'OUTLINER_OB_LIGHT')
+            operator = flow.operator("alva_common.remove_or_highlight_channel", text=str(channel.chan), icon='TRASH' if item.highlight_or_remove_enum == 'option_remove' else 'OUTLINER_OB_LIGHT')
             operator.group_id = item.name
             operator.channel = channel.chan
     else:
         col.label(text="Add channels by typing them below.")
 
-    layout.separator()
+    if has_channels:
+        layout.separator()
 
     row = layout.row(align=True)
     if has_channels:
@@ -431,12 +432,6 @@ def draw_generate_fixtures(self, context):
     layout.use_property_decorate = False
 
     if scene.scene_props.console_type_enum == 'option_eos' and not scene.scene_props.school_mode_enabled:
-        layout.column(heading="Array").prop(scene.scene_props, "array_modifier_enum", text="Array", icon='MOD_ARRAY')
-        if scene.scene_props.array_curve_enum != "":
-            layout.column(heading="Array").prop(scene.scene_props, "array_curve_enum", text="Curve", icon='CURVE_BEZCURVE')
-            
-        layout.separator()
-
         layout.use_property_split = True
         layout.use_property_decorate = False
 

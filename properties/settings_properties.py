@@ -49,7 +49,7 @@ def register():
     Scene.house_down_argument = StringProperty(default="500 at 1 Enter", description="Argument needed to lower house lights on playback")
     Scene.house_up_on_stop = BoolProperty(default=False, description="Automatically raise the house lights for safety when sequencer stops playing")
     Scene.house_up_argument = StringProperty(default="500 at 75 Enter", description="Argument needed to raise house lights on stop")
-    Scene.sync_timecode = BoolProperty(default=True, description="Sync console's timecode clock with Sorcerer on play/stop/scrub based on top-most active sound strip's event list number")
+    Scene.sync_timecode = BoolProperty(name="Sync Timecode", default=True, description="Sync console's timecode clock with Sorcerer on play/stop/scrub based on top-most active sound strip's event list number")
     Scene.timecode_expected_lag = IntProperty(name="Expected Lag", default=5, min=0, max=100, description="Expected lag in frames. Sorcerer will start the console's clock late to compensate, using this number. WARNING: May lead to early strips not being fired since this skips the first frames on the console (and any corresponding events)")
     Scene.int_event_list = IntProperty(default=1, min=1, max=99999, name="Default Clock Number", description="Use this default clock number for timecode sync if no relevant sound strip exists")
     Scene.use_default_clock = BoolProperty(default=True, name="Always Sync", description="Use the default clock number if no relevant sound strip")

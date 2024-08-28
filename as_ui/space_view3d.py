@@ -180,7 +180,7 @@ def draw_lighting_modifiers(self, context):
 
         row = box.row()
         row.use_property_decorate = False
-        row.prop(mod, "show_expanded", text="", emboss=False, icon='TRIA_DOWN' if mod.show_expanded else 'TRIA_UP')
+        row.prop(mod, "show_expanded", text="", emboss=False, icon='TRIA_DOWN' if mod.show_expanded else 'TRIA_RIGHT')
         row.prop(mod, "name", text="", emboss = False)
 
         row.prop(mod, "mute", text="", icon='HIDE_OFF' if not mod.mute else 'HIDE_ON', emboss=False)

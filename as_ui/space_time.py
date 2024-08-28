@@ -64,7 +64,7 @@ def draw_alva_time_header(self, context):
         from ..panels import TIME_PT_alva_flags
         row.popover(
             panel=TIME_PT_alva_flags.bl_idname,
-            text="Render OSC",
+            text="Render Flags",
         )
 
         row.prop(scene, "sync_timecode", text="", icon='LINKED' if scene.sync_timecode else 'UNLINKED')
@@ -117,7 +117,7 @@ def draw_alva_time_flags(self, context):
     layout.use_property_split = True
     layout.use_property_decorate = False
 
-    layout.column(heading="Methods").prop(scene, "enable_lighting", text="Lighting")
+    layout.column(heading="Types").prop(scene, "enable_lighting", text="Lighting")
     layout.prop(scene, "enable_video", text="Video")
     layout.prop(scene, "enable_audio", text="Audio")
 
