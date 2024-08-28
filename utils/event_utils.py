@@ -134,7 +134,7 @@ class EventUtils:
             value = getattr(obj, prop)
             if isinstance(value, float) and value != 0:
                 setattr(obj, prop, value)
-            elif isinstance(value, mathutils.Color) and any(v != 0 for v in value):
+            elif isinstance(value, mathutils.Color) and any(v != 1 for v in value):
                 setattr(obj, prop, value)
                 
     @staticmethod

@@ -124,10 +124,8 @@ class Items:
         
     def get_modifier_items(self, context):
         items = [("NONE", "None", "No array modifiers available")]
+        obj = context.active_object
         
-        obj_name = context.scene.scene_props.array_cone_enum
-        obj = bpy.data.objects.get(obj_name)
-
         if obj:
             for modifier in obj.modifiers:
                 if not modifier.name.isdigit():
@@ -158,9 +156,6 @@ class Items:
         return items
 
 
-    #####################
-    # From old Harmonizer
-    #####################
     def color_profiles(self, context):
         items = [
             ('option_rgb', "RGB", "Red, Green, Blue"),

@@ -99,20 +99,42 @@ class PatchGroupOperator(bpy.types.Operator):
     bl_idname = "array.patch_group_operator"
     bl_label = "Patch Group"
     bl_description = "Patch group on console"
+    bl_options = {'REGISTER', 'UNDO'}
 
-    def execute(self, context):
-        active_node = None
-        try:
-            active_node = context.space_data.edit_tree.nodes.active
-        except:
-            pass
-        
+    def find_array_modifier(self, context):
         scene = context.scene
         array_modifier = None
-        if scene.scene_props.array_modifier_enum in context.active_object.modifiers:
-            address = "/eos/newcmd"
+
+        try:
+            array_modifier = context.active_object.modifiers.get(scene.scene_props.array_modifier_enum)
+        except (AttributeError, KeyError):
+            pass
+
+        if not array_modifier:
+            if context.active_object and context.active_object.modifiers:
+                array_modifier = context.active_object.modifiers[0]
+            else:
+                return None
+
+        return array_modifier
+
+    def execute(self, context):
+        scene = context.scene
+        array_modifier = None
+        address = "/eos/newcmd"
+
+        original_objects = [obj for obj in context.selected_objects]
+
+        for obj in original_objects:
+            bpy.ops.object.select_all(action='DESELECT')
+            obj.select_set(True)
+            context.view_layer.objects.active = obj
             
-            array_modifier = context.active_object.modifiers[scene.scene_props.array_modifier_enum]
+            array_modifier = self.find_array_modifier(context)
+
+            if not array_modifier:
+                self.report({'INFO', "Please make an array modifier."})
+                return {'CANCELLED'}
             
             if scene.scene_props.array_curve_enum != "NONE":
                 curve_modifier = context.active_object.modifiers[scene.scene_props.array_curve_enum]
@@ -121,8 +143,8 @@ class PatchGroupOperator(bpy.types.Operator):
             
             if context.object.mode != 'OBJECT':
                 bpy.ops.object.mode_set(mode='OBJECT')
-                
-            if scene.scene_props.array_curve_enum != "NONE":   
+
+            if scene.scene_props.array_curve_enum != "NONE":
                 bpy.ops.object.modifier_apply(modifier=curve_modifier.name)
             
             bpy.ops.object.editmode_toggle()
@@ -133,24 +155,23 @@ class PatchGroupOperator(bpy.types.Operator):
                     context.view_layer.objects.active = obj
                     bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS')
             
-            starting_channel = scene.scene_props.int_array_start_channel
-            group_number = scene.scene_props.int_array_group_index
-            group_label = scene.scene_props.str_array_group_name
             starting_universe = scene.scene_props.int_array_universe
             start_address = scene.scene_props.int_array_start_address
             channels_to_add = scene.scene_props.int_array_channel_mode
             total_lights = len([chan for chan in bpy.data.objects if chan.select_get()])
             addresses_list = Utils.find_addresses(starting_universe, start_address, channels_to_add, total_lights)
             
-            OSC.send_osc_lighting("/eos/key/live", "1")
-            OSC.send_osc_lighting("/eos/key/live", "0")
+            # Setup the patch screen.
+            OSC.send_osc_lighting("/eos/key/blind", "1")
+            OSC.send_osc_lighting("/eos/key/blind", "0")
+            time.sleep(.3)
+            OSC.send_osc_lighting("/eos/newcmd", "Patch Enter")
+            time.sleep(.3)
             
             relevant_channels = []
         
+            # Patch the channels.
             for i, chan in enumerate([obj for obj in bpy.data.objects if obj.select_get()]):
-                OSC.send_osc_lighting(address, "Patch Enter")
-                time.sleep(.3)
-                
                 chan_num = scene.scene_props.int_array_start_channel
 
                 chan.str_manual_fixture_selection = str(chan_num)
@@ -164,64 +185,24 @@ class PatchGroupOperator(bpy.types.Operator):
                 orientation_x = round(math.degrees(chan.rotation_euler.x + math.pi))
                 orientation_y = round(math.degrees(chan.rotation_euler.y))
                 orientation_z = round(math.degrees(chan.rotation_euler.z))
-                OSC.send_osc_lighting(address, f"Chan {chan_num} Type {scene.scene_props.str_array_group_maker} {scene.scene_props.str_array_group_type} Enter, Chan {chan_num} Position {position_x} / {position_y} / {position_z} Enter, Chan {chan_num} Orientation {orientation_x} / {orientation_y} / {orientation_z} Enter, Chan {chan_num} at {str(current_universe)} / {str(current_address)} Enter")
+                OSC.send_osc_lighting(address, f"Chan {chan_num} Position {position_x} / {position_y} / {position_z} Enter, Chan {chan_num} Orientation {orientation_x} / {orientation_y} / {orientation_z} Enter, Chan {chan_num} at {str(current_universe)} / {str(current_address)} Enter")
                 channel_number = chan_num
                 relevant_channels.append(channel_number)
                 scene.scene_props.int_array_start_channel += 1
-                time.sleep(.5)
-            
+                time.sleep(.3)
+
+            # Increase all indexes for next time.
             scene.scene_props.int_array_start_channel = chan_num + 1
             scene.scene_props.int_array_start_address = current_address + channels_to_add
             scene.scene_props.int_array_universe = current_universe
             scene.scene_props.int_array_group_index += 1
-            
-            # Create the group.
-            OSC.send_osc_lighting("/eos/key/group", "1")
-            time.sleep(.1)
-            OSC.send_osc_lighting("/eos/key/group", "0")
-            time.sleep(.1)
-            OSC.send_osc_lighting("/eos/key/group", "1")
-            time.sleep(.1)
-            OSC.send_osc_lighting("/eos/key/group", "0")
-            
-            time.sleep(1)
-            
-            OSC.send_osc_lighting("/eos/newcmd", f"Group {group_number} Enter")
-            
-            time.sleep(1)
-            
-            OSC.send_osc_lighting("/eos/newcmd", f"Group {group_number} Label {group_label}")
-            
-            time.sleep(1)
-            
-            OSC.send_osc_lighting("/eos/key/enter", "1")
-            time.sleep(.1)
-            OSC.send_osc_lighting("/eos/key/enter", "0")
-            time.sleep(.1)
-            OSC.send_osc_lighting("/eos/key/enter", "1")
-            time.sleep(.1)
-            OSC.send_osc_lighting("/eos/key/enter", "0")
-            
-            time.sleep(1)
-            
+
+            # Select the new lights on the console for highlight visibility.
             argument = "Chan "
             if len(relevant_channels) != 0: 
                 for light in relevant_channels:
                     argument += f"{light} "
-                argument += "Enter Enter"
-                
-            OSC.send_osc_lighting("/eos/newcmd", f"Group {group_number} Enter, Chan {argument}")
-            
-            time.sleep(1)
-            
-            OSC.send_osc_lighting(address, "Patch Enter")
-            time.sleep(.3)
-            
-            OSC.send_osc_lighting("/eos/newcmd", f"{argument}")
-            
-            time.sleep(1)
-            
-            # Select the new lights on the console for highlight visibility.
+                argument += "Enter Enter Full Enter"
             OSC.send_osc_lighting(address, argument)
 
             bpy.ops.object.editmode_toggle()
@@ -231,34 +212,15 @@ class PatchGroupOperator(bpy.types.Operator):
             scene.scene_props.array_modifier_enum = "NONE"
             scene.scene_props.array_curve_enum = "NONE"
             
-            #################################
-            # Begin to add controller
-            #################################
+            # Add group to Sorcerer group_data
             new_group = scene.scene_group_data.add()
-            new_group.name = group_label
+            new_group.name = new_group.name
             for channel in relevant_channels:
                 new_channel = new_group.channels_list.add()
                 new_channel.chan = channel
-            
-            # Begin adding controller.
-            if active_node:
-                tree = context.space_data.edit_tree
-                new_controller = tree.nodes.new('group_controller_type')
-                new_controller.selected_group_enum = group_label
-
-                new_controller.strobe_is_on = scene.scene_props.strobe_is_on
-                new_controller.color_is_on = scene.scene_props.color_is_on
-                new_controller.pan_tilt_is_on = scene.scene_props.pan_tilt_is_on
-                new_controller.diffusion_is_on = scene.scene_props.diffusion_is_on
-                new_controller.edge_is_on = scene.scene_props.edge_is_on
-                new_controller.iris_is_on = scene.scene_props.iris_is_on
-                new_controller.gobo_is_on = scene.scene_props.gobo_is_on
-                new_controller.zoom_is_on = scene.scene_props.zoom_is_on
-            
-                new_controller.label = new_controller.str_group_label
-            
-            self.report({'INFO'}, "Orb complete.")
-                    
+        
+        self.report({'INFO'}, "Orb complete.")
+                
         return {'FINISHED'}
     
 

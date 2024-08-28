@@ -202,7 +202,6 @@ def draw_gobo_settings(self, context, active_controller):
 
 
 def draw_alva_right_click(self, context):
-    print("Running")
     is_property = False
     try:
         prop = context.button_prop
@@ -255,7 +254,6 @@ def draw_alva_right_click(self, context):
     has_selected_strip = hasattr(context.scene.sequence_editor, "active_strip") and context.scene.sequence_editor.active_strip is not None
 
     if in_sequencer and has_selected_strip:
-        print("Here")
         active_strip = context.scene.sequence_editor.active_strip
         if active_strip.my_settings.motif_type_enum == 'option_animation':
             layout.separator()
