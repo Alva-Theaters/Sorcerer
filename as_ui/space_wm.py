@@ -238,7 +238,7 @@ def draw_alva_right_click(self, context):
     if is_property and prop.identifier == 'float_intensity' and st == 'VIEW_3D':
         if not has_separated:
             self.layout.separator()
-        layout.operator("alva_common.add_driver", text="Add Driver", icon_value=orb.icon_id)
+        layout.operator("alva_common.driver_add", text="Add Driver", icon_value=orb.icon_id)
 
     in_viewport = context.area.type == 'VIEW_3D' and context.region.type == 'WINDOW'
     has_selected_object = context.object is not None

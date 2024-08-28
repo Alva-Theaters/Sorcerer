@@ -422,7 +422,7 @@ def draw_fixture_groups(self, context):
     if has_channels:
         row.prop(item, "highlight_or_remove_enum", expand=True, text="")
     row.prop(scene.scene_props, "add_channel_ids", text="")
-    
+
 
 def draw_generate_fixtures(self, context):
     scene = context.scene
@@ -446,23 +446,4 @@ def draw_generate_fixtures(self, context):
         pcoll = preview_collections["main"]
         orb = pcoll["orb"]
         
-        layout.operator("array.patch_group_operator", text="Generate Fixtures", icon_value=orb.icon_id)
-        
-# Slated for next release
-
-#            box = layout.box()
-#            row = box.row()
-#            row.label(text="Realtime 3D Feedback for Augment3D", icon='VIEW_PAN')
-#            
-#            row = box.row(align=True)
-#            row.scale_y = 1.3
-#            row.scale_x = 2
-#            row.operator("array.patch_group_operator", text="Spread")
-#            row.operator("array.patch_group_operator", text="Bump")
-#            row.operator("array.patch_group_operator", text="", icon='BACK')
-#            
-#            row.operator("array.patch_group_operator", text="", icon='SORT_DESC')
-#            row.operator("array.patch_group_operator", text="", icon='SORT_ASC')
-#            row.operator("array.patch_group_operator", text="", icon='FORWARD')
-#            
-#            box.separator()
+        layout.operator("alva_orb.group_patch", text="Generate Fixtures", icon_value=orb.icon_id)

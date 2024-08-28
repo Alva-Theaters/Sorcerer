@@ -225,10 +225,8 @@ class Utils:
         light_object = bpy.data.objects.get(light_name)
 
         if light_object and light_object.type == 'MESH':
-            # Get the world matrix of the object.
             matrix = light_object.matrix_world
 
-            # Convert the matrix to Euler angles (XYZ rotation order).
             euler = matrix.to_euler('XYZ')
 
             # Convert radians to degrees
@@ -243,33 +241,20 @@ class Utils:
         else:
             print("Light object named", light_name,"not found or is not a lamp.")
             return None, None
-        
-    #    This one was from Sequencer. Not sure which one is right.
-    #    def get_light_rotation_degrees(light_name):
-    #        """
-    #        Returns the X (tilt) and Y (pan) rotation angles in degrees for a given light object,
-    #        adjusting the range of pan to -270 to 270 degrees.
-    #        
-    #        :param light_name: Name of the light object in the scene.
-    #        :return: Tuple containing the X (tilt) and Y (pan) rotation angles in degrees.
-    #        """
-    #        
-    #        light_object = bpy.data.objects.get(light_name)
 
-    #        if light_object and light_object.type == 'LIGHT':
-    #            matrix = light_object.matrix_world
-    #            euler = matrix.to_euler('XYZ')
-    #            x_rot_deg = math.degrees(euler.x)
-    #            y_rot_deg = math.degrees(euler.z)  # Pan seems to be on zed euler, not on y as y resolves to super tiny number
+    def get_matrix_orientation(obj):
+        depsgraph = bpy.context.evaluated_depsgraph_get()
+        eval_obj = obj.evaluated_get(depsgraph)
+        matrix = eval_obj.matrix_world
+        euler = matrix.to_euler('XYZ')
 
-    #            # Adjust the pan angle to extend the range to -270 to 270 degrees
-    #            if y_rot_deg > 90:
-    #                y_rot_deg -= 360
+        # Convert radians to degrees
+        x_rot_deg = math.degrees(euler.x) # Tilt
+        y_rot_deg = math.degrees(euler.z)  # Pan seems to be on zed euler, not on y as y resolves to super tiny number.
+        z_rot_deg = math.degrees(euler.y)
 
-    #            return x_rot_deg, y_rot_deg
-    #        else:
-    #            print("It appears as though", light_name,"has left the chat.")
-    #            return None, None
+        return x_rot_deg, y_rot_deg, z_rot_deg
+
                 
     def try_parse_int(value):
         try:
@@ -486,7 +471,6 @@ class Utils:
         if type(v) == mathutils.Color:
             return (v.r * 100, v.g * 100, v.b * 100)
 
-        
         else: 
             r, g, b = v
             return (r * 100, g * 100, b * 100)

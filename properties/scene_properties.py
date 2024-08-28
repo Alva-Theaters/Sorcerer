@@ -105,11 +105,10 @@ class SceneProperties(PropertyGroup):
     int_argument_size: IntProperty(name="Maximum Argument Size", default=40, min=1, max=65, description="How many consecutive command line commands can be batched onto one OSC packet.") # type: ignore
 
     is_baking: BoolProperty(default=False, description="Sorcerer is currently baking") # type: ignore # type: ignore
-    
     is_cue_baking: BoolProperty(default=False, description="Sorcerer is currently baking") # type: ignore # type: ignore
-    
     is_event_baking: BoolProperty(default=False, description="Sorcerer is currently baking") # type: ignore # type: ignore
-    
+    freeze_cpvia: BoolProperty(default=False, description="Used by Patch Console Remotely orb operator to prevent random CPVIA updates interfering with patching operations") # type: ignore
+
     show_presets: BoolProperty(default=False, description="Shows buttons on intensities panel") # type: ignore # type: ignore
     
     color_is_preset_mode: BoolProperty(default=False, description="Show color with just the preset buttons") # type: ignore # type: ignore

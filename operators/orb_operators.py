@@ -33,18 +33,16 @@ from ..utils.osc import OSC
 from ..orb import Orb
 
 
-class SEQUENCER_OT_base_modal_operator(Operator):
-    bl_idname = "my.base_modal_operator"
+class ORB_OT_base_modal_operator(Operator):
+    bl_idname = "alva_orb.modal_base"
     bl_label = ""
-    bl_description = "Base class for modal operators"
+    bl_description = "Base class for Orb modals"
 
     cancel_key = 'ESC'
 
     def execute(self, context):
         self._cancel = False
-        if self.strip != 'qmeo':
-            self._generator = self.initiate_orb(context, strip=self.strip, enable=self.enable)
-        else:
+        if self.strip == 'qmeo':
             frame_rate = Utils.get_frame_rate(context.scene)
             scene = context.scene
             if hasattr(scene.sequence_editor, "active_strip") and scene.sequence_editor.active_strip is not None and scene.sequence_editor.active_strip.type == 'SOUND':
@@ -56,6 +54,12 @@ class SEQUENCER_OT_base_modal_operator(Operator):
                 end_frame = context.scene.frame_end
             
             self._generator = self.make_qmeo(context.scene, frame_rate, start_frame, end_frame)
+        
+        elif self.strip == 'patch':
+            self._generator = self.patch_group(context)
+        
+        else:
+            self._generator = self.initiate_orb(context, strip=self.strip, enable=self.enable)
 
         wm = context.window_manager
         self._timer = wm.event_timer_add(0.1, window=context.window)
@@ -89,6 +93,9 @@ class SEQUENCER_OT_base_modal_operator(Operator):
     def make_qmeo(self, scene, frame_rate, start_frame, end_frame):
         yield from Orb.Eos.make_qmeo(scene, frame_rate, start_frame, end_frame)
 
+    def patch_group(self, context):
+        yield from Orb.Eos.patch_group(self, context)
+
     def cancel(self, context):
         wm = context.window_manager
         wm.event_timer_remove(self._timer)
@@ -97,9 +104,21 @@ class SEQUENCER_OT_base_modal_operator(Operator):
         OSC.send_osc_lighting("/eos/newcmd", "")
         Orb.Eos.reset_macro_key()
         Orb.Eos.restore_snapshot(context.scene)
+
+
+class VIEW3D_OT_alva_group_patch(ORB_OT_base_modal_operator):
+    bl_idname = "alva_orb.group_patch"
+    bl_label = "Patch Group"
+    bl_description = "Patch group on console"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        self.strip = 'patch'
+        self.enable = True
+        return super().execute(context)
         
 
-class SEQUENCER_OT_execute_sound_on_cue(SEQUENCER_OT_base_modal_operator):
+class SEQUENCER_OT_execute_sound_on_cue(ORB_OT_base_modal_operator):
     bl_idname = "my.execute_on_cue_operator"
     bl_label = ""
     bl_description = "Orb executes sound on cue"
@@ -110,7 +129,7 @@ class SEQUENCER_OT_execute_sound_on_cue(SEQUENCER_OT_base_modal_operator):
         return super().execute(context)
 
 
-class SEQUENCER_OT_disable_sound_on_cue(SEQUENCER_OT_base_modal_operator):
+class SEQUENCER_OT_disable_sound_on_cue(ORB_OT_base_modal_operator):
     bl_idname = "my.disable_on_cue_operator"
     bl_label = ""
     bl_description = "Orb disables sound on cue"
@@ -121,7 +140,7 @@ class SEQUENCER_OT_disable_sound_on_cue(SEQUENCER_OT_base_modal_operator):
         return super().execute(context)
 
 
-class SEQUENCER_OT_execute_animation_on_cue(SEQUENCER_OT_base_modal_operator):
+class SEQUENCER_OT_execute_animation_on_cue(ORB_OT_base_modal_operator):
     bl_idname = "my.execute_animation_on_cue_operator"
     bl_label = ""
     bl_description = "Orb executes animation on cue"
@@ -132,7 +151,7 @@ class SEQUENCER_OT_execute_animation_on_cue(SEQUENCER_OT_base_modal_operator):
         return super().execute(context)
 
 
-class SEQUENCER_OT_disable_animation_on_cue(SEQUENCER_OT_base_modal_operator):
+class SEQUENCER_OT_disable_animation_on_cue(ORB_OT_base_modal_operator):
     bl_idname = "my.disable_animation_on_cue_operator"
     bl_label = ""
     bl_description = "Orb disables animation on cue"
@@ -143,7 +162,7 @@ class SEQUENCER_OT_disable_animation_on_cue(SEQUENCER_OT_base_modal_operator):
         return super().execute(context)
 
 
-class SEQUENCER_OT_generate_start_frame_macro(SEQUENCER_OT_base_modal_operator):
+class SEQUENCER_OT_generate_start_frame_macro(ORB_OT_base_modal_operator):
     bl_idname = "my.generate_start_frame_macro"
     bl_label = ""
     bl_description = "Orb generates start frame macro"
@@ -154,7 +173,7 @@ class SEQUENCER_OT_generate_start_frame_macro(SEQUENCER_OT_base_modal_operator):
         return super().execute(context)
 
 
-class SEQUENCER_OT_generate_end_frame_macro(SEQUENCER_OT_base_modal_operator):
+class SEQUENCER_OT_generate_end_frame_macro(ORB_OT_base_modal_operator):
     bl_idname = "my.generate_end_frame_macro"
     bl_label = ""
     bl_description = "Orb generates end frame macro"
@@ -165,7 +184,7 @@ class SEQUENCER_OT_generate_end_frame_macro(SEQUENCER_OT_base_modal_operator):
         return super().execute(context)
 
 
-class SEQUENCER_OT_build_flash_macros(SEQUENCER_OT_base_modal_operator):
+class SEQUENCER_OT_build_flash_macros(ORB_OT_base_modal_operator):
     bl_idname = "my.build_flash_macros"
     bl_label = ""
     bl_description = "Orb builds flash macros"
@@ -176,7 +195,7 @@ class SEQUENCER_OT_build_flash_macros(SEQUENCER_OT_base_modal_operator):
         return super().execute(context)
     
     
-class SEQUENCER_OT_generate_offset_macro(SEQUENCER_OT_base_modal_operator):
+class SEQUENCER_OT_generate_offset_macro(ORB_OT_base_modal_operator):
     bl_idname = "my.generate_offset_macro"
     bl_label = ""
     bl_description = "Orb generates offset macro"
@@ -187,9 +206,9 @@ class SEQUENCER_OT_generate_offset_macro(SEQUENCER_OT_base_modal_operator):
         return super().execute(context)
     
     
-class SEQUENCER_OT_bake_curves_to_cues(SEQUENCER_OT_base_modal_operator):
+class SEQUENCER_OT_bake_curves_to_cues(ORB_OT_base_modal_operator):
     bl_idname = "alva_orb.render_qmeo"
-    bl_label = "Bake F-curves To Cues"
+    bl_label = "Make Qmeo"
     bl_description = "Orb will create a qmeo. A qmeo is like a video, only each frame is a lighting cue. Use it to store complex animation data on the lighting console" 
 
     def execute(self, context):
@@ -214,7 +233,7 @@ class SEQUENCER_OT_only_cues(Operator):
         return {'FINISHED'}
     
     
-class TEXT_OT_generate_text_macro(SEQUENCER_OT_base_modal_operator):
+class TEXT_OT_generate_text_macro(ORB_OT_base_modal_operator):
     bl_idname = "text.generate_text_macro"
     bl_label = ""
     bl_description = "Orb generates macro from text block"
@@ -226,7 +245,8 @@ class TEXT_OT_generate_text_macro(SEQUENCER_OT_base_modal_operator):
     
     
 orb_operators = [
-    SEQUENCER_OT_base_modal_operator,
+    VIEW3D_OT_alva_group_patch,
+    ORB_OT_base_modal_operator,
     SEQUENCER_OT_execute_sound_on_cue,
     SEQUENCER_OT_disable_sound_on_cue,
     SEQUENCER_OT_execute_animation_on_cue,

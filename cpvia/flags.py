@@ -37,6 +37,9 @@ def check_flags(context, parent, c, p, v, type):
     scene = context.scene.scene_props
     p = p[0]
 
+    if scene.freeze_cpvia:
+        return False
+
     if not scene.enable_lighting:
         return False
     

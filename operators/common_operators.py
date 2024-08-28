@@ -256,35 +256,44 @@ class COMMON_OT_alva_white_balance(Operator):
 
 class COMMON_OT_alva_add_driver(Operator):
     '''Create a Sorcerer driver to control parameters with movement in 3D View'''
-    bl_idname = "alva_common.add_driver"
-    bl_label = "Add Driver"
+    bl_idname = "alva_common.driver_add"
+    bl_label = "Quick Driver"
 
     def execute(self, context):
-        ao = context.active_object
         try:
             prop = context.button_prop
         except:
             return
-        
-        # Lock x and y
-        ao.lock_location[0] = True
-        ao.lock_location[1] = True
+            
+        len_added = 0
+        for obj in bpy.context.selected_objects:
+            try:
+                # Lock x and y
+                obj.lock_location[0] = True
+                obj.lock_location[1] = True
 
-        # Add driver
-        fcurve = ao.driver_add(prop.identifier)
-        driver = fcurve.driver
+                # Add driver
+                fcurve = obj.driver_add(prop.identifier)
+                driver = fcurve.driver
 
-        # Set driver properties
-        var = driver.variables.new()
-        var.name = "var"
-        var.type = 'TRANSFORMS'
-        var.targets[0].id = ao
-        var.targets[0].transform_type = 'LOC_Z'
-        var.targets[0].transform_space = 'WORLD_SPACE'
-        driver.expression = "(var * 50) - 50"
+                # Set driver properties
+                var = driver.variables.new()
+                var.name = "var"
+                var.type = 'TRANSFORMS'
+                var.targets[0].id = obj
+                var.targets[0].transform_type = 'LOC_Z'
+                var.targets[0].transform_space = 'WORLD_SPACE'
+                driver.expression = "(var * 50) - 50"
 
-        # Ensure "Tweak" is selected in toolbar for instant grabbing (TWSS)
-        bpy.ops.wm.tool_set_by_id(name="builtin.select")
+                # Ensure "Tweak" is selected in toolbar for instant grabbing (TWSS)
+                bpy.ops.wm.tool_set_by_id(name="builtin.select")
+                len_added += 1
+
+            except:
+                self.report({'WARNING'}, "Error. Ensure object types are valid")
+                return {'CANCELLED'}
+            
+        self.report({'INFO'}, f"Added {len_added} drivers")
         return {'FINISHED'}
         
 
