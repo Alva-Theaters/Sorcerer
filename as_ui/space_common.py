@@ -439,7 +439,7 @@ def draw_generate_fixtures(self, context):
         layout.column().prop(scene.scene_props, "int_array_universe", text="Universe")
         layout.column().prop(scene.scene_props, "int_array_start_address", text="Address")
         layout.separator()
-        layout.column().prop(scene.scene_props, "int_array_channel_mode", text="Channel Mode")
+        layout.column().prop(scene.scene_props, "int_array_channel_mode", text="Mode")
 
         layout.separator()
         

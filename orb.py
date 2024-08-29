@@ -687,10 +687,9 @@ class Orb:
                 position_z = round(chan.location.z / .3048)
 
                 # Round and rotate x by 180 degrees (pi in radians) since cone facing up is the same as a light facing down.
-                orientation_x, orientation_y, orientation_z = Utils.get_matrix_orientation(chan)
-                orientation_x = round(orientation_x + math.pi)
-                orientation_y = round(orientation_y)
-                orientation_z = round(orientation_z)
+                orientation_x = round(math.degrees(chan.rotation_euler.x + math.pi))
+                orientation_y = round(math.degrees(chan.rotation_euler.y))
+                orientation_z = 0  # Prevent modifiers from messing up pan/tilt. ## Add option to enable in the future.
 
                 # Set channel-specific UI fields inside the loop.
                 chan.str_manual_fixture_selection = str(chan_num)

@@ -109,8 +109,8 @@ challenges.
         playback inside the video editor kind of stinks until you render the 
         video. So we need a way to get all the animation stuff (and other 
         types of stuff) from Blender onto the console where it can be 
-        "played back" reliably. 
-        
+        "played back" reliably.
+
         If you want to play a Blender animation on a lighting console, you 
         can't just load the .blend file on the lighting console and merge 
         the f-curve data onto, well, there's nothing to merge it to. Lighting 
