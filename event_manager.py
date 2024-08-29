@@ -74,10 +74,10 @@ challenges.
         signal. This way, it's far, far simpler for the end user. It even 
         works through WiFi. We can get away with this where others can't 
         because Sorcerer is not intended for realtime use at FOH during 
-        final shows. It's a lot like how a you don't keep a video editor
+        final shows. It's a lot like how you don't keep a video editor
         open when you show a movie to an audience. You instead render out
         the movie, close the video editor (in this case Sorcerer), and play
-        back the movie with something else that's far better at the realtime,
+        back the movie with something else that's far better for a realtime,
         high stress, high reliability environment.
 
         In addition to just keeping timecode in sync, we also have little
@@ -87,7 +87,7 @@ challenges.
         from the middle of a cue sequence (otherwise you would have to 
         constantly scrub backwards to fire the most relevant cue or the stage
         may look completely wrong for the moment you're working on.) The 
-        user can turn all these things off an on in Sorcerer Preferences.
+        user can turn all these things off and on in Sorcerer Preferences.
 
     Objective 3. Fix Blender's Depsgraph.
         Blender's depsgraph system does not automatically run the updaters
@@ -98,15 +98,40 @@ challenges.
         change.
 
     Objective 4 (solved by orb.py).
-        We need a way to get all the animation stuff (and other types of 
-        stuff) from Blender onto the console where it can be "played back" 
-        reliably. We solve this problem by inventing the "qmeo". A qmeo is 
-        like a video, but every frame is a lighting cue, not a picture. To
-        make a qmeo actually work, we need 3 things:
+        Say you use Sorcerer to make a super emotional, lifelike, fluid,
+        organic, natural, and lively lighting animation that is so amazing
+        that no one has ever seen stage lights move, dance and breath the way
+        you just made them move, dance, and breath. But the problem you
+        now have is that Blender does this stuff by sending a crap ton of
+        OSC commands. It's not very reliable. It lags. It's slow. It really
+        stinks for continuous, real-time playback. It's fine for design work
+        but certainly not for the final show. It's like video editors: the 
+        playback inside the video editor kind of stinks until you render the 
+        video. So we need a way to get all the animation stuff (and other 
+        types of stuff) from Blender onto the console where it can be 
+        "played back" reliably. 
+        
+        If you want to play a Blender animation on a lighting console, you 
+        can't just load the .blend file on the lighting console and merge 
+        the f-curve data onto, well, there's nothing to merge it to. Lighting 
+        consoles kinda sorta do super simple curves in their effect editors, 
+        but those are extremely primitive compared to the graph editors in 3D 
+        animation suites like Blender and Maya. So we need a way to force-feed 
+        this f-curve data down the console's throat in a way it can understand.
 
-            a. The console needs to have all the cues for each timecode frame
+        So what we do is we basically have this automatic Orb assistant 
+        manually animate the sequence on the console frame-by-frame by hitting 
+        record cue for every frame. And then we bind each cue to the right 
+        timecode frame on the console's event list.
+
+        We call the end result a "qmeo". A qmeo is like a video, but every 
+        frame is a lighting cue, not a picture. To make a qmeo actually work, 
+        we need 3 things:
+
+            a. The console needs to have the cue for each timecode frame
                stored on its own hard drive, preferably in an out-of-the-way
-               cue list.
+               cue list. The cue transition time needs to reflect the frame
+               rate.
 
             b. The console needs to have an event list that binds each cue
                to its respective timecode frame. This way we don't have to
@@ -126,7 +151,7 @@ challenges.
 
         We solve all these problems with the Orb assistant. Most buttons 
         in Sorcerer's UI that use the purple orb icon are Orb operators. 
-        See orb.py to learn how.
+        See orb.py to learn how we do it.
 
 
     Objective 5 (solved by the CPVIA folder).
@@ -142,7 +167,7 @@ challenges.
                choose. They need to all speak the same language. That language is 
                called CPVIA. A CPVIA request is a tuple in the form of
 
-        (Channel, Parameter, Value, Influence, Argument)
+               (Channel, Parameter, Value, Influence, Argument)
 
         Every single controller that ever wants to make a change to a parameter
         on the console must make a change request in the CPVIA format. This 
@@ -181,7 +206,7 @@ Sequence of events when frame changes BEGINS and we are NOT in playback:
     A1:3.1 We trigger any drivers that may need to run, since Blender
            doesn't automatically fire their updaters.
 
-    A1:3.2 We trigger any objects set to Dynamic that may need to run, 
+    A1:3.2 We trigger any controllers set to Dynamic that may need to run, 
            since Blender doesn't automatically fire their updaters.
     
     A1:1. We look for normal ALVA controllers in the scene...
