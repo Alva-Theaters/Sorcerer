@@ -44,6 +44,133 @@ stored_channels = set()
 
 
 '''
+__________________________________________________________________________________
+EVENT MANAGER OBJECTIVES:
+
+We need to basically simulate a full-blown theatrical lighting console
+and Dolby Atmos sound system inside Blender. Unlike a lighting console,
+Sorcerer works primarily with f-curves. That presents many unique 
+challenges. 
+
+    Objective 1. Harmonize.
+        Traditional animation is different from ALVA lighting animation
+        because traditional 3D animation doesn't usually require 
+        controlling hundreds of completely separate objects at once, 
+        outside simulations at least. For this reason, we need to use
+        a controller-based approach where you control objects more 
+        indirectly. You can have hundreds of different controllers and 
+        each controller can target whatever it wants whenever it wants.
+        As a result, they can tend to disagree. So we need to harmonize
+        the disagreements so we don't spam the lighting console with 
+        contradictory commands. We also want to simplify them as best
+        we can to minimize bandwidth usage. We even give the user 
+        "freezing" options they can use to make individual controllers
+        only go every other frame or every third frame.
+
+    Objective 2. Sync.
+        We need to keep the lighting console's timecode clock in sync with 
+        Blender's timecode clock during playback. We do this with singular
+        OSC commands, not by actually streaming a continuous timecode 
+        signal. This way, it's far, far simpler for the end user. It even 
+        works through WiFi. We can get away with this where others can't 
+        because Sorcerer is not intended for realtime use at FOH during 
+        final shows. It's a lot like how a you don't keep a video editor
+        open when you show a movie to an audience. You instead render out
+        the movie, close the video editor (in this case Sorcerer), and play
+        back the movie with something else that's far better at the realtime,
+        high stress, high reliability environment.
+
+        In addition to just keeping timecode in sync, we also have little
+        optional things we'd like to do on play and on stop. For example,
+        turning the house lights down a little on play, turning them back
+        up on stop, firing the latest cue in the sequencer if we are starting
+        from the middle of a cue sequence (otherwise you would have to 
+        constantly scrub backwards to fire the most relevant cue or the stage
+        may look completely wrong for the moment you're working on.) The 
+        user can turn all these things off an on in Sorcerer Preferences.
+
+    Objective 3. Fix Blender's Depsgraph.
+        Blender's depsgraph system does not automatically run the updaters
+        of custom properties when they are updated by fcurves during frame 
+        change or playback. That means we need to sort of build our own 
+        depsgraph system that just looks for stuff that changed since the 
+        last frame. That way we know what stuff needs to be done during frame
+        change.
+
+    Objective 4 (solved by orb.py).
+        We need a way to get all the animation stuff (and other types of 
+        stuff) from Blender onto the console where it can be "played back" 
+        reliably. We solve this problem by inventing the "qmeo". A qmeo is 
+        like a video, but every frame is a lighting cue, not a picture. To
+        make a qmeo actually work, we need 3 things:
+
+            a. The console needs to have all the cues for each timecode frame
+               stored on its own hard drive, preferably in an out-of-the-way
+               cue list.
+
+            b. The console needs to have an event list that binds each cue
+               to its respective timecode frame. This way we don't have to
+               worry about them getting out of sync from using imprecise 
+               cue timings.
+
+            c. The user needs an extremely simple way to record and play 
+               back these qmeos. Preferably the user is able to just go to
+               a specific cue or fire a specific macro. The qmeo plays, the
+               qmeo finishes, and the qmeo stops its own clock when its done
+               so that the user doesn't have to.
+
+            d. While Sorcerer is building a qmeo, the user needs to be able
+               to escape out of that process without terminating Blender. 
+               Especially if they accidentally started to build a super long
+               qmeo.
+
+        We solve all these problems with the Orb assistant. Most buttons 
+        in Sorcerer's UI that use the purple orb icon are Orb operators. 
+        See orb.py to learn how.
+
+
+    Objective 5 (solved by the CPVIA folder).
+        Sorcerer is almost its own full blown lighting console with its own army 
+        of different controller types that can all be trying to do stuff to the 
+        same stuff at once. That creates two problems:
+         
+            1. Sorcerer does not send DMX, it doesn't have a patch page,
+               but it still needs to know things about specific fixtures or 
+               its commands to the lighting console won't make any sense.
+
+            2. We can't have all our controllers speaking whatever language they 
+               choose. They need to all speak the same language. That language is 
+               called CPVIA. A CPVIA request is a tuple in the form of
+
+        (Channel, Parameter, Value, Influence, Argument)
+
+        Every single controller that ever wants to make a change to a parameter
+        on the console must make a change request in the CPVIA format. This 
+        is how we keep everything sorted out in the data flow.
+
+        We need to keep this so organized because we often need to do a ton of 
+        stuff to the requests to make them kosher for the fixture on the console.
+        For example, mapping values to the right min/max, appending appropriate 
+        enable and disable commands for things like strobe (we definitely don't
+        want the user to have to manually enable such things. If they increase 
+        strobe value, we can reasonably infer they want the strobe on), and 
+        setting the argument to be relative or absolute based on the controller
+        type. We complete all these operations at various stages, so the CPVIA
+        format is very important.
+
+        See the cpvia folder to see how we manage the primary control flow.
+
+        
+    Objective 6. 3D Audio Panner.
+        This is currently out of order, but will be repaired soon. If you need 
+        it, go back to Alva Sequencer where it still works.
+
+
+Hopefully that provides you a general idea of what Sorcerer does, what kinds 
+of problems it solves, and how it solves them. Below is a more in-depth,
+technical documentation that is referenced within this script at each stage.
+
+
 __________________________________________________________________________________ 
 DOCUMENTATION CODE A1
 Sequence of events when frame changes BEGINS and we are NOT in playback:
