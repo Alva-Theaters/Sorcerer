@@ -88,6 +88,17 @@ Sorcerer’s non-oscillating effects are powered by Blender’s animation system
 The way we get that precision to the console itself is one of 2 ways: we can stream the data in real time over OSC, or we can record the animation onto the console frame by frame, cue by cue. Streaming in real-time at full speed via OSC can be slow and laggy, especially if the console can’t handle the bandwidth. That’s why we need to go slow, and often frame by frame. To playback at full speed at full strength, Sorcerer’s Orb feature allows us to create a "qmeo", with the press of a button. The non-oscillating effect is now stored on the console as an event-list/cue-list pair where each cue in the cue list represents a frame of the animation, while the event list is responsible for firing the cues/frames in time with the correct frame rate. Now, a Sorcerer-created non-oscillating effect can be played back on the console like a normal effect. However, note that it is next to impossible to make meaningful changes to the qmeo without deleting and recreating the qmeo with Sorcerer.
 
 
+**Service Mode:**
+------------------------------------------------------------------
+Service Mode is an unconventional logging system built into Sorcerer that does most of what a normal logging system does,
+but you control it from the Blender UI. It could not possibly be any simpler. Use it if you're debugging something,
+something's acting weird, and you want to start adding debug statements. Don't. First, enter into Service Mode to see if 
+the print statements you need are already there. Enter into (or exit out of) Service Mode by typing "service mode" into
+the str_manual_fixture_selection field at the top of an object controller in 3D view. Once in Service Mode, a new panel
+will appear in the VIEW3D space/area. In that panel, you can turn on or turn off the built-in print statements by script
+(or by OSC type). Unlike traditional logging systems, you don't have to reload scripts—or even touch the code editor/IDE
+to change what will and won't be printed. 
+
 
 **Basic Python Data Structure (For Beginners):**
 ------------------------------------------------------------------

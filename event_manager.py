@@ -378,17 +378,14 @@ class EventManager:
 
         '''A2:2'''
         alva_log("harmonizer", f"Harmonizer change_requests input: {change_requests}")
-        
         no_duplicates = Harmonizer.remove_duplicates(change_requests)
         alva_log("harmonizer", f"no_duplicates: {no_duplicates}")
-
         if scene.scene_props.is_democratic:
             no_conflicts = Harmonizer.democracy(no_duplicates)
             alva_log("harmonizer", f"Democratic. no_conflicts: {no_conflicts}")
         else:
             no_conflicts = Harmonizer.highest_takes_precedence(no_duplicates)
             alva_log("harmonizer", f"HTP. no_conflicts: {no_conflicts}")
-            
         simplified = Harmonizer.simplify(no_conflicts)
         alva_log("harmonizer", f"simplified: {simplified}")
 
