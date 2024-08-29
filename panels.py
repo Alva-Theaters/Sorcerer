@@ -81,6 +81,7 @@ from .as_ui.space_view3d import (
     draw_alva_view_3d_view,
     draw_view3d_cmd_line,
     draw_tool_settings,
+    draw_service_mode
 )
 from .as_ui.properties_scene import (
     draw_alva_stage_manager, 
@@ -183,6 +184,21 @@ class VIEW3D_PT_alva_fixture_generator(Panel, View3D_Panel):
 
     def draw(self, context):
         draw_generate_fixtures(self, context)
+
+
+class VIEW3D_PT_alva_service_mode(Panel):
+    """Access debug print settings"""
+    bl_label = "Service Mode"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Alva Sorcerer'
+
+    @classmethod
+    def poll(cls, context):
+        return context.scene.scene_props.service_mode
+
+    def draw(self, context):
+        draw_service_mode(self, context)
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -404,6 +420,7 @@ panels = [
     VIEW3D_PT_alva_lighting_modifiers,
     VIEW3D_PT_alva_fixture_groups,
     VIEW3D_PT_alva_fixture_generator,
+    VIEW3D_PT_alva_service_mode,
 
     SCENE_PT_alva_cue_switcher,
     SCENE_PT_alva_stage_manager,

@@ -33,6 +33,7 @@ from ..cpvia.cpvia_finders import CPVIAFinders # type: ignore
 from ..cpvia.split_color import ColorSplitter # type: ignore
 from ..cpvia.flags import check_flags
 from ..utils.utils import is_rendered_mode
+from ..maintenance.logging import alva_log
 
 
 '''
@@ -81,6 +82,8 @@ class CPVIAGenerator:
         i = []
         a = []
         influence = parent.influence
+
+        alva_log("cpvia_generator", f"CPV: {c}, {p}, {v}")
         for chan, param, val in zip(c, p, v):
             argument = finders.find_my_argument_template(parent, type, chan, param, val)
             i.append(influence)
@@ -90,6 +93,7 @@ class CPVIAGenerator:
         publisher = Publisher()
         #is_rendering = is_rendered_mode()
         is_rendering = False # Until Blender fixes their stuff. Can't enable render mode without immediately crashing.
+        alva_log("cpvia_generator", f"CPVIA: {c}, {p}, {v}, {i}, {a}")
         for chan, param, val, inf, arg in zip(c, p, v, i, a):
             if param in ["intensity", "raise_intensity", "lower_intensity", "color", "raise_color", "lower_color"] and is_rendering:
                 publisher.render_in_viewport(parent, chan, param, val)

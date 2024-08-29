@@ -85,7 +85,7 @@ class SceneProperties(PropertyGroup):
         description="Select the type of 3rd party audio mixer you wish to commandeer with Sorcerer",
         items=AlvaItems.mixer_types
     ) # type: ignore # type: ignore
-    
+
     core_type_enum: EnumProperty(
         name="Theater Type",
         description="Select the model theater",
@@ -97,6 +97,40 @@ class SceneProperties(PropertyGroup):
         description="Select the drive you will use to transport DTP assets to the core",
         items=AlvaItems.core_drives
     ) # type: ignore
+
+    # Service Mode
+    service_mode: BoolProperty(default=False) # type: ignore
+    # OSC
+    print_osc_lighting: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="OSC Lighting") # type: ignore
+    print_osc_video: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="OSC Video") # type: ignore
+    print_osc_audio: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="OSC Audio") # type: ignore
+    print_osc: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="All OSC") # type: ignore
+    # CPVIA
+    print_cpvia_generator: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="cpvia_generator.py") # type: ignore
+    print_flags: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="flags.py") # type: ignore
+    print_harmonizer: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="harmonizer.py") # type: ignore
+    print_influencers: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="influencers.py") # type: ignore
+    print_map: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="map.py") # type: ignore
+    print_mix: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="mix.py") # type: ignore
+    print_publish: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="publish.py") # type: ignore
+    print_split_color: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="split_color.py") # type: ignore
+    # Operators
+    print_common_operators: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="common_operators.py") # type: ignore
+    print_cue_builder_operators: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="cue_builder_operators.py") # type: ignore
+    print_node_operators: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="node_operators.py") # type: ignore
+    print_orb_operators: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="orb_operators.py") # type: ignore
+    print_properties_operators: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="properties_operators.py") # type: ignore
+    print_sequencer_operators: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="sequencer_operators.py") # type: ignore
+    print_strip_formatter_operators: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="strip_formatter_operators") # type: ignore
+    print_view3d_operators: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="view3d_operators.py") # type: ignore
+    # Updaters
+    print_common_updaters: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="common_updaters.py") # type: ignore
+    print_node_updaters: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="node_updaters.py") # type: ignore
+    print_properties_updaters: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="properties_updaters.py") # type: ignore
+    print_sequencer_updaters: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="sequencer_updaters.py") # type: ignore
+    # Main
+    print_event_manager: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="event_manager.py") # type: ignore
+    print_orb: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="orb.py") # type: ignore
     
     str_core_ip_address: StringProperty(name="Theater IP Address", default="") # type: ignore
     

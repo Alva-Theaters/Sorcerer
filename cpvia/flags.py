@@ -27,20 +27,27 @@
 ## Double hashtag indicates notes for future development requiring some level of attention
 
 
+from ..maintenance.logging import alva_log
+
+
 def check_flags(context, parent, c, p, v, type):
     if not parent or not type or not p or not c or not v:
+        alva_log("flags", "Stopping CPVIA per nonetypes.")
         return False
 
     if hasattr(parent, "mute") and parent.mute:
+        alva_log("flags", "Stopping CPVIA per mute.")
         return False
 
     scene = context.scene.scene_props
     p = p[0]
 
     if scene.freeze_cpvia:
+        alva_log("flags", "Stopping CPVIA per freezing.")
         return False
 
     if not scene.enable_lighting:
+        alva_log("flags", "Stopping CPVIA per enable_lighting.")
         return False
     
     # Check type-related flags
@@ -52,8 +59,10 @@ def check_flags(context, parent, c, p, v, type):
 
     if type in type_checks:
         if not type_checks[type]:
+            alva_log("flags", "Stopping CPVIA per type_checks.")
             return False
     elif not scene.enable_objects:
+        alva_log("flags", "Stopping CPVIA per type_checks.")
         return False
 
     # Check parameter-related flags
@@ -72,10 +81,13 @@ def check_flags(context, parent, c, p, v, type):
     }
 
     if p in param_flags and not param_flags[p]:
+        alva_log("flags", "Stopping CPVIA per parameter toggles.")
         return False
     
     if scene.has_solos and (scene.is_playing or scene.in_frame_change):
         if not parent.alva_solo:
+            alva_log("flags", "Stopping CPVIA per solos.")
             return False
         
+    alva_log("flags", "CPVIA passes all flags, continuing.")
     return True

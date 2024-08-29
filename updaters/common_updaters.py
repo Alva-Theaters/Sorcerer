@@ -79,6 +79,10 @@ class CommonUpdaters:
             item = self.list_group_channels.add()
             item.chan = chan
 
+        if self.str_manual_fixture_selection.lower() == "service mode":
+            context.scene.scene_props.service_mode = not context.scene.scene_props.service_mode
+            self.str_manual_fixture_selection = ""
+
             
     @staticmethod
     def group_profile_updater(self, context):

@@ -27,6 +27,9 @@
 ## Double hashtag indicates notes for future development requiring some level of attention
 
 
+# Alva Logging for this script is actually done from the event_manager.py script.
+
+
 class Harmonizer:    
     @staticmethod        
     def remove_duplicates(change_requests):
@@ -61,7 +64,7 @@ class Harmonizer:
             a = value_dict['arguments']
             v = weighted_sum / total_influence  # Calculate weighted average value
             no_conflicts.append((c, p, v, total_influence, a))
-        
+
         return no_conflicts
 
     @staticmethod
@@ -86,7 +89,6 @@ class Harmonizer:
         ''' Finds any instances where everything but channel number is the same 
             between multiple requests and combines them using "thru" for consecutive numbers.
         '''
-        
         simplified_dict = {}
 
         for c, p, v, i, a in no_conflicts:

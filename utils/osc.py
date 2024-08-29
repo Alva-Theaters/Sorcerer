@@ -31,6 +31,8 @@ import bpy
 import socket
 import time
 
+from ..maintenance.logging import alva_log
+
 
 class OSC:
     def correct_argument_because_etc_is_weird(argument):
@@ -41,7 +43,6 @@ class OSC:
         scene = bpy.context.scene.scene_props
         ip_address = scene.str_osc_ip_address
         port = scene.int_osc_port
-        #print(argument)
         OSC.send_osc_string(address, ip_address, port, argument)
         
         
@@ -50,7 +51,7 @@ class OSC:
         scene = bpy.context.scene.scene_props
         ip_address = scene.str_osc_ip_address
         port = scene.int_osc_port
-        #print(argument)
+        alva_log("osc_lighting", argument)
         OSC.send_osc_string(address, ip_address, port, argument)
 
 
@@ -72,7 +73,7 @@ class OSC:
         scene = bpy.context.scene.scene_props
         ip_address = scene.str_osc_ip_address
         port = scene.int_osc_port
-        #print(argument)
+        alva_log("osc_video", argument)
         OSC.send_osc_string(address, ip_address, port, argument)
         
         
@@ -80,7 +81,7 @@ class OSC:
         scene = bpy.context.scene.scene_props
         ip_address = scene.str_osc_ip_address
         port = scene.int_osc_port
-        #print(argument)
+        alva_log("osc_audio", argument)
         OSC.send_osc_string(address, ip_address, port, argument)
 
 
@@ -102,5 +103,7 @@ class OSC:
         except Exception:
             import traceback
             traceback.print_exc()
+
+        alva_log("osc", string)
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

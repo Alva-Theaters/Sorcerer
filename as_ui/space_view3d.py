@@ -217,3 +217,52 @@ def draw_lighting_modifiers(self, context):
                 col.prop(mod, "highlights", slider=True)
                 col.prop(mod, "shadows", slider=True)
                 col.prop(mod, "blacks", slider=True)
+
+
+def draw_service_mode(self, context):
+    layout = self.layout
+    layout.use_property_split = True
+    layout.use_property_decorate = False
+
+    scene = context.scene.scene_props
+
+    # OSC
+    col = layout.column(heading="OSC")
+    col.prop(scene, "print_osc_lighting")
+    col.prop(scene, "print_osc_video")
+    col.prop(scene, "print_osc_audio")
+    col.prop(scene, "print_osc")
+
+    # CPVIA
+    col = layout.column(heading="CPVIA")
+    col.prop(scene, "print_cpvia_generator")
+    col.prop(scene, "print_flags")
+    col.prop(scene, "print_harmonizer")
+    col.prop(scene, "print_influencers")
+    col.prop(scene, "print_map")
+    col.prop(scene, "print_mix")
+    col.prop(scene, "print_publish")
+    col.prop(scene, "print_split_color")
+
+    # Operators
+    col = layout.column(heading="Operators")
+    col.prop(scene, "print_common_operators")
+    col.prop(scene, "print_cue_builder_operators")
+    col.prop(scene, "print_node_operators")
+    col.prop(scene, "print_orb_operators")
+    col.prop(scene, "print_properties_operators")
+    col.prop(scene, "print_sequencer_operators")
+    col.prop(scene, "print_strip_formatter_operators")
+    col.prop(scene, "print_view3d_operators")
+
+    # Updaters
+    col = layout.column(heading="Updaters")
+    col.prop(scene, "print_common_updaters")
+    col.prop(scene, "print_node_updaters")
+    col.prop(scene, "print_properties_updaters")
+    col.prop(scene, "print_sequencer_updaters")
+
+    # Main
+    col = layout.column(heading="Main")
+    col.prop(scene, "print_event_manager")
+    col.prop(scene, "print_orb")

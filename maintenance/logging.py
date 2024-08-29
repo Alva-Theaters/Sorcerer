@@ -27,19 +27,50 @@
 ## Double hashtag indicates notes for future development requiring some level of attention
 
 
-import logging
-import logging.config
-import os
-
-log_file_path = os.path.join(os.path.dirname(__file__), 'log.txt')
+import bpy
 
 
-def alva_logging(level=logging.CRITICAL):
-    logging.basicConfig(
-        level=level,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.StreamHandler(),
-            logging.FileHandler(log_file_path)
-        ]
-    )
+scripts = [
+    # OSC
+    "print_osc_lighting",
+    "print_osc_video",
+    "print_osc_audio",
+    "print_osc",
+
+    # CPVIA
+    "print_cpvia_generator",
+    "print_flags",
+    "print_harmonizer",
+    "print_influencers",
+    "print_map",
+    "print_mix",
+    "print_publish",
+    "print_split_color",
+
+    # Operators
+    "print_common_operators",
+    "print_cue_builder_operators",
+    "print_node_operators",
+    "print_orb_operators",
+    "print_properties_operators",
+    "print_sequencer_operators",
+    "print_strip_formatter_operators",
+    "print_view3d_operators",
+
+    # Updaters
+    "print_common_updaters",
+    "print_node_updaters",
+    "print_properties_updaters",
+    "print_sequencer_updaters",
+
+    # Main
+    "print_event_manager",
+    "print_orb"
+]
+
+
+def alva_log(script, string):
+    if bpy.context.scene.scene_props.service_mode:
+        if f"print_{script}" in scripts:
+            if getattr(bpy.context.scene.scene_props, f"print_{script}"):
+                print(string)
