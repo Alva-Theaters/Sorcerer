@@ -58,8 +58,14 @@ class Influencers:
             c = []
             param = []
             v = []
-            new_channels = current_channels - old_channels
-            
+
+            if parent.alva_is_absolute:
+                new_channels = current_channels | old_channels
+                raise_prefix = ""
+            else:
+                new_channels = current_channels - old_channels
+                raise_prefix = "raise_"
+
             # Release
             if type == "Influencer":
                 for chan in list(raise_channels):
@@ -85,11 +91,12 @@ class Influencers:
                 channel = cpvia_finders.find_channel_number(chan)
                 c.append(channel)
                 
-                # Append Parameter
+                # Append Parameter. 
+                # Don't mess with this block unless you know exactly what you're doing.
                 if type == "Brush":
-                    param.append(f"raise_{p}")
+                    param.append(f"{raise_prefix}{p}")
                 elif type == "Influencer" and p != "color":
-                    param.append(f"raise_{p}")
+                    param.append(f"{raise_prefix}{p}")
                 else: param.append(p)
                 
                 # Append Value
@@ -103,7 +110,6 @@ class Influencers:
                         else: new_raise_value = restore_value
                         
                         if type == "Brush":
-                            #return [], [], []
                             if parent.is_erasing:
                                 new_raise_value = (1, 1, 1)
                             new_raise_value = self.invert_color(new_raise_value)

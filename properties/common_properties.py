@@ -158,6 +158,7 @@ class CommonProperties:
         ('is_erasing', BoolProperty(name="Eraser", description="Erase instead of add")),
         ('influencer_list', CollectionProperty(type=InfluencerListSubClass)),
         ('float_object_strength', FloatProperty(name="Strength", default=1, min=0, max=1, description="If you diminish the strength, it will act like a brush. If you keep this up all the way, it will act more like an object passing through the lights that resets them as it leaves", update=CommonUpdaters.controller_ids_updater)),
+        ('alva_is_absolute', BoolProperty(name="Absolute", default=False, description="With this enabled, the influencer can't work on top of other effects, but it can put animations on dynamic targets. Instead of sending a command to increase the value, it will command the console to go to a specific value full stop")),
         
         # Pan/Tilt node properties. Registered on object for patch reasons.
         ('float_vec_pan_tilt_graph', FloatVectorProperty(
