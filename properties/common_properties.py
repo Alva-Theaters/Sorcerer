@@ -361,7 +361,7 @@ class CommonProperties:
         )),
         ('float_strobe', FloatProperty(
             name="Shutter Strobe",
-            default=0.0,
+            default=100.0,
             min=0.0,
             max=100.0,
             description="Shutter strobe value",

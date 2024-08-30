@@ -66,6 +66,7 @@ class CPVIAGenerator:
         find_function (function): The function that finds the channels and values for the given property.
         """
         finders = Find()
+        alva_log("cpvia_generator", f"CPVIA Initial: {property_name}, {self}")
 
         p = property_name  # Inherited from the partial.
         mode = p

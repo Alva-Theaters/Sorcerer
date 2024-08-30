@@ -57,6 +57,7 @@ scripts = [
 
     # CPVIA
     "print_cpvia_generator",
+    "print_find",
     "print_flags",
     "print_harmonizer",
     "print_influencers",

@@ -36,6 +36,7 @@ from ..assets.sli import SLI # type: ignore
 from ..assets.dictionaries import Dictionaries # type: ignore
 from ..cpvia.map import Mapping # type: ignore
 from ..cpvia.find import Find # type: ignore
+from ..maintenance.logging import alva_log
 
 
 NUMBER_TO_ADD_IF_NULL = 1
@@ -56,28 +57,33 @@ class CPVIAFinders:
         v: Values list
         type: Controller type
         """
+        alva_log("find", f"Find my Channels and Values: {parent}, {p}")
         if p in ['pan_graph', 'tilt_graph']:
             controller_type = self._find_my_controller_type(parent, pan_tilt_node=True)  # Should return a string.
         else:
             controller_type = self._find_my_controller_type(parent, pan_tilt_node=False)  # Should return a string.
         
         if controller_type in ["Influencer", "Brush"]:
+            alva_log("find", f"Is Influencer or Brush.")
             from .influencers import Influencers
             influencers = Influencers()  # Must be instance.
             c, p, v = influencers.find_my_influencer_values(parent, p, controller_type)
             return c, p, v, controller_type
         
         elif controller_type in ["Fixture", "Pan/Tilt Fixture", "Pan/Tilt"]:
+            alva_log("find", f"Is Channel.")
             channel = self.find_channel_number(parent)
             value = self._find_my_value(parent, p, controller_type, channel)
             p = self._strip_graph_suffix(p)  # Change [pan or tilt]_graph to simple
             return [channel], [p], [value], controller_type
         
         elif controller_type in  ["group", "strip", "Stage Object"]:
+            alva_log("find", f"Is Group.")
             c, p, v = self._find_my_group_values(parent, p, controller_type)
             return c, p, v, controller_type
         
         elif controller_type == "mixer":
+            alva_log("find", f"Is Mixer.")
             mixing = Mixer()
             c, p, v = mixing.mix_my_values(parent, p)
             return c, p, v, controller_type

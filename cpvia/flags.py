@@ -64,6 +64,15 @@ def check_flags(context, parent, c, p, v, type):
     elif not scene.enable_objects:
         alva_log("flags", "Stopping CPVIA per type_checks.")
         return False
+    
+    if scene.has_solos and (scene.is_playing or scene.in_frame_change):
+        if not parent.alva_solo:
+            alva_log("flags", "Stopping CPVIA per solos.")
+            return False
+        
+    if type == 'mixer': # Bypass parameter toggles for mixers since they don't have them.
+        alva_log("flags", "CPVIA passes all flags, continuing.")
+        return True
 
     # Check parameter-related flags
     param_flags = {
@@ -83,11 +92,6 @@ def check_flags(context, parent, c, p, v, type):
     if p in param_flags and not param_flags[p]:
         alva_log("flags", "Stopping CPVIA per parameter toggles.")
         return False
-    
-    if scene.has_solos and (scene.is_playing or scene.in_frame_change):
-        if not parent.alva_solo:
-            alva_log("flags", "Stopping CPVIA per solos.")
-            return False
         
     alva_log("flags", "CPVIA passes all flags, continuing.")
     return True

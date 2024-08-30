@@ -486,13 +486,13 @@ def draw_pan_tilt_node(self, context, layout):
     active_object = None
     
     for obj in bpy.data.objects:
-        if obj.type == 'MESH' and obj.name == channel_string:
+        if obj.type == 'MESH' and obj.str_manual_fixture_selection == channel_string:
             active_object = obj
             break
     
     if active_object:
         #row.prop(active_object, "pan_is_inverted", text="", icon='SORT_DESC')
-        row.prop(self, "pan_tilt_channel", text="Channel:")
+        row.prop(self, "pan_tilt_channel", text="Channel")
         column.separator()
         column.separator()
         

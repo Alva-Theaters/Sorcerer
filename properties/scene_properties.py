@@ -107,6 +107,7 @@ class SceneProperties(PropertyGroup):
     print_osc: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="All OSC") # type: ignore
     # CPVIA
     print_cpvia_generator: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="cpvia_generator.py") # type: ignore
+    print_find: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="cpvia_finders.py") # type: ignore
     print_flags: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="flags.py") # type: ignore
     print_harmonizer: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="harmonizer.py") # type: ignore
     print_influencers: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="influencers.py") # type: ignore

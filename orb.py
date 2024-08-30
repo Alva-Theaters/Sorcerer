@@ -589,7 +589,7 @@ class Orb:
             # Ensure at least one object is selected.
             original_objects = [obj for obj in context.selected_objects]
             if not original_objects:
-                yield 'CANCELLED', "Please select at least one object in the viewport so Orb knows where to patch it on Augment 3D"
+                yield {'CANCELLED'}, "Please select at least one object in the viewport so Orb knows where to patch it on Augment 3D"
                 return
             
             yield Orb.Eos.record_snapshot(context.scene), "Orb is running"
@@ -718,8 +718,9 @@ class Orb:
             OSC.send_osc_lighting(address, argument)
 
             # Add group to Sorcerer group_data
-            new_group = scene.scene_group_data.add()
-            new_group.name = new_group.name
-            for channel in relevant_channels:
-                new_channel = new_group.channels_list.add()
-                new_channel.chan = channel
+            if len(relevant_channels) > 1:
+                new_group = scene.scene_group_data.add()
+                new_group.name = new_group.name
+                for channel in relevant_channels:
+                    new_channel = new_group.channels_list.add()
+                    new_channel.chan = channel

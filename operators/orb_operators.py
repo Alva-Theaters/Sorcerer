@@ -77,7 +77,10 @@ class ORB_OT_base_modal_operator(Operator):
             try:
                 func, msg = next(self._generator)
                 if func:
-                    func()
+                    try:
+                        func()
+                    except:
+                        print("An unknown error occured with Orb.")
                 if msg:
                     self.report({'INFO'}, msg)
             except StopIteration:

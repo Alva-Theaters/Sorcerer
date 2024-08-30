@@ -236,6 +236,7 @@ def draw_service_mode(self, context):
     # CPVIA
     col = layout.column(heading="CPVIA")
     col.prop(scene, "print_cpvia_generator")
+    col.prop(scene, "print_find")
     col.prop(scene, "print_flags")
     col.prop(scene, "print_harmonizer")
     col.prop(scene, "print_influencers")
