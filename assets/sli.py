@@ -30,6 +30,7 @@
 import inspect
 import os
 
+
 class SLI:
     def SLI_assert_unreachable(*args):
         """
