@@ -29,6 +29,7 @@
 
 import bpy
 from bpy.app.handlers import persistent
+import time
 
 from .utils.event_utils import EventUtils as Utils
 from .utils.utils import Utils as NormalUtils
@@ -345,11 +346,14 @@ class EventManager:
                 obj = update.id
 
                 if obj.object_identities_enum in {"Influencer", "Brush", "Stage Object", "Fixture"}:
+                    start = time.time()
                     if update.is_updated_transform:
                         Utils.trigger_special_update(obj)
+                    alva_log('time', f"trigger_special_update and is_updated_transform took {time.time() - start} seconds")
 
+        start = time.time()
         Utils.check_and_trigger_drivers(updated_objects)
-        
+        alva_log('time', f"check_and_trigger_drivers took {time.time() - start} seconds")
 
     #-------------------------------------------------------------------------------------------------------------------------------------------
     '''Frame Change PRE handlers'''
@@ -568,9 +572,9 @@ def load_macro_buttons(string):
         item = scene.macro_buttons.add()
         item.name = button
 
-@persistent
-def on_depsgraph_update_pre(scene):    
-    event_manager_instance.render_audio_objects(scene)
+# @persistent
+# def on_depsgraph_update_pre(scene):
+#     event_manager_instance.render_audio_objects(scene)
 
 @persistent
 def on_depsgraph_update_post(scene, depsgraph):
@@ -578,9 +582,11 @@ def on_depsgraph_update_post(scene, depsgraph):
 
 @persistent
 def on_frame_change_pre(scene):
+    start = time.time()
     event_manager_instance.timecode_scrubbing_and_fire_strip_mapping(scene)
     event_manager_instance.fire_parameter_updaters(scene)
     event_manager_instance.update_livemap(scene)
+    alva_log('time', f"on_frame_change_pre took {time.time() - start} seconds")
 
 @persistent
 def on_animation_playback(scene):
@@ -597,7 +603,7 @@ def on_frame_change_post(scene):
                     
 def register():
     bpy.app.handlers.load_post.append(load_macro_buttons)
-    bpy.app.handlers.depsgraph_update_pre.append(on_depsgraph_update_pre)
+    #bpy.app.handlers.depsgraph_update_pre.append(on_depsgraph_update_pre)
     bpy.app.handlers.depsgraph_update_post.append(on_depsgraph_update_post)
     bpy.app.handlers.frame_change_pre.append(on_frame_change_pre)
     bpy.app.handlers.frame_change_post.append(on_frame_change_post)
@@ -607,7 +613,7 @@ def register():
 
 def unregister():
     bpy.app.handlers.load_post.remove(load_macro_buttons)
-    bpy.app.handlers.depsgraph_update_pre.remove(on_depsgraph_update_pre)
+    #bpy.app.handlers.depsgraph_update_pre.remove(on_depsgraph_update_pre)
     bpy.app.handlers.depsgraph_update_post.remove(on_depsgraph_update_post)
     bpy.app.handlers.frame_change_pre.remove(on_frame_change_pre)
     bpy.app.handlers.frame_change_post.remove(on_frame_change_post)

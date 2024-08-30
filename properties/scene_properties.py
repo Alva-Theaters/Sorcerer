@@ -132,6 +132,7 @@ class SceneProperties(PropertyGroup):
     # Main
     print_event_manager: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="event_manager.py") # type: ignore
     print_orb: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="orb.py") # type: ignore
+    print_time: BoolProperty(default=False, description="Enable built-in debug prints to external command line for speed tests", name="Time") # type: ignore
     
     str_core_ip_address: StringProperty(name="Theater IP Address", default="") # type: ignore
     

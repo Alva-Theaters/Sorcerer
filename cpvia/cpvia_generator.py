@@ -27,6 +27,7 @@
 ## Double hashtag indicates notes for future development requiring some level of attention
 
 from functools import partial
+import time
 
 from ..cpvia.find import Find # type: ignore
 from ..cpvia.cpvia_finders import CPVIAFinders # type: ignore
@@ -65,6 +66,8 @@ class CPVIAGenerator:
         property_name (str): The name of the property to update.
         find_function (function): The function that finds the channels and values for the given property.
         """
+        start = time.time()
+        
         finders = Find()
         alva_log("cpvia_generator", f"CPVIA Initial: {property_name}, {self}")
 
@@ -99,6 +102,8 @@ class CPVIAGenerator:
             if param in ["intensity", "raise_intensity", "lower_intensity", "color", "raise_color", "lower_color"] and is_rendering:
                 publisher.render_in_viewport(parent, chan, param, val)
             publisher.send_cpvia(chan, param, val, inf, arg)
+
+        alva_log('time', f"cpvia_generator took {time.time() - start} seconds")
 
 
     '''These are the universal updater partial calls for direct 

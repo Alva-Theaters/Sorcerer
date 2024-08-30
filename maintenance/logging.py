@@ -84,7 +84,8 @@ scripts = [
 
     # Main
     "print_event_manager",
-    "print_orb"
+    "print_orb",
+    "print_time"
 ]
 
 

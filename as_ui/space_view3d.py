@@ -159,7 +159,7 @@ def draw_object_header(self, context, scene, active_object, node_layout=None):
         if identity == "Brush":
             row.prop(ao, "is_erasing", icon='GPBRUSH_ERASE_STROKE', text="Erase")
         else:
-            row.prop(ao, "alva_is_absolute", icon='FCURVE' if ao.alva_is_absolute else 'FREEZE', text="")
+            row.prop(ao, "alva_is_absolute", icon='FCURVE', text="")
 
     if scene.is_democratic and identity != "Brush":
         box = column.box()
@@ -269,3 +269,4 @@ def draw_service_mode(self, context):
     col = layout.column(heading="Main")
     col.prop(scene, "print_event_manager")
     col.prop(scene, "print_orb")
+    col.prop(scene, "print_time")

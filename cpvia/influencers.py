@@ -29,17 +29,21 @@
 
 import bpy
 from mathutils import Vector
+import time
 
 from ..assets.dictionaries import Dictionaries # type: ignore
 from ..cpvia.map import Mapping # type: ignore
 from ..cpvia.cpvia_finders import CPVIAFinders # type: ignore
 from ..assets.sli import SLI # type: ignore
 from ..utils.utils import Utils
+from ..maintenance.logging import alva_log
 
 
 class Influencers:  
     def find_my_influencer_values(self, parent, p, type):
         """Receives a bpy object mesh (parent), parameter, and controller_type, and returns three lists for channels list (c), parameters list, and values list (v)"""
+        start = time.time()
+
         attribute_name = Dictionaries.parameter_mapping.get(p)
         if attribute_name:  # Find and map value
             new_value = getattr(parent, attribute_name)
@@ -139,6 +143,7 @@ class Influencers:
                 if p != "color":
                     new_channel.original_influence = new_value
 
+            alva_log('time', f"find_my_influencer_values took {time.time() - start} seconds")
             return c, param, v
         
         else:
@@ -160,28 +165,15 @@ class Influencers:
         return False
         
 
-    def is_inside_mesh(self, obj, mesh_obj):
+    def is_inside_mesh(self, obj, controller, bbox_min, bbox_max):
         #torus = is_torus(mesh_obj)
         #torus = False
         
         #if not torus:
         # Transform the object's location into the mesh object's local space.
-        obj_loc_local = mesh_obj.matrix_world.inverted() @ obj.location
-
-        # Get the local bounding box corners of the mesh object.
-        bbox_corners_local = [Vector(corner) for corner in mesh_obj.bound_box]
-
-        # Calculate the min and max bounding box corners in local space.
-        bbox_min = Vector((min(corner.x for corner in bbox_corners_local),
-                            min(corner.y for corner in bbox_corners_local),
-                            min(corner.z for corner in bbox_corners_local)))
-        bbox_max = Vector((max(corner.x for corner in bbox_corners_local),
-                            max(corner.y for corner in bbox_corners_local),
-                            max(corner.z for corner in bbox_corners_local)))
+        obj_loc_local = controller.matrix_world.inverted() @ obj.location
         inside = all(bbox_min[i] <= obj_loc_local[i] <= bbox_max[i] for i in range(3))
-
         return inside
-
         
     #        else:
     #            depsgraph = bpy.context.evaluated_depsgraph_get()
@@ -221,8 +213,22 @@ class Influencers:
         
     def find_influencer_current_channels(self, parent):
         """Receives a bpy object mesh, parent, and returns a set representing channels within that mesh"""
-        lights_inside = {obj for obj in bpy.data.objects if obj.type == 'MESH' and not obj.hide_viewport and self.is_inside_mesh(obj, parent)}
+        start = time.time()
+        
+        # Get the local bounding box corners of the mesh object.
+        bbox_corners_local = [Vector(corner) for corner in parent.bound_box]
+
+        # Calculate the min and max bounding box corners in local space.
+        bbox_min = Vector((min(corner.x for corner in bbox_corners_local),
+                            min(corner.y for corner in bbox_corners_local),
+                            min(corner.z for corner in bbox_corners_local)))
+        bbox_max = Vector((max(corner.x for corner in bbox_corners_local),
+                            max(corner.y for corner in bbox_corners_local),
+                            max(corner.z for corner in bbox_corners_local)))
+        
+        lights_inside = {obj for obj in bpy.data.objects if obj.type == 'MESH' and not obj.hide_viewport and self.is_inside_mesh(obj, parent, bbox_min, bbox_max)}
         lights_inside = {obj for obj in lights_inside if obj.name != parent.name}
+        alva_log('time', f"find_influencer_current_channels took {time.time() - start} seconds")
         return lights_inside
 
         
