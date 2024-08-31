@@ -1,91 +1,51 @@
 **3D Animation in Real Life, for Theatre, with Blender**
 ======================================================================
+
+.. figure:: ../sorcerer/images/alva_sorcerer.png
+   :align: center
+   :alt: 3D Audio
+   :width: 700px
+   
 Imagine an absurdly sophisticated, effortlessly intuitive, exotically bizarre entertainment lighting software designed by aliens from a distant planet. Imagine this software is capable of doing things with lights that make our expensive lighting consoles shake in their boots. Imagine that using this software as an artist is so intuitive that it feels the same as painting with a paint brush, playing piano, or writing poetry. That’s what Alva Sorcerer is trying to be. It’s not trying to be just another DMX software. It’s not just trying to make a few steps forward. It’s trying to **radically redefine extraordinary**.
 
 Alva Sorcerer is a heavyweight Blender addon that uses OSC to remote-control ETC Eos family theatrical lighting consoles, Qlab, live sound mixers, and other professional lighting consoles. Blender is the free and open source 3D animation suite supporting modeling, rigging, animation, simulation, rendering, compositing, motion tracking and video editing. Alva Sorcerer connects that power to FOH show control to create 3D animations in real life for theatre.
 
 
-**What Does it Actually Do?**
----------------------------------------
+1.	Software Type:
+- Blender addon. Blender is an open-source 3D animation suite
+- OSC remote-control for ETC Eos lighting console, common in theaters
+- Produces deliverables for existing FOH hardware to play back
 
-Imagine the software they use to make 3D animated movies like Tangled, Kung Fu Panda, Frozen, movies like that. Sorcerer lets you use that kind of software to control the lighting, video, and audio at a theater. That's why it's called 3D animation in real life, for theatre, with Blender. Basically, in one software only, you have god-like control over everything in the theater at all times in the most intuitive way possible. There's no geeky techno syntax, it's just organic artistic flow. In fact, the term "pro\*\*\*mming" is banned at Alva Theaters, except in the context of an actual programming language (like Python or C). You don't "pro\*\*\*m" lights, you "design" lights.
+2.	Software Objectives:
+- Provide artist-friendly, nontechnical way to create a lighting show
+- Allow user to create lifelike, emotional animations with stage lights
+- Allow user to integrate lighting control with music seamlessly
 
+3.	Software Constraints:
+- Must increase flexibility and precision—cannot decrease it
+- User must be able to bring their own ETC Eos lighting console
+- Each feature family must be fully explainable in 60 seconds, respectively
 
-**Even More Simply:**
--------------------------------------------
-The quickest way to use Sorcerer is when you're trying to make lights dance to music, but you have to use an ETC Eos theatrical lighting console to do it since that's the console your theater has. Sorcerer makes that stupidly easy, so easy that it's extremely unfair to everyone else. It's so easy to sync the lights to the music with Sorcerer/Eos that you could teach a 3rd grader to do it.
+4.	DELETED Software Constraints:
+- Must be able to send DMX
+- Must be able to complete all basic lighting console tasks
+- Must be reliable and fast enough for real-time operation
 
+5.	Primary Achievements of Version 2:
+- Automatically stores complex Blender animations onto Eos with one click
+- Creates precise, musical timecode sequences on Eos in seconds
+- Most feature families can be fully demonstrated in 1 minute, respectively
 
-**Entry-level Features:**
----------------------------------------
+6.	Approach:
+- First-principles approach that simplifies problems to their purest form
+- Anti-parts approach that deletes dumb parts instead of fixing dumb parts
+- Anti-technical approach that says the artist experience is the only priority
 
-- Automation tools for ETC Eos lighting consoles like copy/paste macro builder and timecode setup
-- Sequence-based timecode editing for ETC Eos
-- True 3D audio panner with animatable audio objects
-- Mixers, which make gradients on ETC Eos extremely simple
-- Node-based ML editors, which replaces many magic sheets
-- Stage-manage a theater show like a bad*ss rocket launch director
-- 3D magic sheets without need for words, sliders, buttons, or anything like that
-- Use virtual 3D objects to influence lights for super intuitive effects
-- Full-screen robust graph editor for precisely editing fades
+7.	Points of Common Confusion
+- It acts like a video editor that renders out a video for the console to play later
+- It provides the option to use animation, but has many other controller types
+- It’s built on top of Blender to get a piggyback ride on the shoulders of giants
 
-
-**"Organic Artistic Flow" vs "Geeky Techno Syntax":**
-------------------------------------------------------------------------------------
-Alva Sorcerer wants to make light design (and other types of technical theater) super fun, super exciting, super intutive, and super artsy. We can't do that with controllers that use geeky techno syntax. We need way more intuitive controls. Sorcerer's design methodology is "organic artistic flow" because the software needs to feel like playing a piano or scultping a scultpure. It needs to feel artsy. It needs to feel organic. It needs to feel like an extension of the artist's emotion. And we need to do this while actually increasing precision, which is the hard part.
-
-In practice, this means giving you an extremely robust graph editor, automating as many repetitive tasks as possible, allowing you to audition variations of effects extremely quickly with no effort, and letting you control lights in ways no one else can. Put simply, every part of the software is dumb, it's just a matter of how dumb. And all the parts of the software will continue to evaluate to Dumb until DDC reaches 0.0.
-
-**DDC: Design Drag Coefficient.** Anything that induces design drag, or anything that makes it take longer for you to take your vision to reality on stage—that's the enemy. That's what we're trying to minimize. The smaller the DDC, the higher the potential for awesomeness. The  less time you spend dealing with technicals, the more time you have to make amazing art.
-
-Sorcerer is designed with ADHD in mind. It's designed for people who can't remember syntax and have to sit there for multiple minutes searching the internet trying to remember what this command is or what that command is. That's not artsy, that's not organic, and that's not flow. "Flow" is a software that is so simple that you learn how everything works in under and hour, but you can spend a lifetime mastering it. Like a piano. A child can figure out how a piano works extremely quickly. It's fundamentally simple. But the complexity comes in how you use it. Right now, the status quo technical theatre control systems are not pianos because they are way too complicated, way too technical, are not nearly intuitive enough, are only accessible to technically minded people, and do not let you focus on art. They want to control the way you think, they want you to do it their way, and you spend more time fighting their software than doing art. They create really smart solutions to problems that are solutions to problems that are solutions to problems that are solutions to a problem that is not the correct problem. The correct question is how do we delete all the steps and skip right to the most fun part?
-
-Sorcerer is trying to become a piano because it understands that the best controller is no controller and that the best user experience is the one where the user forgets they are using software. Alva Sorcerer wants to become so simple and intuitive that you feel like you're god—at the theater at least. The time it takes to imagine something — anything — is almost the same amount of time it takes to make it real. And you don't have to have a decade of "programming" experience to do it.
-
-
-
-**What Sorcerer IS:**
----------------------------------------
-
-- Node-based light design for ETC Eos
-- Sequence-based light design for ETC Eos
-- Animation-based light design for ETC Eos
-- 3D bitmapping for light design for ETC Eos
-- Motion capture for light design for ETC Eos
-- 3D audio panner for Qlab and M32
-- Automation tools for ETC Eos
-- ADHD friendly
-
-
-**What Sorcerer Does NOT Do:**
----------------------------------------
-
-- It is not DMX software, it instead remote-controls professional consoles and produces deliverables
-- Sorcerer is not visualization software
-- It does not output multichannel audio, it instead works with Qlab and/or an audio mixer
-- It is not meant to send OSC during final shows, it instead creates deliverables stored on FOH hardware for the final show(s)
-
-
-**Use Cases:**
-------------------
-
-- Use an absurdly simple node layout to provide students or volunteers the simplest conceivable way to control lights
-- Output short, extremely sophisticated and precise lighting animations as deliverables to play as effects
-- Animate moving lights to track 3D audio objects
-- Use the video editor to make timecoding on Eos absurdly intuitive
-- Use node layouts to build lighting cues the way a painter would, not how a computer programmer would
-- Create exotic lighting effects by animating 3D objects that influence the lights they move over
-
-
-**Relevant Blender Feature Sets:**
----------------------------------------
-
-- Advanced animation tools like Graph Editor, NLA Editor, Dope Sheet, arrays, and constraints 
-- Blender’s .blend file management 
-- Blender’s highly customizable UI and keymap 
-- Asset manager for organizing and sharing file components
-- Many other tools within Blender that have been under continuous, iterative, open source evolution for 3 decades
-- The Blender community
 
 
 **Compatibility:**
