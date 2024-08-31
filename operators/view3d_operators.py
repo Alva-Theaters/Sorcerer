@@ -76,7 +76,7 @@ class ModalChannelControllerPanel(Operator):
         return wm.invoke_props_dialog(self, width=260)
     
     def __del__(self):
-        if bpy.context:
+        if bpy.context.scene and hasattr(bpy.context.scene, "scene_props"):
             bpy.context.scene.scene_props.channel_controller_is_active = False
     
     def draw(self, context):
