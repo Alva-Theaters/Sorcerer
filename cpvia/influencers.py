@@ -214,7 +214,7 @@ class Influencers:
     def find_influencer_current_channels(self, parent):
         """Receives a bpy object mesh, parent, and returns a set representing channels within that mesh"""
         start = time.time()
-        
+
         # Get the local bounding box corners of the mesh object.
         bbox_corners_local = [Vector(corner) for corner in parent.bound_box]
 
@@ -251,3 +251,7 @@ class Influencers:
         x = parent.float_object_strength
         r, g, b = value
         return (r * x, g * x, b * x)
+    
+
+def test_influencers(SENSITIVITY): # Return True for fail, False for pass
+    return False

@@ -46,6 +46,7 @@ as_info = {
 }
 
 
+import bpy
 import sys
 import os
 
@@ -264,7 +265,17 @@ def register():
     except Exception as e:
         print("Failed to register keymap:", e)
 
-    from .spy import SorcererPython
+    from .spy import SorcererPython # Simply importing this initilializes spy
+
+    bpy.app.timers.register(on_register, first_interval=.01)
+
+
+def on_register():
+    from .maintenance.tests import test_sorcerer
+    from .event_manager import load_macro_buttons
+
+    test_sorcerer()
+    load_macro_buttons("")
 
 
 def unregister():

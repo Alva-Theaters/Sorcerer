@@ -49,8 +49,13 @@ def draw_alva_topbar(self, context):
         hasattr(context.scene, "scene_props") and 
         context.scene.scene_props.view_topbar):
         layout = self.layout
-        col = layout.column()
-        row = col.row(align=True)
+        if context.scene.scene_props.limp_mode:
+            row = layout.row()
+            row.alert = 1
+            scene = context.scene.scene_props
+            row.label(text=f"ALVA LIMP MODE: {scene.user_limp_mode_explanation}. Systems Down: {scene.number_of_systems_down}")
+            row.alert = 0
+        row = layout.row(align=True)
         row.operator("alva_topbar.preferences", text="", icon_value=orb.icon_id, emboss=0)
         layout.label(text=" +")
 

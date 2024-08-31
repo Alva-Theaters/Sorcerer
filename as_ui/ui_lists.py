@@ -30,6 +30,10 @@
 import bpy
 from bpy.types import UIList
 
+class VIEW3D_UL_alva_errors_list(UIList):
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        layout.row().label(text=item.error_type)
+
 
 class COMMON_UL_group_data_list(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
@@ -121,6 +125,7 @@ class TEXT_UL_macro_list_all(UIList):
             
          
 uilist_classes = [
+    VIEW3D_UL_alva_errors_list,
     COMMON_UL_group_data_list,
     SCENE_UL_preview_cue_list,
     SCENE_UL_program_cue_list,

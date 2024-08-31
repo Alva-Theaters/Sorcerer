@@ -279,3 +279,7 @@ class Publisher:
     def clear_requests(self):
         global change_requests
         change_requests = []
+
+
+def test_publisher(SENSITIVITY): # Return True for fail, False for pass
+    return False

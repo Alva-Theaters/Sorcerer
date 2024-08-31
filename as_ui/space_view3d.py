@@ -35,6 +35,8 @@ from .space_common import draw_text_or_group_input
 import bpy.utils.previews
 import os
 
+DISASTER_THRESHOLD = 3
+
 preview_collections = {}
 pcoll = bpy.utils.previews.new()
 preview_collections["main"] = pcoll
@@ -222,7 +224,29 @@ def draw_lighting_modifiers(self, context):
 
 
 def draw_service_mode(self, context):
+    scene = context.scene.scene_props
     layout = self.layout
+
+    if scene.limp_mode:
+        if len(scene.errors) > DISASTER_THRESHOLD:
+            is_disaster = True
+        else:
+            is_disaster = False
+
+        row = layout.row()
+        row.alert = is_disaster
+        row.label(text="SORCERER ERRORS:")
+        layout.template_list("VIEW3D_UL_alva_errors_list", "", scene, "errors", scene, "errors_index")
+    
+        try:
+            item = scene.errors[scene.errors_index]
+            layout.label(text=f"Type: {item.error_type}")
+            layout.label(text=f"Explanation: {item.explanation}")
+            layout.label(text=f"Severity: {str(item.severity)}")
+            layout.label(text="Run from command line for details.")
+        except:
+            print("Could not find item for service mode UI List.")
+
     layout.use_property_split = True
     layout.use_property_decorate = False
 

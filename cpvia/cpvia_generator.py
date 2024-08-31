@@ -67,7 +67,7 @@ class CPVIAGenerator:
         find_function (function): The function that finds the channels and values for the given property.
         """
         start = time.time()
-        
+
         finders = Find()
         alva_log("cpvia_generator", f"CPVIA Initial: {property_name}, {self}")
 
@@ -173,3 +173,7 @@ edge_partial = partial(cpvia_generator.cpvia_generator, property_name="edge", fi
 gobo_id_partial = partial(cpvia_generator.cpvia_generator, property_name="gobo_id", find_function=finders_instance.find_my_channels_and_values)
 gobo_speed_partial = partial(cpvia_generator.cpvia_generator, property_name="gobo_speed", find_function=finders_instance.find_my_channels_and_values)
 prism_partial = partial(cpvia_generator.cpvia_generator, property_name="prism", find_function=finders_instance.find_my_channels_and_values)
+
+
+def test_cpvia_generator(SENSITIVITY): # Return True for fail, False for pass
+    return False

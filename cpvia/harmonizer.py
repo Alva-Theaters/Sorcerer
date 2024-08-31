@@ -124,3 +124,7 @@ class Harmonizer:
             simplified.append((combined_channels_str, p, v, i, a))
 
         return simplified
+    
+
+def test_harmonizer(SENSITIVITY): # Return True for fail, False for pass
+    return False

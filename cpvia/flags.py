@@ -95,3 +95,7 @@ def check_flags(context, parent, c, p, v, type):
         
     alva_log("flags", "CPVIA passes all flags, continuing.")
     return True
+
+
+def test_flags(SENSITIVITY): # Return True for fail, False for pass
+    return False
