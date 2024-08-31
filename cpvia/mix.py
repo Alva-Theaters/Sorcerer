@@ -39,6 +39,9 @@ from ..maintenance.logging import alva_log
 # pyright: reportInvalidTypeForm=false
 
 
+OFFSET_SENSITIVITY = .5
+
+
 class Mixer:
     def mix_my_values(self, parent, param):
         """Receives a bpy object mesh, parent, and returns three lists for channels list (c), parameters list (p), 
@@ -64,7 +67,7 @@ class Mixer:
         
     def mix(self, parent, parameter, channels):
         values_list = parent.parameters
-        offset = parent.float_offset * .5
+        offset = parent.float_offset * OFFSET_SENSITIVITY
         subdivisions = parent.int_subdivisions
         mode = parent.mix_method_enum
         param_mode = parameter
