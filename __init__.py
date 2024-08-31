@@ -14,6 +14,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+'''
+=====================================================================
+                      DESIGNED BY ALVA THEATERS
+                       FOR THE SOLE PURPOSE OF
+                         MAKING PEOPLE HAPPY
+=====================================================================
+'''
+
+# This file is part of Alva Sorcerer.
+# Copyright (C) 2024 Alva Theaters
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 
 '''
 =====================================================================
@@ -29,7 +53,7 @@ bl_info = {
     "name": "Alva Sorcerer",
     "author": "Alva Theaters",
     "location": "ShaderEditor/View3D/Sequencer/TextEditor/Properties",
-    "version": (2, 0, 1),
+    "version": (2, 0, 2),
     "blender": (4, 1, 0),
     "description": "3D animation in real life, for theatre, with Blender.",
     "warning": "Copious UI components. Not for existing Blender workflows.",
@@ -45,228 +69,58 @@ as_info = {
     "restrictions_url": "https://github.com/Alva-Theaters/Sorcerer/discussions/40"
 }
 
-
 import bpy
 import sys
 import os
 
 sys.path.append(os.path.dirname(__file__))
 
-try:
-    from .operators.strip_formatter_ops import register as strip_formatter_ops_register, unregister as strip_formatter_ops_unregister
-except ImportError as e:
-    print(f"Failed to import strip_formatter_ops: {e}")
+# START SEQUENCE
+MODULES = {
+    'strip_formatter_ops': 'operators.strip_formatter_ops',
+    'ui_lists': 'as_ui.ui_lists',
+    'property_groups': 'properties.property_groups',
+    'lighting_nodes': 'nodes.lighting_nodes',
+    'audio_nodes': 'nodes.audio_nodes',
+    'node_operators': 'operators.node_operators',
+    'properties_operators': 'operators.properties_operators',
+    'view3d_operators': 'operators.view3d_operators',
+    'cue_builder_ops': 'operators.cue_builder_ops',
+    'sequencer_operators': 'operators.sequencer_operators',
+    'orb_operators': 'operators.orb_operators',
+    'common_operators': 'operators.common_operators',
+    'text_properties': 'properties.text_properties',
+    'settings_properties': 'properties.settings_properties',
+    'sequencer_props': 'properties.sequencer_properties',
+    'scene_properties': 'properties.scene_properties',
+    'common_properties': 'properties.common_properties',
+    'panels': 'panels',
+    'menus': 'as_ui.menus',
+    'event_manager': 'event_manager',
+    'keymap': 'operators.keymap',
+}
 
-try:
-    from .as_ui.ui_lists import register as ui_lists_register, unregister as ui_lists_unregister
-except ImportError as e:
-    print(f"Failed to import ui_lists: {e}")
+REGISTER_FUNCS = []
+UNREGISTER_FUNCS = []
 
-try:
-    from .properties.property_groups import register as property_groups_register, unregister as property_groups_unregister
-except ImportError as e:
-    print(f"Failed to import property_groups: {e}")
 
-try:
-    from .nodes.lighting_nodes import register as lighting_nodes_register, unregister as lighting_nodes_unregister
-except ImportError as e:
-    print(f"Failed to import lighting_nodes: {e}")
-
-try:
-    from .nodes.audio_nodes import register as audio_nodes_register, unregister as audio_nodes_unregister
-except ImportError as e:
-    print(f"Failed to import audio_nodes: {e}")
-
-try:
-    from .operators.node_operators import register as node_operators_register, unregister as node_operators_unregister
-except ImportError as e:
-    print(f"Failed to import node_operators: {e}")
-
-try:
-    from .operators.properties_operators import register as props_operators_register, unregister as props_operators_unregister
-except ImportError as e:
-    print(f"Failed to import properties_operators: {e}")
-
-try:
-    from .operators.view3d_operators import register as view3d_operators_register, unregister as view3d_operators_unregister
-except ImportError as e:
-    print(f"Failed to import view3d_operators: {e}")
-
-try:
-    from .operators.cue_builder_ops import register as cue_builder_ops_register, unregister as cue_builder_ops_unregister
-except ImportError as e:
-    print(f"Failed to import cue_builder_ops: {e}")
-
-try:
-    from .operators.sequencer_operators import register as sequencer_operators_register, unregister as sequencer_operators_unregister
-except ImportError as e:
-    print(f"Failed to import sequencer_operators: {e}")
-
-try:
-    from .operators.orb_operators import register as orb_operators_register, unregister as orb_operators_unregister
-except ImportError as e:
-    print(f"Failed to import orb_operators: {e}")
-
-try:
-    from .operators.common_operators import register as common_operators_register, unregister as common_operators_unregister
-except ImportError as e:
-
-    print(f"Failed to import common_operators: {e}")
-
-try:
-    from .properties.text_properties import register as text_properties_register, unregister as text_properties_unregister
-except ImportError as e:
-    print(f"Failed to import text_properties: {e}")
-
-try:
-    from .properties.settings_properties import register as settings_properties_register, unregister as settings_properties_unregister
-except ImportError as e:
-    print(f"Failed to import settings_properties: {e}")
-
-try:
-    from .properties.sequencer_properties import register as sequencer_props_register, unregister as sequencer_props_unregister
-except ImportError as e:
-    print(f"Failed to import sequencer_props: {e}")
-
-try:
-    from .properties.scene_properties import register as scene_props_register, unregister as scene_props_unregister
-except ImportError as e:
-    print(f"Failed to import scene_properties: {e}")
-
-try:
-    from .properties.common_properties import register as common_properties_register, unregister as common_properties_unregister
-except ImportError as e:
-    print(f"Failed to import common_properties: {e}")
-
-try:
-    from .panels import register as panels_register, unregister as panels_unregister
-except ImportError as e:
-    print(f"Failed to import panels: {e}")
-
-try:
-    from .as_ui.menus import register as menus_register, unregister as menus_unregister
-except ImportError as e:
-    print(f"Failed to import menus: {e}")
-
-try:
-    from .event_manager import register as event_manager_register, unregister as event_manager_unregister
-except ImportError as e:
-    print(f"Failed to import event_manager: {e}")
-
-try:
-    from .operators.keymap import register as keymap_register, unregister as keymap_unregister
-except ImportError as e:
-    print(f"Failed to import event_manager: {e}")
+for module_name, module_path in MODULES.items():
+    try:
+        module = __import__(f"{__package__}.{module_path}", fromlist=['register', 'unregister'])
+        REGISTER_FUNCS.append(module.register)
+        UNREGISTER_FUNCS.append(module.unregister)
+    except ImportError as e:
+        print(f"Failed to import {module_name}: {e}")
 
 
 def register():
-    try:
-        strip_formatter_ops_register()
-    except Exception as e:
-        print("Failed to register strip_formatter_ops:", e)
+    for register_func in REGISTER_FUNCS:
+        try:
+            register_func()
+        except Exception as e:
+            print(f"Failed to register: {e}")
 
-    try:
-        ui_lists_register()
-    except Exception as e:
-        print("Failed to register ui_lists:", e)
-
-    try:
-        property_groups_register()
-    except Exception as e:
-        print("Failed to register property_groups:", e)
-
-    try:
-        lighting_nodes_register()
-    except Exception as e:
-        print("Failed to register lighting_nodes:", e)
-
-    try:
-        audio_nodes_register()
-    except Exception as e:
-        print("Failed to register audio_nodes:", e)
-
-    try:
-        node_operators_register()
-    except Exception as e:
-        print("Failed to register node_operators:", e)
-
-    try:
-        props_operators_register()
-    except Exception as e:
-        print("Failed to register properties_operators:", e)
-
-    try:
-        view3d_operators_register()
-    except Exception as e:
-        print("Failed to register view3d_operators:", e)
-
-    try:
-        cue_builder_ops_register()
-    except Exception as e:
-        print("Failed to register cue_builder_ops:", e)
-
-    try:
-        sequencer_operators_register()
-    except Exception as e:
-        print("Failed to register sequencer_operators:", e)
-
-    try:
-        orb_operators_register()
-    except Exception as e:
-        print("Failed to register orb_operators:", e)
-
-    try:
-        common_operators_register()
-    except Exception as e:
-        print("Failed to register common_operators:", e)
-
-    try:
-        text_properties_register()
-    except Exception as e:
-        print("Failed to register text_properties:", e)
-
-    try:
-        settings_properties_register()
-    except Exception as e:
-        print("Failed to register settings_properties:", e)
-
-    try:
-        sequencer_props_register()
-    except Exception as e:
-        print("Failed to register sequencer_props:", e)
-
-    try:
-        scene_props_register()
-    except Exception as e:
-        print("Failed to register scene_properties:", e)
-
-    try:
-        common_properties_register()
-    except Exception as e:
-        print("Failed to register common_properties:", e)
-
-    try:
-        panels_register()
-    except Exception as e:
-        print("Failed to register panels:", e)
-
-    try:
-        menus_register()
-    except Exception as e:
-        print("Failed to register menus:", e)
-
-    try:
-        event_manager_register()
-    except Exception as e:
-        print("Failed to register event_manager:", e)
-
-    try:
-        keymap_register()
-    except Exception as e:
-        print("Failed to register keymap:", e)
-
-    from .spy import SorcererPython # Simply importing this initilializes spy
-
+    from .spy import SorcererPython  # Simply importing this initializes spy
     bpy.app.timers.register(on_register, first_interval=.01)
 
 
@@ -279,107 +133,8 @@ def on_register():
 
 
 def unregister():
-    try:
-        keymap_unregister()
-    except Exception as e:
-        print("Failed to unregister keymap:", e)
-
-    try:
-        event_manager_unregister()
-    except Exception as e:
-        print("Failed to unregister event_manager:", e)
-
-    try:
-        menus_unregister()
-    except Exception as e:
-        print("Failed to unregister menus:", e)
-
-    try:
-        panels_unregister()
-    except Exception as e:
-        print("Failed to unregister panels:", e)
-
-    try:
-        common_properties_unregister()
-    except Exception as e:
-        print("Failed to unregister common_properties:", e)
-
-    try:
-        sequencer_props_unregister()
-    except Exception as e:
-        print("Failed to unregister sequencer_props:", e)
-
-    try:
-        settings_properties_unregister()
-    except Exception as e:
-        print("Failed to unregister settings_properties:", e)
-
-    try:
-        text_properties_unregister()
-    except Exception as e:
-        print("Failed to unregister text_properties:", e)
-
-    try:
-        common_operators_unregister()
-    except Exception as e:
-        print("Failed to unregister common_operators:", e)
-
-    try:
-        orb_operators_unregister()
-    except Exception as e:
-        print("Failed to unregister orb_operators:", e)
-
-    try:
-        sequencer_operators_unregister()
-    except Exception as e:
-        print("Failed to unregister sequencer_operators:", e)
-
-    try:
-        cue_builder_ops_unregister()
-    except Exception as e:
-        print("Failed to unregister cue_builder_ops:", e)
-
-    try:
-        view3d_operators_unregister()
-    except Exception as e:
-        print("Failed to unregister view3d_operators:", e)
-
-    try:
-        scene_props_unregister()
-    except Exception as e:
-        print("Failed to unregister scene_properties:", e)
-
-    try:
-        props_operators_unregister()
-    except Exception as e:
-        print("Failed to unregister properties_operators:", e)
-
-    try:
-        node_operators_unregister()
-    except Exception as e:
-        print("Failed to unregister node_operators:", e)
-
-    try:
-        audio_nodes_unregister()
-    except Exception as e:
-        print("Failed to unregister audio_nodes:", e)
-
-    try:
-        lighting_nodes_unregister()
-    except Exception as e:
-        print("Failed to unregister lighting_nodes:", e)
-
-    try:
-        property_groups_unregister()
-    except Exception as e:
-        print("Failed to unregister property_groups:", e)
-
-    try:
-        ui_lists_unregister()
-    except Exception as e:
-        print("Failed to unregister ui_lists:", e)
-
-    try:
-        strip_formatter_ops_unregister()
-    except Exception as e:
-        print("Failed to unregister strip_formatter_ops:", e)
+    for unregister_func in reversed(UNREGISTER_FUNCS):
+        try:
+            unregister_func()
+        except Exception as e:
+            print(f"Failed to unregister: {e}")
