@@ -189,7 +189,7 @@ class Mixer:
         max_channel = sorted_channels[-1]
         channel_range = max_channel - min_channel
         num_interpolation_points = len(channels)
-        interpolation_points = np.linspace(min_channel, max_channel, num_interpolation_points, endpoint=False) + offset * num_interpolation_points
+        interpolation_points = np.linspace(min_channel, max_channel, num_interpolation_points, endpoint=True) + offset * num_interpolation_points
         interpolation_points = np.mod(interpolation_points - min_channel, channel_range) + min_channel
         return interpolation_points
 
