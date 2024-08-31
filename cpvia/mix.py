@@ -29,8 +29,9 @@
 
 import bpy
 import numpy as np  # type: ignore
-from typing import List, Tuple
+from typing import List, Tuple, Union
 import time
+import mathutils
 
 from ..assets.sli import SLI 
 from ..maintenance.logging import alva_log
@@ -63,7 +64,7 @@ class Mixer:
         
     def mix(self, parent, parameter, channels):
         values_list = parent.parameters
-        offset = parent.float_offset
+        offset = parent.float_offset * .5
         subdivisions = parent.int_subdivisions
         mode = parent.mix_method_enum
         param_mode = parameter
@@ -179,9 +180,31 @@ class Mixer:
 
     def sort(self, channels: List[int], values: List[float]) -> Tuple[List[int], List[float]]:
         """Sort channels and values together so they are of same length, important for numpy."""
+        if len(channels) < len(values): # Handle cases where there are more value choices than channels
+            values = self.simplify_values(values, len(channels))
         sorted_channels_values = sorted(zip(channels, values))
         sorted_channels, sorted_values = zip(*sorted_channels_values)
         return list(sorted_channels), list(sorted_values)
+
+    def simplify_values(self, values_list: List[Union[float, Tuple[float, float, float]]], num_channels: int) -> List[Union[float, Tuple[float, float, float]]]:
+        """Simplifies the values list to match the number of channels by averaging groups of values."""
+        group_size = len(values_list) / num_channels
+        
+        simplified_values = []
+        for i in range(num_channels):
+            start = int(i * group_size)
+            end = int((i + 1) * group_size)
+            
+            group = values_list[start:end]
+            
+            if isinstance(group[0], mathutils.Color):
+                group_average = tuple(sum(component) / len(group) for component in zip(*group))
+            else:
+                group_average = sum(group) / len(group)
+            
+            simplified_values.append(group_average)
+        
+        return simplified_values
     
     def get_interpolation_points(self, sorted_channels: np.ndarray, channels: List[int], offset: float) -> np.ndarray:
         """Use numpy matrix to get interpolation points."""
@@ -189,7 +212,8 @@ class Mixer:
         max_channel = sorted_channels[-1]
         channel_range = max_channel - min_channel
         num_interpolation_points = len(channels)
-        interpolation_points = np.linspace(min_channel, max_channel, num_interpolation_points, endpoint=True) + offset * num_interpolation_points
+        interpolation_points = np.linspace(min_channel, max_channel, num_interpolation_points, endpoint=False) + offset * channel_range
+        alva_log('mix', f"Interpolation Array: {interpolation_points}")
         interpolation_points = np.mod(interpolation_points - min_channel, channel_range) + min_channel
         return interpolation_points
 
