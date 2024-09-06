@@ -160,7 +160,7 @@ def unregister_sockets():
 ###################
 class NODE_NT_group_controller(Node):
     bl_idname = 'group_controller_type'
-    bl_label = 'Group Controller Node'
+    bl_label = 'Group Controller'
     bl_icon = 'STICKY_UVS_LOC'
     bl_width_default = 300
     
@@ -186,7 +186,7 @@ class NODE_NT_group_controller(Node):
     
 class NODE_NT_mixer(Node):
     bl_idname = 'mixer_type'
-    bl_label = 'Mixer Node'
+    bl_label = 'Mixer'
     bl_icon = 'OPTIONS'
     bl_width_default = 400
 
@@ -252,7 +252,7 @@ class NODE_NT_pan_tilt(Node):
         
 class NODE_NT_global(Node):
     bl_idname = 'global_type'
-    bl_label = 'Global Node'
+    bl_label = 'Group Parameters'
     bl_icon = 'WORLD_DATA'
     bl_width_default = 600
     bl_description="Adjust any parameter across all Group Controller nodes"
@@ -312,7 +312,7 @@ class NODE_NT_motor(Node):
             
 class NODE_NT_console_buttons(Node):
     bl_idname = 'console_buttons_type'
-    bl_label = 'Direct Selects Node'
+    bl_label = 'Direct Selects'
     bl_icon = 'DESKTOP'
     bl_width_default = 400
     bl_description="Create console buttons with custom OSC syntax"
@@ -340,7 +340,7 @@ class NODE_NT_console_buttons(Node):
 
 class NODE_NT_flash(Node):
     bl_idname = 'flash_type'
-    bl_label = 'Flash Node'
+    bl_label = 'Flash'
     bl_icon = 'LIGHT_SUN'
     bl_width_default = 190
     bl_description="Autofill the Flash Up and Flash Down fields of flash strips in Sequencer with node settings and noodle links. Intended primarily for pose-based choreography"
@@ -377,7 +377,7 @@ class NODE_NT_flash(Node):
         
 class NODE_NT_alva_presets(Node):
     bl_idname = 'presets_type'
-    bl_label = 'Presets Node'
+    bl_label = 'Presets Grid'
     bl_icon = 'NONE'
     bl_width_default = 600
     bl_description="Record and recall console presets"
@@ -400,7 +400,7 @@ class NODE_NT_alva_presets(Node):
 
 class NODE_NT_settings(Node):
     bl_idname = 'settings_type'
-    bl_label = 'Settings Node'
+    bl_label = 'Settings'
     bl_icon = 'PREFERENCES'
     bl_width_default = 500
     bl_description="Sorcerer node settings"
