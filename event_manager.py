@@ -431,7 +431,7 @@ class EventManager:
         active_strip = context.scene.sequence_editor.active_strip
         current_frame = context.scene.frame_current
         
-        if not not active_strip:
+        if not active_strip:
             return
         
         relevant_cue_strip = Utils.find_livemap_cue(scene, current_frame, active_strip)
