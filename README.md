@@ -12,7 +12,7 @@ Sorcerer is a Blender add-on intended for theatrical lighting designers who stru
 
 - **3D Viewport:** Control lights with 3D objects
 - **Video Sequence Editor:** Sequence timecode events intuitively
-- **Node Editor:** Add as many ML Editors as desired
+- **Node Editor:** Use multiple ML Editors at once
 - **Graph Editor:** Adjust fade curves with near-analog precision
 - **Text Editor:** Generate Eos macros using QWERTY and Copy/Paste
 
