@@ -42,24 +42,64 @@ addon_dir = os.path.dirname(__file__)
 pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
 
 
-class TIME_MT_alva_time_flags(Menu): # This currently does absolutely nothing.
-    bl_idname = "TIME_MT_alva_time_flags"
-    bl_label = ""
+class NODE_MT_alva_general_audio_nodes(Menu): # This currently does absolutely nothing.
+    bl_idname = "NODE_MT_alva_general_audio_nodes"
+    bl_label = "General"
 
     def draw(self, context):
         layout = self.layout
-        layout.operator_context = 'INVOKE_DEFAULT'
-        layout.popover(
-            panel="TIME_PT_alva_flags",
-            text="Flags",
-        )
+        layout.operator("node.add_fader_bank_node", text="Fader Bank Node", icon='EMPTY_SINGLE_ARROW')
+        layout.operator("node.add_buses_node", text="Buses Node", icon='OUTLINER_OB_ARMATURE')
+        layout.operator("node.add_matrix_node", text="Matrix Node", icon='NETWORK_DRIVE')
+        layout.operator("node.add_dcas_node", text="DCAs Node", icon='VIEW_CAMERA')
+        layout.operator("node.add_eq_node", text="EQ Node", icon='SHARPCURVE')
+        layout.operator("node.add_compressor_node", text="Compressor Node", icon='MOD_DYNAMICPAINT')
+        layout.operator("node.add_gate_node", text="Gate Node", icon='IPO_EXPO')
+        layout.operator("node.add_reverb_node", text="Reverb Node", icon='IPO_BOUNCE') 
+
+
+class NODE_MT_alva_inputs_audio_nodes(Menu): # This currently does absolutely nothing.
+    bl_idname = "NODE_MT_alva_inputs_audio_nodes"
+    bl_label = "Inputs"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator("node.add_physical_inputs_node", text="Physical Inputs Node", icon='FORWARD')
+        layout.operator("node.add_aes50_a_inputs_node", text="AES50-A Inputs Node", icon='FORWARD')
+        layout.operator("node.add_aes50_b_inputs_node", text="AES50-B Inputs Node", icon='FORWARD')
+        layout.operator("node.add_usb_inputs_node", text="USB Inputs Node", icon='FORWARD')
+        layout.operator("node.add_madi_inputs_node", text="MADI Inputs Node", icon='FORWARD')
+        layout.operator("node.add_dante_inputs_node", text="Dante Inputs Node", icon='FORWARD')
+
+
+class NODE_MT_alva_outputs_audio_nodes(Menu):
+    bl_idname = "NODE_MT_alva_outputs_audio_nodes"
+    bl_label = "Outputs"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator("node.add_physical_outputs_node", text="Physical Outputs Node", icon='BACK')
+        layout.operator("node.add_aes50_a_outputs_node", text="AES50 Outputs Node", icon='BACK')
+        layout.operator("node.add_aes50_b_outputs_node", text="AES50 Outputs Node", icon='BACK')
+        layout.operator("node.add_usb_outputs_node", text="USB Outputs Node", icon='BACK')
+        layout.operator("node.add_madi_outputs_node", text="MADI Outputs Node", icon='BACK')
+        layout.operator("node.add_dante_outputs_node", text="Dante Outputs Node", icon='BACK')
+
+
+menus = [
+    NODE_MT_alva_general_audio_nodes,
+    NODE_MT_alva_inputs_audio_nodes,
+    NODE_MT_alva_outputs_audio_nodes
+]
 
 
 def register():
     from bpy.utils import register_class
-    register_class(TIME_MT_alva_time_flags)
+    for menu in menus:
+        register_class(menu)
 
 
 def unregister():
     from bpy.utils import unregister_class
-    unregister_class(TIME_MT_alva_time_flags)
+    for menu in reversed(menus):
+        unregister_class(menu)

@@ -30,6 +30,11 @@
 import bpy
 
 from ..utils.utils import Utils
+from .menus import (
+    NODE_MT_alva_general_audio_nodes,
+    NODE_MT_alva_inputs_audio_nodes,
+    NODE_MT_alva_outputs_audio_nodes
+)
 
 # Custom icon stuff
 import bpy.utils.previews
@@ -81,26 +86,9 @@ def draw_alva_node_menu(self, layout):
         if bpy.context.scene.scene_props.view_node_add_lighting:
             layout.separator()
             layout.label(text="Audio Nodes", icon_value=orb.icon_id)
-            layout.operator("node.add_physical_inputs_node", text="Physical Inputs Node", icon='FORWARD')
-            layout.operator("node.add_aes50_a_inputs_node", text="AES50-A Inputs Node", icon='FORWARD')
-            layout.operator("node.add_aes50_b_inputs_node", text="AES50-B Inputs Node", icon='FORWARD')
-            layout.operator("node.add_usb_inputs_node", text="USB Inputs Node", icon='FORWARD')
-            layout.operator("node.add_madi_inputs_node", text="MADI Inputs Node", icon='FORWARD')
-            layout.operator("node.add_dante_inputs_node", text="Dante Inputs Node", icon='FORWARD')
-            layout.operator("node.add_physical_outputs_node", text="Physical Outputs Node", icon='BACK')
-            layout.operator("node.add_aes50_a_outputs_node", text="AES50 Outputs Node", icon='BACK')
-            layout.operator("node.add_aes50_b_outputs_node", text="AES50 Outputs Node", icon='BACK')
-            layout.operator("node.add_usb_outputs_node", text="USB Outputs Node", icon='BACK')
-            layout.operator("node.add_madi_outputs_node", text="MADI Outputs Node", icon='BACK')
-            layout.operator("node.add_dante_outputs_node", text="Dante Outputs Node", icon='BACK')
-            layout.operator("node.add_fader_bank_node", text="Fader Bank Node", icon='EMPTY_SINGLE_ARROW')
-            layout.operator("node.add_buses_node", text="Buses Node", icon='OUTLINER_OB_ARMATURE')
-            layout.operator("node.add_matrix_node", text="Matrix Node", icon='NETWORK_DRIVE')
-            layout.operator("node.add_dcas_node", text="DCAs Node", icon='VIEW_CAMERA')
-            layout.operator("node.add_eq_node", text="EQ Node", icon='SHARPCURVE')
-            layout.operator("node.add_compressor_node", text="Compressor Node", icon='MOD_DYNAMICPAINT')
-            layout.operator("node.add_gate_node", text="Gate Node", icon='IPO_EXPO')
-            layout.operator("node.add_reverb_node", text="Reverb Node", icon='IPO_BOUNCE') 
+            layout.menu("NODE_MT_alva_general_audio_nodes")
+            layout.menu("NODE_MT_alva_inputs_audio_nodes")
+            layout.menu("NODE_MT_alva_outputs_audio_nodes")
 
 
 def draw_node_formatter_group(self, context, active_node):
