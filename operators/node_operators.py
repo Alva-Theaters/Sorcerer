@@ -59,7 +59,7 @@ class NODE_OT_node_formatter(Operator):
         column = layout.column(align=True)
         
         space = context.space_data.edit_tree.nodes
-        active_node = None 
+        active_node = None
 
         if hasattr(context.space_data, 'edit_tree') and context.space_data.edit_tree is not None:
             active_node = context.space_data.edit_tree.nodes.active

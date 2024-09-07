@@ -603,9 +603,10 @@ def draw_presets_node(self, context, layout):
 
         for controller in node_tree.nodes:
             if controller.bl_idname == 'group_controller_type':
+                group_label = Utils.find_group_label(controller)
                 box = column.box()
                 row = box.row(align=True)
-                row.label(text=f"{controller.str_group_id}: {controller.str_group_label}")
+                row.label(text=group_label)
 
                 row.prop(self, "is_recording", text="", icon='REC')
 
