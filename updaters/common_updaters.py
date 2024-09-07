@@ -38,15 +38,21 @@ from ..utils.osc import OSC
 class CommonUpdaters:
     @staticmethod
     def controller_ids_updater(self, context):
-        """This creates property group instances based on the manual
-           text input or group_profile_enum for list_group_channels"""
-        if self.str_manual_fixture_selection != "":
-            self.is_group_not_manual = True
+        """This intuits what mode the user must want the object to be,
+           based on what is or isn't typed into the manual selection 
+           field. That mode is used by CPVIA when the controller happens 
+           to be an object.
 
+           It also is responsible for updating all background properties
+           for controllers like labels, channels lists, and others."""
+        if not hasattr(self, "str_manual_fixture_selection") or not hasattr(self, "selected_group_enum"):
+            return
+        
+        if self.str_manual_fixture_selection != "":
+            self.is_text_not_group = True # Used primarily by UI
             channels_list = Utils.parse_channels(self.str_manual_fixture_selection)
 
             num_channels = len(channels_list)
-
             if num_channels > 1:
                 new_type = "Stage Object"
             elif num_channels == 1:
@@ -55,30 +61,31 @@ class CommonUpdaters:
                 new_type = "Influencer" # If the input text was unintelligible
 
         else:
-            self.is_group_not_manual = False
-            if self.selected_group_enum != "Dynamic":
+            self.is_text_not_group = False
+            self.str_group_label = self.selected_group_enum
+            if self.selected_group_enum == "Dynamic":
+                new_type = "Influencer"
+                channels_list = []
+            else:
+                new_type = "Stage Object"
                 item = [item for item in context.scene.scene_group_data if item.name == self.selected_group_enum]
                 if item is not None:
                     channels_list = [chan.chan for chan in item[0].channels_list]
 
-                new_type = "Stage Object"
-            else:
-                channels_list = []
-                new_type = "Influencer"
-
         if new_type == "Influencer" and hasattr(self, "float_object_strength"):
-            if not self.float_object_strength == 1:
+            if self.float_object_strength != 1:
                 new_type = "Brush"
 
         if hasattr(self, "object_identities_enum"):
             self.object_identities_enum = new_type
-        
+
+        # Update channels list
         self.list_group_channels.clear()
-        
         for chan in channels_list:
             item = self.list_group_channels.add()
             item.chan = chan
 
+        # "Secret" Backdoor to Service Mode
         if self.str_manual_fixture_selection.lower() == "service mode":
             context.scene.scene_props.service_mode = not context.scene.scene_props.service_mode
             self.str_manual_fixture_selection = ""

@@ -379,7 +379,7 @@ class NODE_NT_alva_presets(Node):
     bl_idname = 'presets_type'
     bl_label = 'Presets Grid'
     bl_icon = 'NONE'
-    bl_width_default = 600
+    bl_width_default = 400
     bl_description="Record and recall console presets"
     
     preset_argument_template: StringProperty(default="Group # Preset $ Enter", description="Write the OSC syntax your console expects for recalling presets. Insert # for group number and $ for color palette number.") # type: ignore # type: ignore

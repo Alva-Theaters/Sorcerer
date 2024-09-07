@@ -211,7 +211,8 @@ class Utils:
         controllers = Find.find_controllers(context.scene)
 
         for controller in controllers:
-            controller.str_manual_fixture_selection = controller.str_manual_fixture_selection
+            if hasattr(controller, "str_manual_fixture_selection"):
+                controller.str_manual_fixture_selection = controller.str_manual_fixture_selection
 
 
     def get_light_rotation_degrees(light_name):
@@ -477,12 +478,10 @@ class Utils:
         
 
     def find_group_label(controller):
-        if controller.is_group_not_manual:
+        if not controller.is_text_not_group:
             return controller.str_group_label
         else:
-            channels = [str(item.chan) for item in controller.list_group_channels]
-            string = ", ".join(channels)
-            return f"Channels {string}"
+            return f"Channels {controller.str_manual_fixture_selection}"
         
         
     def update_nodes(connected_nodes):

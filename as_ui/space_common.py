@@ -68,7 +68,7 @@ def draw_text_or_group_input(self, context, row_or_box, active_object, object=Fa
         row.prop(active_object, "selected_profile_enum", icon_only=True, icon='SHADERFX')
 
     # Decision between group and text or just group
-    if not active_object.is_group_not_manual:
+    if not active_object.is_text_not_group:
         row.prop(active_object, "selected_group_enum", text = "", icon='COLLECTION_NEW')
     row.prop(active_object, "str_manual_fixture_selection", text = "")
 

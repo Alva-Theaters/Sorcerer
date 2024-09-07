@@ -133,7 +133,7 @@ class CommonProperties:
         ('str_group_id',  StringProperty(default="1")),
         ('list_group_channels', CollectionProperty(type=ChannelsListSubClass)),
         ('str_group_label', StringProperty(default="")),
-        ('is_group_not_manual', BoolProperty(default=True, description="Stores the decision to use manual input or group enum")),
+        ('is_text_not_group', BoolProperty(default=True, description="Stores the decision to use manual input or group enum")),
         ('node_tree_pointer', PointerProperty(
             name="Node Tree Pointer",
             type=bpy.types.NodeTree,
