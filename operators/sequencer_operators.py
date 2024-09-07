@@ -43,6 +43,7 @@ from ..as_ui.space_sequencer import (
 from ..utils.utils import Utils # type: ignore
 from ..utils.osc import OSC
 from ..orb import Orb
+from ..maintenance.logging import alva_log
 
 # Custom icon stuff
 import bpy.utils.previews
@@ -205,8 +206,8 @@ class SEQUENCER_OT_extrude_strips(Operator):  ## New strips must inherit propert
         active_strip = context.scene.sequence_editor.active_strip
         self.active_strip_name = active_strip.name
         self.active_strip_color = active_strip.color
-        self.active_strip_start_frame_macro = active_strip.start_frame_macro
-        self.active_strip_end_frame_macro = active_strip.end_frame_macro
+        self.active_strip_start_frame_macro = active_strip.int_start_macro
+        self.active_strip_end_frame_macro = active_strip.int_end_macro
         self.active_strip_trigger_prefix = active_strip.trigger_prefix
         self.active_strip_osc_trigger = active_strip.osc_trigger
         self.active_strip_osc_trigger_end = active_strip.osc_trigger_end
@@ -243,16 +244,15 @@ class SEQUENCER_OT_extrude_strips(Operator):  ## New strips must inherit propert
             delta = (event.mouse_x - self.first_mouse_x) * self.sensitivity_factor
             num_duplicates = int(delta / self.pattern_length)
             
-            print("num_duplicates:", num_duplicates)
-            print("last_extruded_frame_end:", self.last_extruded_frame_end)
-            print("pattern end:", self.pattern_details[-1][1])
-            print("pattern length:", self.pattern_length)
+            alva_log("sequencer_operators", f"num_duplicates: {num_duplicates}")
+            alva_log("sequencer_operators", f"last_extruded_frame_end: {self.last_extruded_frame_end}")
+            alva_log("sequencer_operators", f"pattern end: {self.pattern_details[-1][1]}")
+            alva_log("sequencer_operators", f"pattern length: {self.pattern_length}")
 
             # Check if we need to create a new strip based on the mouse movement.
             if num_duplicates > 0 and (self.last_extruded_frame_end is None or 
                num_duplicates > (self.last_extruded_frame_end - self.pattern_details[-1][1]) // self.pattern_length):
                 
-                print("through check")
                 # Get the end frame of the last strip in the pattern.
                 last_frame_end = self.last_extruded_frame_end or self.pattern_details[-1][1]
                 # Sort the pattern details by the start frame of each strip.
@@ -299,8 +299,8 @@ class SEQUENCER_OT_extrude_strips(Operator):  ## New strips must inherit propert
         if new_strip:
             new_strip.name = self.active_strip_name
             new_strip.color = self.active_strip_color
-            new_strip.start_frame_macro = self.active_strip_start_frame_macro
-            new_strip.end_frame_macro = self.active_strip_end_frame_macro
+            new_strip.int_start_macro = self.active_strip_start_frame_macro
+            new_strip.int_end_macro = self.active_strip_end_frame_macro
             new_strip.trigger_prefix = self.active_strip_trigger_prefix
             new_strip.osc_trigger = self.active_strip_osc_trigger
             new_strip.osc_trigger_end = self.active_strip_osc_trigger_end
