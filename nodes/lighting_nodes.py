@@ -454,6 +454,7 @@ def register():
     # Mixer node common property registrations.
     Utils.register_properties(NODE_NT_mixer, common_properties.controller_ids)
     Utils.register_properties(NODE_NT_mixer, common_properties.common_header)
+    Utils.register_properties(NODE_NT_mixer, common_properties.mins_maxes) # For white balance property
 
 
 def unregister():
@@ -462,6 +463,7 @@ def unregister():
     
     Utils.register_properties(NODE_NT_mixer, common_properties.controller_ids, register=False)
     Utils.register_properties(NODE_NT_mixer, common_properties.common_header, register=False)
+    Utils.register_properties(NODE_NT_mixer, common_properties.mins_maxes, register=False)
     
     Utils.register_properties(NODE_NT_group_controller, common_properties.controller_ids, register=False)
     Utils.register_properties(NODE_NT_group_controller, common_properties.common_header, register=False)
