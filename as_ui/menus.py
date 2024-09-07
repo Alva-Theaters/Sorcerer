@@ -42,7 +42,21 @@ addon_dir = os.path.dirname(__file__)
 pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
 
 
-class NODE_MT_alva_general_audio_nodes(Menu): # This currently does absolutely nothing.
+class NODE_MT_alva_other_lighting_nodes(Menu):
+    bl_idname = "NODE_MT_alva_other_lighting_nodes"
+    bl_label = "Others"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator("node.add_settings_node", text="Settings", icon='PREFERENCES')
+        layout.operator("node.add_motor_node", text="Motor", icon='ANTIALIASED')
+        #layout.operator("node.add_flash_node", text="Flash", icon='LIGHT_SUN')
+        layout.operator("node.add_global_node", text="Global", icon='WORLD_DATA')
+        layout.operator("node.add_presets_node", text="Presets", icon='NONE')
+        layout.operator("node.add_pan_tilt_node", text="Pan/Tilt", icon='ORIENTATION_GIMBAL')
+
+
+class NODE_MT_alva_general_audio_nodes(Menu):
     bl_idname = "NODE_MT_alva_general_audio_nodes"
     bl_label = "General"
 
@@ -58,7 +72,7 @@ class NODE_MT_alva_general_audio_nodes(Menu): # This currently does absolutely n
         layout.operator("node.add_reverb_node", text="Reverb Node", icon='IPO_BOUNCE') 
 
 
-class NODE_MT_alva_inputs_audio_nodes(Menu): # This currently does absolutely nothing.
+class NODE_MT_alva_inputs_audio_nodes(Menu):
     bl_idname = "NODE_MT_alva_inputs_audio_nodes"
     bl_label = "Inputs"
 
@@ -87,6 +101,7 @@ class NODE_MT_alva_outputs_audio_nodes(Menu):
 
 
 menus = [
+    NODE_MT_alva_other_lighting_nodes,
     NODE_MT_alva_general_audio_nodes,
     NODE_MT_alva_inputs_audio_nodes,
     NODE_MT_alva_outputs_audio_nodes

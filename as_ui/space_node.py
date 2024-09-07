@@ -31,6 +31,7 @@ import bpy
 
 from ..utils.utils import Utils
 from .menus import (
+    NODE_MT_alva_other_lighting_nodes,
     NODE_MT_alva_general_audio_nodes,
     NODE_MT_alva_inputs_audio_nodes,
     NODE_MT_alva_outputs_audio_nodes
@@ -66,20 +67,11 @@ def draw_alva_node_menu(self, layout):
     if bpy.context.scene.scene_props.view_node_add_lighting:
         layout = self.layout
         layout.separator()
-        layout.label(text="Primary Lighting Nodes", icon_value=orb.icon_id)
+        layout.label(text="Lighting Nodes", icon_value=orb.icon_id)
         layout.operator("node.add_group_controller_node", text="Group Controller", icon='STICKY_UVS_LOC')
         layout.operator("node.add_mixer_node", text="Mixer", icon='OPTIONS')
         layout.operator("node.add_direct_selects_node", text="Direct Selects", icon='DESKTOP')
-
-        layout.separator()
-
-        layout.label(text="Specialty Lighting Nodes", icon_value=orb.icon_id)
-        layout.operator("node.add_settings_node", text="Settings", icon='PREFERENCES')
-        layout.operator("node.add_motor_node", text="Motor", icon='ANTIALIASED')
-        #layout.operator("node.add_flash_node", text="Flash", icon='LIGHT_SUN')
-        layout.operator("node.add_global_node", text="Global", icon='WORLD_DATA')
-        layout.operator("node.add_presets_node", text="Presets", icon='NONE')
-        layout.operator("node.add_pan_tilt_node", text="Pan/Tilt", icon='ORIENTATION_GIMBAL')
+        layout.menu("NODE_MT_alva_other_lighting_nodes")
         
     if bpy.context.scene.scene_props.view_node_add_audio:
         layout = self.layout

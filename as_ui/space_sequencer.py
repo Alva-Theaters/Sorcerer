@@ -222,7 +222,7 @@ def draw_add_buttons_row(self, context, column, scene, active_strip, motif_name=
     row.operator("my.add_cue", text="", icon='PLAY')
     row.operator("my.add_flash", text="", icon='LIGHT_SUN')
     row.operator("my.add_animation", text="", icon='IPO_BEZIER')
-    row.operator("my.add_offset_strip", text="", icon='UV_SYNC_SELECT')
+    #row.operator("my.add_offset_strip", text="", icon='UV_SYNC_SELECT')
     row.operator("my.add_trigger", text="", icon='SETTINGS')
     
 
