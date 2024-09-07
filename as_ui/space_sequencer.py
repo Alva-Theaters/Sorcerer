@@ -93,7 +93,7 @@ def draw_alva_sequencer_add_menu(self, layout):
         layout.operator("my.add_cue", text="Cue", icon='PLAY')
         layout.operator("my.add_flash", text="Flash", icon='LIGHT_SUN')
         layout.operator("my.add_animation", text="Animation", icon='IPO_BEZIER')
-        layout.operator("my.add_offset_strip", text="Offset", icon='UV_SYNC_SELECT')
+        #layout.operator("my.add_offset_strip", text="Offset", icon='UV_SYNC_SELECT')
         layout.operator("my.add_trigger", text="Trigger", icon='SETTINGS')
 
 
@@ -168,7 +168,7 @@ def draw_strip_media(self, context, scene, bake_panel=True):
 
             elif console_context == "flash":  
                 row = box.row()
-                row.prop(active_strip, "flash_type_enum", expand=0, text="Method")
+                #row.prop(active_strip, "flash_type_enum", expand=0, text="Method")
                 
                 if active_strip.flash_type_enum != 'option_use_controllers':
                     draw_strip_flash_manual(self, context, box, active_strip)

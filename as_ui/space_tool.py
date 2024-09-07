@@ -62,7 +62,7 @@ def draw_alva_toolbar(self, context):
         flow.operator("my.add_cue", icon='PLAY', text="Cue" if region_width > 200 else "")
         flow.operator("my.add_flash", icon='LIGHT_SUN', text="Flash" if region_width > 200 else "")
         flow.operator("my.add_animation", icon='IPO_BEZIER', text="Animation" if region_width > 200 else "")
-        flow.operator("my.add_offset_strip", icon='UV_SYNC_SELECT', text="Offset" if region_width > 200 else "")
+        #flow.operator("my.add_offset_strip", icon='UV_SYNC_SELECT', text="Offset" if region_width > 200 else "")
         flow.operator("my.add_trigger", icon='SETTINGS', text="Trigger" if region_width > 200 else "")
         flow.separator()
         flow.operator("alva_playback.clear_solos", icon='SOLO_OFF', text="Clear Solos" if region_width >= 200 else "")

@@ -76,7 +76,7 @@ def draw_alva_node_menu(self, layout):
         layout.label(text="Specialty Lighting Nodes", icon_value=orb.icon_id)
         layout.operator("node.add_settings_node", text="Settings", icon='PREFERENCES')
         layout.operator("node.add_motor_node", text="Motor", icon='ANTIALIASED')
-        layout.operator("node.add_flash_node", text="Flash", icon='LIGHT_SUN')
+        #layout.operator("node.add_flash_node", text="Flash", icon='LIGHT_SUN')
         layout.operator("node.add_global_node", text="Global", icon='WORLD_DATA')
         layout.operator("node.add_presets_node", text="Presets", icon='NONE')
         layout.operator("node.add_pan_tilt_node", text="Pan/Tilt", icon='ORIENTATION_GIMBAL')

@@ -385,7 +385,7 @@ class Items:
             ('option_eos_cue', "", "Use strip length to define cue duration", 'PLAY', 1),
             ('option_eos_flash', "", "Flash intensity up and down with strip length", 'LIGHT_SUN', 2),
             ('option_animation', "", "Use keyframes, or inverted cues, to control parameters", 'IPO_BEZIER', 3),
-            ('option_offset', "", "Rapidly make offset effects like wipes and chases using parameters or palettes", 'UV_SYNC_SELECT', 4),
+            #('option_offset', "", "Rapidly make offset effects like wipes and chases using parameters or palettes", 'UV_SYNC_SELECT', 4),
             ('option_trigger', "", "Send discrete trigger at strip's start and/or end frame. Eos does not record this", 'SETTINGS', 5)
         ]
 
