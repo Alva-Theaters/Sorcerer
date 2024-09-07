@@ -31,7 +31,7 @@ import bpy
 
 from ..utils.utils import Utils
 from .menus import (
-    NODE_MT_alva_other_lighting_nodes,
+    NODE_MT_alva_lighting_nodes,
     NODE_MT_alva_general_audio_nodes,
     NODE_MT_alva_inputs_audio_nodes,
     NODE_MT_alva_outputs_audio_nodes
@@ -64,23 +64,17 @@ def draw_alva_node_view(self, layout):
 
 
 def draw_alva_node_menu(self, layout):
+    layout = self.layout
+    layout.separator()
+    layout.label(text="Sorcerer", icon_value=orb.icon_id)
+
     if bpy.context.scene.scene_props.view_node_add_lighting:
-        layout = self.layout
-        layout.separator()
-        layout.label(text="Lighting Nodes", icon_value=orb.icon_id)
-        layout.operator("node.add_group_controller_node", text="Group Controller", icon='STICKY_UVS_LOC')
-        layout.operator("node.add_mixer_node", text="Mixer", icon='OPTIONS')
-        layout.operator("node.add_direct_selects_node", text="Direct Selects", icon='DESKTOP')
-        layout.menu("NODE_MT_alva_other_lighting_nodes")
+        layout.menu("NODE_MT_alva_lighting_nodes")
         
     if bpy.context.scene.scene_props.view_node_add_audio:
-        layout = self.layout
-        if bpy.context.scene.scene_props.view_node_add_lighting:
-            layout.separator()
-            layout.label(text="Audio Nodes", icon_value=orb.icon_id)
-            layout.menu("NODE_MT_alva_general_audio_nodes")
-            layout.menu("NODE_MT_alva_inputs_audio_nodes")
-            layout.menu("NODE_MT_alva_outputs_audio_nodes")
+        layout.menu("NODE_MT_alva_general_audio_nodes")
+        layout.menu("NODE_MT_alva_inputs_audio_nodes")
+        layout.menu("NODE_MT_alva_outputs_audio_nodes")
 
 
 def draw_node_formatter_group(self, context, active_node):

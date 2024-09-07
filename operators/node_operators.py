@@ -38,137 +38,6 @@ from ..cpvia.find import Find
 from ..utils.osc import OSC
 
 
-class NODE_OT_add_console_buttons(Operator):
-    bl_idname = "node.add_direct_selects_node"
-    bl_label = "Add Direct Selects"
-    bl_description="Adjust all intensities of group controller nodes on this level"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        tree = context.space_data.edit_tree
-        my_node = tree.nodes.new('console_buttons_type')
-        my_node.location = (100, 100)
-        
-        return {'FINISHED'} 
-        
-    
-class NODE_OT_add_settings(Operator):
-    bl_idname = "node.add_settings_node"
-    bl_label = "Add Settings"
-    bl_description="Sorcerer node settings"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        tree = context.space_data.edit_tree
-        my_node = tree.nodes.new('settings_type')
-        my_node.location = (100, 100)
-        
-        return {'FINISHED'}
-        
-    
-class NODE_OT_add_global(Operator):
-    bl_idname = "node.add_global_node"
-    bl_label = "Add Global"
-    bl_description="Adjust all intensities of group controller nodes on this level"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        tree = context.space_data.edit_tree
-        my_node = tree.nodes.new('global_type')
-        my_node.location = (100, 100)
-        
-        return {'FINISHED'}
-    
-    def invoke(self, context, event):
-        self.execute(context)
-        bpy.ops.node.translate_attach_remove_on_cancel('INVOKE_DEFAULT', node='NEW')
-        return {'FINISHED'}
-        
-    
-class NODE_OT_add_presets(Operator):
-    bl_idname = "node.add_presets_node"
-    bl_label = "Add Presets"
-    bl_description="Record and recall console presets"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        tree = context.space_data.edit_tree
-        my_node = tree.nodes.new('presets_type')
-        my_node.location = (100, 100)
-        
-        return {'FINISHED'}
-    
-        
-class NODE_OT_add_pan_tilt(Operator):
-    bl_idname = "node.add_pan_tilt_node"
-    bl_label = "Add Pan/Tilt controller for FOH-hung mover"
-    bl_description="Intuitive pan/tilt controller only for FOH, forward-facing fixtures"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        tree = context.space_data.edit_tree
-        my_node = tree.nodes.new('pan_tilt_type')
-        my_node.location = (100, 100)
-        
-        return {'FINISHED'}    
-    
-
-class NODE_OT_add_group_controller(Operator):
-    bl_idname = "node.add_group_controller_node"
-    bl_label = "Control a group defined in Properties"
-    bl_description="Control a group defined in Properties"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        tree = context.space_data.edit_tree
-        my_node = tree.nodes.new('group_controller_type')
-        my_node.location = (100, 100)
-        
-        return {'FINISHED'}
-        
-
-class NODE_OT_add_mixer(Operator):
-    bl_idname = "node.add_mixer_node"
-    bl_label = "Mix 3 different parameter choices across a group"
-    bl_description="Mix 3 different parameter choices accross a group"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        tree = context.space_data.edit_tree
-        my_node = tree.nodes.new('mixer_type')
-        my_node.location = (100, 100)
-        
-        return {'FINISHED'}
-    
-    
-class NODE_OT_add_motor(Operator):
-    bl_idname = "node.add_motor_node"
-    bl_label = "Create oscillations for mixer node progress"
-    bl_description="Create oscillations for mixer node progress"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        tree = context.space_data.edit_tree
-        my_node = tree.nodes.new('motor_type')
-        my_node.location = (100, 100)
-        
-        return {'FINISHED'}
-    
-
-class NODE_OT_add_flash(Operator):
-    bl_idname = "node.add_flash_node"
-    bl_label = "Connect to flash strips in the sequencer"
-    bl_description="Autofill the Flash Up and Flash Down fields of flash strips in Sequencer with node settings and noodle links. Intended primarily for pose-based choreography"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        tree = context.space_data.edit_tree
-        my_node = tree.nodes.new('flash_type')
-        my_node.location = (100, 100)
-        
-        return {'FINISHED'}
-
-
 class NODE_OT_node_formatter(Operator):
     bl_idname = "nodes.show_node_formatter"
     bl_label = "Node Formatter"
@@ -262,21 +131,6 @@ class NODE_OT_keyframe_mixer(bpy.types.Operator):
             return {'CANCELLED'}
     
         return {'FINISHED'}
-
-            
-add_operators = [
-    NODE_OT_add_console_buttons,
-    NODE_OT_add_settings,
-    NODE_OT_add_global,
-    NODE_OT_add_presets,
-    NODE_OT_add_pan_tilt,
-    NODE_OT_add_group_controller,
-    NODE_OT_add_mixer,
-    NODE_OT_add_motor,
-    NODE_OT_add_flash,
-    NODE_OT_node_formatter,
-    NODE_OT_keyframe_mixer
-]
 
         
 class AddCustomButton(bpy.types.Operator):
@@ -545,7 +399,9 @@ class FlashPresetSearchOperator(bpy.types.Operator):
         return {'FINISHED'}
     
 
-others = [
+operators = [
+    NODE_OT_node_formatter,
+    NODE_OT_keyframe_mixer,
     RemoveCustomButton,
     CustomButton,
     BumpUpCustomButton,
@@ -553,19 +409,15 @@ others = [
     AddCustomButton,
     RecordEffectPresetOperator,
     RecordDownEffectPresetOperator,
-    FlashPresetSearchOperator,
+    FlashPresetSearchOperator
 ]
 
 
 def register():
-    for cls in add_operators:
-        bpy.utils.register_class(cls)
-    for cls in others:
+    for cls in operators:
         bpy.utils.register_class(cls)
 
 
 def unregister():
-    for cls in reversed(add_operators):
-        bpy.utils.unregister_class(cls)
-    for cls in reversed(others):
+    for cls in reversed(operators):
         bpy.utils.unregister_class(cls)

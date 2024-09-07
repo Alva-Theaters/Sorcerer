@@ -30,7 +30,10 @@
 import bpy
 
 from bpy.types import Menu
-from bpy.app.translations import contexts as i18n_contexts
+from bpy.app.translations import (
+    pgettext_iface as iface_,
+    contexts as i18n_contexts,
+)
 
 # Custom icon stuff
 import bpy.utils.previews
@@ -42,23 +45,34 @@ addon_dir = os.path.dirname(__file__)
 pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
 
 
-class NODE_MT_alva_other_lighting_nodes(Menu):
-    bl_idname = "NODE_MT_alva_other_lighting_nodes"
-    bl_label = "Others"
+def add_node_type(layout, label, node_type, icon='NONE'): # Heavily borrowed from blender/scripts/startup/bl_ui/node_add_menu.py
+    translation_context = i18n_contexts.default
+    add_op = layout.operator("node.add_node", text=label, text_ctxt=translation_context, icon=icon) # Not sure why it doesn't want search_weight, as in source
+    add_op.type = node_type
+    add_op.use_transform = True # This makes it follow cursor until you click.
+
+
+class NODE_MT_alva_lighting_nodes(Menu):
+    bl_idname = "NODE_MT_alva_lighting_nodes"
+    bl_label = "Lighting"
 
     def draw(self, context):
         layout = self.layout
-        layout.operator("node.add_settings_node", text="Settings", icon='PREFERENCES')
-        layout.operator("node.add_motor_node", text="Motor", icon='ANTIALIASED')
-        #layout.operator("node.add_flash_node", text="Flash", icon='LIGHT_SUN')
-        layout.operator("node.add_global_node", text="Global", icon='WORLD_DATA')
-        layout.operator("node.add_presets_node", text="Presets", icon='NONE')
-        layout.operator("node.add_pan_tilt_node", text="Pan/Tilt", icon='ORIENTATION_GIMBAL')
+        add_node_type(layout, "Group Controller", "group_controller_type", icon='STICKY_UVS_LOC')
+        add_node_type(layout, "Mixer", "mixer_type", icon='OPTIONS')
+        add_node_type(layout, "Direct Selects", "console_buttons_type", icon='DESKTOP')
+        layout.separator()
+        add_node_type(layout, "Settings", "settings_type")
+        add_node_type(layout, "Motor", "motor_type")
+        #add_node_type(layout, "Flash", "flash_type")
+        add_node_type(layout, "Global", "global_type")
+        add_node_type(layout, "Presets", "presets_type")
+        add_node_type(layout, "FOH Pan/Tilt", "pan_tilt_type")
 
 
 class NODE_MT_alva_general_audio_nodes(Menu):
     bl_idname = "NODE_MT_alva_general_audio_nodes"
-    bl_label = "General"
+    bl_label = "General Audio"
 
     def draw(self, context):
         layout = self.layout
@@ -74,7 +88,7 @@ class NODE_MT_alva_general_audio_nodes(Menu):
 
 class NODE_MT_alva_inputs_audio_nodes(Menu):
     bl_idname = "NODE_MT_alva_inputs_audio_nodes"
-    bl_label = "Inputs"
+    bl_label = "Audio Inputs"
 
     def draw(self, context):
         layout = self.layout
@@ -88,7 +102,7 @@ class NODE_MT_alva_inputs_audio_nodes(Menu):
 
 class NODE_MT_alva_outputs_audio_nodes(Menu):
     bl_idname = "NODE_MT_alva_outputs_audio_nodes"
-    bl_label = "Outputs"
+    bl_label = "Audio Outputs"
 
     def draw(self, context):
         layout = self.layout
@@ -101,7 +115,7 @@ class NODE_MT_alva_outputs_audio_nodes(Menu):
 
 
 menus = [
-    NODE_MT_alva_other_lighting_nodes,
+    NODE_MT_alva_lighting_nodes,
     NODE_MT_alva_general_audio_nodes,
     NODE_MT_alva_inputs_audio_nodes,
     NODE_MT_alva_outputs_audio_nodes
