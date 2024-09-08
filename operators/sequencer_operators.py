@@ -505,31 +505,42 @@ class SEQUENCER_OT_bump_universal(Operator):
     direction: IntProperty() # type: ignore
 
     def execute(self, context):
-        sequence_editor = context.scene.sequence_editor
-        selected_strips = [strip for strip in sequence_editor.sequences_all if strip.select]
-        for strip in selected_strips:
+        alva_log("sequencer_operators", f"Running universal bump operator.")
+        for strip in context.selected_sequences:
             strip.frame_start += self.direction
         return {'FINISHED'}
 
 class SEQUENCER_OT_bump_left(SEQUENCER_OT_bump_universal):
     bl_idname = "sequencer.left_operator"
     bl_label = "Left Operator"
-    direction = bpy.props.IntProperty(default=-1)
+
+    def invoke(self, context, event):
+        self.direction = -1
+        return self.execute(context)
 
 class SEQUENCER_OT_bump_right(SEQUENCER_OT_bump_universal):
     bl_idname = "sequencer.right_operator"
     bl_label = "Right Operator"
-    direction = bpy.props.IntProperty(default=1)
+
+    def invoke(self, context, event):
+        self.direction = 1
+        return self.execute(context)
 
 class SEQUENCER_OT_bump_left_long(SEQUENCER_OT_bump_universal):
     bl_idname = "sequencer.left_long_operator"
     bl_label = "Left Long Operator"
-    direction = bpy.props.IntProperty(default=-5)
+
+    def invoke(self, context, event):
+        self.direction = -5
+        return self.execute(context)
 
 class SEQUENCER_OT_bump_right_long(SEQUENCER_OT_bump_universal):
     bl_idname = "sequencer.right_long_operator"
     bl_label = "Right Long Operator"
-    direction = bpy.props.IntProperty(default=5)
+
+    def invoke(self, context, event):
+        self.direction = 5
+        return self.execute(context)
 
 
 class SEQUENCER_OT_select_channel(Operator):
