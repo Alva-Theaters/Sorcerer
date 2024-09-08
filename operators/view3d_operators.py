@@ -174,21 +174,30 @@ class BaseColorOperator(Operator):
     bl_label = "Base Color Operator"
     bl_description = "Base Operator for Color Activation"
 
-    record_preset_argument_template: StringProperty(default="Group # Record Color_Palette $ Enter")
-    preset_argument_template: StringProperty(default="Group # Preset $ Enter")
-    group_id: StringProperty()
-    is_recording: BoolProperty()
+    record_preset_argument_template: StringProperty(default="Chan # Record ^ $ Enter")
+    preset_argument_template: StringProperty(default="Chan # ^ $ Enter")
     index_offset: IntProperty()
+    is_recording: BoolProperty()
     color_number: IntProperty()
+    group_name: StringProperty()
+    preset_type: StringProperty()
 
     def execute(self, context):
-        address = "/eos/newcmd"
-
-        index = int(self.group_id) + self.index_offset
-        argument_template = self.record_preset_argument_template if self.is_recording else self.preset_argument_template
-        argument = argument_template.replace('#', str(index)).replace('$', str(self.color_number))
+        for grp in context.scene.scene_group_data:
+            if grp.name == self.group_name:
+                group = grp
+        if not group:
+            self.report({'INFO'}, "Cannot find group.")
+            return {'CANCELLED'}
         
-        OSC.send_osc_lighting(address, argument)
+        channels = [str(chan.chan) for chan in group.channels_list]
+        channels = " + ".join(channels)
+        channels = Utils.simplify_channels_expression(channels)
+        preset_number = self.color_number + self.index_offset
+        argument_template = self.record_preset_argument_template if self.is_recording else self.preset_argument_template
+        argument = argument_template.replace('#', str(channels)).replace('$', str(preset_number)).replace('^', self.preset_type)
+        
+        OSC.send_osc_lighting("/eos/newcmd", argument)
         return {'FINISHED'}
     
 

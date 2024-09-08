@@ -170,6 +170,8 @@ class GroupData(PropertyGroup):
     channels_list: CollectionProperty(type=ChannelsList) 
     int_group_id: IntProperty(name="ID #", description="Group's number on the console") 
 
+    show_in_presets_node: BoolProperty(name="Hide", description="Hide this when settings are hidden", default=True)
+
     separator: BoolProperty(name="Separate", default=False, description='Use this to separate groups', update=CommonUpdaters.ui_list_separator_updater) 
     label: BoolProperty(name="Label", default=False, description='Use this to label groups of groups', update=CommonUpdaters.ui_list_label_updater) 
 
@@ -231,7 +233,7 @@ class RaiseChannels(PropertyGroup):
         
 class InfluencerList(PropertyGroup):
     parameter: StringProperty() 
-    raise_channels: CollectionProperty(type=RaiseChannels) 
+    raise_channels: CollectionProperty(type=RaiseChannels)
     
     
 class LightingModifier(PropertyGroup):

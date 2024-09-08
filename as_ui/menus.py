@@ -58,15 +58,15 @@ class NODE_MT_alva_lighting_nodes(Menu):
 
     def draw(self, context):
         layout = self.layout
-        add_node_type(layout, "Group Controller", "group_controller_type", icon='STICKY_UVS_LOC')
-        add_node_type(layout, "Mixer", "mixer_type", icon='OPTIONS')
-        add_node_type(layout, "Direct Selects", "console_buttons_type", icon='DESKTOP')
+        add_node_type(layout, "Group Controller", "group_controller_type")
+        add_node_type(layout, "Mixer", "mixer_type")
+        add_node_type(layout, "Direct Selects", "console_buttons_type")
         layout.separator()
         add_node_type(layout, "Settings", "settings_type")
         add_node_type(layout, "Motor", "motor_type")
         #add_node_type(layout, "Flash", "flash_type")
         add_node_type(layout, "Global", "global_type")
-        add_node_type(layout, "Presets", "presets_type")
+        add_node_type(layout, "Color Grid", "presets_type")
         add_node_type(layout, "FOH Pan/Tilt", "pan_tilt_type")
 
 

@@ -333,6 +333,14 @@ class Items:
         ]
         return items
     
+
+    def presets_node_types(self, context):
+        items = [
+            ('Preset', "Preset", "Record and overwrite all parameters"),
+            ('Color_Palette', "Color Palette", "Record and overwrite only color data")
+        ]
+        return items
+    
     
     def get_audio_object_items(self, context):
         items = [

@@ -594,58 +594,63 @@ def create_presets_operator(row, op_idname, icon, **kwargs):
         
 def draw_presets_node(self, context, layout):
     scene = context.scene
+
+    column = layout.column()
+    row = column.row()
+    row.prop(self, "preset_types_enum", expand=True)
+    row.prop(self, "index_offset", icon='ADD', text="Index Offset")
+    row.prop(self, "show_settings", icon='PREFERENCES', text="")
+
     column = layout.column(align=True)
 
-    world = scene.world
+    if len(scene.scene_group_data) == 0:
+        column.label(text="Make groups in 3D View side panel to get started.")
+        return
 
-    if world is not None and world.node_tree:
-        node_tree = world.node_tree
+    for group in scene.scene_group_data:
+        if not group.show_in_presets_node and not self.show_settings:
+            continue
+        
+        group_label = group.name
+        box = column.box()
+        row = box.row(align=True)
+        row.label(text=group_label)
 
-        for controller in node_tree.nodes:
-            if controller.bl_idname == 'group_controller_type':
-                group_label = Utils.find_group_label(controller)
-                box = column.box()
-                row = box.row(align=True)
-                row.label(text=group_label)
+        row.prop(self, "is_recording", text="", icon='REC')
 
-                row.prop(self, "is_recording", text="", icon='REC')
+        if self.is_recording:
+            row.alert = 1
 
-                if self.is_recording:
-                    row.alert = 1
+        color_ops = [
+            ("my.color_one", 'COLORSET_01_VEC'),
+            ("my.color_two", 'COLORSET_02_VEC'),
+            ("my.color_three", 'COLORSET_03_VEC'),
+            ("my.color_four", 'COLORSET_04_VEC'),
+            ("my.color_five", 'COLORSET_05_VEC'),
+            ("my.color_six", 'COLORSET_06_VEC'),
+            ("my.color_seven", 'COLORSET_07_VEC'),
+            ("my.color_eight", 'COLORSET_08_VEC'),
+            ("my.color_nine", 'COLORSET_09_VEC'),
+            ("my.color_ten", 'COLORSET_11_VEC'),
+            ("my.color_eleven", 'COLORSET_12_VEC'),
+            ("my.color_twelve", 'COLORSET_13_VEC'),
+            ("my.color_thirteen", 'COLORSET_14_VEC'),
+            ("my.color_fourteen", 'COLORSET_15_VEC')
+        ]
 
-                color_ops = [
-                    ("my.color_one", 'COLORSET_01_VEC'),
-                    ("my.color_two", 'COLORSET_02_VEC'),
-                    ("my.color_three", 'COLORSET_03_VEC'),
-                    ("my.color_four", 'COLORSET_04_VEC'),
-                    ("my.color_five", 'COLORSET_05_VEC'),
-                    ("my.color_six", 'COLORSET_06_VEC'),
-                    ("my.color_seven", 'COLORSET_07_VEC'),
-                    ("my.color_eight", 'COLORSET_08_VEC'),
-                    ("my.color_nine", 'COLORSET_09_VEC'),
-                    ("my.color_ten", 'COLORSET_11_VEC'),
-                    ("my.color_eleven", 'COLORSET_12_VEC'),
-                    ("my.color_twelve", 'COLORSET_13_VEC'),
-                    ("my.color_thirteen", 'COLORSET_14_VEC'),
-                    ("my.color_fourteen", 'COLORSET_15_VEC')
-                ]
+        i = 1
+        for op_idname, icon in color_ops:
+            create_presets_operator(row, op_idname, icon,
+                            is_recording=self.is_recording,
+                            index_offset = self.index_offset,
+                            color_number = i,
+                            group_name=group.name,
+                            preset_type=self.preset_types_enum)
+            i += 1
 
-                for op_idname, icon in color_ops:
-                    create_presets_operator(row, op_idname, icon,
-                                    preset_argument_template=self.preset_argument_template,
-                                    record_preset_argument_template=self.record_preset_argument_template,
-                                    index_offset=self.index_offset,
-                                    group_id=controller.str_group_id,
-                                    is_recording=self.is_recording)
-
-                row.alert = 0
-
-        column.separator()
-
-        row = column.row()
-        row.prop(self, "index_offset", icon='ADD', text="Index Offset")
-
-        column.separator()
+        if self.show_settings:
+            row.prop(group, "show_in_presets_node", text="", icon='HIDE_OFF' if group.show_in_presets_node else 'HIDE_ON')
+        row.alert = 0
 
 
 def draw_oven_node(self, context, layout):

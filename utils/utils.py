@@ -203,6 +203,43 @@ class Utils:
         except Exception as e:
             print(f"An error has occured within parse_channels: {e}")
             return None
+        
+
+    def simplify_channels_expression(expression):
+        # Split the input string into individual numbers
+        numbers = list(map(int, re.findall(r'\d+', expression)))
+        
+        # Function to find ranges of consecutive numbers
+        def find_ranges(nums):
+            ranges = []
+            start = nums[0]
+            end = nums[0]
+
+            for i in range(1, len(nums)):
+                if nums[i] == end + 1:
+                    end = nums[i]
+                else:
+                    if start == end:
+                        ranges.append(str(start))
+                    else:
+                        ranges.append(f"{start} thru {end}")
+                    start = end = nums[i]
+            
+            # Add the last range
+            if start == end:
+                ranges.append(str(start))
+            else:
+                ranges.append(f"{start} thru {end}")
+            
+            return ranges
+        
+        # Find consecutive ranges
+        simplified_ranges = find_ranges(numbers)
+        
+        # Join the simplified ranges with " + "
+        simplified_expression = " + ".join(simplified_ranges)
+        
+        return simplified_expression
 
 
     def update_all_controller_channel_lists(context):

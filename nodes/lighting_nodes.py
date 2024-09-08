@@ -377,18 +377,20 @@ class NODE_NT_flash(Node):
         
 class NODE_NT_alva_presets(Node):
     bl_idname = 'presets_type'
-    bl_label = 'Presets Grid'
+    bl_label = 'Color Grid'
     bl_icon = 'NONE'
     bl_width_default = 400
     bl_description="Record and recall console presets"
     
-    preset_argument_template: StringProperty(default="Group # Preset $ Enter", description="Write the OSC syntax your console expects for recalling presets. Insert # for group number and $ for color palette number.") # type: ignore # type: ignore
-    record_preset_argument_template: StringProperty(default="Group # Record Preset $ Enter", description="Write the OSC syntax your console expects for recording presets. Insert # for group number and $ for color palette number.") # type: ignore
-
-    expand_settings: BoolProperty(default=False, description="Settings") # type: ignore
+    show_settings: BoolProperty(name="Show Settings",description="Show the node's settings") # type: ignore
+    preset_types_enum: EnumProperty(
+        name="Types",
+        description="Choose whether this should use preset or color palettes",
+        items=AlvaItems.presets_node_types,
+        default=0
+    ) # type: ignore
     is_recording: BoolProperty(default=False, description="Recording") # type: ignore
-
-    index_offset: IntProperty(default=0, description="Start button index here") # type: ignore
+    index_offset: IntProperty(default=0, name="Index Offset", description="Use this if you don't want the Preset/CP numbers to start at 1") # type: ignore
 
     def init(self, context):
         return
