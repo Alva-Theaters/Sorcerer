@@ -307,7 +307,10 @@ class TOOL_OT_ghost_out(Operator):
     
     def execute(self, context):
         ghost_out_time = context.scene.scene_props.ghost_out_time
-        osc.send_osc_lighting("/eos/newcmd", f"Go_to_Cue Out Time {str(ghost_out_time)} Enter")
+        ghost_out_string = context.scene.scene_props.ghost_out_string
+        argument = ghost_out_string.replace("*", str(ghost_out_time))
+        osc.send_osc_lighting("/eos/newcmd", argument)
+
         for obj in bpy.context.scene.objects:
             if obj.type == "MESH" and hasattr(obj.data, 'materials'):
                 for mat in obj.data.materials:

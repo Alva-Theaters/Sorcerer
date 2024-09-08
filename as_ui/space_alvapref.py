@@ -308,8 +308,6 @@ def draw_orb(self, context, column):
     col1 = split.column()
     col1.prop(scene, "is_armed_turbo", text="Orb skips Shift+Update", slider=True)
     col1.separator()
-    col1.prop(context.scene.scene_props, "ghost_out_time", text="Ghost Out Time:")
-    col1.separator()
     col1.prop(scene, "orb_chill_time", text="Wait Time:", slider=False)
 
     col2 = split.column()
@@ -317,10 +315,19 @@ def draw_orb(self, context, column):
     col2.separator()
     col2.prop(scene, "orb_finish_snapshot", text="Snapshot After Orb:", slider=False)
 
+    row = box.row()
+    row.use_property_split = True
+    row.use_property_decorate = False
+    row.prop(context.scene.scene_props, "ghost_out_time", text="Ghost Out Time:")
+    row = box.row()
+    row.use_property_split = True
+    row.use_property_decorate = False
+    row.prop(context.scene.scene_props, "ghost_out_string", text="Ghost Out Command:")
+
     box = column.box()
 
     row = box.row()
-    row.label(text="Orb wants you to spend more time focusing on art rather than on macros.")
+    row.label(text="Allow Orb to have these all to itself in the background:")
 
     row = box.row()
     row.separator()

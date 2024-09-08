@@ -72,22 +72,22 @@ def register():
         default=True, name="Orb Skips Shift+Update", description="Arm this to skip the safety step where build buttons save the console file prior to messing with stuff on the console")
     Scene.orb_chill_time = FloatProperty(default=.2, name="Wait Time", description="How long Orb waits for Eos to catch up when rendering qmeos frame by frame")
     Scene.orb_finish_snapshot = IntProperty(default=1, min=1, max=9999, description="Snapshot that Orb should set when done")
-    Scene.orb_records_snapshot = BoolProperty(default=True, description="Orb will record current screen as its snapshot before doing anything to restore correctly when finished.")
+    Scene.orb_records_snapshot = BoolProperty(default=True, description="Orb will record current screen as its snapshot before doing anything to restore correctly when finished")
     
-    Scene.orb_macros_start = IntProperty(default=88888, max=99998, min=1, name="Range Start", description="Orb will use this range to create the background macros it needs. If Orb runs out, it will ask for a larger range.")
-    Scene.orb_macros_end = IntProperty(default=99999, max=99999, min=1, name="Range End", description="Orb will use this range to create the background macros it needs. If Orb runs out, it will ask for a larger range.")
-    Scene.orb_cue_lists_start = IntProperty(default=888, max=998, min=1, name="Range Start", description="Orb will use this range to create the background cue lists it needs for animation strips. If Orb runs out, it will ask for a larger range.")
-    Scene.orb_cue_lists_end = IntProperty(default=999, max=999, min=1, name="Range End", description="Orb will use this range to create the background cue lists it needs for animation strips. If Orb runs out, it will ask for a larger range.")
-    Scene.orb_event_lists_start = IntProperty(default=888, max=998, min=1, name="Range Start", description="Orb will use this range to create the background event lists it needs. If Orb runs out, it will ask for a larger range.")
-    Scene.orb_event_lists_end = IntProperty(default=999, max=999, min=1, name="Range End", description="Orb will use this range to create the background event lists it needs. If Orb runs out, it will ask for a larger range.")
-    Scene.orb_presets_start = IntProperty(default=8888, max=9998, min=1, name="Range Start", description="Orb will use this range to create the background presets it needs. If Orb runs out, it will ask for a larger range.")
-    Scene.orb_presets_end = IntProperty(default=9999, max=9999, min=1, name="Range End", description="Orb will use this range to create the background presets it needs. If Orb runs out, it will ask for a larger range.")
+    Scene.orb_macros_start = IntProperty(default=88888, max=99998, min=1, name="Range Start", description="Orb will use this range to create the background macros it needs. If Orb runs out, it will ask for a larger range")
+    Scene.orb_macros_end = IntProperty(default=99999, max=99999, min=1, name="Range End", description="Orb will use this range to create the background macros it needs. If Orb runs out, it will ask for a larger range")
+    Scene.orb_cue_lists_start = IntProperty(default=888, max=998, min=1, name="Range Start", description="Orb will use this range to create the background cue lists it needs for animation strips. If Orb runs out, it will ask for a larger range")
+    Scene.orb_cue_lists_end = IntProperty(default=999, max=999, min=1, name="Range End", description="Orb will use this range to create the background cue lists it needs for animation strips. If Orb runs out, it will ask for a larger range")
+    Scene.orb_event_lists_start = IntProperty(default=888, max=998, min=1, name="Range Start", description="Orb will use this range to create the background event lists it needs. If Orb runs out, it will ask for a larger range")
+    Scene.orb_event_lists_end = IntProperty(default=999, max=999, min=1, name="Range End", description="Orb will use this range to create the background event lists it needs. If Orb runs out, it will ask for a larger range")
+    Scene.orb_presets_start = IntProperty(default=8888, max=9998, min=1, name="Range Start", description="Orb will use this range to create the background presets it needs. If Orb runs out, it will ask for a larger range")
+    Scene.orb_presets_end = IntProperty(default=9999, max=9999, min=1, name="Range End", description="Orb will use this range to create the background presets it needs. If Orb runs out, it will ask for a larger range")
 
     Scene.add_underscores = BoolProperty(default=True, name="Add Underscores", description="Orb will try to add underscores to known keywords if they are missing")
     Scene.add_enter = BoolProperty(default=True, name="Add Enter", description="Orb will automatically add Enter to the end of each line if you forgot to. Turn this off if you want to leave the commandline open, for example if this macro works with other macros or the user to add multiple things to the commandline at once")
 
     # Lighting
-    Scene.osc_receive_port = IntProperty(min=0, max=65535)  
+    Scene.osc_receive_port = IntProperty(min=0, max=65535)
 
     # Audio
     Scene.audio_osc_address = StringProperty(default="", description="Type # for channel/fader/ouput number and $ for value, to be autofilled in background by .. Use this for realtime feedback during design, then bake/export to Qlab. Set up the mixer as if these are IEM's")

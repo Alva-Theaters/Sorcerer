@@ -211,6 +211,7 @@ class SceneProperties(PropertyGroup):
     use_alva_core: BoolProperty(default=False, name="In-house Mode", description="Commandeer your local Alva theater") 
 
     ghost_out_time: IntProperty(default=1, name="Ghost Out Time", description="This does not impact the lighting console's own Go_to_Cue time") 
+    ghost_out_string: StringProperty(default="Go_to_Cue Out Time * Enter", name="Ghost Out Command", description="This is what the Ghost Out button will tell the console. Add * for Ghost Out Time")
 
     highlight_mode: BoolProperty(default=False, name="Highlight Mode", description="Automatically highlight the selected group on stage", update=CommonUpdaters.highlight_mode_updater) 
     int_highlight_value: IntProperty(name="Highlight Intensity", description="Value 1-100 that the highlight function should set highlighted lights to", min=1, max=100, default=100) 
