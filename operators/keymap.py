@@ -38,42 +38,37 @@ def register_keymap_item(keymap, idname, key, value, **kwargs):
 def register_keymaps():
     wm = bpy.context.window_manager
     if wm.keyconfigs.addon:
-        view3d_km = wm.keyconfigs.addon.keymaps.new(name='View3D', space_type='VIEW_3D')
+        view3d_km = wm.keyconfigs.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
         register_keymap_item(view3d_km, "view3d.object_controller", 'P', 'PRESS')
+        register_keymap_item(view3d_km, "alva_tool.ghost_out", 'G', 'PRESS', shift=True)
 
         sequencer_km = wm.keyconfigs.addon.keymaps.new(name='Sequencer', space_type='SEQUENCE_EDITOR')
-
         # Command line stuff
         register_keymap_item(sequencer_km, "sequencer.simple_command_line", 'C', 'PRESS')
         register_keymap_item(sequencer_km, "seq.render_strips_operator", 'SPACE', 'PRESS', shift=True)
-
+        #Ghost Out
+        register_keymap_item(sequencer_km, "alva_tool.ghost_out", 'G', 'PRESS', shift=True)
         # Define the hotkeys
         register_keymap_item(sequencer_km, "seq.scale_strips", 'S', 'PRESS')
         register_keymap_item(sequencer_km, "sequencer.vse_extrude_strips", 'E', 'PRESS')
         register_keymap_item(sequencer_km, "sequencer.duplicate_pattern", 'E', 'PRESS', shift=True)
-
         # Bump up
         kmi = register_keymap_item(sequencer_km, 'sequencer.vse_bump_strip_channel', 'U', 'PRESS')
         kmi.properties.direction = 1
-
         # Bump down with shift
         kmi_shift = register_keymap_item(sequencer_km, 'sequencer.vse_bump_strip_channel', 'U', 'PRESS', shift=True)
         kmi_shift.properties.direction = -1
-
         # Deselect all
         register_keymap_item(sequencer_km, 'sequencer.vse_deselect_all', 'D', 'PRESS')
-
         # Add color strip
         register_keymap_item(sequencer_km, 'sequencer.vse_new_color_strip', 'Z', 'RELEASE')
         register_keymap_item(sequencer_km, 'sequencer.vse_new_color_strip_kick', 'Z', 'PRESS')
         register_keymap_item(sequencer_km, 'sequencer.vse_new_color_strip_pointer', 'Z', 'PRESS', shift=True)
-
         # Left and Right operators
         register_keymap_item(sequencer_km, 'sequencer.left_operator', 'L', 'PRESS')
         register_keymap_item(sequencer_km, 'sequencer.right_operator', 'R', 'PRESS')
         register_keymap_item(sequencer_km, 'sequencer.left_long_operator', 'L', 'PRESS', shift=True)
         register_keymap_item(sequencer_km, 'sequencer.right_long_operator', 'R', 'PRESS', shift=True)
-
         # Additional Sequencer keymaps
         kmi1 = register_keymap_item(sequencer_km, "seq.show_strip_properties", 'M', 'PRESS')
         kmi2 = register_keymap_item(sequencer_km, "seq.show_strip_formatter", 'F', 'PRESS')
@@ -84,6 +79,7 @@ def register_keymaps():
         node_editor_km = wm.keyconfigs.addon.keymaps.new(name='Node Editor', space_type='NODE_EDITOR')
         node_editor_kmi = register_keymap_item(node_editor_km, "nodes.show_node_formatter", 'F', 'PRESS')
         node_editor_kmi.active = True
+        register_keymap_item(node_editor_km, "alva_tool.ghost_out", 'G', 'PRESS', shift=True)
         custom_node_editor_keymaps.append((node_editor_km, node_editor_kmi))
 
 def unregister_keymaps():
