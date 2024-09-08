@@ -333,29 +333,19 @@ def draw_volume_monitor(self, context, sequence_editor):
 def draw_play_bar(self, context, layout):
     '''Copy/pasted from /scripts/startup/bl_ui/space_time.py.
         This is here because the normal keymaps don't work for 
-        keyframing in the popup window context.'''
+        keyframing in the popup window context.
+        
+        With modifications from raw source for view_3d space
+        compatibility.'''
     scene = context.scene
-    tool_settings = context.tool_settings
     screen = context.screen
 
-    layout.separator_spacer()
-
-    row = layout.row(align=True)
-    row.prop(tool_settings, "use_keyframe_insert_auto", text="", toggle=True)
-    sub = row.row(align=True)
-    sub.active = tool_settings.use_keyframe_insert_auto
-    sub.popover(
-        panel="TIME_PT_auto_keyframing",
-        text="",
-    )
+    #layout.separator_spacer()
 
     row = layout.row(align=True)
     row.operator("screen.frame_jump", text="", icon='REW').end = False
     row.operator("screen.keyframe_jump", text="", icon='PREV_KEYFRAME').next = False
     if not screen.is_animation_playing:
-        # if using JACK and A/V sync:
-        #   hide the play-reversed button
-        #   since JACK transport doesn't support reversed playback
         if scene.sync_mode == 'AUDIO_SYNC' and context.preferences.system.audio_device == 'JACK':
             row.scale_x = 2
             row.operator("screen.animation_play", text="", icon='PLAY')

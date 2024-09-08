@@ -39,7 +39,7 @@ def register_keymaps():
     wm = bpy.context.window_manager
     if wm.keyconfigs.addon:
         view3d_km = wm.keyconfigs.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
-        register_keymap_item(view3d_km, "view3d.object_controller", 'P', 'PRESS')
+        register_keymap_item(view3d_km, "alva_view3d.object_controller", 'P', 'PRESS')
         register_keymap_item(view3d_km, "alva_tool.ghost_out", 'G', 'PRESS', shift=True)
 
         sequencer_km = wm.keyconfigs.addon.keymaps.new(name='Sequencer', space_type='SEQUENCE_EDITOR')

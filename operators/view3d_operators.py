@@ -864,7 +864,7 @@ class RemoveGroupOperator(bpy.types.Operator):
 
 
 class VIEW3D_OT_object_controller(Operator):
-    bl_idname = "view3d.object_controller"
+    bl_idname = "alva_view3d.object_controller"
     bl_label = "Object Controller"
     
     def execute(self, context):
@@ -891,8 +891,8 @@ class VIEW3D_OT_object_controller(Operator):
             draw_footer_toggles(self, context, column, active_object)
             draw_play_bar(self, context, self.layout)
         
-        if active_object.type == 'SPEAKER':
-            draw_speaker(self, context, active_object)
+        # if active_object.type == 'SPEAKER':
+        #     draw_speaker(self, context, active_object)
 
 
 class VIEW3D_OT_alva_set_context_to_scene(bpy.types.Operator):
