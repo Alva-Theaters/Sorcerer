@@ -26,6 +26,7 @@
 
 ## Double hashtag indicates notes for future development requiring some level of attention
 
+import bpy
 from functools import partial
 import time
 
@@ -74,6 +75,12 @@ class CPVIAGenerator:
         p = property_name  # Inherited from the partial.
         mode = p
         parent = finders.find_parent(self)
+
+        from .publish import Publisher
+        publisher = Publisher()
+        if isinstance(context.space_data, bpy.types.SpaceView3D):
+            publisher.update_other_selections(context, parent, p)
+
         c, p, v, type = find_function(parent, p)  # Should return 3 lists and a string. find_function() is find_my_channels_and_values().
 
         if not check_flags(context, parent, c, p, v, type):
@@ -93,8 +100,6 @@ class CPVIAGenerator:
             i.append(influence)
             a.append(argument)
 
-        from .publish import Publisher
-        publisher = Publisher()
         #is_rendering = is_rendered_mode()
         is_rendering = False # Until Blender fixes their stuff. Can't enable render mode without immediately crashing.
         alva_log("cpvia_generator", f"CPVIA: {c}, {p}, {v}, {i}, {a}")

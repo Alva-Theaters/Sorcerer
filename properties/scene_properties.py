@@ -271,8 +271,6 @@ class SceneProperties(PropertyGroup):
 
     selected_array_name: StringProperty(default="", description="Select an array modifier in 3D view that represents a group of light fixtures") 
 
-    channel_controller_is_active: BoolProperty(default=False, description="This allows the channel updaters to know whether to consider selected objects or not")  
-
     int_cue_fader_bar: IntProperty(min=0, max=100, update=PropertiesUpdaters.fader_bar_updater) 
     int_fader_bar_memory: IntProperty(default=0) 
     str_preview_cue_index: StringProperty() 

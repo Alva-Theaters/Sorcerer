@@ -32,6 +32,7 @@ import bpy
 from ..assets.sli import SLI # type: ignore
 from ..cpvia.cpvia_finders import CPVIAFinders # type: ignore
 from ..utils.osc import OSC
+from ..assets.dictionaries import Dictionaries
     
 
 change_requests = []
@@ -160,6 +161,18 @@ class Publisher:
                 relevant_objects.append(obj)
                 pass
         return relevant_objects
+    
+
+    def update_other_selections(self, context, parent, p):
+        if parent != context.active_object:
+            return  # Prevent infinite recursion
+        
+        others = [obj for obj in bpy.context.selected_objects if obj.type == 'MESH']
+        if parent in others:
+            others.remove(parent)
+        param = Dictionaries.parameter_mapping[p]
+        for obj in others:
+                setattr(obj, param, getattr(parent, param))
             
             
     def render_in_viewport(self, parent, chan, param, val):

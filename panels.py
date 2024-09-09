@@ -166,6 +166,10 @@ class VIEW3D_PT_alva_lighting_modifiers(Panel, View3D_Panel):
     '''Modifiers for changing all lights as one'''
     bl_label = "Modify All Lights at Once"
 
+    @classmethod
+    def poll(cls, context):
+        return False # Currently disabled until it actually works
+
     def draw(self, context):
         draw_lighting_modifiers(self, context)
         
@@ -276,6 +280,10 @@ class SEQUENCER_PT_alva_Video(Panel, SequencerPanel):
     '''Currently does nothing, but will soon be for PTZ camera animation.'''
     bl_label = "Video"
 
+    @classmethod
+    def poll(cls, context):
+        return False # Temporarily disabled until it's built
+
     def draw(self, context):
         draw_strip_video(self, context)
         
@@ -283,6 +291,10 @@ class SEQUENCER_PT_alva_Video(Panel, SequencerPanel):
 class SEQUENCER_PT_alva_Audio(Panel, SequencerPanel):
     '''This is for the 3D audio system on the Sequencer side.'''
     bl_label = "Audio"
+
+    @classmethod
+    def poll(cls, context):
+        return False # Temporarily disabled until it's rebuilt
 
     def draw(self, context):
         scene = context.scene

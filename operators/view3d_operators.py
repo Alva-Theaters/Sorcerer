@@ -59,41 +59,6 @@ def apply_patch(item, object):
 #-------------------------------------------------------------------------------------------------------------------------------------------
 '''Begin operators section'''
     
-class ModalChannelControllerPanel(Operator):
-    bl_idname = "my.show_properties"
-    bl_label = "Object Controller"
-    
-    @classmethod
-    def poll(cls, context):
-        return context.active_object is not None
-
-    def execute(self, context):
-        return {'FINISHED'}
-    
-    def invoke(self, context, event):
-        context.scene.scene_props.channel_controller_is_active = True
-        wm = context.window_manager
-        return wm.invoke_props_dialog(self, width=260)
-    
-    def __del__(self):
-        if bpy.context.scene and hasattr(bpy.context.scene, "scene_props"):
-            bpy.context.scene.scene_props.channel_controller_is_active = False
-    
-    def draw(self, context):
-        layout = self.layout
-        active_object = context.active_object
-        
-        if active_object.type == 'MESH':
-            bpy.types.ALVA_CommonUI.draw_object_header(self, context)
-            bpy.types.ALVA_CommonUI.draw_parameters(self, context)
-            bpy.types.ALVA_CommonUI.draw_footer_toggles(self, context)
-        
-        if active_object.type == 'SPEAKER':
-            box = layout.box()
-            row = box.row()
-            row.label(text="Audio Destination:", icon='PLAY_SOUND')
-            row.prop(active_object, "int_speaker_number", text="Speaker:")
-    
 
 class AddChannelToGroupOperator(bpy.types.Operator):
     bl_idname = "patch.add_channel"
@@ -871,13 +836,8 @@ class VIEW3D_OT_object_controller(Operator):
         return {'FINISHED'}
     
     def invoke(self, context, event):
-        bpy.context.scene.scene_props.channel_controller_is_active = True
         width = 180
         return context.window_manager.invoke_popup(self, width=width)
-
-    def __del__(self):
-        if bpy.context.scene and hasattr(bpy.context.scene, "scene_props"):
-            bpy.context.scene.scene_props.channel_controller_is_active = False
 
     @classmethod
     def poll(cls, context):
@@ -910,7 +870,6 @@ class VIEW3D_OT_alva_set_context_to_scene(bpy.types.Operator):
 
     
 classes = (
-    ModalChannelControllerPanel,
     AddChannelToGroupOperator,
     RemoveChannelFromGroupOperator,
     ApplyPatchToObjectsOperator,
