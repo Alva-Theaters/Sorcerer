@@ -361,7 +361,7 @@ class CommonProperties:
             update=CPVIAGenerator.diffusion_updater
         )),
         ('float_strobe', FloatProperty(
-            name="Shutter Strobe",
+            name="Strobe",
             default=100.0,
             min=0.0,
             max=100.0,
@@ -379,7 +379,7 @@ class CommonProperties:
             update=CPVIAGenerator.edge_updater
         )),
         ('int_gobo_id', IntProperty(
-            name="Gobo Selection",
+            name="Gobo ID",
             default=1,
             min=0,
             max=20,
@@ -388,7 +388,7 @@ class CommonProperties:
             update=CPVIAGenerator.gobo_id_updater
         )),
         ('float_gobo_speed', FloatProperty(
-            name="Gobo Speed",
+            name="Speed",
             default=0.0,
             min=-100.0,
             max=100.0,

@@ -329,6 +329,34 @@ def draw_volume_monitor(self, context, sequence_editor):
         row = box.row()
         row.label(text="No participating speaker strips found.")
 
+def draw_parameters_mini(self, context, layout, active_object, use_slider=False):
+    ao = active_object
+
+    layout.use_property_split = True
+    layout.use_property_decorate = True
+
+    if ao.intensity_is_on:
+        layout.prop(ao, "float_intensity", slider=use_slider)
+    if ao.strobe_is_on:
+        layout.prop(ao, "float_strobe", slider=use_slider)
+    if ao.color_is_on:
+        layout.prop(ao, "float_vec_color", slider=use_slider)
+    if ao.pan_tilt_is_on:
+        layout.prop(ao, "float_pan", slider=use_slider)
+        layout.prop(ao, "float_tilt", slider=use_slider)
+    if ao.zoom_is_on:
+        layout.prop(ao, "float_zoom", slider=use_slider)
+    if ao.iris_is_on:
+        layout.prop(ao, "float_iris", slider=use_slider)
+    if ao.edge_is_on:
+        layout.prop(ao, "float_edge", slider=use_slider)
+    if ao.diffusion_is_on:
+        layout.prop(ao, "float_diffusion", slider=use_slider)
+    if ao.gobo_is_on:
+        layout.prop(ao, "int_gobo_id", slider=use_slider)
+        layout.prop(ao, "float_gobo_speed", slider=use_slider)
+        layout.prop(ao, "int_prism", slider=use_slider)
+
 
 def draw_play_bar(self, context, layout):
     '''Copy/pasted from /scripts/startup/bl_ui/space_time.py.
@@ -340,9 +368,8 @@ def draw_play_bar(self, context, layout):
     scene = context.scene
     screen = context.screen
 
-    #layout.separator_spacer()
-
     row = layout.row(align=True)
+    row.label(text="")
     row.operator("screen.frame_jump", text="", icon='REW').end = False
     row.operator("screen.keyframe_jump", text="", icon='PREV_KEYFRAME').next = False
     if not screen.is_animation_playing:
@@ -359,6 +386,7 @@ def draw_play_bar(self, context, layout):
         row.scale_x = 1
     row.operator("screen.keyframe_jump", text="", icon='NEXT_KEYFRAME').next = True
     row.operator("screen.frame_jump", text="", icon='FF').end = True
+    row.label(text="")
 
 
 def draw_fixture_groups(self, context):

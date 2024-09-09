@@ -871,8 +871,13 @@ class VIEW3D_OT_object_controller(Operator):
         return {'FINISHED'}
     
     def invoke(self, context, event):
-        width = 300
+        bpy.context.scene.scene_props.channel_controller_is_active = True
+        width = 180
         return context.window_manager.invoke_popup(self, width=width)
+
+    def __del__(self):
+        if bpy.context.scene and hasattr(bpy.context.scene, "scene_props"):
+            bpy.context.scene.scene_props.channel_controller_is_active = False
 
     @classmethod
     def poll(cls, context):
@@ -880,15 +885,13 @@ class VIEW3D_OT_object_controller(Operator):
                 hasattr(context, "active_object"))
 
     def draw(self, context):
-        scene = bpy.context.scene.scene_props
         active_object = context.active_object
-        from ..as_ui.space_common import draw_parameters, draw_footer_toggles, draw_play_bar
-        from ..as_ui.space_view3d import draw_object_header, draw_speaker
+        from ..as_ui.space_common import draw_parameters_mini, draw_play_bar
+        from ..as_ui.space_view3d import draw_speaker
         
         if active_object.type == 'MESH':
-            box, column = draw_object_header(self, context, scene, active_object)
-            draw_parameters(self, context, column, box, active_object)
-            draw_footer_toggles(self, context, column, active_object)
+            draw_parameters_mini(self, context, self.layout, active_object, use_slider=True)
+            self.layout.separator()
             draw_play_bar(self, context, self.layout)
         
         # if active_object.type == 'SPEAKER':
