@@ -79,8 +79,8 @@ class ORB_OT_base_modal_operator(Operator):
                 if func:
                     try:
                         func()
-                    except:
-                        print("An unknown error occured with Orb.")
+                    except Exception as e:
+                        print(f"An unknown error occured with Orb: {e}")
                 if msg:
                     self.report({'INFO'}, msg)
             except StopIteration:

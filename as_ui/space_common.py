@@ -462,6 +462,7 @@ def draw_generate_fixtures(self, context):
         layout.use_property_split = True
         layout.use_property_decorate = False
 
+        layout.column().prop(scene.scene_props, "int_group_number", text="Group")
         layout.column().prop(scene.scene_props, "int_array_start_channel", text="Channel")
         layout.column().prop(scene.scene_props, "int_array_universe", text="Universe")
         layout.column().prop(scene.scene_props, "int_array_start_address", text="Address")

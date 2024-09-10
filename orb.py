@@ -682,13 +682,13 @@ class Orb:
                 current_universe, current_address = addresses_list[i]
 
                 # Convert meters to feet.
-                position_x = round(chan.location.x / .3048)
-                position_y = round(chan.location.y / .3048)
-                position_z = round(chan.location.z / .3048)
+                position_x = round(chan.location.x / .3048, 2)
+                position_y = round(chan.location.y / .3048, 2)
+                position_z = round(chan.location.z / .3048, 2)
 
                 # Round and rotate x by 180 degrees (pi in radians) since cone facing up is the same as a light facing down.
-                orientation_x = round(math.degrees(chan.rotation_euler.x + math.pi))
-                orientation_y = round(math.degrees(chan.rotation_euler.y))
+                orientation_x = round(math.degrees(chan.rotation_euler.x + math.pi), 2)
+                orientation_y = round(math.degrees(chan.rotation_euler.y), 2)
                 orientation_z = 0  # Prevent modifiers from messing up pan/tilt. ## Add option to enable in the future.
 
                 # Set channel-specific UI fields inside the loop.
@@ -717,6 +717,11 @@ class Orb:
                 argument += "Enter Enter Full Enter"
             OSC.send_osc_lighting(address, argument)
 
+            # Record group
+            group_number = scene.scene_props.int_group_number
+            Orb.Eos.record_group(group_number, relevant_channels)
+            scene.scene_props.int_group_number += 1
+
             # Add group to Sorcerer group_data
             if len(relevant_channels) > 1:
                 new_group = scene.scene_group_data.add()
@@ -724,6 +729,18 @@ class Orb:
                 for channel in relevant_channels:
                     new_channel = new_group.channels_list.add()
                     new_channel.chan = channel
+
+
+        @staticmethod
+        def record_group(group_number, channels):
+            if group_number != 0:
+                OSC.send_osc_lighting("/eos/key/live", "1")
+                OSC.send_osc_lighting("/eos/key/live", "0")
+                time.sleep(.1)
+                channels = [str(chan) for chan in channels]
+                argument = " + ".join(channels)
+                argument = f"Chan {argument} Record Group {group_number} Enter Enter"
+                Orb.Eos.send_osc_with_delay("/eos/newcmd", argument)
 
 
 def test_orb(): # Return True for fail, False for pass
