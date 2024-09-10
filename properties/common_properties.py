@@ -324,7 +324,7 @@ class CommonProperties:
         )),
         ('float_iris', FloatProperty(
             name="Iris",
-            default=0.0,
+            default=100.0,
             min=0.0,
             max=100.0,
             description="Iris value",
