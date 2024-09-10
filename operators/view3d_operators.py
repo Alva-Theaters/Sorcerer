@@ -828,6 +828,28 @@ class RemoveGroupOperator(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class BumpGroupOperator(bpy.types.Operator):
+    bl_idname = "patch.bump_group_item"
+    bl_label = "Bump Group Up or Down"
+    
+    direction: bpy.props.IntProperty()
+
+    def execute(self, context):
+        scene = context.scene
+        index = scene.scene_props.group_data_index
+        
+        if self.direction == 1 and index < len(scene.scene_group_data) - 1:
+            scene.scene_group_data.move(index, index + 1)
+            scene.scene_props.group_data_index += 1
+        elif self.direction == -1 and index > 0:
+            scene.scene_group_data.move(index, index - 1)
+            scene.scene_props.group_data_index -= 1
+        else:
+            self.report({'WARNING'}, "Cannot move further in this direction")
+        
+        return {'FINISHED'}
+
+
 class VIEW3D_OT_object_controller(Operator):
     bl_idname = "alva_view3d.object_controller"
     bl_label = "Object Controller"
@@ -903,6 +925,7 @@ classes = (
     RemoveChoiceOperator,
     AddGroupOperator,
     RemoveGroupOperator,
+    BumpGroupOperator,
     VIEW3D_OT_object_controller,
     VIEW3D_OT_alva_set_context_to_scene
 )

@@ -63,6 +63,7 @@ def draw_settings(self, context, layout=None):
     mode = context.scene.scene_props.preferences_enum
     scene = context.scene
     restrictions = SLI.SLI_find_restrictions(scene)
+    is_restricted = context.scene.scene_props.school_mode_enabled
     
     col2 = split.column(align=True)
     
@@ -84,8 +85,9 @@ def draw_settings(self, context, layout=None):
         row.label(text="Nothing to display here yet.")
         
     elif mode == 'system': 
-        draw_school_mode(self, context, col2)
-        draw_fps(self, context, col2)
+        draw_school_mode(self, context, col2, is_restricted)
+        if not is_restricted:
+            draw_fps(self, context, col2)
 
 
 def draw_network(self, context, column):
@@ -249,9 +251,7 @@ def draw_fps(self, context, column):
     column.separator()
             
 
-def draw_school_mode(self, context, column):
-    is_restricted = context.scene.scene_props.school_mode_enabled
-    
+def draw_school_mode(self, context, column, is_restricted):
     # Label section
     box = column.box()
     row = box.row()
@@ -279,18 +279,11 @@ def draw_school_mode(self, context, column):
     col1 = split.column()
     col1.enabled = not is_restricted
     col1.prop(scene, "restrict_network")
-    col1.prop(scene, "restrict_sync")
-    col1.prop(scene, "restrict_sequencer")
-    col1.prop(scene, "restrict_house_lights")
-    col1.prop(scene, "restrict_influencers")
+    col1.prop(scene, "restrict_pan_tilt")
     
     col2 = split.column()
     col2.enabled = not is_restricted
     col2.prop(scene, "restrict_patch")
-    col2.prop(scene, "restrict_strip_media")
-    col2.prop(scene, "restrict_pan_tilts")
-    col2.prop(scene, "restrict_brushes")
-    col2.prop(scene, "restrict_stage_objects")
 
     column.separator()
     column.separator()

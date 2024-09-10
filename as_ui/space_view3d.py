@@ -74,7 +74,11 @@ def draw_tool_settings(self, context):
         would introduce hundreds of bugs throughout the codebase.'''
     if (hasattr(context, "scene") and 
         hasattr(context.scene, "scene_props") and context.scene.scene_props.view_ip_address_tool):
+        if context.scene.scene_props.school_mode_enabled and context.scene.scene_props.restrict_network:
+            return
+        
         scene = context.scene.scene_props
+        
         layout = self.layout
         row = layout.row(align=True)
         row.prop(context.scene, "lock_ip_settings", text="", icon='LOCKED' if context.scene.lock_ip_settings else 'UNLOCKED')

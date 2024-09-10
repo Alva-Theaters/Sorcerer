@@ -171,16 +171,9 @@ class SceneProperties(PropertyGroup):
     school_mode_password: StringProperty(default="", description="Reduces potential for students or volunteers to break things", update=CommonUpdaters.school_mode_password_updater)  
     school_mode_enabled: BoolProperty(default=False, description="Reduces potential for students or volunteers to break things")  
 
-    restrict_network: BoolProperty(name="Network", default=True, description="When school mode is enabled, you can't change network settings.")  
-    restrict_sync: BoolProperty(name="Sync", default=False, description="When school mode is enabled, you can't change sync settings.")  
-    restrict_patch: BoolProperty(name="Patch", default=True, description="When school mode is enabled, you can't change patch settings.")  
-    restrict_house_lights: BoolProperty(name="House Lights", default=True, description="When school mode is enabled, you can't change house lights settings.") 
-    restrict_strip_media: BoolProperty(name="Controller Settings", default=False, description="When school mode is enabled, you can't change controller settings.") 
-    restrict_sequencer: BoolProperty(name="Sequencer Settings", default=True, description="When school mode is enabled, you can't change sequencer settings.")  
-    restrict_stage_objects: BoolProperty(name="Stage Objects", default=False, description="When school mode is enabled, stage objects are disabled") 
-    restrict_influencers: BoolProperty(name="Influencers", default=False, description="When school mode is enabled, influencers are disabled") 
-    restrict_pan_tilts: BoolProperty(name="Pan/Tilts", default=True, description="When school mode is enabled, stage pan_tilt objects are disabled")  
-    restrict_brushes: BoolProperty(name="Brushes", default=False, description="When school mode is enabled, brushes are disabled")  
+    restrict_network: BoolProperty(name="Network", default=True, description="When school mode is enabled, you can't change network settings")
+    restrict_patch: BoolProperty(name="Patch", default=True, description="When school mode is enabled, you can't change patch settings")  
+    restrict_pan_tilt: BoolProperty(name="Pan/Tilts", default=True, description="When school mode is enabled, stage pan_tilt objects are disabled")  
 
     view_ip_address_tool: BoolProperty(name="IP Address", default=True, description="Draw the IP Address box in Tool Settings or Header area") 
     view_sequencer_add: BoolProperty(name="Sequencer Add", default=True, description="Draw the Add menu on the Sequencer") 
@@ -280,9 +273,9 @@ class SceneProperties(PropertyGroup):
     float_blue_time: FloatProperty(name="Blue Time", description="Duration that Blue uses") 
     float_black_time: FloatProperty(name="Black Time", description="Duration that Black uses") 
     float_restore_time: FloatProperty(name="Restore Time", description="Duration that Restore uses") 
-    string_blue_cue: StringProperty(name="Blue Cue Number", description="Cue number of blueout cue.") 
-    string_black_cue: StringProperty(name="Black Cue Number", description="Cue number of blackout cue.") 
-    string_restore_cue: StringProperty(name="Restore Cue Number", description="Cue number of restore cue.") 
+    string_blue_cue: StringProperty(name="Blue Cue Number", description="Cue number of blueout cue") 
+    string_black_cue: StringProperty(name="Black Cue Number", description="Cue number of blackout cue") 
+    string_restore_cue: StringProperty(name="Restore Cue Number", description="Cue number of restore cue") 
     
     cue_lists_index: IntProperty(default=0) 
     

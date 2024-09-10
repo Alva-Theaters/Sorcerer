@@ -188,7 +188,7 @@ class CommonProperties:
             default=0.0,
             update=CPVIAGenerator.tilt_graph_updater
         )),
-        ('pan_is_inverted', BoolProperty(default=True, description="Light is hung facing forward, for example, in FOH.")),
+        ('pan_is_inverted', BoolProperty(default=True, description="Light is hung facing forward, for example, in FOH")),
         ('last_hue', FloatProperty(default=0)),
         ('overdrive_mode', StringProperty(default="")),
         ('is_overdriven_left', BoolProperty(default=False)),

@@ -57,16 +57,9 @@ class SLI:
             return []
         
         restriction_properties = [
-            'restrict_network', 
-            'restrict_sync',
-            'restrict_patch', 
-            'restrict_house_lights', 
-            'restrict_strip_media', 
-            'restrict_sequencer', 
-            'restrict_stage_objects', 
-            'restrict_influencers', 
-            'restrict_pan_tilts', 
-            'restrict_brushes'
+            'restrict_network',
+            'restrict_patch',
+            'restrict_pan_tilt'
         ]
 
         true_restrictions = []

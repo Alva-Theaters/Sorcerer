@@ -184,14 +184,15 @@ def draw_parameters(self, context, column, box, active_object):
 
     # PAN/TILT    
     if active_object.pan_tilt_is_on and object_type not in ["Stage Object", "Influencer", "Brush"]:
-        row = box.row(align=True)
-        op = row.operator("alva_common.pan_tilt_properties", icon='ORIENTATION_GIMBAL', text="")
-        op.space_type = space_type
-        op.node_name = node_name
-        op.node_tree_name = node_tree_name
-        
-        row.prop(active_object, "float_pan", text="Pan", slider=True)
-        row.prop(active_object, "float_tilt", text="Tilt", slider=True)
+        if not (context.scene.scene_props.school_mode_enabled and context.scene.scene_props.restrict_pan_tilt):
+            row = box.row(align=True)
+            op = row.operator("alva_common.pan_tilt_properties", icon='ORIENTATION_GIMBAL', text="")
+            op.space_type = space_type
+            op.node_name = node_name
+            op.node_tree_name = node_tree_name
+            
+            row.prop(active_object, "float_pan", text="Pan", slider=True)
+            row.prop(active_object, "float_tilt", text="Tilt", slider=True)
     
     # ZOOM/IRIS
     if active_object.zoom_is_on or active_object.iris_is_on:
@@ -285,9 +286,10 @@ def draw_footer_toggles(self, context, column, active_object, box=True, vertical
     else: row.prop(active_object, "color_is_on", text="", icon_value=color_dark.icon_id, emboss=False)
     
     if object_type not in ["Stage Object", "Influencer", "Brush"]:
-        if active_object.pan_tilt_is_on:
-            row.prop(active_object, "pan_tilt_is_on", text="", icon='ORIENTATION_GIMBAL', emboss=False)
-        else: row.prop(active_object, "pan_tilt_is_on", text="", icon_value=pan_tilt_dark.icon_id, emboss=False)
+        if not (context.scene.scene_props.school_mode_enabled and context.scene.scene_props.restrict_pan_tilt):
+            if active_object.pan_tilt_is_on:
+                row.prop(active_object, "pan_tilt_is_on", text="", icon='ORIENTATION_GIMBAL', emboss=False)
+            else: row.prop(active_object, "pan_tilt_is_on", text="", icon_value=pan_tilt_dark.icon_id, emboss=False)
 
     if active_object.zoom_is_on:
         row.prop(active_object, "zoom_is_on", text="", icon_value=zoom.icon_id, emboss=False)
@@ -342,8 +344,9 @@ def draw_parameters_mini(self, context, layout, active_object, use_slider=False)
     if ao.color_is_on:
         layout.prop(ao, "float_vec_color", slider=use_slider)
     if ao.pan_tilt_is_on:
-        layout.prop(ao, "float_pan", slider=use_slider)
-        layout.prop(ao, "float_tilt", slider=use_slider)
+        if not (context.scene.scene_props.school_mode_enabled and context.scene.scene_props.restrict_pan_tilt):
+            layout.prop(ao, "float_pan", slider=use_slider)
+            layout.prop(ao, "float_tilt", slider=use_slider)
     if ao.zoom_is_on:
         layout.prop(ao, "float_zoom", slider=use_slider)
     if ao.iris_is_on:
@@ -398,8 +401,11 @@ def draw_fixture_groups(self, context):
 
     col = row.column(align=True)
     col.operator("patch.add_group_item", text="", icon='ADD')
-    
     col.operator("patch.remove_group_item", text="", icon='REMOVE')
+    if len(scene.scene_group_data) > 1:
+        col.separator()
+        col.operator("patch.bump_group_item", text="", icon='TRIA_UP').direction = -1
+        col.operator("patch.bump_group_item", text="", icon='TRIA_DOWN').direction = 1
     col.separator()
     col.alert = scene.scene_props.highlight_mode
     col.prop(scene.scene_props, "highlight_mode", icon='OUTLINER_OB_LIGHT' if scene.scene_props.highlight_mode else 'LIGHT_DATA', text="")
@@ -449,7 +455,10 @@ def draw_generate_fixtures(self, context):
     layout.use_property_split = True
     layout.use_property_decorate = False
 
-    if scene.scene_props.console_type_enum == 'option_eos' and not scene.scene_props.school_mode_enabled:
+    if scene.scene_props.console_type_enum == 'option_eos':
+        if scene.scene_props.school_mode_enabled and scene.scene_props.restrict_patch:
+            return
+        
         layout.use_property_split = True
         layout.use_property_decorate = False
 
