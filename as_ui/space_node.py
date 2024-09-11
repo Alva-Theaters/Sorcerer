@@ -80,25 +80,6 @@ def draw_alva_node_menu(self, layout):
 def draw_node_formatter_group(self, context, active_node):
     layout = self.layout
     column = layout.column()
-    row = column.row()
-    row.prop(active_node, "strobe_is_on", text="Strobe", slider=True)
-    row.prop(active_node, "color_is_on", text="Color", slider=True)
-    
-    row = column.row()
-    row.prop(active_node, "pan_tilt_is_on", text="Pan/Tilt", slider=True)
-    
-    row = column.row()
-    row.prop(active_node, "zoom_is_on", text="Zoom", slider=True)
-    row.prop(active_node, "iris_is_on", text="Iris", slider=True)
-    
-    row = column.row()
-    row.prop(active_node, "edge_is_on", text="Edge", slider=True)
-    row.prop(active_node, "diffusion_is_on", text="Diffusion", slider=True)
-    
-    row = column.row()
-    row.prop(active_node, "gobo_is_on", text="Gobo", slider=True)
-    
-    column.separator()
     
     if active_node.bl_idname == "group_controller_type":
         row = column.row()
@@ -109,7 +90,7 @@ def draw_node_formatter_group(self, context, active_node):
 
 def draw_node_formatter_mixer(self, context, active_node): ## This whole thing needs update
     row = self.layout.row(align=True)
-    row.prop(active_node, "str_selected_group", text="")
+    row.prop(active_node, "str_manual_fixture_selection", text="")
     row = self.layout.row(align=True)
     row.prop(active_node, "parameters_enum", text="")
     if active_node.parameters_enum == 'option_color':
