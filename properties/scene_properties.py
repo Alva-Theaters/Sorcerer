@@ -195,8 +195,8 @@ class SceneProperties(PropertyGroup):
     enable_nodes: BoolProperty(name="Enable Nodes", default=True, description="Enable nodes OSC output")  
     enable_strips: BoolProperty(name="Enable Strips", default=True, description="Enable sequencer strips OSC output")  
     enable_objects: BoolProperty(name="Enable Objects", default=True, description="Enable 3D view OSC output") 
-    enable_seconds: BoolProperty(name="Freeze Secondaries", default=True, description="Controllers set to On Seconds will only be rendered every other frame (right click them to set)")  
-    enable_thirds: BoolProperty(name="Freeze Tertiaries", default=True, description="Controllers set to On Thirds will only be rendered every third frame (right click them to set)") 
+    enable_seconds: BoolProperty(name="Freeze Seconds", default=True, description="Controllers set to On Seconds will only be rendered every other frame (right click them to set). When unchecked, these controllers will be completely disabled during frame change and playback")  
+    enable_thirds: BoolProperty(name="Freeze Thirds", default=True, description="Controllers set to On Thirds will only be rendered every third frame (right click them to set). When unchecked, these controllers will be completely disabled during frame change and playback") 
     
     has_solos: BoolProperty() 
 
