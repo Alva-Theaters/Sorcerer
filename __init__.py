@@ -53,20 +53,20 @@ bl_info = {
     "name": "Alva Sorcerer",
     "author": "Alva Theaters",
     "location": "ShaderEditor/View3D/Sequencer/TextEditor/Properties",
-    "version": (2, 0, 2),
+    "version": (2, 0, 3),
     "blender": (4, 1, 0),
     "description": "3D animation in real life, for theatre, with Blender.",
     "warning": "Copious UI components. Not for existing Blender workflows.",
     "wiki_url": "https://alva-sorcerer.readthedocs.io/en/latest/index.html#",
-    "tracker_url": "https://www.workstraight.com/site/login",
+    "tracker_url": "https://sorcerer.alvatheaters.com/support",
     "category": "EMARs",
 }
 
 as_info = {
-    "alpha": True,
-    "beta": False,
+    "alpha": False,
+    "beta": True,
     "rating": "Experimental",
-    "restrictions_url": "https://github.com/Alva-Theaters/Sorcerer/discussions/40"
+    "restrictions_url": "https://github.com/Alva-Theaters/Sorcerer/discussions/55"
 }
 
 import bpy
