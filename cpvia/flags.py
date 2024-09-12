@@ -28,6 +28,7 @@
 
 
 from ..maintenance.logging import alva_log
+from .find import Find
 
 
 def check_flags(context, parent, c, p, v, type):
@@ -92,6 +93,25 @@ def check_flags(context, parent, c, p, v, type):
     if p in param_flags and not param_flags[p]:
         alva_log("flags", "Stopping CPVIA per parameter toggles.")
         return False
+
+    # Check for freeze mode
+    if scene.in_frame_change:
+        frame = round(context.scene.frame_current) # This is technically a float
+        freeze_mode = parent.freezing_mode_enum
+        if freeze_mode == 'option_seconds':
+            if not scene.enable_seconds:
+                alva_log("flags", "Stopping CPVIA per render freezing (seconds globally disabled).")
+                return False
+            if frame % 2 != 0:
+                alva_log("flags", "Stopping CPVIA per render freezing (seconds).")
+                return False
+        elif freeze_mode == 'option_thirds':
+            if not scene.enable_thirds:
+                alva_log("flags", "Stopping CPVIA per render freezing (thirds globally disabled).")
+                return False
+            if frame % 3 != 0:
+                alva_log("flags", "Stopping CPVIA per render freezing (thirds).")
+                return False
         
     alva_log("flags", "CPVIA passes all flags, continuing.")
     return True
