@@ -221,6 +221,7 @@ def draw_alva_right_click(self, context):
 
     if is_property and prop.identifier == 'float_vec_color':
         if st == 'NODE_EDITOR':
+            return ## Fix this later
             node_tree = context.space_data.node_tree
             node_name = self.name # will this work? What is self?
             node_tree_name = node_tree.name

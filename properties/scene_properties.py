@@ -198,7 +198,7 @@ class SceneProperties(PropertyGroup):
     enable_seconds: BoolProperty(name="Freeze Seconds", default=True, description="Controllers set to On Seconds will only be rendered every other frame (right click them to set). When unchecked, these controllers will be completely disabled during frame change and playback")  
     enable_thirds: BoolProperty(name="Freeze Thirds", default=True, description="Controllers set to On Thirds will only be rendered every third frame (right click them to set). When unchecked, these controllers will be completely disabled during frame change and playback") 
     
-    has_solos: BoolProperty() 
+    has_solos: BoolProperty()
 
     core_enabled: BoolProperty(name="Enable Core", default=True, description="Enable Renegade's core") 
     use_alva_core: BoolProperty(default=False, name="In-house Mode", description="Commandeer your local Alva theater") 
