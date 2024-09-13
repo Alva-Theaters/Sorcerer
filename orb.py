@@ -677,6 +677,13 @@ class Orb:
         def loop_over_children(self, context, scene, addresses_list, channels_to_add, address):
             relevant_channels = []
 
+            # Ensure correct console mode.
+            OSC.send_osc_lighting("/eos/key/blind", "1")
+            OSC.send_osc_lighting("/eos/key/blind", "0")
+            time.sleep(.3)
+            OSC.send_osc_lighting("/eos/newcmd", "Patch Enter")
+            time.sleep(.3)
+
             for i, chan in enumerate([obj for obj in bpy.data.objects if obj.select_get()]):
                 chan_num = scene.scene_props.int_array_start_channel
                 current_universe, current_address = addresses_list[i]
