@@ -26,7 +26,7 @@ Links
 
 Development/Python API
 -----------------------
-- [Development README](https://github.com/Alva-Theaters/Sorcerer/blob/main/DEVELOPERS.md)
+- [Development README](https://github.com/Alva-Theaters/Sorcerer/blob/main/maintenance/DEVELOPERS.md)
 
 License
 -------
