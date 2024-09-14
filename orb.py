@@ -455,7 +455,8 @@ class Orb:
             wm.progress_begin(0, 100)
 
             for i, frame in enumerate(frames):
-                yield Orb.Eos.qmeo_frame(frame, scene, cue_list, event_list, cue_duration, wm, frames, i), "Making Qmeo"
+                Orb.Eos.set_frame(scene, frame)
+                yield Orb.Eos.qmeo_frame(frame, scene, cue_list, event_list, cue_duration, wm, frames, i), "Rendering qmeo"
 
             wm.progress_end()
             bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
@@ -485,11 +486,12 @@ class Orb:
             Orb.Eos.send_osc_with_delay("/eos/newcmd/", f"Delete Cue {cue_list} / Enter Enter", delay=.3)
 
         @staticmethod
+        def set_frame(scene, frame):
+            scene.frame_set(frame)
+            bpy.context.view_layer.update()
+
+        @staticmethod
         def qmeo_frame(frame, scene, cue_list, event_list, cue_duration, wm, frames, i):
-            # Set current frame and redraw window so user knows what's going on.
-            bpy.context.scene.frame_set(frame)
-            bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
-            
             # Get ready to record cue with the new CPVIA updates.
             current_frame_number = scene.frame_current
             argument_one = f"Record Cue {str(cue_list)} / {str(current_frame_number)} Time {str(cue_duration)} Enter Enter"
@@ -504,6 +506,8 @@ class Orb:
             
             # Go ahead and actually send the final command
             delay = scene.orb_chill_time
+            scene.frame_set(frame)
+            time.sleep(.1)
             Orb.Eos.send_osc_with_delay("/eos/newcmd", argument_one, delay=.1)
             Orb.Eos.send_osc_with_delay("/eos/newcmd", argument_two, delay)
 

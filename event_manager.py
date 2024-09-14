@@ -364,6 +364,7 @@ class EventManager:
             if abs(current_frame - self.last_frame) > 1 and self.last_frame != -1:
                 '''C2:1'''
                 Utils.on_scrub_detected(current_frame)
+                alva_log("event_manager", "Scrub Detected.")
                 
             self.last_frame = current_frame
         
@@ -389,6 +390,8 @@ class EventManager:
 
 
     def fire_parameter_updaters(self, scene):
+        alva_log("event_manager", f"frame_change_pre firing in fire_parameter_updaters. Frame is: {scene.frame_current}.")
+
         '''DOCUMENTATION CODE A1'''
         '''A1:3'''
         Utils.use_harmonizer(True)
@@ -407,10 +410,12 @@ class EventManager:
             self.controllers = Find.find_controllers(scene)
         
         current_controllers = self.controllers
+        alva_log("event_manager", f"Current controllers: {current_controllers}")
         
         new_graph = Utils.convert_to_props(scene, current_controllers)
         '''A1:2'''
         updates = Utils.find_updates(self.old_graph, new_graph)
+        alva_log("event_manager", f"Updates: {updates}")
         
         '''A1:4,6'''
         Utils.fire_updaters(updates)
