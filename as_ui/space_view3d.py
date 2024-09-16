@@ -163,7 +163,7 @@ def draw_object_header(self, context, scene, active_object, node_layout=None):
         row = box.row(align=True)
         row.prop(ao, "float_object_strength", slider = True, text = "Strength:")
         if identity == "Brush":
-            row.prop(ao, "is_erasing", icon='GPBRUSH_ERASE_STROKE', text="Erase")
+            row.prop(ao, "is_erasing", text="Erase", toggle=True)
         else:
             row.prop(ao, "alva_is_absolute", icon='FCURVE', text="")
 
