@@ -374,19 +374,19 @@ class EventManager:
         frame = scene.frame_current
         if self.start_mapping and frame in self.start_mapping:
             for trigger_prefix, osc_trigger in self.start_mapping[frame]:
-                OSC.send_osc_lighting(trigger_prefix, osc_trigger)
+                OSC.send_osc_lighting(trigger_prefix, osc_trigger, user=0)
 
         if self.offset_start_mapping and frame in self.offset_start_mapping:
             for item in self.offset_start_mapping[frame]:
                 try:
                     trigger_prefix, osc_trigger = item
-                    OSC.send_osc_lighting(trigger_prefix, osc_trigger)
+                    OSC.send_osc_lighting(trigger_prefix, osc_trigger, user=0)
                 except ValueError as e:
                     print(f"Error: {e}")
 
         if self.end_mapping and frame in self.end_mapping: # Trigger strip end frame.
             for trigger_prefix, osc_trigger_end in self.end_mapping[frame]:
-                OSC.send_osc_lighting(trigger_prefix, osc_trigger_end) 
+                OSC.send_osc_lighting(trigger_prefix, osc_trigger_end, user=0) 
 
 
     def fire_parameter_updaters(self, scene):
@@ -461,7 +461,7 @@ class EventManager:
         if scene.house_down_on_play: 
             house_prefix = scene.house_prefix
             house_down_argument = scene.house_down_argument
-            OSC.send_osc_lighting(house_prefix, house_down_argument)
+            OSC.send_osc_lighting(house_prefix, house_down_argument, user=0)
 
         # Get trigger maps
         '''C1:2'''
@@ -482,8 +482,8 @@ class EventManager:
                 int_fps = int(fps)
                 clock = relevant_clock_object.int_event_list
                 '''C1:4'''
-                OSC.send_osc_lighting("/eos/newcmd", f"Event {clock} / Frame_Rate {int_fps} Enter")
-                OSC.send_osc_lighting("/eos/newcmd", f"Event {clock} / Internal Time {timecode} Enter, Event {clock} / Internal Enable Enter")
+                OSC.send_osc_lighting("/eos/newcmd", f"Event {clock} / Frame_Rate {int_fps} Enter", user=0)
+                OSC.send_osc_lighting("/eos/newcmd", f"Event {clock} / Internal Time {timecode} Enter, Event {clock} / Internal Enable Enter", user=0)
 
         # Go livemap.
         '''C1:5'''
@@ -494,7 +494,7 @@ class EventManager:
 
             if relevant_cue_strip:
                 eos_cue_number_selected = relevant_cue_strip.eos_cue_number
-                OSC.send_osc_lighting("/eos/newcmd", f"Go_to_Cue {eos_cue_number_selected} Time 1 Enter")
+                OSC.send_osc_lighting("/eos/newcmd", f"Go_to_Cue {eos_cue_number_selected} Time 1 Enter", user=0)
                 scene.livemap_label = f"Livemap Cue: {eos_cue_number_selected}"
                 return 
 
@@ -512,7 +512,7 @@ class EventManager:
             '''C3:1'''
             house_prefix = scene.house_prefix
             house_up_argument = scene.house_up_argument
-            OSC.send_osc_lighting(house_prefix, house_up_argument)
+            OSC.send_osc_lighting(house_prefix, house_up_argument, user=0)
         
         # End timecode.    
         if scene.sync_timecode:
@@ -521,7 +521,7 @@ class EventManager:
                 
             if relevant_sound_strip:
                 clock = relevant_sound_strip.int_event_list
-                OSC.send_osc_lighting("/eos/newcmd", f"Event {clock} / Internal Disable Enter")
+                OSC.send_osc_lighting("/eos/newcmd", f"Event {clock} / Internal Disable Enter", user=0)
 
         '''C3:3'''
         self.start_mapping = None
@@ -556,7 +556,7 @@ class EventManager:
         for request in simplified:
             address, argument = publisher.form_osc(*request)  # Should return 2 strings
             '''A2:4'''
-            OSC.send_osc_lighting(address, argument)
+            OSC.send_osc_lighting(address, argument, user=0)
 
         if not scene.scene_props.is_playing:
             scene.scene_props.in_frame_change = False

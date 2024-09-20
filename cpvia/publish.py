@@ -78,8 +78,8 @@ class Publisher:
         else:
             v = str(v)
         return v
-        
-        
+
+
     def form_osc(self, c, p, v, i, a):
         """
         This function converts cpvia into (address, argument) tuples.
@@ -151,8 +151,8 @@ class Publisher:
             change_requests.append((c, p, v, i, a))
         else:
             address, argument = self.form_osc(c, p, v, i, a)  # Should return 2 strings
-            OSC.send_osc_lighting(address, argument)
-            
+            OSC.send_osc_lighting(address, argument, user=0)
+
             
     def find_objects(self, chan):
         relevant_objects = []

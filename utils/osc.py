@@ -38,6 +38,7 @@ class OSC:
     def correct_argument_because_etc_is_weird(argument):
         '''Required for influencers to work properly'''
         return argument.replace(" at - 00 ", " at + 00 ")
+        
 
     def send_osc(address, argument):
         scene = bpy.context.scene.scene_props
@@ -46,8 +47,9 @@ class OSC:
         OSC.send_osc_string(address, ip_address, port, argument)
         
         
-    def send_osc_lighting(address, argument):
+    def send_osc_lighting(address, argument, user=1):
         argument = OSC.correct_argument_because_etc_is_weird(argument)
+        address = address.replace("/eos", f"/eos/user/{user}")
         scene = bpy.context.scene.scene_props
         ip_address = scene.str_osc_ip_address
         port = scene.int_osc_port
