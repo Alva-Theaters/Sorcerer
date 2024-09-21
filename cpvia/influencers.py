@@ -31,10 +31,10 @@ import bpy
 from mathutils import Vector
 import time
 
-from ..assets.dictionaries import Dictionaries # type: ignore
-from ..cpvia.map import Mapping # type: ignore
-from ..cpvia.cpvia_finders import CPVIAFinders # type: ignore
-from ..assets.sli import SLI # type: ignore
+from ..assets.dictionaries import Dictionaries 
+from ..cpvia.map import Mapping 
+from ..cpvia.cpvia_finders import CPVIAFinders 
+from ..assets.sli import SLI 
 from ..utils.utils import Utils
 from ..maintenance.logging import alva_log
 

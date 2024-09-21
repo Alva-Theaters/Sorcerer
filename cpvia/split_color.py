@@ -27,8 +27,8 @@
 ## Double hashtag indicates notes for future development requiring some level of attention
 
 
-from ..cpvia.publish import Publisher # type: ignore
-from ..cpvia.find import Find # type: ignore
+from ..cpvia.publish import Publisher 
+from ..cpvia.find import Find 
 from ..utils.utils import is_rendered_mode
 
 

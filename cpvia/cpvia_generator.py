@@ -30,9 +30,9 @@ import bpy
 from functools import partial
 import time
 
-from ..cpvia.find import Find # type: ignore
-from ..cpvia.cpvia_finders import CPVIAFinders # type: ignore
-from ..cpvia.split_color import ColorSplitter # type: ignore
+from ..cpvia.find import Find 
+from ..cpvia.cpvia_finders import CPVIAFinders 
+from ..cpvia.split_color import ColorSplitter 
 from ..cpvia.flags import check_flags
 from ..utils.utils import is_rendered_mode
 from ..maintenance.logging import alva_log

@@ -29,9 +29,9 @@
 
 import bpy
 
-from ..assets.dictionaries import Dictionaries # type: ignore
-from ..assets.sli import SLI # type: ignore
-from ..utils.utils import Utils # type: ignore
+from ..assets.dictionaries import Dictionaries 
+from ..assets.sli import SLI 
+from ..utils.utils import Utils 
 
 
 class Find:
@@ -112,7 +112,7 @@ class Find:
         Returns:
             parent: A bpy object that may be a node, strip, or object
         """
-        from ..updaters.node_updaters import NodeUpdaters # type: ignore
+        from ..updaters.node_updaters import NodeUpdaters 
         
         if not isinstance(object, bpy.types.PropertyGroup):
             return object

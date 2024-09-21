@@ -40,7 +40,7 @@ from ..as_ui.space_sequencer import (
     draw_strip_formatter_video_audio, 
     draw_strip_formatter_generator
 )
-from ..utils.utils import Utils # type: ignore
+from ..utils.utils import Utils 
 from ..utils.osc import OSC
 from ..orb import Orb
 from ..maintenance.logging import alva_log
@@ -359,7 +359,7 @@ class SEQUENCER_OT_bump_strip(Operator):
     bl_label = "Bump VSE Strip Channel"
     bl_options = {'REGISTER', 'UNDO'}
 
-    direction: IntProperty() # type: ignore # Not importing all bpy.types just for this
+    direction: IntProperty()  # Not importing all bpy.types just for this
 
     def execute(self, context):
         for strip in context.selected_sequences:
@@ -502,7 +502,7 @@ class SEQUENCER_OT_new_pointer(Operator):
 
     
 class SEQUENCER_OT_bump_universal(Operator):
-    direction: IntProperty() # type: ignore
+    direction: IntProperty() 
 
     def execute(self, context):
         alva_log("sequencer_operators", f"Running universal bump operator.")
@@ -544,7 +544,7 @@ class SEQUENCER_OT_bump_right_long(SEQUENCER_OT_bump_universal):
 
 
 class SEQUENCER_OT_select_channel(Operator):
-    channel: IntProperty() # type: ignore
+    channel: IntProperty() 
 
     def execute(self, context):
         sequence_editor = context.scene.sequence_editor

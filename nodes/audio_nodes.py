@@ -39,7 +39,7 @@ class InputsNode(Node):
     bl_icon = 'FORWARD'
     bl_width_default = 400
 
-    patch_number: IntProperty(name="Patch Number", default=1, min=1, max=99, description="") # type: ignore
+    patch_number: IntProperty(name="Patch Number", default=1, min=1, max=99, description="") 
 
     def init(self, context):
         for i in range(32):
@@ -56,7 +56,7 @@ class OutputsNode(Node):
     bl_icon = 'BACK'
     bl_width_default = 400
 
-    patch_number: IntProperty(name="Patch Number", default=1, min=1, max=99, description="") # type: ignore
+    patch_number: IntProperty(name="Patch Number", default=1, min=1, max=99, description="") 
 
     def init(self, context):
         for i in range(16):
@@ -75,7 +75,7 @@ class BusesNode(Node):
     bl_icon = 'OUTLINER_OB_ARMATURE'
     bl_width_default = 400
 
-    patch_number: IntProperty(name="Patch Number", default=1, min=1, max=99, description="")  # type: ignore
+    patch_number: IntProperty(name="Patch Number", default=1, min=1, max=99, description="")  
     
     def get_buses(self, context):
         items = []
@@ -93,7 +93,7 @@ class BusesNode(Node):
             
         return items
     
-    bus_number_enum: EnumProperty(items=get_buses)  # type: ignore
+    bus_number_enum: EnumProperty(items=get_buses)  
 
     def init(self, context):
         for i in range(1, 18):  # Assuming 17 buses based on the get_buses method
@@ -113,7 +113,7 @@ class DCAsNode(Node):
     bl_icon = 'VIEW_CAMERA'
     bl_width_default = 400
 
-    patch_number: IntProperty(name="Patch Number", default=1, min=1, max=99, description="") # type: ignore
+    patch_number: IntProperty(name="Patch Number", default=1, min=1, max=99, description="") 
 
     def init(self, context):
         for i in range(6):

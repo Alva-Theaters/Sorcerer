@@ -78,9 +78,9 @@ class NODE_OT_keyframe_mixer(bpy.types.Operator):
     bl_idname = 'nodes.keyframe_mixer'
     bl_label = "Keyframe mixer"
     
-    space_type: bpy.props.StringProperty() # type: ignore
-    node_name: bpy.props.StringProperty() # type: ignore
-    node_tree_name: bpy.props.StringProperty() # type: ignore
+    space_type: bpy.props.StringProperty() 
+    node_name: bpy.props.StringProperty() 
+    node_tree_name: bpy.props.StringProperty() 
     
     def execute(self, context):
         finders = Find
@@ -205,9 +205,9 @@ class CustomButton(bpy.types.Operator):
 
     button_index: IntProperty()
 
-    space_type: bpy.props.StringProperty() # type: ignore
-    node_name: bpy.props.StringProperty() # type: ignore
-    node_tree_name: bpy.props.StringProperty() # type: ignore
+    space_type: bpy.props.StringProperty() 
+    node_name: bpy.props.StringProperty() 
+    node_tree_name: bpy.props.StringProperty() 
 
     def execute(self, context):
         finders = Find

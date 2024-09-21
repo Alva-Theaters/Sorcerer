@@ -35,12 +35,13 @@ import time
 from bpy.props import FloatProperty, FloatVectorProperty, IntProperty
 from bpy.types import Scene, Object
 
+
 try:
     import allin1 # type: ignore
 except:
     print(f"Could not import allin1.")
     
-from ..assets.dictionaries import Dictionaries # type: ignore
+from ..assets.dictionaries import Dictionaries 
 from ..utils.osc import OSC
 
 
@@ -527,7 +528,7 @@ class Utils:
 
 
     def update_alva_controller(controller):
-        from ..properties.common_properties import CommonProperties # type: ignore
+        from ..properties.common_properties import CommonProperties 
         props = CommonProperties
 
         # Redirect to mixer node's PropertyGroup if controller is a mixer node
@@ -542,7 +543,7 @@ class Utils:
 
 
     def home_alva_controller(controller):
-        from ..properties.common_properties import CommonProperties # type: ignore
+        from ..properties.common_properties import CommonProperties 
         props = CommonProperties
 
         # Redirect to mixer node's PropertyGroup if controller is a mixer node

@@ -29,8 +29,8 @@
 
 import bpy
 
-from ..assets.sli import SLI # type: ignore
-from ..cpvia.cpvia_finders import CPVIAFinders # type: ignore
+from ..assets.sli import SLI 
+from ..cpvia.cpvia_finders import CPVIAFinders 
 from ..utils.osc import OSC
 from ..assets.dictionaries import Dictionaries
     

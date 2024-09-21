@@ -32,10 +32,10 @@ from bpy.types import Operator
 from bpy.props import StringProperty
 import time
 
-from ..utils.osc import OSC as osc # type: ignore
+from ..utils.osc import OSC as osc 
 from ..utils.utils import Utils
-from ..as_ui.space_alvapref import draw_settings # type: ignore
-from ..cpvia.find import Find # type: ignore
+from ..as_ui.space_alvapref import draw_settings 
+from ..cpvia.find import Find 
 from ..assets.dictionaries import Dictionaries
 from ..as_ui.space_wm import (
     draw_edge_diffusion_settings, 
@@ -45,6 +45,8 @@ from ..as_ui.space_wm import (
     draw_zoom_settings, 
     draw_splash
 )
+
+# pyright: reportInvalidTypeForm=false
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -93,9 +95,9 @@ class HomeControllerButton(Operator):
     bl_idname = "alva_node.home"
     bl_label = "Home"
 
-    space_type: StringProperty() # type: ignore # type: ignore
-    node_name: StringProperty() # type: ignore
-    node_tree_name: StringProperty() # type: ignore # type: ignore
+    space_type: StringProperty()  
+    node_name: StringProperty() 
+    node_tree_name: StringProperty()  
 
     def execute(self, context):
         finders = Find
@@ -108,9 +110,9 @@ class UpdateControllerButton(Operator):
     bl_idname = "alva_node.update"
     bl_label = "Update"
 
-    space_type: StringProperty() # type: ignore
-    node_name: StringProperty() # type: ignore
-    node_tree_name: StringProperty() # type: ignore
+    space_type: StringProperty() 
+    node_name: StringProperty() 
+    node_tree_name: StringProperty() 
 
     def execute(self, context):
         finders = Find
@@ -123,9 +125,9 @@ class COMMON_OT_strobe_props(Operator):
     bl_idname = "alva_common.strobe_properties"
     bl_label = "View Strobe and Color Properties"
     
-    space_type: StringProperty() # type: ignore
-    node_name: StringProperty() # type: ignore
-    node_tree_name: StringProperty() # type: ignore
+    space_type: StringProperty() 
+    node_name: StringProperty() 
+    node_tree_name: StringProperty() 
     
     def execute(self, context):
         return {'FINISHED'}
@@ -144,9 +146,9 @@ class COMMON_OT_pan_tilt_props(Operator):
     bl_label = "Pan/Tilt Properties"
     bl_description = "Access pan and tilt min and max settings"
 
-    space_type: StringProperty() # type: ignore
-    node_name: StringProperty() # type: ignore
-    node_tree_name: StringProperty() # type: ignore
+    space_type: StringProperty() 
+    node_name: StringProperty() 
+    node_tree_name: StringProperty() 
     
     def execute(self, context):
         return {'FINISHED'}
@@ -165,9 +167,9 @@ class COMMON_OT_zoom_iris_props(Operator):
     bl_label = "Zoom/Iris Properties"
     bl_description = "Access min and max settings"
 
-    space_type: StringProperty() # type: ignore
-    node_name: StringProperty() # type: ignore
-    node_tree_name: StringProperty() # type: ignore # type: ignore
+    space_type: StringProperty() 
+    node_name: StringProperty() 
+    node_tree_name: StringProperty()  
     
     def execute(self, context):
         return {'FINISHED'}
@@ -185,9 +187,9 @@ class COMMON_OT_edge_diffusion_props(Operator):
     bl_idname = "alva_common.edge_diffusion_properties"
     bl_label = "Edge/Diffusion Properties"
     
-    space_type: StringProperty() # type: ignore # type: ignore
-    node_name: StringProperty() # type: ignore # type: ignore
-    node_tree_name: StringProperty()  # type: ignore
+    space_type: StringProperty()  
+    node_name: StringProperty()  
+    node_tree_name: StringProperty()  
     
     def execute(self, context):
         return {'FINISHED'}
@@ -206,9 +208,9 @@ class COMMON_OT_gobo_props(Operator):
     bl_label = "View Gobo Properties"
     bl_description = "Access gobo-related settings"
 
-    space_type: StringProperty() # type: ignore
-    node_name: StringProperty() # type: ignore
-    node_tree_name: StringProperty() # type: ignore
+    space_type: StringProperty() 
+    node_name: StringProperty() 
+    node_tree_name: StringProperty() 
     
     def execute(self, context):
         return {'FINISHED'}
@@ -242,9 +244,9 @@ class COMMON_OT_alva_white_balance(Operator):
     bl_idname = "alva_common.white_balance"
     bl_label = "Set White Balance"
 
-    space_type: StringProperty() # type: ignore
-    node_name: StringProperty() # type: ignore
-    node_tree_name: StringProperty() # type: ignore
+    space_type: StringProperty() 
+    node_name: StringProperty() 
+    node_tree_name: StringProperty() 
 
     def execute(self, context):
         active_controller = Find.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
@@ -384,7 +386,7 @@ class TEXT_OT_populate_macros(Operator):
     bl_idname = "alva_text.populate_macros"
     bl_label = "Populate Macro Buttons"
 
-    filter_group: StringProperty()  # type: ignore
+    filter_group: StringProperty()  
 
     def execute(self, context):
         scene = context.scene
@@ -422,7 +424,7 @@ class WM_OT_show_message(bpy.types.Operator):
     bl_idname = "alva_wm.show_message"
     bl_label = "Alva Sorcerer"
     
-    message: StringProperty(name="Message", default="") # type: ignore
+    message: StringProperty(name="Message", default="") 
 
     def execute(self, context):
         return {'FINISHED'}

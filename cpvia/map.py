@@ -27,8 +27,8 @@
 ## Double hashtag indicates notes for future development requiring some level of attention
 
 
-from ..cpvia.find import Find # type: ignore
-from ..assets.sli import SLI # type: ignore
+from ..cpvia.find import Find 
+from ..assets.sli import SLI 
 
 
 class Mapping:

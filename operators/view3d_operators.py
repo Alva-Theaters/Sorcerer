@@ -35,8 +35,8 @@ from bpy.types import Operator
 
 # pyright: reportInvalidTypeForm=false
 
-from ..cpvia.find import Find # type: ignore
-from ..utils.utils import Utils # type: ignore
+from ..cpvia.find import Find 
+from ..utils.utils import Utils 
 from ..utils.osc import OSC
 
 
@@ -65,7 +65,7 @@ class AddChannelToGroupOperator(bpy.types.Operator):
     bl_label = "Add Channels"
     bl_description = "Add channel to group"
     
-    group_id: StringProperty() # type: ignore
+    group_id: StringProperty() 
     
     def execute(self, context):
         # The best part is no part.
@@ -662,9 +662,9 @@ class ToggleObjectMuteOperator(bpy.types.Operator):
     bl_label = "Mute OSC"
     bl_description = "Disable object's OSC output"
 
-    space_type: StringProperty() # type: ignore
-    node_name: StringProperty() # type: ignore
-    node_tree_name: StringProperty() # type: ignore
+    space_type: StringProperty() 
+    node_name: StringProperty() 
+    node_tree_name: StringProperty() 
 
     def execute(self, context):
         finders = Find
@@ -780,8 +780,8 @@ class AddChoiceOperator(bpy.types.Operator):
         node = context.node
         choice = node.parameters.add()
         node.active_modifier_index = len(node.parameters) - 1
-        choice.node_tree_pointer = node.id_data  # Set node tree name
-        choice.node_name = node.name  # Set node name
+        choice.node_tree_pointer = node.id_data
+        choice.node_name = node.name
         return {'FINISHED'}
     
     

@@ -28,7 +28,7 @@
 
 
 import bpy
-import numpy as np  # type: ignore
+import numpy as np  
 from typing import List, Tuple, Union
 import time
 import mathutils

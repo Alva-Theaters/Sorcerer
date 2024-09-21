@@ -31,9 +31,9 @@ import bpy
 from bpy.types import NodeSocket, Node, PropertyGroup
 from bpy.props import *
 
-from ..assets.items import Items as AlvaItems # type: ignore
-from ..updaters.node_updaters import NodeUpdaters # type: ignore
-from ..utils.utils import Utils # type: ignore
+from ..assets.items import Items as AlvaItems 
+from ..updaters.node_updaters import NodeUpdaters 
+from ..utils.utils import Utils 
 
 from ..as_ui.space_common import draw_text_or_group_input, draw_parameters, draw_footer_toggles
 from ..as_ui.space_alvapref import draw_settings
@@ -46,6 +46,8 @@ from ..as_ui.space_node import (
     draw_flash_node, 
     draw_presets_node
 )
+
+# pyright: reportInvalidTypeForm=false
 
 
 MixerParametersSubClass = Utils.find_subclass_by_name(PropertyGroup, "MixerParameters")
@@ -190,38 +192,38 @@ class NODE_NT_mixer(Node):
     bl_icon = 'OPTIONS'
     bl_width_default = 400
 
-    parameters: CollectionProperty(type=MixerParametersSubClass) # type: ignore # type: ignore
+    parameters: CollectionProperty(type=MixerParametersSubClass)  
     
     # Common property registrations in register() section.
 
-    influence: IntProperty(default=1, min=1, max=10, description="How many votes this controller has when there are conflicts", options={'ANIMATABLE'}) # type: ignore # type: ignore
-    show_settings: BoolProperty(default=True, name="Show Settings", description="Expand/collapse group/parameter row and UI controller row") # type: ignore # type: ignore
-    float_offset: FloatProperty(name="Offset", description="Move or animate this value for a moving effect", update=NodeUpdaters.mixer_param_updater) # type: ignore
-    int_subdivisions: IntProperty(name="Subdivisions", description="Subdivide the mix into multiple sections", update=NodeUpdaters.mixer_param_updater, min=0, max=32) # type: ignore # type: ignore
-    columns: IntProperty(name="# of Columns:", min=1, max=8, default=3) # type: ignore # type: ignore
-    scale: FloatProperty(name="Size of Choices:", min=1, max=3, default=2) # type: ignore # type: ignore
+    influence: IntProperty(default=1, min=1, max=10, description="How many votes this controller has when there are conflicts", options={'ANIMATABLE'})  
+    show_settings: BoolProperty(default=True, name="Show Settings", description="Expand/collapse group/parameter row and UI controller row")  
+    float_offset: FloatProperty(name="Offset", description="Move or animate this value for a moving effect", update=NodeUpdaters.mixer_param_updater) 
+    int_subdivisions: IntProperty(name="Subdivisions", description="Subdivide the mix into multiple sections", update=NodeUpdaters.mixer_param_updater, min=0, max=32)  
+    columns: IntProperty(name="# of Columns:", min=1, max=8, default=3)  
+    scale: FloatProperty(name="Size of Choices:", min=1, max=3, default=2)  
     mix_method_enum: EnumProperty(
         name="Method",
         description="Choose a mixing method",
         items=AlvaItems.mixer_methods,
         default=1
-    ) # type: ignore
+    ) 
     parameters_enum: EnumProperty(
         name="Parameter",
         description="Choose a parameter type to mix",
         items=AlvaItems.mixer_parameters,
         default=1,
         update=NodeUpdaters.update_node_name
-    ) # type: ignore # type: ignore
+    )  
     node_tree_pointer: PointerProperty(
         name="Node Tree Pointer",
         type=bpy.types.NodeTree,
         description="Pointer to the node tree"
-    ) # type: ignore # type: ignore
+    )  
     node_name: bpy.props.StringProperty(
         name="Node Name",
         description="Name of the node"
-    ) # type: ignore
+    ) 
     
     def init(self, context):
         self.inputs.new('MotorInputType', "Motor Input")
@@ -240,8 +242,8 @@ class NODE_NT_pan_tilt(Node):
     bl_width_default = 150
     bl_description="Intuitive pan/tilt controller only for FOH, forward-facing fixtures"
 
-    pan_tilt_channel: IntProperty(default=1, description="Channel for pan/tilt graph. Think of the circle as a helix or as an infinite staircase. Pan-around is when you fall down to go forward an inch or jump up to go forward an inch. The circle below is a helix with 150% the surface area of a circle. Only use this for front-facing FOH/catwalk movers") # type: ignore # type: ignore
-    pan_is_inverted: BoolProperty(default = True) # type: ignore
+    pan_tilt_channel: IntProperty(default=1, description="Channel for pan/tilt graph. Think of the circle as a helix or as an infinite staircase. Pan-around is when you fall down to go forward an inch or jump up to go forward an inch. The circle below is a helix with 150% the surface area of a circle. Only use this for front-facing FOH/catwalk movers")  
+    pan_is_inverted: BoolProperty(default = True) 
 
     def init(self, context):
         return
@@ -262,9 +264,9 @@ class NODE_NT_global(Node):
         description="Choose a parameter type to control",
         items=AlvaItems.global_node_parameters,
         default=1
-    ) # type: ignore
-    columns: IntProperty(name="Columns:", description="", default=3, max=8, min=1) # type: ignore
-    scale: FloatProperty(name="Size:", description="", default=1, max=3, min=.2) # type: ignore
+    ) 
+    columns: IntProperty(name="Columns:", description="", default=3, max=8, min=1) 
+    scale: FloatProperty(name="Size:", description="", default=1, max=3, min=.2) 
 
     def init(self, context):
         return
@@ -288,19 +290,19 @@ class NODE_NT_motor(Node):
         min=0.0,
         max=1,
         update=NodeUpdaters.motor_updater
-    ) # type: ignore
+    ) 
     transmission_enum: EnumProperty(
         name="Transmission",
         description="Choose whether to spin the motor manually or with keyframes",
         items=AlvaItems.transmission_options,
         default=1
-    ) # type: ignore
-    float_progress: FloatProperty(name="Progress:", description="How far along in the steps the mixer is", default=0, update=NodeUpdaters.props_updater) # type: ignore # type: ignore
-    float_scale: FloatProperty(name="Scale:", description="Size of the effect, 1 is no reduction, 0 is complete reduction", default=1, min=0, max=1, update=NodeUpdaters.props_updater) # type: ignore
+    ) 
+    float_progress: FloatProperty(name="Progress:", description="How far along in the steps the mixer is", default=0, update=NodeUpdaters.props_updater)  
+    float_scale: FloatProperty(name="Scale:", description="Size of the effect, 1 is no reduction, 0 is complete reduction", default=1, min=0, max=1, update=NodeUpdaters.props_updater) 
 
-    initial_angle: FloatProperty(name="Initial Angle", default=0) # type: ignore
-    prev_angle: FloatProperty(name="Previous Angle", default=0) # type: ignore
-    is_interacting: BoolProperty(name="Is Interacting", default=False) # type: ignore
+    initial_angle: FloatProperty(name="Initial Angle", default=0) 
+    prev_angle: FloatProperty(name="Previous Angle", default=0) 
+    is_interacting: BoolProperty(name="Is Interacting", default=False) 
 
     def init(self, context):
         self.outputs.new('MotorOutputType', "Motor Out")
@@ -317,19 +319,19 @@ class NODE_NT_console_buttons(Node):
     bl_width_default = 400
     bl_description="Create console buttons with custom OSC syntax"
 
-    custom_buttons: CollectionProperty(type=CustomButtonPropertyGroupSubClass) # type: ignore
-    active_button_index: IntProperty() # type: ignore
-    number_of_columns: IntProperty(default=3, max=9, name="Num. Columns", description="Change how many buttons should be in each row, or in other words how many columns there should be") # type: ignore
-    scale: FloatProperty(default=2, max=5, min=.2, name="Scale", description="Change the scale of the buttons") # type: ignore
-    expand_settings: BoolProperty(default=True) # type: ignore
+    custom_buttons: CollectionProperty(type=CustomButtonPropertyGroupSubClass) 
+    active_button_index: IntProperty() 
+    number_of_columns: IntProperty(default=3, max=9, name="Num. Columns", description="Change how many buttons should be in each row, or in other words how many columns there should be") 
+    scale: FloatProperty(default=2, max=5, min=.2, name="Scale", description="Change the scale of the buttons") 
+    expand_settings: BoolProperty(default=True) 
     direct_select_types_enum: EnumProperty(
         name="Types",
         description="List of supported direct select types",
         items=AlvaItems.direct_select_types,
         default=0,
         update=NodeUpdaters.direct_select_types_updater
-    ) # type: ignore
-    boost_index: IntProperty(name="Boost", description="Boost all the index numbers of the buttons", min=-99999, max=99999, update=NodeUpdaters.boost_index_updater) # type: ignore
+    ) 
+    boost_index: IntProperty(name="Boost", description="Boost all the index numbers of the buttons", min=-99999, max=99999, update=NodeUpdaters.boost_index_updater) 
 
     def init(self, context):
         return
@@ -349,7 +351,7 @@ class NODE_NT_flash(Node):
         name="Node Tree Pointer",
         type=bpy.types.NodeTree,
         description="Pointer to the node tree"
-    ) # type: ignore
+    ) 
     
     flash_motif_names_enum: EnumProperty(
         name="",
@@ -357,11 +359,11 @@ class NODE_NT_flash(Node):
         items=AlvaItems.get_motif_name_items,
         update=NodeUpdaters.flash_node_updater,
         default=0
-    ) # type: ignore
+    ) 
     
-    show_effect_preset_settings: BoolProperty(default=False, description="Show settings", update=NodeUpdaters.flash_node_updater) # type: ignore
-    int_start_preset: IntProperty(default=0, description="Preset number on console", update=NodeUpdaters.flash_node_updater) # type: ignore # type: ignore
-    int_end_preset: IntProperty(default=0, description="Preset number on console", update=NodeUpdaters.flash_node_updater) # type: ignore # type: ignore
+    show_effect_preset_settings: BoolProperty(default=False, description="Show settings", update=NodeUpdaters.flash_node_updater) 
+    int_start_preset: IntProperty(default=0, description="Preset number on console", update=NodeUpdaters.flash_node_updater)  
+    int_end_preset: IntProperty(default=0, description="Preset number on console", update=NodeUpdaters.flash_node_updater)  
     
     def init(self, context):
         up = self.inputs.new('FlashUpType', "Flash Up")
@@ -382,15 +384,15 @@ class NODE_NT_alva_presets(Node):
     bl_width_default = 400
     bl_description="Record and recall console presets"
     
-    show_settings: BoolProperty(name="Show Settings",description="Show the node's settings") # type: ignore
+    show_settings: BoolProperty(name="Show Settings",description="Show the node's settings") 
     preset_types_enum: EnumProperty(
         name="Types",
         description="Choose whether this should use preset or color palettes",
         items=AlvaItems.presets_node_types,
         default=0
-    ) # type: ignore
-    is_recording: BoolProperty(default=False, description="Recording") # type: ignore
-    index_offset: IntProperty(default=0, name="Index Offset", description="Use this if you don't want the Preset/CP numbers to start at 1") # type: ignore
+    ) 
+    is_recording: BoolProperty(default=False, description="Recording") 
+    index_offset: IntProperty(default=0, name="Index Offset", description="Use this if you don't want the Preset/CP numbers to start at 1") 
 
     def init(self, context):
         return
@@ -441,7 +443,7 @@ def register():
     register_sockets()
     register_nodes()
     
-    from ..properties.common_properties import CommonProperties # type: ignore
+    from ..properties.common_properties import CommonProperties 
     common_properties = CommonProperties()
     
     # Group controller node common property registrations.
@@ -460,7 +462,7 @@ def register():
 
 
 def unregister():
-    from ..properties.common_properties import CommonProperties # type: ignore
+    from ..properties.common_properties import CommonProperties 
     common_properties = CommonProperties()
     
     Utils.register_properties(NODE_NT_mixer, common_properties.controller_ids, register=False)

@@ -28,7 +28,7 @@
 import bpy
 from bpy.types import Operator
 
-from ..utils.utils import Utils # type: ignore
+from ..utils.utils import Utils 
 from ..utils.osc import OSC
 from ..orb import Orb
 
