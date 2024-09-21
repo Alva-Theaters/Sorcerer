@@ -33,6 +33,7 @@ from ..utils.utils import Utils
 from ..properties.common_properties import CommonProperties 
 from ..assets.items import Items as AlvaItems 
 from .property_groups import LightingModifier, Errors
+from ..assets.tooltips import format_tooltip
 
 # pyright: reportInvalidTypeForm=false
 
@@ -247,10 +248,10 @@ class SceneProperties(PropertyGroup):
     int_array_group_index: IntProperty(name="Group #", default=1, max=9999, description="Group number on console") 
     int_array_start_channel: IntProperty(name="Start Channel #", default=1, max=9999, description="Channel number to start at on console") 
     
-    int_group_number: IntProperty(name="Group #", default=0, max=9999, min=0, description="Group to create for this set. Set to 0 to skip recording group")  
-    int_array_universe: IntProperty(name="Universe #", default=1, max=9999, min=1, description="Universe to start patching to on console")  
-    int_array_start_address: IntProperty(name="Start Address #", default=1, max=9999, min=1, description="Address to start patching to on console") 
-    int_array_channel_mode: IntProperty(name="Channel Mode", default=1, max=9999, min=1, description="How many channels each fixture needs on console") 
+    int_group_number: IntProperty(name="Group #", default=0, max=9999, min=0, description=format_tooltip("Group to create for this set. Set to 0 to skip recording group"))  
+    int_array_universe: IntProperty(name="Universe #", default=1, max=9999, min=1, description=format_tooltip("Universe to start patching to on console"))  
+    int_array_start_address: IntProperty(name="Start Address #", default=1, max=9999, min=1, description=format_tooltip("Address to start patching to on console")) 
+    int_array_channel_mode: IntProperty(name="Channel Mode", default=1, max=9999, min=1, description=format_tooltip("How many channels each fixture needs on console.")) 
 
     bool_eos_console_mode: BoolProperty(default=False, description="I am using an ETC Eos lighting console") 
 

@@ -37,10 +37,8 @@ from ..updaters.common_updaters import CommonUpdaters
 from ..updaters.sequencer_updaters import SequencerUpdaters 
 from ..updaters.node_updaters import NodeUpdaters 
 from ..cpvia.cpvia_generator import CPVIAGenerator 
-
-
-InfluencerListSubClass = Utils.find_subclass_by_name(PropertyGroup, "InfluencerList")
-ChannelsListSubClass = Utils.find_subclass_by_name(PropertyGroup, "ChannelsList")
+from .property_groups import InfluencerList, ChannelsList
+from ..assets.tooltips import find_tooltip
 
 
 '''
@@ -131,7 +129,7 @@ HOW TO USE.
 class CommonProperties:
     controller_ids = [
         ('str_group_id',  StringProperty(default="1")),
-        ('list_group_channels', CollectionProperty(type=ChannelsListSubClass)),
+        ('list_group_channels', CollectionProperty(type=ChannelsList)),
         ('str_group_label', StringProperty(default="")),
         ('is_text_not_group', BoolProperty(default=True, description="Stores the decision to use manual input or group enum")),
         ('node_tree_pointer', PointerProperty(
@@ -156,9 +154,9 @@ class CommonProperties:
             update=CommonUpdaters.call_fixtures_updater
         )),
         ('is_erasing', BoolProperty(name="Eraser", description="Erase instead of add")),
-        ('influencer_list', CollectionProperty(type=InfluencerListSubClass)),
-        ('float_object_strength', FloatProperty(name="Strength", default=1, min=0, max=1, description="If you diminish the strength, it will act like a brush. If you keep this up all the way, it will act more like an object passing through the lights that resets them as it leaves", update=CommonUpdaters.controller_ids_updater)),
-        ('alva_is_absolute', BoolProperty(name="Absolute", default=False, description="Enable absolute mode. In absolute mode, the object can animate the channels inside it while they are inside. With this turned off, channels will only be changed by the influencer when the influencer comes and goes, not just because there is fcurve data. With this off, the influencer is in relative mode and can work on top of other effects")),
+        ('influencer_list', CollectionProperty(type=InfluencerList)),
+        ('float_object_strength', FloatProperty(name="Strength", default=1, min=0, max=1, description=find_tooltip("strength"), update=CommonUpdaters.controller_ids_updater)),
+        ('alva_is_absolute', BoolProperty(name="Absolute", default=False, description=find_tooltip("absolute"))),
         
         # Pan/Tilt node properties. Registered on object for patch reasons.
         ('float_vec_pan_tilt_graph', FloatVectorProperty(
@@ -239,8 +237,8 @@ class CommonProperties:
 
     common_header = [
         ('str_manual_fixture_selection', StringProperty(
-            name="Selected Light",
-            description="Instead of the group selector to the left, simply type in what you wish to control here. Just type in the channels you want or don't want in plain English",
+            name="Selected Light(s)",
+            description=find_tooltip("manual_fixture_selection"),
             default="1",
             update=CommonUpdaters.controller_ids_updater
         )),
@@ -263,7 +261,7 @@ class CommonProperties:
         )),
         ('alva_solo', BoolProperty(
             name="Solo",
-            description="Mute all controllers but this one, and any others with solo also turned on. Clear all solos with the button on the Playback menu in the Timeline header",
+            description=find_tooltip("solo"),
             update=CommonUpdaters.solo_updater
         )),
         ('freezing_mode_enum', EnumProperty(
@@ -281,7 +279,7 @@ class CommonProperties:
             default=0.0,
             min=0.0,
             max=100.0,
-            description="Intensity value",
+            description=find_tooltip("intensity"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.intensity_updater
         )),
@@ -292,7 +290,7 @@ class CommonProperties:
             default=(1.0, 1.0, 1.0),
             min=0.0,
             max=1.0,
-            description='Color value. If your fixture is not an RGB fixture, but CMY, RGBA, or something like that, Sorcerer will automatically translate RGB to the correct color profile. The best way to tell Sorcerer which color profile is here on the object controller, to the right of this field. To make changes to many at a time, use the magic "Profile to Apply" feature on the top left of this box, or the "Apply Patch to Objects in Scene" button at the end of the group patch below this panel',
+            description=find_tooltip("color"),
             update=CPVIAGenerator.color_updater
         )),
         ('float_pan', FloatProperty(
@@ -300,7 +298,7 @@ class CommonProperties:
             default=0.0,
             min=-100,
             max=100,
-            description="Pan value",
+            description=find_tooltip("pan"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.pan_updater
         )),
@@ -309,7 +307,7 @@ class CommonProperties:
             default=0.0,
             min=-100,
             max=100,
-            description="Tilt value",
+            description=find_tooltip("tilt"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.tilt_updater
         )),
@@ -318,7 +316,7 @@ class CommonProperties:
             default=0.0,
             min=0.0,
             max=100.0,
-            description="Zoom value",
+            description=find_tooltip("tilt"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.zoom_updater
         )),
@@ -327,7 +325,7 @@ class CommonProperties:
             default=100.0,
             min=0.0,
             max=100.0,
-            description="Iris value",
+            description=find_tooltip("iris"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.iris_updater
         ))
@@ -341,14 +339,14 @@ class CommonProperties:
             default=(1.0, 1.0, 1.0),
             min=0.0,
             max=1.0,
-            description="Why are there 2 colors for this one? Because remotely making relative changes to color doesn't work well. Influencers use relative changes for everything but color for this reason. This second color picker picks the color the influencer will restore channels to after passing over"
+            description=find_tooltip("color_restore"),
         )),
         ('float_volume', FloatProperty(
             name="Volume",
             default=0.0,
             min=0.0,
             max=100.0,
-            description="Volume of microphone",
+            description=find_tooltip("volume"),
             options={'ANIMATABLE'}
         )),
         ('float_diffusion', FloatProperty(
@@ -356,7 +354,7 @@ class CommonProperties:
             default=0.0,
             min=0,
             max=100.0,
-            description="Diffusion value",
+            description=find_tooltip("diffusion"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.diffusion_updater
         )),
@@ -365,7 +363,7 @@ class CommonProperties:
             default=100.0,
             min=0.0,
             max=100.0,
-            description="Shutter strobe value",
+            description=find_tooltip("strobe"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.strobe_updater
         )),
@@ -374,7 +372,7 @@ class CommonProperties:
             default=0.0,
             min=0.0,
             max=100.0,
-            description="Edge value",
+            description=find_tooltip("edge"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.edge_updater
         )),
@@ -383,7 +381,7 @@ class CommonProperties:
             default=1,
             min=0,
             max=20,
-            description="Gobo selection",
+            description=find_tooltip("gobo"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.gobo_id_updater
         )),
@@ -392,7 +390,7 @@ class CommonProperties:
             default=0.0,
             min=-100.0,
             max=100.0,
-            description="Rotation of individual gobo speed",
+            description=find_tooltip("speed"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.gobo_speed_updater
         )),
@@ -401,7 +399,7 @@ class CommonProperties:
             default=0,
             min=0,
             max=1,
-            description="Prism value. 1 is on, 0 is off",
+            description=find_tooltip("prism"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.prism_updater
         ))

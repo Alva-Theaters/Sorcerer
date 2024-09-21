@@ -39,6 +39,7 @@ from bpy.props import (FloatProperty,
 from bpy.types import PropertyGroup, Sequence, Scene
 
 from ..updaters.common_updaters import CommonUpdaters
+from ..assets.tooltips import format_tooltip
 
 # pyright: reportInvalidTypeForm=false
 
@@ -67,7 +68,7 @@ class CueLists(PropertyGroup):
     int_velocity_multiplier: IntProperty(default=1)  
     t_bar_target: FloatProperty(default=100)  
     is_progressive: BoolProperty(name="Switching Mode", description="Progressive, indicated by forward arrow, means Preview advances to next cue after completed transition. Swap, indicated by opposing arrows, means Program and Preview will swap") 
-    int_cue_list_number: IntProperty(name="Cue List", description="Cue list for this song's cues on the console", default=1)  
+    int_cue_list_number: IntProperty(name="Cue List", description=format_tooltip("Cue list for this song's cues on the console"), default=1)  
 
 
 class ShowSequencer(PropertyGroup):
