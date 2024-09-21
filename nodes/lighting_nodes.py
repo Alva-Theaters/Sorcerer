@@ -28,12 +28,13 @@
 
 
 import bpy
-from bpy.types import NodeSocket, Node, PropertyGroup
+from bpy.types import NodeSocket, Node, NodeTree
 from bpy.props import *
 
 from ..assets.items import Items as AlvaItems 
 from ..updaters.node_updaters import NodeUpdaters 
 from ..utils.utils import Utils 
+from ..properties.property_groups import MixerParameters, CustomButtonPropertyGroup
 
 from ..as_ui.space_common import draw_text_or_group_input, draw_parameters, draw_footer_toggles
 from ..as_ui.space_alvapref import draw_settings
@@ -50,16 +51,13 @@ from ..as_ui.space_node import (
 # pyright: reportInvalidTypeForm=false
 
 
-MixerParametersSubClass = Utils.find_subclass_by_name(PropertyGroup, "MixerParameters")
-CustomButtonPropertyGroupSubClass = Utils.find_subclass_by_name(PropertyGroup, "CustomButtonPropertyGroup")
-
-
 LINK_LIMIT = 5
+LINK_LIMIT_MIXER = 10
 
 
-###################
-# NODE SOCKETS
-###################
+#-------------------------------------------------------------------------------------------------------------------------------------------
+'''Sockets'''
+#-------------------------------------------------------------------------------------------------------------------------------------------   
 class NODE_ST_lighting_input(NodeSocket):
     bl_idname = 'LightingInputType'
     bl_label = 'Lighting Input Socket'
@@ -157,9 +155,9 @@ def unregister_sockets():
         bpy.utils.unregister_class(cls)
     
     
-###################
-# NODES
-###################
+#-------------------------------------------------------------------------------------------------------------------------------------------
+'''Nodes'''
+#------------------------------------------------------------------------------------------------------------------------------------------- 
 class NODE_NT_group_controller(Node):
     bl_idname = 'group_controller_type'
     bl_label = 'Group Controller'
@@ -192,7 +190,7 @@ class NODE_NT_mixer(Node):
     bl_icon = 'OPTIONS'
     bl_width_default = 400
 
-    parameters: CollectionProperty(type=MixerParametersSubClass)  
+    parameters: CollectionProperty(type=MixerParameters)  
     
     # Common property registrations in register() section.
 
@@ -217,10 +215,10 @@ class NODE_NT_mixer(Node):
     )  
     node_tree_pointer: PointerProperty(
         name="Node Tree Pointer",
-        type=bpy.types.NodeTree,
+        type=NodeTree,
         description="Pointer to the node tree"
     )  
-    node_name: bpy.props.StringProperty(
+    node_name: StringProperty(
         name="Node Name",
         description="Name of the node"
     ) 
@@ -319,7 +317,7 @@ class NODE_NT_console_buttons(Node):
     bl_width_default = 400
     bl_description="Create console buttons with custom OSC syntax"
 
-    custom_buttons: CollectionProperty(type=CustomButtonPropertyGroupSubClass) 
+    custom_buttons: CollectionProperty(type=CustomButtonPropertyGroup) 
     active_button_index: IntProperty() 
     number_of_columns: IntProperty(default=3, max=9, name="Num. Columns", description="Change how many buttons should be in each row, or in other words how many columns there should be") 
     scale: FloatProperty(default=2, max=5, min=.2, name="Scale", description="Change the scale of the buttons") 

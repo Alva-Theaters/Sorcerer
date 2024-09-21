@@ -32,12 +32,10 @@ from ..updaters.properties_updaters import PropertiesUpdaters
 from ..utils.utils import Utils 
 from ..properties.common_properties import CommonProperties 
 from ..assets.items import Items as AlvaItems 
+from .property_groups import LightingModifier, Errors
 
 # pyright: reportInvalidTypeForm=false
 
-
-LightingModifierSubClass = Utils.find_subclass_by_name(PropertyGroup, "LightingModifier")
-ErrorsSubClass = Utils.find_subclass_by_name(PropertyGroup, "Errors")
 
 class SceneProperties(PropertyGroup):
     group_data_index: IntProperty(name="Index", default=0, update=CommonUpdaters.highlight_mode_updater) 
@@ -104,7 +102,7 @@ class SceneProperties(PropertyGroup):
     # Service Mode
     service_mode: BoolProperty(default=False)
     limp_mode: BoolProperty(default=False)
-    errors: CollectionProperty(type=ErrorsSubClass) 
+    errors: CollectionProperty(type=Errors) 
     number_of_systems_down: IntProperty(default=0)
     user_limp_mode_explanation: StringProperty()
     errors_index: IntProperty(default=0)
@@ -360,7 +358,7 @@ class SceneProperties(PropertyGroup):
 def register():
     bpy.utils.register_class(SceneProperties)
     Scene.scene_props = PointerProperty(type=SceneProperties)
-    Scene.lighting_modifiers = CollectionProperty(type=LightingModifierSubClass)
+    Scene.lighting_modifiers = CollectionProperty(type=LightingModifier)
     Scene.active_modifier_index = IntProperty(default=-1)
     
     common_properties = CommonProperties()

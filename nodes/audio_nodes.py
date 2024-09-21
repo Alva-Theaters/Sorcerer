@@ -31,6 +31,8 @@ import bpy
 from bpy.props import IntProperty, EnumProperty
 from bpy.types import Node, NodeSocket, Operator
 
+# pyright: reportInvalidTypeForm=false
+
 
 # NODES
 class InputsNode(Node):

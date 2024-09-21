@@ -32,9 +32,7 @@ import math
 import mathutils
 import re
 import time
-from bpy.props import FloatProperty, FloatVectorProperty, IntProperty
 from bpy.types import Scene, Object
-
 
 try:
     import allin1 # type: ignore

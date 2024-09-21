@@ -56,6 +56,8 @@ pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
 pcoll = preview_collections["main"]
 orb = pcoll["orb"]
 
+# pyright: reportInvalidTypeForm=false
+
 
 '''
 DIRECTORY: (exact line numbers will change)
