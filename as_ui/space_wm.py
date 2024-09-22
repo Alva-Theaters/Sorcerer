@@ -264,5 +264,5 @@ def draw_alva_right_click(self, context):
     in_node_editor = (st == 'NODE_EDITOR')
     has_selected_node = hasattr(context, "active_node") and context.active_node is not None
 
-    if in_node_editor and has_selected_node:
+    if in_node_editor and has_selected_node and hasattr(context.active_node, "expand_color"):
         layout.prop(context.active_node, "expand_color", text="Expand Color")
