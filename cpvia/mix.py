@@ -56,6 +56,8 @@ class Mixer:
         cpvia_finders = CPVIAFinders()
         channels_list = []
         channels_list = cpvia_finders._find_channels_list(parent)
+        if len(channels_list) == 0:
+            return [], [], []
 
         c, p, v = self.mix(parent, param, channels_list)
         cumulative_c.extend(c)
@@ -191,8 +193,7 @@ class Mixer:
 
     def simplify_values(self, values_list: List[Union[float, Tuple[float, float, float]]], num_channels: int) -> List[Union[float, Tuple[float, float, float]]]:
         """Simplifies the values list to match the number of channels by averaging groups of values."""
-        if num_channels != 0:
-            group_size = len(values_list) / num_channels
+        group_size = len(values_list) / num_channels
         
         simplified_values = []
         for i in range(num_channels):
