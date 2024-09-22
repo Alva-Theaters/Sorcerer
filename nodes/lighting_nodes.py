@@ -54,6 +54,8 @@ from ..as_ui.space_node import (
 
 LINK_LIMIT = 5
 LINK_LIMIT_MIXER = 10
+DEFAULT_QUANTITY_DIRECT_SELECTS = 3
+DEFAULT_QUANTITY_MIXER = 3
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -224,6 +226,10 @@ class NODE_NT_mixer(Node):
         description="Name of the node"
     ) 
 
+    def add_three_choices(self):
+        for _ in range(DEFAULT_QUANTITY_MIXER):
+            self.parameters.add()
+
     def mirror_upstream_group_controllers(self):
         connected_nodes = Find.find_connected_nodes(self.inputs[0])
         choices = self.parameters
@@ -247,6 +253,7 @@ class NODE_NT_mixer(Node):
         self.inputs.new('MotorInputType', "Motor Input")
         self.outputs.new('FlashOutType', "Flash")
         NodeUpdaters.update_node_name(self)
+        self.add_three_choices()
         return
 
     def draw_buttons(self, context, layout):  
@@ -334,8 +341,8 @@ class NODE_NT_console_buttons(Node):
     bl_idname = 'console_buttons_type'
     bl_label = 'Direct Selects'
     bl_icon = 'DESKTOP'
-    bl_width_default = 400
-    bl_description="Create console buttons with custom OSC syntax"
+    bl_width_default = 425
+    bl_description="Traditional direct selects"
 
     custom_buttons: CollectionProperty(type=CustomButtonPropertyGroup) 
     active_button_index: IntProperty() 
@@ -351,7 +358,15 @@ class NODE_NT_console_buttons(Node):
     ) 
     boost_index: IntProperty(name="Boost", description="Boost all the index numbers of the buttons", min=-99999, max=99999, update=NodeUpdaters.boost_index_updater) 
 
+    def add_three_buttons(self):
+        i = 1
+        for _ in range(DEFAULT_QUANTITY_DIRECT_SELECTS):
+            new_button = self.custom_buttons.add()
+            new_button.constant_index = i
+            i += 1
+
     def init(self, context):
+        self.add_three_buttons()
         return
 
     def draw_buttons(self, context, layout):
