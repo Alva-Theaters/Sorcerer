@@ -179,10 +179,6 @@ def draw_node_mixer(self, context, layout):
             row.prop(self, "int_subdivisions", text="Subdivisions:")
     if self.parameters_enum in ["option_color", "option_pose"]:
         row.prop(self, "color_profile_enum", text="", icon='COLOR', icon_only=True)
-    op_key = row.operator('nodes.keyframe_mixer', text="", icon='DOT', emboss=False)
-    op_key.space_type = space_type
-    op_key.node_name = node_name
-    op_key.node_tree_name = node_tree_name
         
     layout.separator()
 
