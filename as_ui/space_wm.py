@@ -221,9 +221,8 @@ def draw_alva_right_click(self, context):
 
     if is_property and prop.identifier == 'float_vec_color':
         if st == 'NODE_EDITOR':
-            return ## Fix this later
             node_tree = context.space_data.node_tree
-            node_name = self.name # will this work? What is self?
+            node_name = context.active_node.name
             node_tree_name = node_tree.name
         else:
             node_name = ""
@@ -261,3 +260,9 @@ def draw_alva_right_click(self, context):
             has_separated = True
             layout.label(text="Render Freezing:", icon_value=orb.icon_id)
             layout.prop(active_strip, "freezing_mode_enum", text="")
+
+    in_node_editor = (st == 'NODE_EDITOR')
+    has_selected_node = hasattr(context, "active_node") and context.active_node is not None
+
+    if in_node_editor and has_selected_node:
+        layout.prop(context.active_node, "expand_color", text="Expand Color")

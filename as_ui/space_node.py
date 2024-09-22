@@ -109,6 +109,12 @@ def draw_node_formatter_footer(self, context, active_node):
     row.prop(active_node, "use_custom_color", text="", icon='HIDE_ON' if not active_node.use_custom_color else 'HIDE_OFF')
     row.template_color_picker(active_node, "color", value_slider=True)
 
+def draw_expanded_color(self, context, layout, row):
+    row.prop(self, "expand_color", text="Back", icon='SCREEN_BACK', slider=True)
+    row.label(text="")
+
+    row = layout.row()
+    row.template_color_picker(self, "float_vec_color", value_slider=False)
 
 def draw_node_header(self, context, active_node=None):
     if not active_node:

@@ -36,10 +36,12 @@ from ..updaters.node_updaters import NodeUpdaters
 from ..utils.utils import Utils 
 from ..properties.property_groups import MixerParameters, CustomButtonPropertyGroup
 from ..cpvia.find import Find
+from ..assets.tooltips import format_tooltip
 
 from ..as_ui.space_common import draw_text_or_group_input, draw_parameters, draw_footer_toggles
 from ..as_ui.space_alvapref import draw_settings
 from ..as_ui.space_node import (
+    draw_expanded_color,
     draw_node_mixer, 
     draw_pan_tilt_node, 
     draw_global_node, 
@@ -166,6 +168,11 @@ class NODE_NT_group_controller(Node):
     bl_label = 'Group Controller'
     bl_icon = 'STICKY_UVS_LOC'
     bl_width_default = 300
+
+    expand_color: BoolProperty(
+        name="Expand Color", 
+        description=format_tooltip("Show only color and expand. Primarily used when driving mixers for animation")
+    )
     
     # Common property registrations in register() section.
 
@@ -182,9 +189,12 @@ class NODE_NT_group_controller(Node):
         column = layout.column()
         row = column.row()
         
-        draw_text_or_group_input(self, context, row, self, object=False)
-        draw_parameters(self, context, column, column, self)
-        draw_footer_toggles(self, context, column, self, box=False)
+        if self.expand_color:
+            draw_expanded_color(self, context, layout, row)
+        else:
+            draw_text_or_group_input(self, context, row, self, object=False)
+            draw_parameters(self, context, column, column, self)
+            draw_footer_toggles(self, context, column, self, box=False)
 
     
 class NODE_NT_mixer(Node):
@@ -344,18 +354,18 @@ class NODE_NT_console_buttons(Node):
     bl_width_default = 425
     bl_description="Traditional direct selects"
 
-    custom_buttons: CollectionProperty(type=CustomButtonPropertyGroup) 
-    active_button_index: IntProperty() 
+    custom_buttons: CollectionProperty(type=CustomButtonPropertyGroup)
+    active_button_index: IntProperty()
     number_of_columns: IntProperty(default=3, max=9, name="Num. Columns", description="Change how many buttons should be in each row, or in other words how many columns there should be") 
-    scale: FloatProperty(default=2, max=5, min=.2, name="Scale", description="Change the scale of the buttons") 
-    expand_settings: BoolProperty(default=True) 
+    scale: FloatProperty(default=2, max=5, min=.2, name="Scale", description="Change the scale of the buttons")
+    expand_settings: BoolProperty(default=True)
     direct_select_types_enum: EnumProperty(
         name="Types",
         description="List of supported direct select types",
         items=AlvaItems.direct_select_types,
         default=0,
         update=NodeUpdaters.direct_select_types_updater
-    ) 
+    )
     boost_index: IntProperty(name="Boost", description="Boost all the index numbers of the buttons", min=-99999, max=99999, update=NodeUpdaters.boost_index_updater) 
 
     def add_three_buttons(self):

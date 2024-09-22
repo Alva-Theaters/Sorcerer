@@ -71,66 +71,6 @@ class NODE_OT_node_formatter(Operator):
                 draw_node_formatter_mixer(self, context, active_node)
 
             draw_node_formatter_footer(self, context, active_node)
-            
-            
-class NODE_OT_keyframe_mixer(bpy.types.Operator):
-    '''Keyframe mixer properties, since I key doesn't work here'''
-    bl_idname = 'nodes.keyframe_mixer'
-    bl_label = "Keyframe mixer"
-    
-    space_type: bpy.props.StringProperty() 
-    node_name: bpy.props.StringProperty() 
-    node_tree_name: bpy.props.StringProperty() 
-    
-    def execute(self, context):
-        finders = Find
-        active_controller = finders.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
-        if not active_controller:
-            return {'CANCELLED'}
-        
-        try:
-            parameters = active_controller.parameters
-            print("SUCCESS")
-        except Exception as e:
-            self.report({'INFO'}, "Please contact Alva Theaters.")
-            print(f"Error: {str(e)}")
-            return {'CANCELLED'}
-        
-        # Assuming `parameters` is a collection, we will access properties directly by name.
-        if active_controller.parameters_enum == 'option_intensity':
-            data_path = 'parameters["float_intensity"]'
-            value = parameters.get("float_intensity")
-            
-        elif active_controller.parameters_enum == 'option_color':
-            data_path = 'parameters["float_vec_color"]'
-            value = parameters.get("float_vec_color")
-            
-        elif active_controller.parameters_enum == 'option_pan_tilt':
-            data_path = 'parameters["float_pan"]'
-            value = parameters.get("float_pan")
-            
-        elif active_controller.parameters_enum == 'option_zoom':
-            data_path = 'parameters["float_zoom"]'
-            value = parameters.get("float_zoom")
-            
-        elif active_controller.parameters_enum == 'option_iris':
-            data_path = 'parameters["float_iris"]'
-            value = parameters.get("float_iris")
-        
-        print(f"Attempting to keyframe: {data_path} with value: {value}")
-        
-        try:
-            # Attempting to use keyframe_insert with the correct path
-            active_controller.keyframe_insert(data_path=data_path, frame=bpy.context.scene.frame_current)
-        except Exception as e:
-            print(f"Failed to keyframe: {str(e)}")
-            self.report({'ERROR'}, f"Failed to keyframe: {str(e)}")
-            for prop_name in parameters.keys():
-                print(f"Property name: {prop_name}")
-                print(f"Value: {parameters[prop_name]}")
-            return {'CANCELLED'}
-    
-        return {'FINISHED'}
 
         
 class AddCustomButton(bpy.types.Operator):
@@ -401,7 +341,6 @@ class FlashPresetSearchOperator(bpy.types.Operator):
 
 operators = [
     NODE_OT_node_formatter,
-    NODE_OT_keyframe_mixer,
     RemoveCustomButton,
     CustomButton,
     BumpUpCustomButton,
