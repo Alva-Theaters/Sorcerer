@@ -35,6 +35,7 @@ from ..assets.items import Items as AlvaItems
 from ..updaters.node_updaters import NodeUpdaters 
 from ..utils.utils import Utils 
 from ..properties.property_groups import MixerParameters, CustomButtonPropertyGroup
+from ..cpvia.find import Find
 
 from ..as_ui.space_common import draw_text_or_group_input, draw_parameters, draw_footer_toggles
 from ..as_ui.space_alvapref import draw_settings
@@ -222,8 +223,27 @@ class NODE_NT_mixer(Node):
         name="Node Name",
         description="Name of the node"
     ) 
+
+    def mirror_upstream_group_controllers(self):
+        connected_nodes = Find.find_connected_nodes(self.inputs[0])
+        choices = self.parameters
+        mode = self.parameters_enum
+        attribute_mapping = {
+            'option_intensity': ["float_intensity"],
+            'option_color': ["float_vec_color"],
+            'option_pan_tilt': ["float_pan", "float_tilt"],
+            'option_zoom': ["float_zoom"],
+            'option_iris': ["float_iris"],
+        }
+
+        for node, choice in zip(connected_nodes, choices):
+            if mode in attribute_mapping:
+                for attr in attribute_mapping[mode]:
+                    setattr(choice, attr, getattr(node, attr))
     
     def init(self, context):
+        group_input = self.inputs.new('LightingInputType', "Lighting Input")
+        group_input.link_limit = LINK_LIMIT_MIXER
         self.inputs.new('MotorInputType', "Motor Input")
         self.outputs.new('FlashOutType', "Flash")
         NodeUpdaters.update_node_name(self)

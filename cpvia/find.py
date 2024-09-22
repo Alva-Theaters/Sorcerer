@@ -275,7 +275,9 @@ class Find:
                     connected_node = link.to_socket.node
                     if connected_node.bl_idname == "group_controller_type":
                         setattr(connected_node, attribute_name, new_value)
-
+                    elif connected_node.bl_idname == "mixer_type":
+                        connected_node.mirror_upstream_group_controllers()
+                        
         
     #-------------------------------------------------------------------------------------------------------------------------------------------
     '''CONTROLLER finders'''
