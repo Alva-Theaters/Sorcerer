@@ -250,8 +250,12 @@ class COMMON_OT_alva_white_balance(Operator):
 
     def execute(self, context):
         active_controller = Find.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
-        active_controller.alva_white_balance = active_controller.float_vec_color
-        time.sleep(.2)
+        if hasattr(active_controller, "float_vec_color"):
+            active_controller.alva_white_balance = active_controller.float_vec_color
+        else:
+            self.report({'INFO'}, "Cannot white balance mixers")
+            return {'CANCELLED'}
+        time.sleep(.2) # Because it threw an error without, I think?
         active_controller.float_vec_color = (1.0, 1.0, 1.0)
         return {'FINISHED'}
     
