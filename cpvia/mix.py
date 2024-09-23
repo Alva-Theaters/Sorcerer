@@ -97,7 +97,7 @@ class Mixer:
             mixed = self.interpolate(sorted_channels, sorted_values, subdivisions, channels, param_mode, offset)
             alva_log('mix', f"Interpolated: {mixed}\n")
         elif mode == "option_pattern": # Alternate between the keys
-            mixed = self.patternize(mode, sorted_values, channels, param_mode, offset)
+            mixed = self.patternize(sorted_values, channels, param_mode, offset)
             alva_log('mix', f"Patternized: {mixed}\n")
         elif mode == "option_pose": # Push all channels through the choices as one, don't mix the choices together across the channels
             mixed = self.pose(channels, param_mode, parent)
