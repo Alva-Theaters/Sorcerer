@@ -48,7 +48,10 @@ class Find:
 
             if needs_special:
                 if param == 'strobe':
-                    argument = f"{special_argument}, {argument}"
+                    if value == 0:
+                        argument = f"{special_argument}"
+                    else:
+                        argument = f"{special_argument}, {argument}"
                 else:
                     argument = special_argument
 

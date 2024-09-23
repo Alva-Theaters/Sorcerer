@@ -360,7 +360,7 @@ class CommonProperties:
         )),
         ('float_strobe', FloatProperty(
             name="Strobe",
-            default=100.0,
+            default=0.0,
             min=0.0,
             max=100.0,
             description=find_tooltip("strobe"),
