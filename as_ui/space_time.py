@@ -45,7 +45,8 @@ def draw_alva_time_header(self, context):
 
     if (hasattr(context.scene, "sync_timecode") and
         hasattr(context.scene, "timecode_expected_lag") and
-        context.scene.scene_props.view_alva_time_header):
+        context.scene.scene_props.view_alva_time_header and
+        context.scene.scene_props.console_type_enum == 'option_eos'):
         scene = context.scene
 
         sequencer_open = False
@@ -93,21 +94,23 @@ def draw_alva_time_header(self, context):
 
 
 def draw_alva_time_view(self, layout):
-    pcoll = preview_collections["main"]
-    orb = pcoll["orb"]
+    if bpy.context.scene.scene_props.console_type_enum == 'option_eos':
+        pcoll = preview_collections["main"]
+        orb = pcoll["orb"]
 
-    layout = self.layout
-    layout.separator()
-    layout.label(text="Alva Sorcerer", icon_value=orb.icon_id)
-    layout.prop (bpy.context.scene.scene_props, "view_alva_time_header", text="Header")
+        layout = self.layout
+        layout.separator()
+        layout.label(text="Alva Sorcerer", icon_value=orb.icon_id)
+        layout.prop (bpy.context.scene.scene_props, "view_alva_time_header", text="Header")
 
 
 def draw_alva_time_playback(self, context):
-    layout = self.layout
-    layout.use_property_split = True
-    layout.use_property_decorate = False
-    
-    layout.prop(context.scene, "timecode_expected_lag", text="OSC Lag")
+    if context.scene.scene_props.console_type_enum == 'option_eos':
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False
+        
+        layout.prop(context.scene, "timecode_expected_lag", text="OSC Lag")
 
 
 def draw_alva_time_flags(self, context):

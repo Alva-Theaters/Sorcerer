@@ -455,23 +455,22 @@ def draw_generate_fixtures(self, context):
     layout.use_property_split = True
     layout.use_property_decorate = False
 
-    if scene.scene_props.console_type_enum == 'option_eos':
-        if scene.scene_props.school_mode_enabled and scene.scene_props.restrict_patch:
-            return
-        
-        layout.use_property_split = True
-        layout.use_property_decorate = False
+    if scene.scene_props.school_mode_enabled and scene.scene_props.restrict_patch:
+        return
+    
+    layout.use_property_split = True
+    layout.use_property_decorate = False
 
-        layout.column().prop(scene.scene_props, "int_group_number", text="Group")
-        layout.column().prop(scene.scene_props, "int_array_start_channel", text="Channel")
-        layout.column().prop(scene.scene_props, "int_array_universe", text="Universe")
-        layout.column().prop(scene.scene_props, "int_array_start_address", text="Address")
-        layout.separator()
-        layout.column().prop(scene.scene_props, "int_array_channel_mode", text="Mode")
+    layout.column().prop(scene.scene_props, "int_group_number", text="Group")
+    layout.column().prop(scene.scene_props, "int_array_start_channel", text="Channel")
+    layout.column().prop(scene.scene_props, "int_array_universe", text="Universe")
+    layout.column().prop(scene.scene_props, "int_array_start_address", text="Address")
+    layout.separator()
+    layout.column().prop(scene.scene_props, "int_array_channel_mode", text="Mode")
 
-        layout.separator()
-        
-        pcoll = preview_collections["main"]
-        orb = pcoll["orb"]
-        
-        layout.operator("alva_orb.group_patch", text="Generate Fixtures", icon_value=orb.icon_id)
+    layout.separator()
+    
+    pcoll = preview_collections["main"]
+    orb = pcoll["orb"]
+    
+    layout.operator("alva_orb.group_patch", text="Generate Fixtures", icon_value=orb.icon_id)

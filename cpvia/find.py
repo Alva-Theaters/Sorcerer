@@ -36,24 +36,32 @@ from ..utils.utils import Utils
 
 class Find:
     def find_my_argument_template(self, parent, type, chan, param, value):
-        if bpy.context.scene.scene_props.console_type_enum == "option_eos":
+        console_mode = bpy.context.scene.scene_props.console_type_enum
+        if console_mode == "option_eos":
             argument = Dictionaries.eos_arguments_dict.get(f"str_{param}_argument", "Unknown Argument")
+        elif console_mode == 'option_ma3':
+            argument = Dictionaries.ma3_arguments_dict.get(f"str_{param}_argument", "Unknown Argument")
+        elif console_mode == 'option_ma2':
+            argument = Dictionaries.ma2_arguments_dict.get(f"str_{param}_argument", "Unknown Argument")
+        else:
+            SLI.SLI_assert_unreachable()
+            return "Invalid console mode."
 
-            needs_special = False
-            if param in ['strobe', 'prism']:
-                needs_special = True
+        needs_special = False
+        if param in ['strobe', 'prism']:
+            needs_special = True
+            if value == 0:
+                special_argument = self.find_my_patch(parent, chan, type, f"str_disable_{param}_argument")
+            else: special_argument = self.find_my_patch(parent, chan, type, f"str_enable_{param}_argument")
+
+        if needs_special:
+            if param == 'strobe':
                 if value == 0:
-                    special_argument = self.find_my_patch(parent, chan, type, f"str_disable_{param}_argument")
-                else: special_argument = self.find_my_patch(parent, chan, type, f"str_enable_{param}_argument")
-
-            if needs_special:
-                if param == 'strobe':
-                    if value == 0:
-                        argument = f"{special_argument}"
-                    else:
-                        argument = f"{special_argument}, {argument}"
+                    argument = f"{special_argument}"
                 else:
-                    argument = special_argument
+                    argument = f"{special_argument}, {argument}"
+            else:
+                argument = special_argument
 
         return argument
                 

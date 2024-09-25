@@ -46,13 +46,16 @@ class Publisher:
         in a way the console will understand (by adding a 0 in front of numbers 1-9.)
         """
         c = str(c)
-        v = int(v)
-        
-        if v >= 0 and v < 10:
-            v = f"0{v}"
-        elif v < 0 and v > -10:
-            v = f"-0{-v}"
+        if bpy.context.scene.scene_props.console_type_enum == 'option_eos':
+            v = int(v)
+            if v >= 0 and v < 10:
+                v = f"0{v}"
+            elif v < 0 and v > -10:
+                v = f"-0{-v}"
+            else:
+                v = str(v)
         else:
+            v = round(v, 2)
             v = str(v)
 
         return c, v
@@ -69,14 +72,18 @@ class Publisher:
         This function formats the channel and value numbers as string and then formats them
         in a way the console will understand (by adding a 0 in front of numbers 1-9.)
         """
-        v = int(v)
-        
-        if v >= 0 and v < 10:
-            v = f"0{v}"
-        elif v < 0 and v > -10:
-            v = f"-0{-v}"
+        if bpy.context.scene.scene_props.console_type_enum == 'option_eos':
+            v = int(v)
+            if v >= 0 and v < 10:
+                v = f"0{v}"
+            elif v < 0 and v > -10:
+                v = f"-0{-v}"
+            else:
+                v = str(v)
         else:
+            v = round(v, 2)
             v = str(v)
+        
         return v
 
 
@@ -90,7 +97,16 @@ class Publisher:
         Returns:
         messages: A list of (address, argument) tuples.
         """
-        address = "/eos/newcmd"
+        console_mode = bpy.context.scene.scene_props.console_type_enum
+        if console_mode == "option_eos":
+            address = "/eos/newcmd"
+        elif console_mode == 'option_ma3':
+            address = "/cmd"
+        elif console_mode == 'option_ma2':
+            address = "/cmd"
+        else:
+            SLI.SLI_assert_unreachable()
+            address = "/eos/newcmd"
 
         color_profiles = {
             # Absolute Arguments

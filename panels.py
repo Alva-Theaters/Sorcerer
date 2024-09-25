@@ -186,6 +186,13 @@ class VIEW3D_PT_alva_fixture_generator(Panel, View3D_Panel):
     """Automation tools for rapidly creating lighting fixtures"""
     bl_label = "Patch Console Remotely"
 
+    @classmethod
+    def poll(cls, context):
+        return (hasattr(context, "scene") and
+                hasattr(context, "active_object") and
+                context.active_object is not None and
+                context.scene.scene_props.console_type_enum == 'option_eos')
+
     def draw(self, context):
         draw_generate_fixtures(self, context)
 
@@ -219,6 +226,10 @@ class SCENE_PT_alva_cue_switcher(Panel, PropertiesPanel):
     '''Live video switcher type system but for lighting cues'''
     bl_label = "ALVA M/E 1 Lighting Cue Switcher"
 
+    @classmethod
+    def poll(cls, context):
+        return context.scene.scene_props.console_type_enum == 'option_eos'
+
     def draw(self, context):
         draw_alva_cue_switcher(self, context)
 
@@ -242,6 +253,10 @@ class TIME_PT_alva_flags(Panel):
     bl_region_type = 'HEADER'
     bl_ui_units_x = 10
 
+    @classmethod
+    def poll(cls, context):
+        return context.scene.scene_props.console_type_enum == 'option_eos'
+
     def draw(self, context):
         draw_alva_time_flags(self, context)
             
@@ -257,6 +272,7 @@ class SequencerPanel:
     @classmethod
     def poll(cls, context):
         return (hasattr(context, "scene") and
+                context.scene.scene_props.console_type_enum == 'option_eos' and
                 context.scene and
                 hasattr(context.scene, "sequence_editor") and
                 context.scene.sequence_editor and 
@@ -342,7 +358,13 @@ class NODE_PT_alva_node_formatter(Panel, NodePanel):
 
 class NODE_PT_alva_fixture_generator(Panel, NodePanel):
     """Automation tools for rapidly creating lighting fixtures"""
-    bl_label = "Generate Fixtures"
+    bl_label = "Patch Console Remotely"
+
+    @classmethod
+    def poll(cls, context):
+        return (context.space_data.tree_type == 'ShaderNodeTree' and 
+                context.space_data.id == context.scene.world and
+                context.scene.scene_props.console_type_enum == 'option_eos')
 
     def draw(self, context):
         draw_generate_fixtures(self, context)
@@ -350,7 +372,7 @@ class NODE_PT_alva_fixture_generator(Panel, NodePanel):
         
 class NODE_PT_alva_fixture_groups(Panel, NodePanel):
     '''Change the fixture groups found in the controller drop downs.'''
-    bl_label = "Fixture Groups"
+    bl_label = "Make Groups"
 
     def draw(self, context):
         draw_fixture_groups(self, context)
@@ -366,7 +388,7 @@ class TextPanel:
     
     @classmethod
     def poll(cls, context):
-        return context.space_data.text is not None
+        return context.space_data.text is not None and context.scene.scene_props.console_type_enum == 'option_eos'
     
 
 class TEXT_PT_alva_macro_generator(Panel, TextPanel):
@@ -392,6 +414,10 @@ class ToolbarPanel:
     bl_label = "Tools"  # not visible
     bl_region_type = 'TOOLS'
     bl_options = {'HIDE_HEADER'}
+
+    @classmethod
+    def poll(cls, context):
+        return context.scene.scene_props.console_type_enum == 'option_eos'
 
 
 class VIEW3D_PT_alva_toolbar(Panel, ToolbarPanel):

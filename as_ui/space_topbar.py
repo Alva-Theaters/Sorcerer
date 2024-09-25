@@ -76,7 +76,8 @@ def draw_alva_render(self, context):
     orb = pcoll["orb"]
 
     if (hasattr(context, "scene") and 
-        hasattr(context.scene, "scene_props")): # Avoid unregistration error
+        hasattr(context.scene, "scene_props") and
+        context.scene.scene_props.console_type_enum == 'option_eos'):
         layout = self.layout
         layout.operator("alva_orb.render_qmeo", text="Render Qmeo", icon_value=orb.icon_id)
 

@@ -69,20 +69,21 @@ pcoll.load("effect_fourteen", os.path.join(icons_dir, "effect_fourteen.png"), 'I
 
 
 def draw_alva_sequencer_view(self, layout):
-    pcoll = preview_collections["main"]
-    orb = pcoll["orb"]
+    if bpy.context.scene.scene_props.console_type_enum == 'option_eos':
+        pcoll = preview_collections["main"]
+        orb = pcoll["orb"]
 
-    layout = self.layout
-    layout.separator()
-    layout.label(text="Alva Sorcerer", icon_value=orb.icon_id)
-    layout.prop(bpy.context.scene.scene_props, "view_sequencer_add", text="Add")
-    layout.prop(bpy.context.scene.scene_props, "view_sequencer_toolbar", text="Toolbar")
-    layout.prop(bpy.context.scene.scene_props, "view_sequencer_command_line", text="Command Line")
-    layout.prop(bpy.context.scene.scene_props, "expand_strobe", text="Expand Strobe")
+        layout = self.layout
+        layout.separator()
+        layout.label(text="Alva Sorcerer", icon_value=orb.icon_id)
+        layout.prop(bpy.context.scene.scene_props, "view_sequencer_add", text="Add")
+        layout.prop(bpy.context.scene.scene_props, "view_sequencer_toolbar", text="Toolbar")
+        layout.prop(bpy.context.scene.scene_props, "view_sequencer_command_line", text="Command Line")
+        layout.prop(bpy.context.scene.scene_props, "expand_strobe", text="Expand Strobe")
 
 
 def draw_alva_sequencer_add_menu(self, layout):
-    if bpy.context.scene.scene_props.view_sequencer_add:
+    if bpy.context.scene.scene_props.view_sequencer_add and bpy.context.scene.scene_props.console_type_enum == 'option_eos':
         pcoll = preview_collections["main"]
         orb = pcoll["orb"]
 
@@ -98,19 +99,20 @@ def draw_alva_sequencer_add_menu(self, layout):
 
 
 def draw_alva_sequencer_strip(self, context):
-    pcoll = preview_collections["main"]
-    orb = pcoll["orb"]
+    if context.scene.scene_props.console_type_enum == 'option_eos':
+        pcoll = preview_collections["main"]
+        orb = pcoll["orb"]
 
-    layout = self.layout
-    layout.separator()
-    layout.label(text="Alva Sorcerer", icon_value=orb.icon_id)
-    layout.prop(context.scene, "is_updating_strip_color", text="Sync Strip Color",  slider=True)
-    layout.prop(context.scene, "is_armed_release", text="Z Adds Strip on Release", slider=True) 
-    layout.prop(context.scene, "strip_end_macros", text="End Frame Macros", slider=True)
-    layout.separator()
-    layout.prop(context.scene, "cue_builder_toggle", slider=True, text="Cue Builder")
-    layout.prop(context.scene, "using_gels_for_cyc", text="Gels for Cyc Color", slider=True)
-    layout.prop(context.scene, "cue_builder_id_offset", text="Index Offset", toggle=True)
+        layout = self.layout
+        layout.separator()
+        layout.label(text="Alva Sorcerer", icon_value=orb.icon_id)
+        layout.prop(context.scene, "is_updating_strip_color", text="Sync Strip Color",  slider=True)
+        layout.prop(context.scene, "is_armed_release", text="Z Adds Strip on Release", slider=True) 
+        layout.prop(context.scene, "strip_end_macros", text="End Frame Macros", slider=True)
+        layout.separator()
+        layout.prop(context.scene, "cue_builder_toggle", slider=True, text="Cue Builder")
+        layout.prop(context.scene, "using_gels_for_cyc", text="Gels for Cyc Color", slider=True)
+        layout.prop(context.scene, "cue_builder_id_offset", text="Index Offset", toggle=True)
 
 
 def draw_alva_sequencer_cmd_line(self, context):
@@ -127,6 +129,9 @@ def draw_alva_sequencer_cmd_line(self, context):
 def draw_strip_media(self, context, scene, bake_panel=True):
     layout = self.layout
     scene = context.scene
+
+    if not context.scene.scene_props.console_type_enum == 'option_eos':
+        return
     
     if not hasattr(scene, "sequence_editor") and scene.sequence_editor:
         draw_intro_header(self, context, None, scene, None, motif_name=False)

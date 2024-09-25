@@ -60,7 +60,8 @@ def draw_alva_view_3d_view(self, layout):
 
 def draw_view3d_cmd_line(self, context):
     if (hasattr(context.scene, "scene_props") and
-        context.scene.scene_props.view_viewport_command_line):
+        context.scene.scene_props.view_viewport_command_line and
+        context.scene.scene_props.console_type_enum == 'option_eos'):
 
         row = self.layout.row()
         row.scale_x = 2
