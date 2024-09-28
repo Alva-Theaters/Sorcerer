@@ -469,15 +469,11 @@ class SEQUENCER_OT_new_pointer(Operator):
     bl_label = "New Color Strip"
 
     def invoke(self, context, event):
-        current_frame = context.scene.frame_current
         sequence_editor = context.scene.sequence_editor
 
         mouse_x, mouse_y = event.mouse_region_x, event.mouse_region_y
         
         region = context.region
-        region_data = context.region_data
-
-        view2d = region.view2d
         frame_start, channel = region.view2d.region_to_view(mouse_x, mouse_y)
         
         frame_start = int(frame_start)
@@ -801,7 +797,6 @@ class SEQUENCER_OT_select_similar(Operator):
     def execute(self, context):
         sequencer = context.scene.sequence_editor
         active_strip = sequencer.active_strip
-        strip_type = active_strip.my_settings.motif_type_enum
         scene = bpy.context.scene
 
         active_strip_color = active_strip.color
@@ -1271,9 +1266,6 @@ macro_operators = [
 ]
 
 
-######################
-# More operators
-######################
 class SEQUENCER_OT_analyze_song(Operator):
     bl_idname = "seq.analyze_song"
     bl_label = "Analyze Song (AI)"
@@ -1488,7 +1480,6 @@ class SEQUENCER_OT_delete_events(Operator):
 
         if active_strip and active_strip.type == 'SOUND':
             event_list_number = active_strip.int_event_list
-
             OSC.send_osc_lighting("/eos/key/tab", "11 Enter")
             OSC.send_osc_lighting("/eos/key/1", "Enter")
             OSC.send_osc_lighting("/eos/key/1", "Enter")
@@ -1643,8 +1634,6 @@ class SEQUENCER_OT_delete_qmeo_cues(Operator):
     bl_description = "Delete qmeo cues"
     
     def execute(self, context):
-        scene = bpy.context.scene
-        context = bpy.context
         active_strip = context.scene.sequence_editor.active_strip
         cue_list = active_strip.int_cue_list
         
@@ -1663,8 +1652,6 @@ class SEQUENCER_OT_delete_qmeo_events(Operator):
     bl_description = "Delete qmeo events"
     
     def execute(self, context):
-        scene = bpy.context.scene
-        context = bpy.context
         active_strip = context.scene.sequence_editor.active_strip 
         event_list = active_strip.animation_event_list_number
         
@@ -1683,10 +1670,7 @@ class SEQUENCER_OT_stop_single_clock(Operator):
     bl_description = "Stop animation clock"
     
     def execute(self, context):
-        scene = bpy.context.scene
         active_strip = context.scene.sequence_editor.active_strip
-        cue_list = active_strip.int_cue_list
-        
         OSC.send_osc_lighting("/eos/newcmd", f"Event {str(active_strip.animation_event_list_number)} / Internal Disable Enter")
         return {'FINISHED'}
 
@@ -1698,7 +1682,6 @@ class SEQUENCER_OT_generate_text(Operator):
     
     def execute(self, context):
         scene = context.scene
-        int_event_list = context.scene.sequence_editor.active_strip.int_event_list
         seq_start = context.scene.frame_start
         seq_end = context.scene.frame_end
         active_strip = context.scene.sequence_editor.active_strip
@@ -1852,9 +1835,6 @@ misc_operators = [
 ]
 
 
-######################
-# Add Strip Operators
-######################
 class SEQUENCER_OT_add_macro(Operator):
     bl_idname = "my.add_macro"
     bl_label = "Macro"
@@ -1910,7 +1890,6 @@ def create_motif_strip(context, motif_type_enum):
     frame_end = current_frame + 25
 
     my_channel = Utils.find_available_channel(sequence_editor, current_frame, frame_end, channel)
-    print(f"Channel is {my_channel}")
 
     color_strip = sequence_editor.sequences.new_effect(
         name="New Strip",
@@ -1947,10 +1926,7 @@ add_strip_operators = [
     SEQUENCER_OT_add_trigger
 ]
     
-
-#####################
-# 3D Audio Operators 
-#####################   
+ 
 class SEQUENCER_OT_bake_audio(Operator):
     bl_idname = "seq.bake_audio_operator"
     bl_label = "Bake Audio"
@@ -2053,6 +2029,7 @@ def register():
         bpy.utils.register_class(cls)
     for cls in three_dee_audio_operators:
         bpy.utils.register_class(cls)
+    
     
 def unregister():
     for cls in reversed(hotkeys_popups):

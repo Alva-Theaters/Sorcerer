@@ -35,8 +35,7 @@ from ..utils.utils import Utils
 
 class StripMapping:
     def get_start_macro_map(scene):
-        mapping = defaultdict(list)
-        start_macro_address = "/eos/macro/fire"    
+        mapping = defaultdict(list)  
         
         for strip in filter_eos_macro_strips(scene.sequence_editor.sequences):
             data = (strip.name, str(strip.int_start_macro))
@@ -47,7 +46,6 @@ class StripMapping:
 
     def get_end_macro_map(scene):
         mapping = defaultdict(list)
-        end_macro_address = "/eos/macro/fire"
 
         for strip in filter_eos_macro_strips(scene.sequence_editor.sequences):
             data = (strip.name, str(strip.int_end_macro))
@@ -57,8 +55,7 @@ class StripMapping:
         return dict(mapping)
 
     def get_start_flash_macro_map(scene):
-        mapping = defaultdict(list)
-        start_flash_macro_address = "/eos/macro/fire"    
+        mapping = defaultdict(list)  
         
         for strip in filter_eos_flash_strips(scene.sequence_editor.sequences):
             data = (strip.name, str(strip.int_start_macro))
@@ -69,7 +66,6 @@ class StripMapping:
 
     def get_end_flash_macro_map(scene):
         mapping = defaultdict(list)
-        end_flash_macro_address = "/eos/macro/fire"    
         
         for strip in filter_eos_flash_strips(scene.sequence_editor.sequences):
             data = (strip.name, str(strip.int_end_macro))
@@ -151,8 +147,7 @@ class StripMapping:
         return dict(mapping)
     
     def get_offset_map(scene):
-        mapping = defaultdict(list)
-        start_macro_address = "/eos/macro/fire"    
+        mapping = defaultdict(list)   
         
         for strip in filter_trigger_strips(scene.sequence_editor.sequences):
             if strip.use_macro:
@@ -228,8 +223,6 @@ def generate_concurrent_command_strings(command, concurrent_commands):
     concurrent_command_list = []
     for commands in zip(*command_lists):
         concurrent_command_list.append(" ".join(commands))
-        
-    command_string = ", ".join(concurrent_command_list)
         
     return concurrent_command_list
 

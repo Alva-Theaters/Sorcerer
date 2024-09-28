@@ -155,7 +155,6 @@ class BlueOperator(bpy.types.Operator):
 
     def execute(self, context):
         scene = context.scene.scene_props
-        cue_list = context.scene.cue_lists[scene.cue_lists_index]
         
         OSC.send_osc_lighting("/eos/newcmd", f"Go_to_Cue {scene.string_blue_cue} Time {scene.float_blue_time} Enter")
         return {'FINISHED'}
@@ -167,7 +166,6 @@ class BlackOperator(bpy.types.Operator):
 
     def execute(self, context):
         scene = context.scene.scene_props
-        cue_list = context.scene.cue_lists[scene.cue_lists_index]
         
         OSC.send_osc_lighting("/eos/newcmd", f"Go_to_Cue {scene.string_black_cue} Time {scene.float_black_time} Enter")
         return {'FINISHED'}
@@ -179,7 +177,6 @@ class RestoreOperator(bpy.types.Operator):
 
     def execute(self, context):
         scene = context.scene.scene_props
-        cue_list = context.scene.cue_lists[scene.cue_lists_index]
         
         OSC.send_osc_lighting("/eos/newcmd", f"Go_to_Cue {scene.string_restore_cue} Time {scene.float_restore_time} Enter")
         return {'FINISHED'}

@@ -30,6 +30,7 @@
 import bpy
 from bpy.types import UIList
 
+
 class VIEW3D_UL_alva_errors_list(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         layout.row().label(text=item.error_type)

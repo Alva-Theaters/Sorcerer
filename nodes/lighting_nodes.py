@@ -184,8 +184,6 @@ class NODE_NT_group_controller(Node):
         return
 
     def draw_buttons(self, context, layout):
-        active_node = None 
-        active_node = context.space_data.edit_tree.nodes.active
         column = layout.column()
         row = column.row()
         

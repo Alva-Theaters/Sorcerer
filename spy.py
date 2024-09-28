@@ -45,7 +45,6 @@ from .utils.utils import Utils
 from .cpvia.find import Find
 from .cpvia.mix import Mixer
 from .cpvia.influencers import Influencers
-from .assets.sli import SLI
 
 
 class SorcererPython:

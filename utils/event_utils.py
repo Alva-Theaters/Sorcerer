@@ -169,6 +169,7 @@ class EventUtils:
             relevant_object = scene
         return relevant_object
             
+            
     @staticmethod
     def find_livemap_cue(scene, current_frame, active_strip):
         relevant_strips = [strip for strip in scene.sequence_editor.sequences if getattr(strip, 'eos_cue_number', 0) != 0 and strip.my_settings.motif_type_enum == 'option_eos_cue' and not strip.mute]

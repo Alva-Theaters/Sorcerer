@@ -29,8 +29,7 @@
 
 import bpy
 
-from ..assets.sli import SLI 
-from ..cpvia.cpvia_finders import CPVIAFinders 
+from ..assets.sli import SLI
 from ..utils.osc import OSC
 from ..assets.dictionaries import Dictionaries
     

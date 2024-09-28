@@ -76,7 +76,6 @@ class NodeUpdaters:
            circle programmatically. Imagine not a circle, but a sort of helical disk
            with 150% the surface area of a circle'''           
         if self.pan_tilt_graph_checker != self.float_vec_pan_tilt_graph:
-            scene = context.scene.scene_props
             r, g, b = self.float_vec_pan_tilt_graph[:3]
             h, s, v = colorsys.rgb_to_hsv(r, g, b)
             v *= 30
@@ -87,13 +86,11 @@ class NodeUpdaters:
                 overdrive_mode = ""
                 self.is_overdriven_left = False
                 self.is_approaching_limit = False
-                print("Overdriving for left pan")
                 
             elif self.is_overdriven_right and h > .25:
                 overdrive_mode = ""
                 self.is_overdriven_right = False
                 self.is_approaching_limit = False
-                print("Overdriving for right pan")
                 
             if self.is_overdriven_left and h < .85:
                 self.is_approaching_limit = True

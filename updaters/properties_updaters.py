@@ -56,7 +56,6 @@ class PropertiesUpdaters:
         current_value = cue_list.int_t_bar
         last_value = scene.int_fader_bar_memory
         current_time = time.time()
-        formatted_time = PropertiesUpdaters.format_time_in_seconds(current_time)
         preview_cue = cue_list.cues[cue_list.int_preview_index].int_number
         program_cue = cue_list.cues[cue_list.int_program_index].int_number
         

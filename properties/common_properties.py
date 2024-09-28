@@ -29,7 +29,7 @@
 
 import bpy
 from bpy.props import StringProperty, CollectionProperty, BoolProperty, EnumProperty, IntProperty, FloatProperty, FloatVectorProperty, PointerProperty
-from bpy.types import PropertyGroup, Object, ColorSequence, Sequence, Scene
+from bpy.types import Object, ColorSequence, Sequence, Scene
 
 from ..utils.utils import Utils 
 from ..assets.items import Items as AlvaItems 

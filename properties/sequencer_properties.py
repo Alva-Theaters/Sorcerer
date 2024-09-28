@@ -27,7 +27,7 @@
 
 
 from bpy.props import *
-from bpy.types import Scene, ColorSequence, SoundSequence, Object, Sequence
+from bpy.types import Scene, ColorSequence, SoundSequence, Object
 
 from ..assets.items import Items as AlvaItems
 from ..updaters.sequencer_updaters import SequencerUpdaters as Updaters

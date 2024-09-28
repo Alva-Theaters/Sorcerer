@@ -264,7 +264,6 @@ class SequencerUpdaters:
       
     def light_updater(self, context, light_value, groups): ##
         '''This really needs to be incorporated into the depsgraph. This is for Cue Builder.'''
-        scene = context.scene
         if context.screen:
             if self.mute:
                 return
@@ -280,7 +279,6 @@ class SequencerUpdaters:
 
     def effect_updater(self, context, effect_value, effect_type): ##
         '''This really needs to be incorporated into the depsgraph. This is for Cue Builder.'''
-        scene = context.scene
         if context.screen:
             if self.mute:
                 return

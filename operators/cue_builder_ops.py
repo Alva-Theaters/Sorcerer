@@ -27,7 +27,6 @@
 ## Double hashtag indicates notes for future development requiring some level of attention
 
 
-import bpy
 from bpy.types import Operator
 from ..utils.utils import Utils
 from ..utils.osc import OSC

@@ -31,11 +31,11 @@ import bpy
 from bpy.types import Operator
 from bpy.props import StringProperty, IntProperty
 
-# pyright: reportInvalidTypeForm=false
-
 from ..as_ui.space_node import draw_node_formatter_footer, draw_node_formatter_group, draw_node_formatter_mixer
 from ..cpvia.find import Find
 from ..utils.osc import OSC
+
+# pyright: reportInvalidTypeForm=false
 
 
 class NODE_OT_node_formatter(Operator):
@@ -54,11 +54,6 @@ class NODE_OT_node_formatter(Operator):
         return wm.invoke_props_dialog(self, width=300)
                 
     def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-        column = layout.column(align=True)
-        
-        space = context.space_data.edit_tree.nodes
         active_node = None
 
         if hasattr(context.space_data, 'edit_tree') and context.space_data.edit_tree is not None:

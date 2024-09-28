@@ -33,11 +33,11 @@ import math
 from bpy.props import *
 from bpy.types import Operator
 
-# pyright: reportInvalidTypeForm=false
-
 from ..cpvia.find import Find 
 from ..utils.utils import Utils 
 from ..utils.osc import OSC
+
+# pyright: reportInvalidTypeForm=false
 
 
 def apply_patch(item, object):

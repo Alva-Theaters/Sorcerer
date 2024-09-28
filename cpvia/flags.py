@@ -28,7 +28,6 @@
 
 
 from ..maintenance.logging import alva_log
-from .find import Find
 
 
 def check_flags(context, parent, c, p, v, type):
