@@ -251,60 +251,50 @@ class Utils:
                 controller.str_manual_fixture_selection = controller.str_manual_fixture_selection
 
 
-    def get_loc_rot(obj):
+    def get_loc_rot(obj, use_matrix=False):
+        x_pos, y_pos, z_pos, x_rot_rad, y_rot_rad, z_rot_rad  = Utils.get_original_loc_rot(obj, use_matrix)
+
         # Convert meters to feet.
-        position_x = round(obj.location.x / .3048, 2)
-        position_y = round(obj.location.y / .3048, 2)
-        position_z = round(obj.location.z / .3048, 2)
+        position_x = round(x_pos / .3048, 2)
+        position_y = round(y_pos / .3048, 2)
+        position_z = round(z_pos / .3048, 2)
 
         # Round and rotate x by 180 degrees (pi in radians) since cone facing up is the same as a light facing down.
-        orientation_x = round(math.degrees(obj.rotation_euler.x + math.pi), 2)
-        orientation_y = round(math.degrees(obj.rotation_euler.y), 2)
+        orientation_x = round(math.degrees(x_rot_rad + math.pi), 2)
+        orientation_y = round(math.degrees(y_rot_rad), 2)
         orientation_z = 0  # Prevent modifiers from messing up pan/tilt. ## Add option to enable in the future.
 
         return position_x, position_y, position_z, orientation_x, orientation_y, orientation_z
-
-
-    def get_light_rotation_degrees(light_name):
-        """
-        Returns the X (tilt) and Y (pan) rotation angles in degrees for a given light object,
-        adjusting the range of pan to -270 to 270 degrees.
-        
-        :param light_name: Name of the light object in the scene.
-        :return: Tuple containing the X (tilt) and Y (pan) rotation angles in degrees.
-        """
-        light_object = bpy.data.objects.get(light_name)
-
-        if light_object and light_object.type == 'MESH':
-            matrix = light_object.matrix_world
-
+    
+    
+    def get_original_loc_rot(obj, use_matrix=False):
+        if use_matrix:
+            depsgraph = bpy.context.evaluated_depsgraph_get()
+            eval_obj = obj.evaluated_get(depsgraph)
+            matrix = eval_obj.matrix_world
+            
             euler = matrix.to_euler('XYZ')
 
-            # Convert radians to degrees
-            x_rot_deg = math.degrees(euler.x)  # Tilt
-            y_rot_deg = math.degrees(euler.z)  # Pan seems to be on zed euler, not on y as y resolves to super tiny number.
+            # Convert radians to degrees for rotation
+            x_rot_rad = euler.x  # Tilt
+            y_rot_rad = euler.z  # Pan seems to be on zed euler, not on y as y resolves to super tiny number.
+            z_rot_rad = euler.y  # Roll
 
-            # Adjust the pan angle to extend the range to -270 to 270 degrees.
-            if y_rot_deg > 90:
-                y_rot_deg -= 360
+            position = matrix.translation
+            x_pos = position.x
+            y_pos = position.y
+            z_pos = position.z
 
-            return x_rot_deg, y_rot_deg
         else:
-            print("Light object named", light_name,"not found or is not a lamp.")
-            return None, None
+            x_pos = obj.location.x
+            y_pos = obj.location.y
+            z_pos = obj.location.z
+            x_rot_rad = obj.rotation_euler.x
+            y_rot_rad = obj.rotation_euler.y
+            z_rot_rad = obj.rotation_euler.z
 
-    def get_matrix_orientation(obj):
-        depsgraph = bpy.context.evaluated_depsgraph_get()
-        eval_obj = obj.evaluated_get(depsgraph)
-        matrix = eval_obj.matrix_world
-        euler = matrix.to_euler('XYZ')
+        return x_pos, y_pos, z_pos, x_rot_rad, y_rot_rad, z_rot_rad 
 
-        # Convert radians to degrees
-        x_rot_deg = math.degrees(euler.x) # Tilt
-        y_rot_deg = math.degrees(euler.z)  # Pan seems to be on zed euler, not on y as y resolves to super tiny number.
-        z_rot_deg = math.degrees(euler.y)
-
-        return x_rot_deg, y_rot_deg, z_rot_deg
 
                 
     def try_parse_int(value):

@@ -121,11 +121,6 @@ class SorcererPython:
                in mixers'''
             return Utils.parse_mixer_channels(input_string)
             
-        def get_light_rotation_degrees(light_name):
-            '''Find true rotation after modifiers/constraints, Returns x_rotation_degrees,
-               y_rotation_degreees. Pass to it the object name as string'''
-            return Utils.get_light_rotation_degrees(light_name)
-            
         def try_parse_int(value):
             '''Use this to avoid runtime errors converting to int. Returns int or none.
                This is just a try/except for int()'''

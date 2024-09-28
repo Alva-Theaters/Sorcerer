@@ -139,7 +139,7 @@ class EventUtils:
     
     @staticmethod
     def trigger_sem(obj, chan_num):
-        x_focus, y_focus, z_focus, x_orientation, y_orientation, z_orientation = Utils.get_loc_rot(obj)
+        x_focus, y_focus, z_focus, x_orientation, y_orientation, z_orientation = Utils.get_loc_rot(obj, use_matrix=True)
         OSC.send_osc_lighting("/eos/newcmd", f"Chan {chan_num} X_Focus {x_focus} Enter, Chan {chan_num} Y_Focus {y_focus} Enter, Chan {chan_num} Z_Focus {z_focus} Enter, Chan {chan_num} X_Orientation {x_orientation} Enter, Chan {chan_num} Y_Orientation {y_orientation} Enter, Chan {chan_num} Z_Orientation {z_orientation} Enter", user=0)
                 
     @staticmethod

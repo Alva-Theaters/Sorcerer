@@ -137,8 +137,6 @@ The *utils.parse_channels(input_string)* function parses an input string and ret
 
 The *utils.parse_mixer_channels(input_string)* function converts a string of mixer channel numbers into a list of tuples. You pass it the input string, and it returns a list of tuples. This is typically used when you want concurrent groups when user uses () (). So for example, if you were to pass this function "(1 - 5) (6 - 10)", the function would return [(1, 2, 3, 4, 5), (6, 7, 8, 9, 10)]. Whereas the normal *parse_channels(input_string)* function would just return a list if integers regardless of () in the input string.
 
-The get_light_rotation_degrees function gets the true rotation degrees of a light object after applying modifiers and constraints. You need this, not the built-in x_rotation/y_rotation accessible in Blender's UI because that number is not impacted by modifiers and/or constraints. You pass this spy function the light object’s name as a string, and it returns the rotation as x_rotation_degrees, y_rotation_degrees.
-
 The try_parse_int function safely converts a value to an integer, avoiding runtime errors. You pass it the value, and it returns the integer or None. 
 
 The swap_preview_and_program function swaps the preview and program for the ALVA M/E Switcher. You pass it a list of cues, and it doesn’t return anything.
