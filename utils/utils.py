@@ -251,6 +251,20 @@ class Utils:
                 controller.str_manual_fixture_selection = controller.str_manual_fixture_selection
 
 
+    def get_loc_rot(obj):
+        # Convert meters to feet.
+        position_x = round(obj.location.x / .3048, 2)
+        position_y = round(obj.location.y / .3048, 2)
+        position_z = round(obj.location.z / .3048, 2)
+
+        # Round and rotate x by 180 degrees (pi in radians) since cone facing up is the same as a light facing down.
+        orientation_x = round(math.degrees(obj.rotation_euler.x + math.pi), 2)
+        orientation_y = round(math.degrees(obj.rotation_euler.y), 2)
+        orientation_z = 0  # Prevent modifiers from messing up pan/tilt. ## Add option to enable in the future.
+
+        return position_x, position_y, position_z, orientation_x, orientation_y, orientation_z
+
+
     def get_light_rotation_degrees(light_name):
         """
         Returns the X (tilt) and Y (pan) rotation angles in degrees for a given light object,

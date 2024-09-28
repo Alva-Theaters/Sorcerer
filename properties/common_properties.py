@@ -157,6 +157,7 @@ class CommonProperties:
         ('influencer_list', CollectionProperty(type=InfluencerList)),
         ('float_object_strength', FloatProperty(name="Strength", default=1, min=0, max=1, description=find_tooltip("strength"), update=CommonUpdaters.controller_ids_updater)),
         ('alva_is_absolute', BoolProperty(name="Absolute", default=False, description=find_tooltip("absolute"))),
+        ('int_alva_sem', IntProperty(name="SEM", default=0, min=0, max=9999, description=find_tooltip("sem"))),
         
         # Pan/Tilt node properties. Registered on object for patch reasons.
         ('float_vec_pan_tilt_graph', FloatVectorProperty(

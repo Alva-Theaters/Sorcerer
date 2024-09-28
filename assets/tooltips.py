@@ -176,5 +176,11 @@ tooltips = {
     "strength": (
         "If you diminish the strength, it will act like a brush. If you keep this up all the way, it will act more like "
         "an object passing through the lights that resets them as it leaves"
+    ),
+    "sem": (
+        '''If this is not zero, it  will behave like an "SEM" channel on ETC Eos. Use this to animate the translation '''
+        '''of objects in Augment3D. This includes remote patching as well. To connect a 3D object in Augment3D to this '''
+        '''channel, go to the right side tab in the A3D editor and drag the model over the SEM channel to link. Eos will '''
+        '''not automatically put them on top of each other.'''
     )
 }

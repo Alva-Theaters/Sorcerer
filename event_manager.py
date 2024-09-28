@@ -350,6 +350,8 @@ class EventManager:
                     if update.is_updated_transform:
                         Utils.trigger_special_update(obj)
                     alva_log('time', f"trigger_special_update and is_updated_transform took {time.time() - start} seconds")
+                if obj.int_alva_sem != 0 and len(obj.list_group_channels) == 1:
+                    Utils.trigger_sem(obj, obj.int_alva_sem)
 
         start = time.time()
         Utils.check_and_trigger_drivers(updated_objects)
@@ -401,9 +403,11 @@ class EventManager:
         Utils.check_and_trigger_drivers(objects_with_drivers)
 
         '''A1:3.2'''
-        dynamic_objects = {obj for obj in scene.objects if obj.animation_data and obj.object_identities_enum in ["Influencer", "Brush"]}
+        dynamic_objects = {obj for obj in scene.objects if obj.animation_data and (obj.object_identities_enum in ["Influencer", "Brush"] or obj.int_alva_sem != 0)}
         for obj in dynamic_objects:
             Utils.trigger_special_update(obj)
+            if obj.int_alva_sem != 0 and len(obj.list_group_channels) == 1:
+                Utils.trigger_sem(obj, obj.int_alva_sem)
 
         if not scene.scene_props.is_playing or not self.controllers:
             '''A1:1 and B1:3'''

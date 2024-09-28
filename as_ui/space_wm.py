@@ -249,6 +249,9 @@ def draw_alva_right_click(self, context):
         has_separated = True
         layout.label(text="Render Freezing:", icon_value=orb.icon_id)
         layout.prop(context.object, "freezing_mode_enum", text="")
+        if len(context.object.list_group_channels) == 1:
+            layout.separator()
+            layout.prop(context.object, "int_alva_sem", icon='NONE')
 
     in_sequencer = context.area.type == 'SEQUENCE_EDITOR'
     has_selected_strip = hasattr(context.scene.sequence_editor, "active_strip") and context.scene.sequence_editor.active_strip is not None
