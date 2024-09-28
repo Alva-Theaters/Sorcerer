@@ -177,7 +177,7 @@ def draw_node_mixer(self, context, layout):
         row.prop(self, "float_offset", text="Offset:")
         if self.mix_method_enum != "option_pattern":
             row.prop(self, "int_subdivisions", text="Subdivisions:")
-    if self.parameters_enum in ["option_color", "option_pose"]:
+    if self.parameters_enum == "option_color" or self.mix_method_enum == 'option_pose':
         row.prop(self, "color_profile_enum", text="", icon='COLOR', icon_only=True)
         
     layout.separator()
@@ -219,8 +219,8 @@ def draw_node_mixer(self, context, layout):
             col.prop(par, "float_intensity", slider=True)
             col.prop(par, "float_pan", text="Pan", slider=True)
             col.prop(par, "float_tilt", text="Tilt", slider=True)
-            col.prop(par, "float_zoom")
-            col.prop(par, "float_iris")
+            col.prop(par, "float_zoom", text="Zoom", slider=True)
+            col.prop(par, "float_iris", text="Iris", slider=True)
 
             # Right side: float_vec_color
             col = split.column()

@@ -208,7 +208,9 @@ class NODE_NT_mixer(Node):
     influence: IntProperty(default=1, min=1, max=10, description="How many votes this controller has when there are conflicts", options={'ANIMATABLE'})  
     show_settings: BoolProperty(default=True, name="Show Settings", description="Expand/collapse group/parameter row and UI controller row")  
     float_offset: FloatProperty(name="Offset", description="Move or animate this value for a moving effect", update=NodeUpdaters.mixer_param_updater) 
+    float_offset_checker: FloatProperty()
     int_subdivisions: IntProperty(name="Subdivisions", description="Subdivide the mix into multiple sections", update=NodeUpdaters.mixer_param_updater, min=0, max=32)  
+    int_subdivisions_checker: IntProperty()
     columns: IntProperty(name="# of Columns:", min=1, max=8, default=3)  
     scale: FloatProperty(name="Size of Choices:", min=1, max=3, default=2)  
     mix_method_enum: EnumProperty(
@@ -329,9 +331,11 @@ class NODE_NT_motor(Node):
         description="Choose whether to spin the motor manually or with keyframes",
         items=AlvaItems.transmission_options,
         default=1
-    ) 
+    )
     float_progress: FloatProperty(name="Progress:", description="How far along in the steps the mixer is", default=0, update=NodeUpdaters.props_updater)  
+    float_progress_checker: FloatProperty()
     float_scale: FloatProperty(name="Scale:", description="Size of the effect, 1 is no reduction, 0 is complete reduction", default=1, min=0, max=1, update=NodeUpdaters.props_updater) 
+    float_scale_checker: FloatProperty()
 
     initial_angle: FloatProperty(name="Initial Angle", default=0) 
     prev_angle: FloatProperty(name="Previous Angle", default=0) 

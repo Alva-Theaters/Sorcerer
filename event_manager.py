@@ -306,6 +306,7 @@ class EventManager:
         
         self.old_graph = []
         self.controllers = []
+        self.mixers_and_motors = []
         
         
     #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -411,8 +412,10 @@ class EventManager:
 
         if not scene.scene_props.is_playing or not self.controllers:
             '''A1:1 and B1:3'''
-            self.controllers = Find.find_controllers(scene)
-        
+            self.controllers, self.mixers_and_motors = Find.find_controllers(scene)
+
+        Utils.trigger_special_mixer_props(self.mixers_and_motors)
+
         current_controllers = self.controllers
         alva_log("event_manager", f"Current controllers: {current_controllers}")
         
@@ -430,6 +433,7 @@ class EventManager:
         if not scene.scene_props.is_playing:
             '''A1:7'''
             self.controllers = []
+            self.mixers_and_motors = []
             
 
     def update_livemap(self, scene):

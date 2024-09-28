@@ -102,6 +102,30 @@ class EventUtils:
                         if fcurve.data_path.startswith(controller.path_from_id()) and fcurve.data_path.endswith(property):
                             return len(fcurve.keyframe_points) > 0
         return False
+    
+    @staticmethod
+    def trigger_special_mixer_props(mixers_and_motors):
+        attributes_to_check = []
+        
+        for node in mixers_and_motors:
+            if node.bl_idname == 'mixer_type' and node.mix_method_enum != 'option_pose':
+                attributes_to_check = [
+                    ("float_offset", "float_offset_checker"),
+                    ("int_subdivisions", "int_subdivisions_checker")
+                ]
+            elif node.bl_idname == 'motor_type' and node.transmission_enum == 'option_keyframe':
+                attributes_to_check = [
+                    ("float_progress", "float_progress_checker"),
+                    ("float_scale", "float_scale_checker")
+                ]
+            else:
+                continue
+
+            for attr, checker in attributes_to_check:
+                if getattr(node, attr) != getattr(node, checker):
+                    setattr(node, attr, getattr(node, attr))
+                    setattr(node, checker, getattr(node, attr))
+
 
     @staticmethod
     def find_updates(old_graph, new_graph):

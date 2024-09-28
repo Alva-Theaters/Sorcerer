@@ -138,7 +138,7 @@ class Find:
             return node
                     
         # Run the program that's supposed to set this up since it must not have run yet
-        nodes = Find.find_nodes(bpy.context.scene, [])
+        nodes = Find.find_nodes(bpy.context.scene)
         for node in nodes:
             if node.bl_idname == 'mixer_type':
                 NodeUpdaters.update_node_name(node)
@@ -296,44 +296,47 @@ class Find:
     # Find object, strip, and node controllers.
     def find_controllers(scene):
         controllers = []
+        objects = []
+        strips = []
+        nodes = []
+        mixers_and_motors = []
 
         if scene.scene_props.enable_objects:
-            controllers = Find.find_objects(scene)
+            objects = Find.find_objects(scene)
         if scene.scene_props.enable_strips:
-            controllers = Find.find_strips(scene, controllers)
+            strips = Find.find_strips(scene)
         if scene.scene_props.enable_nodes:
-            controllers = Find.find_nodes(scene, controllers)
+            nodes = Find.find_nodes(scene)
+            mixers_and_motors = [node for node in nodes if node.bl_idname in ['mixer_type', 'motor_type']]
 
-        return controllers
+        controllers = objects + strips + nodes
+
+        return controllers, mixers_and_motors
 
     def find_objects(scene):
         if not scene.scene_props.enable_objects:
             return []
-
         return [obj for obj in scene.objects]
 
-    def find_strips(scene, controllers):
+    def find_strips(scene):
         if not scene.scene_props.enable_strips or not hasattr(scene, "sequence_editor"):
-            return controllers
-
+            return []
+        strips = []
         for strip in scene.sequence_editor.sequences_all:
             if strip.type == 'COLOR' and strip.my_settings.motif_type_enum == 'option_animation':
-                controllers.append(strip)
+                strips.append(strip)
+        return strips
 
-        return controllers
-
-    def find_nodes(scene, controllers):
+    def find_nodes(scene):
         if not scene.scene_props.enable_nodes:
-            return controllers
-
+            return []
         node_trees = set()
-        
+        nodes = []
         if bpy.context.scene.world and bpy.context.scene.world.node_tree:
             node_trees.add(bpy.context.scene.world.node_tree)
         for node_tree in bpy.data.node_groups:
             node_trees.add(node_tree)
         for node_tree in node_trees:
             for node in node_tree.nodes:
-                controllers.append(node)
-                
-        return controllers
+                nodes.append(node)
+        return nodes
