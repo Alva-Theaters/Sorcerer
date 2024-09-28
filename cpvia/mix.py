@@ -140,7 +140,10 @@ class Mixer:
         poses = parent.parameters
         num_poses = len(poses)
         motor_node = self.find_motor_node(parent)
-        progress = (motor_node.float_progress * .1)
+        if motor_node:
+            progress = (motor_node.float_progress * .1)
+        else:
+            progress = .1
         
         # Ensure pose_index is within range
         pose_index = int(progress * (num_poses - 1)) % num_poses
@@ -167,7 +170,7 @@ class Mixer:
                 mixed_value = value1 * (1 - blend_factor) + value2 * blend_factor
                 mixed_values[param] = [mixed_value] * len(channels)
 
-        scaled_values = self.scale_motor(parent, param_mode, mixed_values)
+        scaled_values = self.scale_motor(parent, param_mode, mixed_values, motor_node)
 
         if param_mode == 'color':
             return scaled_values['float_vec_color']
@@ -248,15 +251,22 @@ class Mixer:
                             return connected_node
         return None
 
-    def scale_motor(self, parent: bpy.types.Node, param_mode: str, mixed_values: List[float]) -> List[float]:
+    def scale_motor(self, parent: bpy.types.Node, param_mode: str, mixed_values: List[float], motor_node: bpy.types.Node) -> List[float]:
         """Scale the mixed values based on the motor node's scale."""
-        motor_node = self.find_motor_node(parent)
         if motor_node:
             float_scale = motor_node.float_scale
-            if param_mode == "color":
-                return [(r * float_scale, g * float_scale, b * float_scale) for r, g, b in mixed_values]
-            else:
-                return [v * float_scale for v in mixed_values]
+        else:
+            float_scale = 1
+
+        if param_mode == "color" and "float_vec_color" in mixed_values:
+            mixed_values['float_vec_color'] = [
+                (r * float_scale, g * float_scale, b * float_scale) for r, g, b in mixed_values['float_vec_color']
+            ]
+        elif param_mode != "color":
+            for key, values in mixed_values.items():
+                if isinstance(values[0], (int, float)):
+                    mixed_values[key] = [v * float_scale for v in values]
+
         return mixed_values
     
 
