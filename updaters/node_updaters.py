@@ -177,24 +177,46 @@ class NodeUpdaters:
         h, s, v = colorsys.rgb_to_hsv(r, g, b)
         self.float_scale = s
 
+        # Define a smaller sensitivity to prevent rapid jumps
+        MOTOR_SENSITIVITY = 1.0  # Adjust as needed
+
+        # Calculate current angle based on hue
+        current_angle = h * 360
+
         if not self.is_interacting:
-            self.initial_angle = h * 360
+            self.initial_angle = current_angle
             self.prev_angle = self.initial_angle
             self.is_interacting = True
 
-        current_angle = h * 360
-        angle_diff = current_angle - self.prev_angle
+        # Increment the update counter
+        self.update_counter += 1
 
-        if angle_diff > 180:
-            angle_diff -= 360
-        elif angle_diff < -180:
-            angle_diff += 360
+        # Only update every update_interval iterations
+        if self.update_counter % self.update_interval == 0:
+            # Calculate the angle difference with wrap-around handling
+            angle_diff = current_angle - self.prev_angle
+            if angle_diff > 180:
+                angle_diff -= 360
+            elif angle_diff < -180:
+                angle_diff += 360
 
-        self.float_progress += angle_diff
-        self.prev_angle = current_angle
-        
+            # Calculate the float_progress increment based on the angle
+            float_progress_increment = (angle_diff / 360) * 10
+            self.float_progress += float_progress_increment
+
+            # Ensure float_progress stays within bounds (0 to 10)
+            if self.float_progress < 0:
+                self.float_progress = 0
+            elif self.float_progress > 10:
+                self.float_progress = 10
+
+            # Update the previous angle
+            self.prev_angle = current_angle
+
+        # Publish updates (if necessary)
         NodeUpdaters.publish(self)
-     
+
+
      
     @staticmethod   
     def props_updater(self, context):

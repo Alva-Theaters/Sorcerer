@@ -336,6 +336,8 @@ class NODE_NT_motor(Node):
     float_progress_checker: FloatProperty()
     float_scale: FloatProperty(name="Scale:", description="Size of the effect, 1 is no reduction, 0 is complete reduction", default=1, min=0, max=1, update=NodeUpdaters.props_updater) 
     float_scale_checker: FloatProperty()
+    update_counter: IntProperty()
+    update_interval: IntProperty(min=1, default=7)
 
     initial_angle: FloatProperty(name="Initial Angle", default=0) 
     prev_angle: FloatProperty(name="Previous Angle", default=0) 
