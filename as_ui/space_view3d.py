@@ -29,7 +29,7 @@
 
 import bpy
 
-from .space_common import draw_text_or_group_input
+from .space_common import draw_text_or_group_input, draw_parameters_mini
 
 # Custom icon stuff
 import bpy.utils.previews
@@ -54,6 +54,7 @@ def draw_alva_view_3d_view(self, layout):
     layout.label(text="Alva Sorcerer", icon_value=orb.icon_id)
     layout.prop(bpy.context.scene.scene_props, "view_viewport_toolbar", text="Toolbar")
     layout.prop(bpy.context.scene.scene_props, "view_ip_address_tool", text="Network")
+    layout.prop(bpy.context.scene.scene_props, "view_parameters_header", text="Parameters")
     layout.prop(bpy.context.scene.scene_props, "view_viewport_command_line", text="Command Line")
     layout.prop(bpy.context.scene.scene_props, "expand_strobe", text="Expand Strobe")
 
@@ -74,55 +75,61 @@ def draw_tool_settings(self, context):
         of scene-registered properties on the scene_props, but haven't yet because doing so
         would introduce hundreds of bugs throughout the codebase.'''
     if (hasattr(context, "scene") and 
-        hasattr(context.scene, "scene_props") and context.scene.scene_props.view_ip_address_tool):
+        hasattr(context.scene, "scene_props")):
         if context.scene.scene_props.school_mode_enabled and context.scene.scene_props.restrict_network:
             return
         
-        scene = context.scene.scene_props
-        
         layout = self.layout
-        row = layout.row(align=True)
-        row.prop(context.scene, "lock_ip_settings", text="", icon='LOCKED' if context.scene.lock_ip_settings else 'UNLOCKED')
-        row.prop(context.scene, "ip_address_view_options", text="", expand=True)
+        
+        if context.scene.scene_props.view_ip_address_tool:
+            scene = context.scene.scene_props
+            
+            row = layout.row(align=True)
+            row.prop(context.scene, "lock_ip_settings", text="", icon='LOCKED' if context.scene.lock_ip_settings else 'UNLOCKED')
+            row.prop(context.scene, "ip_address_view_options", text="", expand=True)
 
-        if context.scene.ip_address_view_options == 'option_lighting':
-            ip = scene.str_osc_ip_address
-            port = scene.int_osc_port
-            if context.scene.lock_ip_settings:
-                row = layout.row()
-                row.label(text=f"{ip}:{port}")
-            else:
-                row = layout.row()
-                row.prop(scene, "str_osc_ip_address", text="")
-                row = layout.row()
-                row.scale_x = .8
-                row.prop(scene, "int_osc_port", text=":")
+            if context.scene.ip_address_view_options == 'option_lighting':
+                ip = scene.str_osc_ip_address
+                port = scene.int_osc_port
+                if context.scene.lock_ip_settings:
+                    row = layout.row()
+                    row.label(text=f"{ip}:{port}")
+                else:
+                    row = layout.row()
+                    row.prop(scene, "str_osc_ip_address", text="")
+                    row = layout.row()
+                    row.scale_x = .8
+                    row.prop(scene, "int_osc_port", text=":")
 
-        elif context.scene.ip_address_view_options == 'option_video':
-            ip = context.scene.str_video_ip_address
-            port = context.scene.int_video_port
-            if context.scene.lock_ip_settings:
-                row = layout.row()
-                row.label(text=f"{ip}:{port}")
-            else:
-                row = layout.row()
-                row.prop(context.scene, "str_video_ip_address", text="")
-                row = layout.row()
-                row.scale_x = .9
-                row.prop(context.scene, "int_video_port", text=":")
+            elif context.scene.ip_address_view_options == 'option_video':
+                ip = context.scene.str_video_ip_address
+                port = context.scene.int_video_port
+                if context.scene.lock_ip_settings:
+                    row = layout.row()
+                    row.label(text=f"{ip}:{port}")
+                else:
+                    row = layout.row()
+                    row.prop(context.scene, "str_video_ip_address", text="")
+                    row = layout.row()
+                    row.scale_x = .9
+                    row.prop(context.scene, "int_video_port", text=":")
 
-        else:
-            ip = context.scene.str_audio_ip_address
-            port = context.scene.int_audio_port
-            if context.scene.lock_ip_settings:
-                row = layout.row()
-                row.label(text=f"{ip}:{port}")
             else:
-                row = layout.row()
-                row.prop(context.scene, "str_audio_ip_address", text="")
-                row = layout.row()
-                row.scale_x = .9
-                row.prop(context.scene, "int_audio_port", text=":")
+                ip = context.scene.str_audio_ip_address
+                port = context.scene.int_audio_port
+                if context.scene.lock_ip_settings:
+                    row = layout.row()
+                    row.label(text=f"{ip}:{port}")
+                else:
+                    row = layout.row()
+                    row.prop(context.scene, "str_audio_ip_address", text="")
+                    row = layout.row()
+                    row.scale_x = .9
+                    row.prop(context.scene, "int_audio_port", text=":")
+
+        obj = context.active_object
+        if obj and obj.type == 'MESH' and context.scene.scene_props.view_parameters_header:
+            draw_parameters_mini(self, context, layout, obj, use_slider=True, expand=False)
                 
 
 def draw_speaker(self, context, active_object):

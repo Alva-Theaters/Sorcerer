@@ -234,6 +234,8 @@ def draw_alva_right_click(self, context):
         op.space_type = st
         op.node_name = node_name
         op.node_tree_name = node_tree_name
+        if st == 'VIEW_3D' and context.active_object and context.active_object.type == 'MESH':
+            self.layout.prop(context.active_object, "color_profile_enum", text="")
 
     if is_property and prop.identifier == 'float_intensity' and st == 'VIEW_3D':
         if not has_separated:

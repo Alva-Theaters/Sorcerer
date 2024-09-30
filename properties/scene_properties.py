@@ -175,6 +175,7 @@ class SceneProperties(PropertyGroup):
     restrict_pan_tilt: BoolProperty(name="Pan/Tilts", default=True, description="When school mode is enabled, stage pan_tilt objects are disabled")  
 
     view_ip_address_tool: BoolProperty(name="IP Address", default=True, description="Draw the IP Address box in Tool Settings or Header area") 
+    view_parameters_header: BoolProperty(name="Parameters", default=True, description="Draw parameters in Tool Settings or Header area")
     view_sequencer_add: BoolProperty(name="Sequencer Add", default=True, description="Draw the Add menu on the Sequencer") 
     view_alva_time_header: BoolProperty(name="View Header", default=True, description="Draw sync and Orb settings in header") 
     view_node_add_lighting: BoolProperty(name="Node Add (Lighting)", default=True, description="Draw the Add menu on the Node Editor for lighting") 

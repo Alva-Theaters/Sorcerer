@@ -331,34 +331,42 @@ def draw_volume_monitor(self, context, sequence_editor):
         row = box.row()
         row.label(text="No participating speaker strips found.")
 
-def draw_parameters_mini(self, context, layout, active_object, use_slider=False):
+def draw_parameters_mini(self, context, layout, active_object, use_slider=False, expand=True):
     ao = active_object
 
-    layout.use_property_split = True
-    layout.use_property_decorate = True
+    layout.use_property_split = expand
+    layout.use_property_decorate = expand
 
+    if expand:
+        element = layout
+    else:
+        row = layout.row(align=True)
+        row.scale_x = .7
+        element = row
+
+    element.prop(ao, "str_manual_fixture_selection", text="")
     if ao.intensity_is_on:
-        layout.prop(ao, "float_intensity", slider=use_slider)
+        element.prop(ao, "float_intensity", slider=use_slider)
     if ao.strobe_is_on:
-        layout.prop(ao, "float_strobe", slider=use_slider)
+        element.prop(ao, "float_strobe", slider=use_slider)
     if ao.color_is_on:
-        layout.prop(ao, "float_vec_color", slider=use_slider)
+        element.prop(ao, "float_vec_color", slider=use_slider, text="Color" if expand else "")
     if ao.pan_tilt_is_on:
         if not (context.scene.scene_props.school_mode_enabled and context.scene.scene_props.restrict_pan_tilt):
-            layout.prop(ao, "float_pan", slider=use_slider)
-            layout.prop(ao, "float_tilt", slider=use_slider)
+            element.prop(ao, "float_pan", slider=use_slider)
+            element.prop(ao, "float_tilt", slider=use_slider)
     if ao.zoom_is_on:
-        layout.prop(ao, "float_zoom", slider=use_slider)
+        element.prop(ao, "float_zoom", slider=use_slider)
     if ao.iris_is_on:
-        layout.prop(ao, "float_iris", slider=use_slider)
+        element.prop(ao, "float_iris", slider=use_slider)
     if ao.edge_is_on:
-        layout.prop(ao, "float_edge", slider=use_slider)
+        element.prop(ao, "float_edge", slider=use_slider)
     if ao.diffusion_is_on:
-        layout.prop(ao, "float_diffusion", slider=use_slider)
+        element.prop(ao, "float_diffusion", slider=use_slider)
     if ao.gobo_is_on:
-        layout.prop(ao, "int_gobo_id", slider=use_slider)
-        layout.prop(ao, "float_gobo_speed", slider=use_slider)
-        layout.prop(ao, "int_prism", slider=use_slider)
+        element.prop(ao, "int_gobo_id", slider=use_slider)
+        element.prop(ao, "float_gobo_speed", slider=use_slider)
+        element.prop(ao, "int_prism", slider=use_slider)
 
 
 def draw_play_bar(self, context, layout):

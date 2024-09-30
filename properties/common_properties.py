@@ -275,11 +275,11 @@ class CommonProperties:
     common_parameters = [
         ('influence', IntProperty(
             default=1, description="How many votes this controller gets when there are conflicts", min=1, max=10)),
-        ('float_intensity', FloatProperty(
+        ('float_intensity', IntProperty(
             name="Intensity",
-            default=0.0,
-            min=0.0,
-            max=100.0,
+            default=0,
+            min=0,
+            max=100,
             description=find_tooltip("intensity"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.intensity_updater
@@ -294,38 +294,38 @@ class CommonProperties:
             description=find_tooltip("color"),
             update=CPVIAGenerator.color_updater
         )),
-        ('float_pan', FloatProperty(
+        ('float_pan', IntProperty(
             name="Pan",
-            default=0.0,
+            default=0,
             min=-100,
             max=100,
             description=find_tooltip("pan"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.pan_updater
         )),
-        ('float_tilt', FloatProperty(
+        ('float_tilt', IntProperty(
             name="Tilt",
-            default=0.0,
+            default=0,
             min=-100,
             max=100,
             description=find_tooltip("tilt"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.tilt_updater
         )),
-        ('float_zoom', FloatProperty(
+        ('float_zoom', IntProperty(
             name="Zoom",
-            default=0.0,
-            min=0.0,
-            max=100.0,
+            default=0,
+            min=0,
+            max=100,
             description=find_tooltip("tilt"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.zoom_updater
         )),
-        ('float_iris', FloatProperty(
+        ('float_iris', IntProperty(
             name="Iris",
-            default=100.0,
-            min=0.0,
-            max=100.0,
+            default=100,
+            min=0,
+            max=100,
             description=find_tooltip("iris"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.iris_updater
@@ -342,37 +342,37 @@ class CommonProperties:
             max=1.0,
             description=find_tooltip("color_restore"),
         )),
-        ('float_volume', FloatProperty(
+        ('float_volume', IntProperty(
             name="Volume",
-            default=0.0,
-            min=0.0,
-            max=100.0,
+            default=0,
+            min=0,
+            max=100,
             description=find_tooltip("volume"),
             options={'ANIMATABLE'}
         )),
-        ('float_diffusion', FloatProperty(
+        ('float_diffusion', IntProperty(
             name="Diffusion",
-            default=0.0,
+            default=0,
             min=0,
-            max=100.0,
+            max=100,
             description=find_tooltip("diffusion"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.diffusion_updater
         )),
-        ('float_strobe', FloatProperty(
+        ('float_strobe', IntProperty(
             name="Strobe",
-            default=0.0,
-            min=0.0,
-            max=100.0,
+            default=0,
+            min=0,
+            max=100,
             description=find_tooltip("strobe"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.strobe_updater
         )),
-        ('float_edge', FloatProperty(
+        ('float_edge', IntProperty(
             name="Edge",
-            default=0.0,
-            min=0.0,
-            max=100.0,
+            default=0,
+            min=0,
+            max=100,
             description=find_tooltip("edge"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.edge_updater
@@ -386,11 +386,11 @@ class CommonProperties:
             options={'ANIMATABLE'},
             update=CPVIAGenerator.gobo_id_updater
         )),
-        ('float_gobo_speed', FloatProperty(
+        ('float_gobo_speed', IntProperty(
             name="Speed",
-            default=0.0,
-            min=-100.0,
-            max=100.0,
+            default=0,
+            min=-100,
+            max=100,
             description=find_tooltip("speed"),
             options={'ANIMATABLE'},
             update=CPVIAGenerator.gobo_speed_updater
