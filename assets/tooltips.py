@@ -158,8 +158,8 @@ tooltips = {
 
     # Common Header
     "manual_fixture_selection": (
-        '''Instead of the group selector to the left, simply type in what you wish to control here. Just type in the 
-        "find_tooltip" channels you want or don't want in plain English'''
+        "Instead of the group selector to the left, simply type in what you wish to control here. Just type in the "
+        "channels you want or don't want in plain English"
     ),
     "solo": (
         "Mute all controllers but this one, and any others with solo also turned on. Clear all solos with the "
