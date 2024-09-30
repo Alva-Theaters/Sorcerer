@@ -342,6 +342,7 @@ class EventManager:
             return
 
         updated_objects = {update.id for update in depsgraph.updates if isinstance(update.id, bpy.types.Object)}
+        alva_log("event_manager", f"Updated objects from depsgraph_post: {updated_objects}")
         for update in depsgraph.updates:
             if isinstance(update.id, bpy.types.Object):
                 obj = update.id
@@ -349,9 +350,11 @@ class EventManager:
                 if obj.object_identities_enum in {"Influencer", "Brush", "Stage Object", "Fixture"}:
                     start = time.time()
                     if update.is_updated_transform:
+                        alva_log("event_manager", f"Triggering special update for object {obj}.")
                         Utils.trigger_special_update(obj)
                     alva_log('time', f"trigger_special_update and is_updated_transform took {time.time() - start} seconds")
                 if obj.int_alva_sem != 0 and len(obj.list_group_channels) == 1:
+                    alva_log("event_manager", f"Triggering SEM update for {obj}.")
                     Utils.trigger_sem(obj, obj.int_alva_sem)
 
         start = time.time()

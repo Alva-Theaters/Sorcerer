@@ -33,6 +33,7 @@ import mathutils
 from ..assets.dictionaries import Dictionaries
 from ..utils.osc import OSC
 from ..utils.utils import Utils
+from ..maintenance.logging import alva_log
 
 
 class EventUtils:
@@ -106,7 +107,7 @@ class EventUtils:
     @staticmethod
     def trigger_special_mixer_props(mixers_and_motors):
         attributes_to_check = []
-        
+
         for node in mixers_and_motors:
             if node.bl_idname == 'mixer_type' and node.mix_method_enum != 'option_pose':
                 attributes_to_check = [
@@ -156,7 +157,7 @@ class EventUtils:
         properties = ['float_intensity', 'float_vec_color', 'float_zoom', 'float_iris']
         for prop in properties:
             value = getattr(obj, prop)
-            if isinstance(value, float) and value != 0:
+            if isinstance(value, int) and value != 0:
                 setattr(obj, prop, value)
             elif isinstance(value, mathutils.Color) and any(v != 1 for v in value):
                 setattr(obj, prop, value)
@@ -172,7 +173,9 @@ class EventUtils:
         for obj in bpy.data.objects:
             if hasattr(obj, "object_identities_enum"):
                 if obj.animation_data:
+                    alva_log("event_manager", "Found animation data in check_and_trigger_drivers.")
                     for driver in obj.animation_data.drivers:
+                        alva_log("event_manager", "Found driver in check_and_trigger_drivers.")
                         data_path = driver.data_path
                         try:
                             for var in driver.driver.variables:
