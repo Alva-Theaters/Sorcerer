@@ -297,6 +297,7 @@ class CommonUpdaters:
 
     def network_settings_updater(self, context):
         context.scene.lock_ip_settings = True
+        OSC.send_osc_lighting("/eos/newcmd", "Hello_there._My_name_is_Alva_Sorcerer!", user=1)
 
 
     def update_light_array(self, context):
