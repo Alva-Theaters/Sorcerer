@@ -123,7 +123,7 @@ class UpdateControllerButton(Operator):
     
 class COMMON_OT_strobe_props(Operator):
     bl_idname = "alva_common.strobe_properties"
-    bl_label = "View Strobe and Color Properties"
+    bl_label = "View Strobe Properties"
     
     space_type: StringProperty() 
     node_name: StringProperty() 
@@ -133,7 +133,7 @@ class COMMON_OT_strobe_props(Operator):
         return {'FINISHED'}
     
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width=400)
+        return context.window_manager.invoke_props_dialog(self, width=250)
 
     def draw(self, context):
         finders = Find
@@ -154,7 +154,7 @@ class COMMON_OT_pan_tilt_props(Operator):
         return {'FINISHED'}
     
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width=400)
+        return context.window_manager.invoke_props_dialog(self, width=200)
 
     def draw(self, context):
         finders = Find
@@ -175,7 +175,7 @@ class COMMON_OT_zoom_iris_props(Operator):
         return {'FINISHED'}
     
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width=400)
+        return context.window_manager.invoke_props_dialog(self, width=200)
 
     def draw(self, context):
         finders = Find
@@ -195,7 +195,7 @@ class COMMON_OT_edge_diffusion_props(Operator):
         return {'FINISHED'}
     
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width=400)
+        return context.window_manager.invoke_props_dialog(self, width=200)
 
     def draw(self, context):
         finders = Find

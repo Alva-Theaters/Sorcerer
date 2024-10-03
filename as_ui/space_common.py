@@ -129,7 +129,7 @@ def draw_parameters(self, context, column, box, active_object):
     # SHORTENED STROBE/COLOR
     if not context.scene.scene_props.expand_strobe:
         # STROBE
-        if active_object.strobe_is_on:
+        if active_object.strobe_is_on and object_type not in ["Influencer", "Brush"]:
             row_one = row.column(align=True)
             row_one.scale_x = 1
             op = row_one.operator("alva_common.strobe_properties", icon='OUTLINER_OB_LIGHTPROBE', text="")
@@ -157,7 +157,7 @@ def draw_parameters(self, context, column, box, active_object):
         if active_object.strobe_is_on or active_object.color_is_on:
             row = box.row(align=True)
 
-            if active_object.strobe_is_on:
+            if active_object.strobe_is_on and object_type not in ["Influencer", "Brush"]:
                 op = row.operator("alva_common.strobe_properties", icon='OUTLINER_OB_LIGHTPROBE', text="")
                 op.space_type = space_type
                 op.node_name = node_name
@@ -208,7 +208,7 @@ def draw_parameters(self, context, column, box, active_object):
             row.prop(active_object, "float_iris", slider=True, text="Iris")
     
     # EDGE/DIFFUSION
-    if active_object.edge_is_on or active_object.diffusion_is_on:
+    if (active_object.edge_is_on or active_object.diffusion_is_on) and object_type not in ["Influencer", "Brush"]:
         row = box.row(align=True)
         op = row.operator("alva_common.edge_diffusion_properties", text="", icon_value=edge.icon_id)
         op.space_type = space_type
@@ -221,7 +221,7 @@ def draw_parameters(self, context, column, box, active_object):
             row.prop(active_object, "float_diffusion", slider=True, text="Diffusion")
 
     # GOBO
-    if active_object.gobo_is_on:
+    if active_object.gobo_is_on and object_type not in ["Influencer", "Brush"]:
         row = box.row(align=True)
         op = row.operator("alva_common.gobo_properties", text="", icon='POINTCLOUD_DATA')
         op.space_type = space_type
@@ -271,10 +271,10 @@ def draw_footer_toggles(self, context, column, active_object, box=True, vertical
     else:
         object_type = getattr(active_object, "object_identities_enum")
     
-    if object_type == "Stage Object":
-        if active_object.audio_is_on:
-            row.prop(active_object, "audio_is_on", text="", icon='SOUND', emboss=False)
-        else: row.prop(active_object, "audio_is_on", text="", icon_value=sound_dark.icon_id, emboss=False)
+    # if object_type == "Stage Object":
+    #     if active_object.audio_is_on:
+    #         row.prop(active_object, "audio_is_on", text="", icon='SOUND', emboss=False)
+    #     else: row.prop(active_object, "audio_is_on", text="", icon_value=sound_dark.icon_id, emboss=False)
     
     if object_type not in ["Influencer", "Brush"]:
         if active_object.strobe_is_on:

@@ -83,61 +83,59 @@ def draw_splash(self, context):
 
 
 def draw_strobe_settings(self, context, active_controller):
+    ac = active_controller
+
     layout = self.layout
+    layout.use_property_split = True
+    layout.use_property_decorate = False
 
-    if active_controller:
-        if hasattr(active_controller, "str_enable_strobe_argument"):
-            if not context.scene.scene_props.expand_strobe:
-                split = layout.split(factor=0.5)
-                row = split.column()
-                row.label(text="Strobe Value", icon='OUTLINER_DATA_LIGHTPROBE')
-                row = split.column()
-                row.prop(active_controller, "float_strobe", text="", slider=True)
-
-                layout.separator()
-
-            row = layout.row()
-            row.prop(active_controller, "strobe_min", text="Strobe Min")
-            row.prop(active_controller, "strobe_max", text="Max")
-
+    if ac and hasattr(ac, "str_enable_strobe_argument"):
+        if not context.scene.scene_props.expand_strobe:
+            layout.use_property_decorate = True
+            layout.prop(ac, "float_strobe")
+            layout.use_property_decorate = False
             layout.separator()
 
-            split = layout.split(factor=0.5)
-            row = split.column()
-            row.label(text="Enable Strobe Argument")
-            row = split.column()
-            row.prop(active_controller, "str_enable_strobe_argument", text="", icon='OUTLINER_DATA_LIGHTPROBE')
-            
-            split = layout.split(factor=0.5)
-            row = split.column()
-            row.label(text="Disable Strobe Argument")
-            row = split.column()
-            row.prop(active_controller, "str_disable_strobe_argument", text="", icon='PANEL_CLOSE')
+        layout.prop(ac, "strobe_min", text="Strobe Min")
+        layout.prop(ac, "strobe_max", text="Max")
+
+        layout.separator()
+        layout.prop(ac, "str_enable_strobe_argument", text="Enable Argument")
+        layout.prop(ac, "str_disable_strobe_argument", text="Disable")
+
+    else:
+        layout.label(text="Active controller not found.")
 
 
 def draw_pan_tilt_settings(self, context, active_controller):
+    ac = active_controller
+
     layout = self.layout
+    layout.use_property_split = True
+    layout.use_property_decorate = False
     
-    if active_controller:
-        row = layout.row()
-        row.prop(active_controller, "pan_min", text="Pan Min")
-        row.prop(active_controller, "pan_max", text="Max")
+    if ac:
+        layout.prop(ac, "pan_min", text="Pan Min")
+        layout.prop(ac, "pan_max", text="Max")
         
-        row = layout.row()
+        layout.separator()
         
-        row.prop(active_controller, "tilt_min", text="Tilt Min")
-        row.prop(active_controller, "tilt_max", text="Max")
+        layout.prop(ac, "tilt_min", text="Tilt Min")
+        layout.prop(ac, "tilt_max", text="Max")
     else:
         layout.label(text="Active controller not found.")
 
 
 def draw_zoom_settings(self, context, active_controller):
+    ac = active_controller
+
     layout = self.layout
+    layout.use_property_split = True
+    layout.use_property_decorate = False
     
     if active_controller:
-        row = layout.row()
-        row.prop(active_controller, "zoom_min", text="Zoom Min")
-        row.prop(active_controller, "zoom_max", text="Max")
+        layout.prop(ac, "zoom_min", text="Zoom Min")
+        layout.prop(ac, "zoom_max", text="Max")
 
     else:
         layout.label(text="Active controller not found.")
