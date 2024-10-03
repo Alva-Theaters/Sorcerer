@@ -101,7 +101,8 @@ class CommonUpdaters:
             "str_enable_strobe_argument", "str_disable_strobe_argument", 
             "str_enable_gobo_speed_argument", "str_disable_gobo_speed_argument", 
             "str_gobo_id_argument", "str_gobo_speed_value_argument", 
-            "str_enable_prism_argument", "str_disable_prism_argument", "color_profile_enum"
+            "str_enable_prism_argument", "str_disable_prism_argument", "color_profile_enum",
+            "alva_white_balance"
         ]
         toggle_properties = [ 
             "pan_tilt_is_on", "color_is_on", "diffusion_is_on", "strobe_is_on", 
