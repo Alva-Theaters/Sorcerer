@@ -414,8 +414,8 @@ class Orb:
         '''Qmeos'''
         #-------------------------------------------------------------------------------------------------------------------------------------------
         @staticmethod
-        def make_qmeo(scene, frame_rate, start_frame, end_frame):
-            if hasattr(scene.sequence_editor, "active_strip") and scene.sequence_editor.active_strip is not None and scene.sequence_editor.active_strip.type == 'SOUND':
+        def make_qmeo(scene, frame_rate, start_frame, end_frame, is_sound):
+            if is_sound:
                 active_strip = scene.sequence_editor.active_strip
                 execute_on_cues = True
             else:
@@ -455,8 +455,7 @@ class Orb:
             wm.progress_begin(0, 100)
 
             for i, frame in enumerate(frames):
-                Orb.Eos.set_frame(scene, frame)
-                yield Orb.Eos.qmeo_frame(frame, scene, cue_list, event_list, cue_duration, wm, frames, i), "Rendering qmeo"
+                Orb.Eos.qmeo_frame(frame, scene, cue_list, event_list, cue_duration, wm, frames, i)
 
             wm.progress_end()
             bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
@@ -486,11 +485,6 @@ class Orb:
             Orb.Eos.send_osc_with_delay("/eos/newcmd/", f"Delete Cue {cue_list} / Enter Enter", delay=.3)
 
         @staticmethod
-        def set_frame(scene, frame):
-            scene.frame_set(frame)
-            bpy.context.view_layer.update()
-
-        @staticmethod
         def qmeo_frame(frame, scene, cue_list, event_list, cue_duration, wm, frames, i):
             # Get ready to record cue with the new CPVIA updates.
             current_frame_number = scene.frame_current
@@ -507,6 +501,7 @@ class Orb:
             # Go ahead and actually send the final command
             delay = scene.orb_chill_time
             scene.frame_set(frame)
+            bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
             time.sleep(.1)
             Orb.Eos.send_osc_with_delay("/eos/newcmd", argument_one, delay=.1)
             Orb.Eos.send_osc_with_delay("/eos/newcmd", argument_two, delay)

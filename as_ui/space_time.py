@@ -48,19 +48,9 @@ def draw_alva_time_header(self, context):
         context.scene.scene_props.view_alva_time_header and
         context.scene.scene_props.console_type_enum == 'option_eos'):
         scene = context.scene
-
-        sequencer_open = False
-        active_strip = False
-
-        for area in context.screen.areas:
-            if area.type == 'SEQUENCE_EDITOR':
-                sequencer_open = True
-                if context.scene.sequence_editor.active_strip and context.scene.sequence_editor.active_strip is not None and context.scene.sequence_editor.active_strip.type == 'SOUND':
-                    active_strip = True
-                    break
+        is_sound = is_qmeo_parent_a_sound_strip(context)
 
         layout = self.layout
-
         row = layout.row()
         from ..panels import TIME_PT_alva_flags
         row.popover(
@@ -69,13 +59,13 @@ def draw_alva_time_header(self, context):
         )
 
         row.prop(scene, "sync_timecode", text="", icon='LINKED' if scene.sync_timecode else 'UNLINKED')
-
         row = layout.row()
-        if sequencer_open and active_strip:
+        is_strip = False
+        if is_sound:
             active_strip = context.scene.sequence_editor.active_strip
-            icon = 'IPO_BEZIER' if active_strip.type == 'COLOR' else 'SOUND'
-            row.label(text="", icon=icon)
+            row.label(text="", icon='SOUND')
             target = active_strip
+            is_strip = True
 
             row = layout.row(align=True)
             row.scale_x = 0.5
@@ -90,7 +80,26 @@ def draw_alva_time_header(self, context):
             row.prop(target, "int_start_macro", text="Macro")
 
         row = layout.row()
-        row.operator("alva_orb.render_qmeo", text="", icon_value=orb.icon_id)
+        row.operator("alva_orb.render_qmeo", text="", icon_value=orb.icon_id).is_sound = is_strip
+
+
+def is_qmeo_parent_a_sound_strip(context):
+    scene = context.scene
+    is_sound = False
+    sequencer_open = False
+    active_strip = False
+
+    for area in context.screen.areas:
+        if area.type == 'SEQUENCE_EDITOR':
+            sequencer_open = True
+            if context.scene.sequence_editor.active_strip and context.scene.sequence_editor.active_strip is not None and context.scene.sequence_editor.active_strip.type == 'SOUND':
+                active_strip = True
+                break
+
+    if sequencer_open and active_strip and scene.sequence_editor.active_strip.type == 'SOUND':
+        is_sound = True
+
+    return is_sound
 
 
 def draw_alva_time_view(self, layout):

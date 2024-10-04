@@ -29,6 +29,8 @@
 
 import bpy
 
+from .space_time import is_qmeo_parent_a_sound_strip
+
 # Custom icon stuff
 import bpy.utils.previews
 import os
@@ -78,8 +80,10 @@ def draw_alva_render(self, context):
     if (hasattr(context, "scene") and 
         hasattr(context.scene, "scene_props") and
         context.scene.scene_props.console_type_enum == 'option_eos'):
+        is_sound = is_qmeo_parent_a_sound_strip(context)
+        
         layout = self.layout
-        layout.operator("alva_orb.render_qmeo", text="Render Qmeo", icon_value=orb.icon_id)
+        layout.operator("alva_orb.render_qmeo", text="Render Qmeo", icon_value=orb.icon_id).is_sound = is_sound
 
 
 def draw_alva_window(self, context):

@@ -628,19 +628,3 @@ def draw_presets_node(self, context, layout):
         if self.show_settings:
             row.prop(group, "show_in_presets_node", text="", icon='HIDE_OFF' if group.show_in_presets_node else 'HIDE_ON')
         row.alert = 0
-
-
-def draw_oven_node(self, context, layout):
-    scene = context.scene.scene_props
-    pcoll = preview_collections["main"]
-    orb = pcoll["orb"]
-
-    scene = context.scene.scene_props
-    col = layout.column(align=True)
-
-    col.separator()
-    col.alert = scene.is_cue_baking
-    col.operator("alva_orb.render_qmeo", text=scene.str_bake_info, icon_value=orb.icon_id)
-    col.separator()
-    col.operator("my.rerecord_cues_operator", text=scene.str_cue_bake_info, icon_value=orb.icon_id)
-    col.separator()

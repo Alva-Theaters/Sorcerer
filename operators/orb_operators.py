@@ -27,6 +27,7 @@
 
 import bpy
 from bpy.types import Operator
+from bpy.props import BoolProperty
 
 from ..utils.utils import Utils 
 from ..utils.osc import OSC
@@ -44,8 +45,7 @@ class ORB_OT_base_modal_operator(Operator):
         self._cancel = False
         if self.strip == 'qmeo':
             frame_rate = Utils.get_frame_rate(context.scene)
-            scene = context.scene
-            if hasattr(scene.sequence_editor, "active_strip") and scene.sequence_editor.active_strip is not None and scene.sequence_editor.active_strip.type == 'SOUND':
+            if self.is_sound:
                 active_strip = context.scene.sequence_editor.active_strip
                 start_frame = active_strip.frame_start
                 end_frame = active_strip.frame_final_end
@@ -53,7 +53,7 @@ class ORB_OT_base_modal_operator(Operator):
                 start_frame = context.scene.frame_start
                 end_frame = context.scene.frame_end
             
-            self._generator = self.make_qmeo(context.scene, frame_rate, start_frame, end_frame)
+            self._generator = self.make_qmeo(context.scene, frame_rate, start_frame, end_frame, self.is_sound)
         
         elif self.strip == 'patch':
             self._generator = self.patch_group(context)
@@ -93,8 +93,8 @@ class ORB_OT_base_modal_operator(Operator):
     def initiate_orb(self, context, strip='sound', enable=True):
         yield from Orb.initiate_orb(self, context, strip=strip, enable=enable)
 
-    def make_qmeo(self, scene, frame_rate, start_frame, end_frame):
-        yield from Orb.Eos.make_qmeo(scene, frame_rate, start_frame, end_frame)
+    def make_qmeo(self, scene, frame_rate, start_frame, end_frame, is_sound):
+        yield from Orb.Eos.make_qmeo(scene, frame_rate, start_frame, end_frame, is_sound)
 
     def patch_group(self, context):
         yield from Orb.Eos.patch_group(self, context)
@@ -213,6 +213,8 @@ class SEQUENCER_OT_bake_curves_to_cues(ORB_OT_base_modal_operator):
     bl_idname = "alva_orb.render_qmeo"
     bl_label = "Make Qmeo"
     bl_description = "Orb will create a qmeo. A qmeo is like a video, only each frame is a lighting cue. Use it to store complex animation data on the lighting console" 
+
+    is_sound: BoolProperty(default=False) # type: ignore
 
     def execute(self, context):
         self.strip = 'qmeo'
