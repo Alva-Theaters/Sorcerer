@@ -335,31 +335,34 @@ class EventManager:
     #-------------------------------------------------------------------------------------------------------------------------------------------
     '''Depsgraph POST handler'''
     #-------------------------------------------------------------------------------------------------------------------------------------------
-    def find_influencer_and_brush_updates(self, scene, depsgraph):
-        '''Looks for internal Blender changes on meshes set to Influencer, Brush
-           or Pan/Tilt type'''
+    def find_transform_updates_and_trigger_cpvia(self, scene, depsgraph):
+        '''Starts CPVIA updates on meshes currently transforming.'''
         if not depsgraph:
             return
+        
+        alva_log("event_manager", f"Depsgraph POST handler called. in_frame_change: {scene.scene_props.in_frame_change}")
 
-        updated_objects = {update.id for update in depsgraph.updates if isinstance(update.id, bpy.types.Object)}
-        alva_log("event_manager", f"Updated objects from depsgraph_post: {updated_objects}")
         for update in depsgraph.updates:
-            if isinstance(update.id, bpy.types.Object):
-                obj = update.id
+            obj = update.id
+            if not isinstance(obj, bpy.types.Object):
+                continue
 
-                if obj.object_identities_enum in {"Influencer", "Brush", "Stage Object", "Fixture"}:
-                    start = time.time()
-                    if update.is_updated_transform:
-                        alva_log("event_manager", f"Triggering special update for object {obj}.")
-                        Utils.trigger_special_update(obj)
-                    alva_log('time', f"trigger_special_update and is_updated_transform took {time.time() - start} seconds")
-                if obj.int_alva_sem != 0 and len(obj.list_group_channels) == 1:
+            if update.is_updated_transform:
+                start = time.time()
+                alva_log("event_manager", f"Transform found for object {obj}. Triggering special update.")
+                Utils.trigger_special_update(obj)
+                alva_log('time', f"trigger_special_update and is_updated_transform took {time.time() - start} seconds")
+                
+                if obj.int_alva_sem != 0:
                     alva_log("event_manager", f"Triggering SEM update for {obj}.")
                     Utils.trigger_sem(obj, obj.int_alva_sem)
 
         start = time.time()
+        updated_objects = {update.id for update in depsgraph.updates if isinstance(update.id, bpy.types.Object)}
+        alva_log("event_manager", f"Updated objects from depsgraph_post: {updated_objects}")
         Utils.check_and_trigger_drivers(updated_objects)
         alva_log('time', f"check_and_trigger_drivers took {time.time() - start} seconds")
+
 
     #-------------------------------------------------------------------------------------------------------------------------------------------
     '''Frame Change PRE handlers'''
@@ -410,7 +413,7 @@ class EventManager:
         dynamic_objects = {obj for obj in scene.objects if obj.animation_data and (obj.object_identities_enum in ["Influencer", "Brush"] or obj.int_alva_sem != 0)}
         for obj in dynamic_objects:
             Utils.trigger_special_update(obj)
-            if obj.int_alva_sem != 0 and len(obj.list_group_channels) == 1:
+            if obj.int_alva_sem != 0:
                 Utils.trigger_sem(obj, obj.int_alva_sem)
 
         if not scene.scene_props.is_playing or not self.controllers:
@@ -594,7 +597,7 @@ def load_macro_buttons(string):
 
 @persistent
 def on_depsgraph_update_post(scene, depsgraph):
-    event_manager_instance.find_influencer_and_brush_updates(scene, depsgraph)
+    event_manager_instance.find_transform_updates_and_trigger_cpvia(scene, depsgraph)
 
 @persistent
 def on_frame_change_pre(scene):

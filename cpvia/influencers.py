@@ -226,14 +226,14 @@ class Influencers:
                             max(corner.y for corner in bbox_corners_local),
                             max(corner.z for corner in bbox_corners_local)))
         
-        lights_inside = {obj for obj in bpy.data.objects if obj.type == 'MESH' and not obj.hide_viewport and self.is_inside_mesh(obj, parent, bbox_min, bbox_max)}
+        lights_inside = {obj for obj in bpy.data.objects if obj.type == 'MESH' and not obj.hide_viewport and len(obj.list_group_channels) == 1 and self.is_inside_mesh(obj, parent, bbox_min, bbox_max)}
         lights_inside = {obj for obj in lights_inside if obj.name != parent.name}
         alva_log('time', f"find_influencer_current_channels took {time.time() - start} seconds")
         return lights_inside
 
         
     def get_list_by_parameter(self, parent, parameter):
-        """Receives parent, object, and parameter, string and returns parameter, string."""
+        """Returns existing CollectionProperty item of correct type or makes a new one if none is found."""
         for inf_list in parent.influencer_list:
             if inf_list.parameter == parameter:
                 return inf_list
