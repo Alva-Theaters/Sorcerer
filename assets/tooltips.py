@@ -70,7 +70,11 @@ For long tooltips, where the delay is 1% of 10 minutes per RTFM event:
              
 In summary:
 - Short tooltips lead to a DDC_short of 0.050.
-- Long tooltips lead to a DDC_long of 0.0133, meaning less time is wasted overall.
+- Long tooltips lead to a DDC_long of 0.0133, meaning less time is wasted overall,
+  via only a small decrease in RTFM frequency.
+
+  In other words, we want to do everything we can to decrease RTFM's because that
+  leads to disproportional gains in overall design efficiency.
 '''
 
 
