@@ -249,12 +249,12 @@ class CommonProperties:
             items=AlvaItems.scene_groups,
             update=CommonUpdaters.controller_ids_updater
         )),
-        ('selected_profile_enum', EnumProperty(
-            name="Profile to Apply",
-            description="Choose a fixture profile to apply to this fixture and any other selected fixtures. To copy settings directly from another light, select the lights you want to copy to, then select the light you wish to copy from, and then select the Dynamic option here",
-            items=AlvaItems.scene_groups,
-            update=CommonUpdaters.group_profile_updater
-        )),
+        # ('selected_profile_enum', EnumProperty(
+        #     name="Profile to Apply",
+        #     description="Choose a fixture profile to apply to this fixture and any other selected fixtures. To copy settings directly from another light, select the lights you want to copy to, then select the light you wish to copy from, and then select the Dynamic option here",
+        #     items=AlvaItems.scene_groups,
+        #     update=CommonUpdaters.group_profile_updater
+        # )),
         ('color_profile_enum', EnumProperty(
             name="Color Profile",
             description="Choose a color profile for the mesh based on the patch in the lighting console",
@@ -474,15 +474,15 @@ class CommonProperties:
         ('audio_is_on', BoolProperty(name="Audio Toggle", default=False, description="Audio is enabled when checked")),
         ('mic_is_linked', BoolProperty(name="Microphone Linking", default=False, description="Microphone volume is linked to Intensity when red")),
         ('intensity_is_on', BoolProperty(name="Intensity Toggle", default=True, description="Intensity is enabled when checked")),
-        ('pan_tilt_is_on', BoolProperty(name="Pan/Tilt Toggle", default=False, description="Pan/Tilt is enabled when checked")), 
-        ('color_is_on', BoolProperty(name="Color Toggle", default=False, description="Color is enabled when checked")),
-        ('diffusion_is_on', BoolProperty(name="Diffusion Toggle", default=False, description="Diffusion is enabled when checked")),
-        ('strobe_is_on', BoolProperty(name="Strobe Toggle", default=False, description="Strobe is enabled when checked")),
-        ('zoom_is_on', BoolProperty(name="Zoom Toggle", default=False, description="Zoom is enabled when checked")),
-        ('iris_is_on', BoolProperty(name="Iris Toggle", default=False, description="Iris is enabled when checked")),
-        ('edge_is_on', BoolProperty(name="Edge Toggle", default=False, description="Edge is enabled when checked")),
-        ('gobo_is_on', BoolProperty(name="Gobo Toggle", default=False, description="Gobo ID is enabled when checked")),
-        ('prism_is_on', BoolProperty(name="Prism Toggle", default=False, description="Prism is enabled when checked")),
+        ('pan_tilt_is_on', BoolProperty(name="Pan/Tilt Toggle", default=True, description="Pan/Tilt is enabled when checked")), 
+        ('color_is_on', BoolProperty(name="Color Toggle", default=True, description="Color is enabled when checked")),
+        ('diffusion_is_on', BoolProperty(name="Diffusion Toggle", default=True, description="Diffusion is enabled when checked")),
+        ('strobe_is_on', BoolProperty(name="Strobe Toggle", default=True, description="Strobe is enabled when checked")),
+        ('zoom_is_on', BoolProperty(name="Zoom Toggle", default=True, description="Zoom is enabled when checked")),
+        ('iris_is_on', BoolProperty(name="Iris Toggle", default=True, description="Iris is enabled when checked")),
+        ('edge_is_on', BoolProperty(name="Edge Toggle", default=True, description="Edge is enabled when checked")),
+        ('gobo_is_on', BoolProperty(name="Gobo Toggle", default=True, description="Gobo ID is enabled when checked")),
+        ('prism_is_on', BoolProperty(name="Prism Toggle", default=True, description="Prism is enabled when checked")),
     ]
 
     special_arguments = [

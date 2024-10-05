@@ -164,8 +164,6 @@ def draw_node_mixer(self, context, layout):
         op_update.node_name = node_name
         op_update.node_tree_name = node_tree_name
         
-        if self.str_manual_fixture_selection == "":
-            row.prop(self, "selected_group_enum", icon='COLLECTION_NEW', icon_only=0, text="")
         row.prop(self, "str_manual_fixture_selection", text="")
         if self.mix_method_enum != "option_pose":
             row.prop(self, "parameters_enum", expand=True, text="")
@@ -272,8 +270,6 @@ def draw_node_formatter(self, context): ## All this needs to be redone.
             column.separator()
             
     elif active_node and active_node.bl_idname == "mixer_type":
-        row = layout.row(align=True)
-        row.prop(active_node, "selected_group_enum", text="")
         row = layout.row(align=True)
         row.prop(active_node, "parameters_enum", text="")
         if active_node.parameters_enum == 'option_color':

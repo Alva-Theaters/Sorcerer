@@ -156,7 +156,7 @@ def draw_object_header(self, context, scene, active_object, node_layout=None):
 
     box = column.box()
     row = box.row(align=True)
-    row.prop(ao, "selected_profile_enum", icon_only=True, icon='SHADERFX')
+    #row.prop(ao, "selected_profile_enum", icon_only=True, icon='SHADERFX')
     draw_text_or_group_input(self, context, row, ao, object=True)
 
     if identity == "Stage Object":

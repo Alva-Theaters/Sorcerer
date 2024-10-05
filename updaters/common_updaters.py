@@ -90,52 +90,6 @@ class CommonUpdaters:
             context.scene.scene_props.service_mode = not context.scene.scene_props.service_mode
             self.str_manual_fixture_selection = ""
 
-            
-    @staticmethod
-    def group_profile_updater(self, context):
-        all_properties = [
-            "pan_min", "pan_max", "tilt_min", "tilt_max", "zoom_min", "zoom_max", 
-            "gobo_speed_min", "gobo_speed_max", "influence_is_on", "intensity_is_on", 
-            "pan_tilt_is_on", "color_is_on", "diffusion_is_on", "strobe_is_on", 
-            "zoom_is_on", "iris_is_on", "edge_is_on", "gobo_is_on", "prism_is_on", 
-            "str_enable_strobe_argument", "str_disable_strobe_argument", 
-            "str_enable_gobo_speed_argument", "str_disable_gobo_speed_argument", 
-            "str_gobo_id_argument", "str_gobo_speed_value_argument", 
-            "str_enable_prism_argument", "str_disable_prism_argument", "color_profile_enum",
-            "alva_white_balance"
-        ]
-        toggle_properties = [ 
-            "pan_tilt_is_on", "color_is_on", "diffusion_is_on", "strobe_is_on", 
-            "zoom_is_on", "iris_is_on", "edge_is_on", "gobo_is_on", "prism_is_on"
-        ]
-
-        if self.selected_profile_enum == 'Dynamic': 
-            properties = all_properties
-            st = context.space_data.type
-
-            if st == 'VIEW_3D' and len(context.selected_objects) > 1:
-                for obj in context.selected_objects:
-                    if obj != self:
-                        CommonUpdaters._update_properties(self, obj, properties)
-
-            elif st == 'NODE_EDITOR' and len(context.selected_nodes) > 1:
-                for node in context.selected_nodes:
-                    if node != self and node.bl_idname in ['group_controller_type', 'mixer_type']:
-                        CommonUpdaters._update_properties(self, node, properties)
-
-            elif st == 'SEQUENCE_EDITOR' and len(context.selected_sequences) > 1:
-                for strip in context.selected_sequences:
-                    if strip != self and strip.type == 'COLOR':
-                        CommonUpdaters._update_properties(self, strip, properties)
-
-        else:
-            properties = toggle_properties
-            profile = context.scene.scene_group_data.get(self.selected_profile_enum)
-            
-            if not profile:
-                return
-            
-            CommonUpdaters._update_properties(profile, self, properties)
 
     def _update_properties(source, target, properties):
         for prop in properties:
