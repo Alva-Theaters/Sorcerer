@@ -456,6 +456,12 @@ class NODE_NT_settings(Node):
     bl_width_default = 500
     bl_description="Sorcerer node settings"
 
+    preferences_enum: EnumProperty(
+        name="Preferences",
+        description="",
+        items=AlvaItems.preferences 
+    )
+
     def init(self, context):
         return
 

@@ -45,6 +45,11 @@ pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
 def draw_settings(self, context, layout=None):
     if not layout:  # If not drawn from a node
         layout = self.layout
+        mode = context.scene.scene_props.preferences_enum
+        pref_source = context.scene.scene_props
+    else:
+        mode = self.preferences_enum
+        pref_source = self # The node, so different nodes can view different parts of settings
     
     split = layout.split(factor=0.2)
     
@@ -55,12 +60,11 @@ def draw_settings(self, context, layout=None):
     
     col1.operator("alva_topbar.splash", text="Splash")
     col1.separator()
-    col1.prop(bpy.context.scene.scene_props, "preferences_enum", expand=True)
+    col1.prop(pref_source, "preferences_enum", expand=True)
 
     if not context.scene:
         return
     
-    mode = context.scene.scene_props.preferences_enum
     scene = context.scene
     restrictions = SLI.SLI_find_restrictions(scene)
     is_restricted = context.scene.scene_props.school_mode_enabled
