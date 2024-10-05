@@ -35,6 +35,7 @@ import mathutils
 
 from ..assets.sli import SLI 
 from ..maintenance.logging import alva_log
+from .map import Mapping
 
 # pyright: reportInvalidTypeForm=false
 
@@ -105,8 +106,10 @@ class Mixer:
         else:
             SLI.SLI_assert_unreachable()
 
-        alva_log('mix', f"mix.py is returning : {list(channels), p, list(mixed)}")
-        return list(channels), p, list(mixed)
+        mapped_channels, p, mapped_values = self.map_mixed_values_using_patch(parent, list(channels), p, list(mixed))
+
+        alva_log('mix', f"mix.py is returning : {mapped_channels, p, mapped_values}")
+        return mapped_channels, p, mapped_values
 
 
     '''EFFECTS'''
@@ -268,6 +271,22 @@ class Mixer:
                     mixed_values[key] = [v * float_scale for v in values]
 
         return mixed_values
+    
+    def map_mixed_values_using_patch(self, parent, channels, p, unmapped_values):
+        type = "mixer"
+        if p[0] in ["pan", "tilt", "zoom"]:
+            mapped_values = []
+            for chan, unmapped_value in zip(channels, unmapped_values):
+                mapping = Mapping()
+                try: 
+                    alva_log('map', f"Mixer is trying to map chan {chan} and param {p} and value {unmapped_value}")
+                    value = mapping.map_value(parent, chan, p[0], unmapped_value, type)
+                    mapped_values.append(value)
+                except AttributeError:
+                    print("Error in find_my_value when attempting to call map_value.")
+            return channels, p, mapped_values
+        else:
+            return channels, p, unmapped_values
     
 
 def test_mixer(SENSITIVITY): # Return True for fail, False for pass
