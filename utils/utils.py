@@ -244,7 +244,7 @@ class Utils:
     def update_all_controller_channel_lists(context):
         from ..cpvia.find import Find
 
-        controllers = Find.find_controllers(context.scene)
+        controllers, mixers_and_motors = Find.find_controllers(context.scene)
 
         for controller in controllers:
             if hasattr(controller, "str_manual_fixture_selection"):
@@ -557,12 +557,12 @@ class Utils:
                 for prop_name, prop in props.common_parameters:
                     try:
                         current_value = getattr(choice, prop_name)
-                        if isinstance(current_value, (float, int)):  ## Add logic here to catch iris, which needs 100
-                            setattr(choice, prop_name, 0.0 if isinstance(current_value, float) else 0)
-                        elif isinstance(current_value, (tuple, list)):
-                            # Assuming it could be a color or vector
+                        if prop_name == "float_iris":
+                            setattr(choice, prop_name, 100)
+                        elif prop_name == "float_vec_color":
                             setattr(choice, prop_name, tuple(1.0 for _ in current_value))
-                        # Further checks can be added for specific types if necessary
+                        elif prop_name in ["float_intensity", "float_pan", "float_tilt", "float_zoom"]:
+                            setattr(choice, prop_name, 0)
                     except AttributeError:
                         print(f"Attribute {prop_name} not found in controller, skipping.")
 
@@ -570,12 +570,14 @@ class Utils:
             for prop_name, prop in props.common_parameters + props.common_parameters_extended:
                 try:
                     current_value = getattr(controller, prop_name)
-                    if isinstance(current_value, (float, int)):
-                        setattr(controller, prop_name, 0.0 if isinstance(current_value, float) else 0)
-                    elif isinstance(current_value, (tuple, list)):
-                        # Assuming it could be a color or vector
+                    if prop_name == "float_iris":
+                        setattr(controller, prop_name, 100)
+                    elif prop_name == "float_vec_color":
                         setattr(controller, prop_name, tuple(1.0 for _ in current_value))
-                    # Further checks can be added for specific types if necessary
+                    elif prop_name in [
+                        "float_intensity", "float_pan", "float_tilt", "float_zoom", "float_strobe", 
+                        "float_edge", "float_diffusion", "float_gobo_speed", "int_gobo_id", "int_prism"]:
+                        setattr(controller, prop_name, 0)
                 except AttributeError:
                     print(f"Attribute {prop_name} not found in controller, skipping.")
         
