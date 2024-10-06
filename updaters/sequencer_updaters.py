@@ -262,17 +262,31 @@ class SequencerUpdaters:
         return          
                          
       
-    def light_updater(self, context, light_value, groups): ##
+    def light_updater(self, context, light_value, param):
         '''This really needs to be incorporated into the depsgraph. This is for Cue Builder.'''
         if context.screen:
             if self.mute:
                 return
+            
+            groups = Utils.parse_channels(getattr(context.scene, f"{param}_groups"))
+            channels = Utils.parse_channels(getattr(context.scene, f"{param}_channels"))
+            submasters = Utils.parse_channels(getattr(context.scene, f"{param}_submasters"))
 
             light_str = str(light_value)
 
             for group in groups:
                 address = "/eos/newcmd"
                 argument = f"Group {group} at {light_str.zfill(2)} Enter"
+                OSC.send_osc_lighting(address, argument)
+
+            for chan in channels:
+                address = "/eos/newcmd"
+                argument = f"Chan {chan} at {light_str.zfill(2)} Enter"
+                OSC.send_osc_lighting(address, argument)
+
+            for sub in submasters:
+                address = "/eos/newcmd"
+                argument = f"Sub {sub} at {light_str.zfill(2)} Enter"
                 OSC.send_osc_lighting(address, argument)
         return
 
@@ -291,25 +305,25 @@ class SequencerUpdaters:
 
 
     def key_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.key_light, Utils.parse_channels(context.scene.key_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.key_light, "key_light")
 
     def rim_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.rim_light, Utils.parse_channels(context.scene.rim_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.rim_light, "rim_light")
 
     def fill_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.fill_light, Utils.parse_channels(context.scene.fill_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.fill_light, "fill_light")
 
     def texture_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.texture_light, Utils.parse_channels(context.scene.texture_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.texture_light, "texture_light")
 
     def band_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.band_light, Utils.parse_channels(context.scene.band_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.band_light, "band_light")
 
     def accent_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.accent_light, Utils.parse_channels(context.scene.accent_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.accent_light, "band_light")
 
     def energy_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.energy_light, Utils.parse_channels(context.scene.energy_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.energy_light, "energy_light")
 
     def energy_speed_updater(self, context):
         SequencerUpdaters.effect_updater(self, context, self.energy_speed, "Rate")
@@ -318,13 +332,13 @@ class SequencerUpdaters:
         SequencerUpdaters.effect_updater(self, context, self.energy_scale, "Scale")
 
     def background_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.background_light_one, Utils.parse_channels(context.scene.cyc_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.background_light_one, "cyc_light")
 
     def background_two_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.background_light_two, Utils.parse_channels(context.scene.cyc_two_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.background_light_two, "cyc_two_light")
 
     def background_three_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.background_light_three, Utils.parse_channels(context.scene.cyc_three_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.background_light_three, "cyc_three_light")
 
     def background_four_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.background_light_four, Utils.parse_channels(context.scene.cyc_four_light_groups))
+        SequencerUpdaters.light_updater(self, context, self.background_light_four, "cyc_four_light")
