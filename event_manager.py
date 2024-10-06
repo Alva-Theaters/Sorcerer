@@ -337,7 +337,7 @@ class EventManager:
     #-------------------------------------------------------------------------------------------------------------------------------------------
     def find_transform_updates_and_trigger_cpvia(self, scene, depsgraph):
         '''Starts CPVIA updates on meshes currently transforming.'''
-        if not depsgraph:
+        if not depsgraph or scene.scene_props.in_frame_change or scene.scene_props.is_playing:
             return
         
         alva_log("event_manager", f"Depsgraph POST handler called. in_frame_change: {scene.scene_props.in_frame_change}")
