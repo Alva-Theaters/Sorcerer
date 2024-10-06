@@ -97,10 +97,10 @@ class CommonUpdaters:
     @staticmethod
     def solo_updater(self, context):
         from ..cpvia.find import Find
-        all_controllers = Find.find_controllers(context.scene)
+        all_controllers, mixers_and_motors = Find.find_controllers(context.scene)
 
         for controller in all_controllers:
-            if hasattr(controller, 'alva_solo') and controller.alva_solo:
+            if hasattr(controller, "alva_solo") and controller.alva_solo:
                 context.scene.scene_props.has_solos = True
                 return
 
