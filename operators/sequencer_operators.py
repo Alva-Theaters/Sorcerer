@@ -58,6 +58,8 @@ orb = pcoll["orb"]
 
 # pyright: reportInvalidTypeForm=false
 
+SCALE_STRIPS_FACTOR = 0.001
+
 
 '''
 DIRECTORY: (exact line numbers will change)
@@ -124,7 +126,7 @@ class SEQUENCER_OT_scale_strips(Operator):  ## Scale type not the most helpful.
         if event.type == 'MOUSEMOVE':
             current_mouse_x = event.mouse_x
             delta_x = current_mouse_x - self.initial_mouse_x
-            scale_factor = 1 + delta_x * 0.003  # scale factor should start from 1, not 0.
+            scale_factor = 1 + delta_x * SCALE_STRIPS_FACTOR  # scale factor should start from 1, not 0.
 
             if len(self.strips_to_scale) == 1:
                 new_length = max(1, self.initial_strip_length * scale_factor)
