@@ -85,11 +85,6 @@ class CommonUpdaters:
             item = self.list_group_channels.add()
             item.chan = chan
 
-        # "Secret" Backdoor to Service Mode
-        if self.str_manual_fixture_selection.lower() == "service mode":
-            context.scene.scene_props.service_mode = not context.scene.scene_props.service_mode
-            self.str_manual_fixture_selection = ""
-
 
     def _update_properties(source, target, properties):
         for prop in properties:
@@ -240,11 +235,15 @@ class CommonUpdaters:
         original = context.scene.scene_props.view3d_command_line
 
         if original != "":
-            try:
-                with_underscores = Utils.add_underscores_to_keywords(original)
-                OSC.send_osc_lighting("/eos/cmd", f"{with_underscores} Enter")
-            except:
-                OSC.send_osc_lighting("/eos/cmd", f"{original} Enter")
+            # "Secret" Backdoor to Service Mode
+            if original.lower() == "service mode":
+                context.scene.scene_props.service_mode = not context.scene.scene_props.service_mode
+            else:
+                try:
+                    with_underscores = Utils.add_underscores_to_keywords(original)
+                    OSC.send_osc_lighting("/eos/cmd", f"{with_underscores} Enter")
+                except:
+                    OSC.send_osc_lighting("/eos/cmd", f"{original} Enter")
             context.scene.scene_props.view3d_command_line = ""
         else:
             OSC.press_lighting_key("enter")

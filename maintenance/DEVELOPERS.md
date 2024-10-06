@@ -3,7 +3,7 @@ Development
 
 Logging/Service Mode:
 ---------------------
-Logging in Sorcerer is controlled through the UI. You type “service mode” into the channel selector in 3D view, it adds a Service Mode panel, and you can toggle the built-in logging print statements for specific debugging needs there. Repeat the activation procedure to disable Service Mode.
+Logging in Sorcerer is controlled through the UI. You type “service mode” into the command line in 3D view, it adds a Service Mode panel, and you can toggle the built-in logging print statements for specific debugging needs there. Repeat the activation procedure to disable Service Mode.
 
 
 Testing/Limp Mode:

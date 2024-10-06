@@ -39,10 +39,9 @@ This method could not possibly be any simpler.
 Plus, you can change what scripts will be debugged from the Blender UI in real time without need 
 to reload scripts, so it's 100 times faster and more efficient for simpler use-cases like ours.
 
-To enable Service Mode and to get to the toggles, just type "service mode" into the 
-str_manual_fixture_selection field in the group contoller in 3D View. A new panel should appear 
-where you can control what is and is not printed in real time. Do the same thing to disable Service 
-Mode.
+To enable Service Mode and to get to the toggles, just type "service mode" into the Eos command 
+line in 3D View. A new panel should appear where you can control what is and is not printed in real 
+time. Do the same thing to disable Service Mode.
 
 Furthermore, this method doesn't add the completely pointless "LOGGING" prefix to every message,
 so it reduces visual clutter.'''
