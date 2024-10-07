@@ -354,9 +354,6 @@ def unregister():
     del Scene.accent_light_channels
     del Scene.energy_light_channels
     del Scene.cyc_light_channels
-    del Scene.cyc_two_light_channels
-    del Scene.cyc_three_light_channels
-    del Scene.cyc_four_light_channels
 
     del Scene.key_light_submasters
     del Scene.rim_light_submasters
@@ -366,9 +363,6 @@ def unregister():
     del Scene.accent_light_submasters
     del Scene.energy_light_submasters
     del Scene.cyc_light_submasters
-    del Scene.cyc_two_light_submasters
-    del Scene.cyc_three_light_submasters
-    del Scene.cyc_four_light_submasters
 
     del ColorSequence.key_light_slow
     del ColorSequence.rim_light_slow
