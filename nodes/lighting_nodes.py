@@ -180,7 +180,6 @@ class NODE_NT_group_controller(Node):
         group_input = self.inputs.new('LightingInputType', "Lighting Input")
         group_input.link_limit = LINK_LIMIT
         self.outputs.new('LightingOutputType', "Lighting Output")
-        self.outputs.new('FlashOutType', "Flash")
         return
 
     def draw_buttons(self, context, layout):
@@ -261,7 +260,6 @@ class NODE_NT_mixer(Node):
         group_input = self.inputs.new('LightingInputType', "Lighting Input")
         group_input.link_limit = LINK_LIMIT_MIXER
         self.inputs.new('MotorInputType', "Motor Input")
-        self.outputs.new('FlashOutType', "Flash")
         NodeUpdaters.update_node_name(self)
         self.add_three_choices()
         return
