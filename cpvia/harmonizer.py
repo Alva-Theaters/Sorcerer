@@ -56,7 +56,13 @@ class Harmonizer:
             if key not in request_dict:
                 request_dict[key] = {'total_influence': 0, 'weighted_sum': 0, 'arguments': a}
             request_dict[key]['total_influence'] += i
-            request_dict[key]['weighted_sum'] += v * i
+            if isinstance(v, tuple): # If color
+                request_dict[key]['weighted_sum'] = tuple(
+                    request_dict[key]['weighted_sum'][j] + v[j] * i if isinstance(request_dict[key]['weighted_sum'], tuple)
+                    else v[j] * i for j in range(len(v))
+                )
+            else:
+                request_dict[key]['weighted_sum'] += v * i
 
         no_conflicts = []
         for key, value_dict in request_dict.items():
@@ -64,7 +70,13 @@ class Harmonizer:
             total_influence = value_dict['total_influence']
             weighted_sum = value_dict['weighted_sum']
             a = value_dict['arguments']
-            v = weighted_sum / total_influence  # Calculate weighted average value
+
+            # Calculate weighted average value
+            if isinstance(weighted_sum, tuple): # If color
+                v = tuple(ws / total_influence for ws in weighted_sum)
+            else:
+                v = weighted_sum / total_influence
+
             no_conflicts.append((c, p, v, total_influence, a))
 
         return no_conflicts
