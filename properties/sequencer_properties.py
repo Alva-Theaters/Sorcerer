@@ -30,6 +30,7 @@ from bpy.props import *
 from bpy.types import Scene, ColorSequence, SoundSequence, Object
 
 from ..assets.items import Items as AlvaItems
+from ..assets.tooltips import format_tooltip
 from ..updaters.sequencer_updaters import SequencerUpdaters as Updaters
 from ..updaters.common_updaters import CommonUpdaters
 from ..utils.utils import Utils
@@ -137,9 +138,10 @@ def register():
     Scene.accent_light_groups = StringProperty(name="Accent Light Groups")
     Scene.energy_light_groups = StringProperty(name="Energy Light Groups")
     Scene.cyc_light_groups = StringProperty(name="Background Light 1 Groups")
-    Scene.cyc_two_light_groups = StringProperty(name="Background Light 1 Groups")
-    Scene.cyc_three_light_groups = StringProperty(name="Background Light 1 Groups")
-    Scene.cyc_four_light_groups = StringProperty(name="Background Light 1 Groups")  
+    Scene.cyc_one_light_groups = StringProperty(name="Background Light 1 Groups")
+    Scene.cyc_two_light_groups = StringProperty(name="Background Light 2 Groups")
+    Scene.cyc_three_light_groups = StringProperty(name="Background Light 3 Groups")
+    Scene.cyc_four_light_groups = StringProperty(name="Background Light 4 Groups")  
 
     Scene.key_light_channels = StringProperty(name="Key Light Channels")
     Scene.rim_light_channels = StringProperty(name="Rim Light Channels")
@@ -149,9 +151,6 @@ def register():
     Scene.accent_light_channels = StringProperty(name="Accent Light Channels")
     Scene.energy_light_channels = StringProperty(name="Energy Light Channels")
     Scene.cyc_light_channels = StringProperty(name="Background Light 1 Channels")
-    Scene.cyc_two_light_channels = StringProperty(name="Background Light 1 Channels")
-    Scene.cyc_three_light_channels = StringProperty(name="Background Light 1 Channels")
-    Scene.cyc_four_light_channels = StringProperty(name="Background Light 1 Channels") 
 
     Scene.key_light_submasters = StringProperty(name="Key Light Submasters")
     Scene.rim_light_submasters = StringProperty(name="Rim Light Submasters")
@@ -161,33 +160,31 @@ def register():
     Scene.accent_light_submasters = StringProperty(name="Accent Light Submasters")
     Scene.energy_light_submasters = StringProperty(name="Energy Light Submasters")
     Scene.cyc_light_submasters = StringProperty(name="Background Light 1 Submasters")
-    Scene.cyc_two_light_submasters = StringProperty(name="Background Light 1 Submasters")
-    Scene.cyc_three_light_submasters = StringProperty(name="Background Light 1 Submasters")
-    Scene.cyc_four_light_submasters = StringProperty(name="Background Light 1 Submasters") 
 
-    ColorSequence.key_light_slow = FloatProperty(name="Slow", description="Slow the transition for this group", min=0, max=1000)
-    ColorSequence.rim_light_slow = FloatProperty(name="Slow", description="Slow the transition for this group", min=0, max=1000)
-    ColorSequence.fill_light_slow = FloatProperty(name="Slow", description="Slow the transition for this group", min=0, max=1000)
-    ColorSequence.texture_light_slow = FloatProperty(name="Slow", description="Slow the transition for this group", min=0, max=1000)
-    ColorSequence.band_light_slow = FloatProperty(name="Slow", description="Slow the transition for this group", min=0, max=1000)
-    ColorSequence.accent_light_slow = FloatProperty(name="Slow", description="Slow the transition for this group", min=0, max=1000)
-    ColorSequence.energy_light_slow = FloatProperty(name="Slow", description="Slow the transition for this group", min=0, max=1000)
-    ColorSequence.cyc_light_slow = FloatProperty(name="Slow", description="Slow the transition for this group", min=0, max=1000)
+    slow_tooltip = format_tooltip("Slow (or speed up) the transition for this group in this cue")
+    ColorSequence.key_light_slow = FloatProperty(name="Slow", description=slow_tooltip, min=0, max=1000)
+    ColorSequence.rim_light_slow = FloatProperty(name="Slow", description=slow_tooltip, min=0, max=1000)
+    ColorSequence.fill_light_slow = FloatProperty(name="Slow", description=slow_tooltip, min=0, max=1000)
+    ColorSequence.texture_light_slow = FloatProperty(name="Slow", description=slow_tooltip, min=0, max=1000)
+    ColorSequence.band_light_slow = FloatProperty(name="Slow", description=slow_tooltip, min=0, max=1000)
+    ColorSequence.accent_light_slow = FloatProperty(name="Slow", description=slow_tooltip, min=0, max=1000)
+    ColorSequence.energy_light_slow = FloatProperty(name="Slow", description=slow_tooltip, min=0, max=1000)
+    ColorSequence.cyc_light_slow = FloatProperty(name="Slow", description=slow_tooltip, min=0, max=1000)
 
-    ColorSequence.key_light = IntProperty(name="Key Light", min=0, max=100, update=Updaters.key_light_updater, description="White, nuetral, primary light for primary performers")
-    ColorSequence.rim_light = IntProperty(name="Rim Light", min=0, max=100,  update=Updaters.rim_light_updater, description="White or warm light coming from upstage to create definition between foreground and background")
-    ColorSequence.fill_light = IntProperty(name="Fill Light", min=0, max=100,  update=Updaters.fill_light_updater, description="White, nuetral light to balance edges between key and rim lights")
-    ColorSequence.texture_light = IntProperty(name="Texture Light", min=0, max=100,  update=Updaters.texture_light_updater, description="Faint light with gobo to create texture on surfaces without interfering with key light")
-    ColorSequence.band_light = IntProperty(name="Band Light", min=0, max=100,  update=Updaters.band_light_updater, description="Strongly saturated light for the band to create mood")
-    ColorSequence.accent_light = IntProperty(name="Accent Light", min=0, max=100,  update=Updaters.accent_light_updater, description="Color scheme typically should have only 1-2 colors, this being one of them")
-    ColorSequence.energy_light = IntProperty(name="Energy Light", min=0, max=100,  update=Updaters.energy_light_updater, description="Intensity of lights on energy effect")
+    ColorSequence.key_light = IntProperty(name="Key", min=0, max=100, update=Updaters.key_light_updater, description="White, nuetral, primary light for primary performers")
+    ColorSequence.rim_light = IntProperty(name="Rim", min=0, max=100,  update=Updaters.rim_light_updater, description="White or warm light coming from upstage to create definition between foreground and background")
+    ColorSequence.fill_light = IntProperty(name="Fill", min=0, max=100,  update=Updaters.fill_light_updater, description="White, nuetral light to balance edges between key and rim lights")
+    ColorSequence.texture_light = IntProperty(name="Texture", min=0, max=100,  update=Updaters.texture_light_updater, description="Faint light with gobo to create texture on surfaces without interfering with key light")
+    ColorSequence.band_light = IntProperty(name="Band", min=0, max=100,  update=Updaters.band_light_updater, description="Strongly saturated light for the band to create mood")
+    ColorSequence.accent_light = IntProperty(name="Accent", min=0, max=100,  update=Updaters.accent_light_updater, description="Color scheme typically should have only 1-2 colors, this being one of them")
+    ColorSequence.energy_light = IntProperty(name="Energy", min=0, max=100,  update=Updaters.energy_light_updater, description="Intensity of lights on energy effect")
     ColorSequence.energy_speed = IntProperty(name="Energy Speed", min=0, max=500, update=Updaters.energy_speed_updater, description="Speed of energy effect")
     ColorSequence.energy_scale = IntProperty(name="Energy Scale", min=0, max=500, update=Updaters.energy_scale_updater, description="Scale of energy effect")
-    ColorSequence.gel_one_light = IntProperty(name="Background Light", min=0, max=100,  update=Updaters.background_light_updater, description="Background light intensity, typically for cyclorama or uplights. Change the colors on console, not here")
-    ColorSequence.background_light_one = IntProperty(name="Background Light 1", min=0, max=100,  update=Updaters.background_light_updater, description="Background light intensity, typically for cyclorama or uplights. Change the colors on console, not here")
-    ColorSequence.background_light_two = IntProperty(name="Background Light 2", min=0, max=100,  update=Updaters.background_two_light_updater, description="Use these additional slots if you're controlling backdrop color by varying intensity of multiple channels with different color gels")
-    ColorSequence.background_light_three = IntProperty(name="Background Light 3", min=0, max=100,  update=Updaters.background_three_light_updater, description="Use these additional slots if you're controlling backdrop color by varying intensity of multiple channels with different color gels")
-    ColorSequence.background_light_four = IntProperty(name="Background Light 4", min=0, max=100,  update=Updaters.background_four_light_updater, description="Use these additional slots if you're controlling backdrop color by varying intensity of multiple channels with different color gels")
+    ColorSequence.gel_one_light = IntProperty(name="Background", min=0, max=100,  update=Updaters.cyc_light_updater, description="Background light intensity, typically for cyclorama or uplights. Change the colors on console, not here")
+    ColorSequence.background_light_one = IntProperty(name="Background 1", min=0, max=100,  update=Updaters.background_light_updater, description="Use these additional slots if you're controlling backdrop color by varying intensity of multiple channels with different color gels")
+    ColorSequence.background_light_two = IntProperty(name="Background 2", min=0, max=100,  update=Updaters.background_two_light_updater, description="Use these additional slots if you're controlling backdrop color by varying intensity of multiple channels with different color gels")
+    ColorSequence.background_light_three = IntProperty(name="Background 3", min=0, max=100,  update=Updaters.background_three_light_updater, description="Use these additional slots if you're controlling backdrop color by varying intensity of multiple channels with different color gels")
+    ColorSequence.background_light_four = IntProperty(name="Background 4", min=0, max=100,  update=Updaters.background_four_light_updater, description="Use these additional slots if you're controlling backdrop color by varying intensity of multiple channels with different color gels")
     
     ColorSequence.cue_description = StringProperty(name="Description", description="What this look has to say")
     ColorSequence.sixty_color = FloatVectorProperty(name="60% Color", subtype='COLOR', size=3, min=0.0, max=1.0, default=(.009, .009, .009), description="Reference color only")
@@ -201,7 +198,7 @@ def register():
     ColorSequence.cue_builder_texture_id = StringProperty(name="")
     ColorSequence.cue_builder_band_id = StringProperty(name="")
     ColorSequence.cue_builder_accent_id = StringProperty(name="")
-    ColorSequence.cue_builder_cyc_id = StringProperty(name="")
+    ColorSequence.cue_builder_gel_one_id = StringProperty(name="")
     
     ColorSequence.key_is_recording = BoolProperty(
         name="", 

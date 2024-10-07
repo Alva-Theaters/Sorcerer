@@ -29,6 +29,8 @@
 
 # Alva Logging for this script is actually done from the event_manager.py script.
 
+from ..utils.utils import Utils
+
 
 class Harmonizer:    
     @staticmethod        
@@ -100,27 +102,7 @@ class Harmonizer:
 
         simplified = []
         for (p, v, a), (channels, p, v, i, a) in simplified_dict.items():
-            channels.sort()
-            combined_channels = []
-            start = channels[0]
-            end = channels[0]
-            
-            for c in channels[1:]:
-                if c == end + 1:
-                    end = c
-                else:
-                    if start == end:
-                        combined_channels.append(str(start))
-                    else:
-                        combined_channels.append(f"{start} Thru {end}")
-                    start = end = c
-            
-            if start == end:
-                combined_channels.append(str(start))
-            else:
-                combined_channels.append(f"{start} Thru {end}")
-
-            combined_channels_str = " + ".join(combined_channels)
+            combined_channels_str = Utils.simplify_channels_list(channels)
             simplified.append((combined_channels_str, p, v, i, a))
 
         return simplified

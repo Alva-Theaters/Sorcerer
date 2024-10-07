@@ -268,9 +268,14 @@ class SequencerUpdaters:
             if self.mute:
                 return
             
-            groups = Utils.parse_channels(getattr(context.scene, f"{param}_groups"))
-            channels = Utils.parse_channels(getattr(context.scene, f"{param}_channels"))
-            submasters = Utils.parse_channels(getattr(context.scene, f"{param}_submasters"))
+            if param in ["cyc_one_light", "cyc_two_light", "cyc_three_light", "cyc_four_light"]:
+                groups = Utils.parse_channels(getattr(context.scene, f"{param}_groups"))
+                channels = []
+                submasters = []
+            else:
+                groups = Utils.parse_channels(getattr(context.scene, f"{param}_groups"))
+                channels = Utils.parse_channels(getattr(context.scene, f"{param}_channels"))
+                submasters = Utils.parse_channels(getattr(context.scene, f"{param}_submasters"))
 
             light_str = str(light_value)
 
@@ -320,7 +325,7 @@ class SequencerUpdaters:
         SequencerUpdaters.light_updater(self, context, self.band_light, "band_light")
 
     def accent_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.accent_light, "band_light")
+        SequencerUpdaters.light_updater(self, context, self.accent_light, "accent_light")
 
     def energy_light_updater(self, context):
         SequencerUpdaters.light_updater(self, context, self.energy_light, "energy_light")
@@ -331,8 +336,11 @@ class SequencerUpdaters:
     def energy_scale_updater(self, context):
         SequencerUpdaters.effect_updater(self, context, self.energy_scale, "Scale")
 
+    def cyc_light_updater(self, context):
+        SequencerUpdaters.light_updater(self, context, self.gel_one_light, "cyc_light")
+
     def background_light_updater(self, context):
-        SequencerUpdaters.light_updater(self, context, self.background_light_one, "cyc_light")
+        SequencerUpdaters.light_updater(self, context, self.background_light_one, "cyc_one_light")
 
     def background_two_light_updater(self, context):
         SequencerUpdaters.light_updater(self, context, self.background_light_two, "cyc_two_light")

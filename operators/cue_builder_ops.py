@@ -44,10 +44,13 @@ class SEQUENCER_OT_update_cue_builder(Operator):
         active_strip.key_light = active_strip.key_light
         active_strip.rim_light = active_strip.rim_light
         active_strip.fill_light = active_strip.fill_light
-        active_strip.background_light_one = active_strip.background_light_one
-        active_strip.background_light_two = active_strip.background_light_two
-        active_strip.background_light_three = active_strip.background_light_three
-        active_strip.background_light_four = active_strip.background_light_four
+        if scene.using_gels_for_cyc:
+            active_strip.background_light_one = active_strip.background_light_one
+            active_strip.background_light_two = active_strip.background_light_two
+            active_strip.background_light_three = active_strip.background_light_three
+            active_strip.background_light_four = active_strip.background_light_four
+        else:
+            active_strip.gel_one_light = active_strip.gel_one_light
         active_strip.texture_light = active_strip.texture_light
         active_strip.band_light = active_strip.band_light
         active_strip.accent_light = active_strip.accent_light
@@ -989,19 +992,18 @@ class SEQUENCER_OT_gel_one_groups(Operator):
 
     def invoke(self, context, event):
         scene = context.scene
-        if not scene.using_gels_for_cyc:
-            return context.window_manager.invoke_props_dialog(self, width=300)
-        else:
-            return context.window_manager.invoke_props_dialog(self, width=600)
+        return context.window_manager.invoke_props_dialog(self, width=300)
 
     def draw(self, context):
         scene = context.scene
         if not scene.using_gels_for_cyc:
             active_strip = context.scene.sequence_editor.active_strip
-            self.layout.prop(context.scene, "cyc_light_groups", text="")
+            self.layout.prop(context.scene, "cyc_light_groups", text="Groups")
+            self.layout.prop(context.scene, "cyc_light_channels", text="Channels")
+            self.layout.prop(context.scene, "cyc_light_submasters", text="Submasters")
             self.layout.prop(active_strip, "cyc_light_slow")
         else:
-            self.layout.prop(context.scene, "cyc_light_groups", text="Gel 1")
+            self.layout.prop(context.scene, "cyc_one_light_groups", text="Gel 1")
             self.layout.prop(context.scene, "cyc_two_light_groups", text="Gel 2")
             self.layout.prop(context.scene, "cyc_three_light_groups", text="Gel 3")
             self.layout.prop(context.scene, "cyc_four_light_groups", text="Gel 4")

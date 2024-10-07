@@ -1536,8 +1536,45 @@ class SEQUENCER_OT_sync_cue(Operator):
         cue_duration = "{:02d}:{:02d}".format(minutes, seconds)
         cue_number = active_strip.eos_cue_number
         
-        OSC.send_osc_lighting("/eos/key/live", "1")
+        OSC.press_lighting_key("live")
         OSC.send_osc_lighting("/eos/newcmd", f"Cue {str(cue_number)} Time {cue_duration} Enter")
+
+        props = ["key_light_slow", "rim_light_slow", "fill_light_slow", "texture_light_slow", "band_light_slow",
+                 "accent_light_slow", "energy_light_slow", "cyc_light_slow"]
+        
+        for prop in props:
+            discrete_time = str(getattr(active_strip, prop))
+            if discrete_time != "0.0":
+                param = prop.replace("_slow", "")
+                groups = Utils.parse_channels(getattr(context.scene, f"{param}_groups"))
+                channels = Utils.parse_channels(getattr(context.scene, f"{param}_channels"))
+                submasters = Utils.parse_channels(getattr(context.scene, f"{param}_submasters"))
+
+                if groups:
+                    groups_str = Utils.simplify_channels_list(groups)
+                    address = "/eos/newcmd"
+                    argument = f"Group {groups_str} Time {discrete_time.zfill(2)} Enter"
+                    OSC.send_osc_lighting(address, argument)
+                    time.sleep(.2)
+
+                if channels:
+                    channels_str = Utils.simplify_channels_list(channels)
+                    address = "/eos/newcmd"
+                    argument = f"Chan {channels_str} Time {discrete_time.zfill(2)} Enter"
+                    OSC.send_osc_lighting(address, argument)
+                    time.sleep(.2)
+
+                if submasters:
+                    submasters_str = Utils.simplify_channels_list(submasters)
+                    address = "/eos/newcmd"
+                    argument = f"Sub {submasters_str} Time {discrete_time.zfill(2)} Enter"
+                    OSC.send_osc_lighting(address, argument)
+                    time.sleep(.2)
+
+        OSC.press_lighting_key("update")
+        time.sleep(.1)
+        OSC.press_lighting_key("enter")
+
         active_strip.name = f"Cue {str(cue_number)}"
         self.report({'INFO'}, "Orb complete.")
         

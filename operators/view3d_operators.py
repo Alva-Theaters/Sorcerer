@@ -157,7 +157,7 @@ class BaseColorOperator(Operator):
         
         channels = [str(chan.chan) for chan in group.channels_list]
         channels = " + ".join(channels)
-        channels = Utils.simplify_channels_expression(channels)
+        channels = Utils.simplify_channels_list(channels)
         preset_number = self.color_number + self.index_offset
         argument_template = self.record_preset_argument_template if self.is_recording else self.preset_argument_template
         argument = argument_template.replace('#', str(channels)).replace('$', str(preset_number)).replace('^', self.preset_type)
