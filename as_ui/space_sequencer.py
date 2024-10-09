@@ -30,6 +30,7 @@
 import bpy
 
 from .space_common import draw_text_or_group_input, draw_parameters, draw_footer_toggles
+from .utils import determine_sequencer_contexts
 
 # Custom icon stuff
 import bpy.utils.previews
@@ -141,7 +142,7 @@ def draw_strip_media(self, context, scene, bake_panel=True):
         sequence_editor = scene.sequence_editor
         if hasattr(sequence_editor, "active_strip") and sequence_editor.active_strip:
             active_strip = sequence_editor.active_strip
-            alva_context, console_context = determine_contexts(sequence_editor, active_strip)
+            alva_context, console_context = determine_sequencer_contexts(sequence_editor, active_strip)
         else:
             alva_context = "none_relevant"
             console_context = "none"
@@ -835,85 +836,3 @@ def draw_strip_formatter_generator(self, context, column, scene):
     row.operator("my.add_color_strip", icon='COLOR')  
 
     column.separator()
-
-
-def determine_contexts(sequence_editor, active_strip):
-    """
-    Determines the alva_context and console_context based on the selected strips in the sequence_editor.
-    """
-    if sequence_editor and active_strip:
-        selected_color_strips = []
-        selected_sound_strips = []
-        selected_video_strips = []
-        selected_strips = []
-        if active_strip:
-            motif_type = active_strip.my_settings.motif_type_enum
-            alva_context = "no_selection"
-            console_context = "no_motif_type"
-        
-        for strip in sequence_editor.sequences:
-            if strip.select:
-                selected_strips.append(strip)
-                if strip.type == 'COLOR':
-                    selected_color_strips.append(strip)
-                elif strip.type == 'SOUND':
-                    selected_sound_strips.append(strip)
-                elif strip.type == 'MOVIE':
-                    selected_video_strips.append(strip)
-        
-        if selected_strips:
-            if len(selected_strips) != len(selected_color_strips) and selected_color_strips:
-                alva_context = "incompatible_types"
-            elif selected_sound_strips and not selected_color_strips and len(selected_strips) == 1:
-                alva_context = "only_sound"
-            elif len(selected_sound_strips) == 1 and len(selected_video_strips) == 1 and len(selected_strips) == 2:
-                alva_context = "one_video_one_audio"
-            elif len(selected_sound_strips) == 1 and len(selected_video_strips) == 1 and len(selected_strips) == 3:
-                alva_context = "one_video_one_audio"
-            elif not (selected_color_strips or selected_sound_strips):
-                alva_context = "none_relevant"
-            elif len(selected_strips) == len(selected_color_strips) and selected_color_strips and active_strip.type == 'COLOR':
-                alva_context = "only_color"
-                
-        elif not selected_strips:
-            alva_context = "none_relevant"
-        
-        if alva_context == "only_color":
-            if motif_type == "option_eos_macro":
-                console_context = "macro"
-            elif motif_type == "option_eos_cue":
-                console_context = "cue"
-            elif motif_type == "option_eos_flash":
-                console_context = "flash"
-            elif motif_type == "option_animation":
-                console_context = "animation"
-            elif motif_type == "option_offset":
-                console_context = "offset"
-            elif motif_type == "option_trigger":
-                console_context = "trigger"
-    else:
-        alva_context = "none_relevant"
-        console_context = "none"
-
-    return alva_context, console_context
-    
-        
-'''Need to figure out where to put this now that the other stuff has been moved to toolbar.
-   It does make sense to incorporate this now since we have an accesible color splitter.
-   Will be reliant on patch though.
-'''
-#        column.separator()
-#        column.separator()
-#        row = column.row(align=True)
-#        if scene.reset_color_palette:
-#            row.alert = 1
-#        row.prop(scene, "reset_color_palette", text="", icon='FORWARD')
-#        row.alert = 0
-#        row.prop(scene, "color_palette_number", text="CP #")
-#        if scene.preview_color_palette:
-#            row.alert = 1
-#        row.prop(scene, "preview_color_palette", text="", icon='LINKED')
-#        row.alert = 0
-#        row.prop(scene, "color_palette_color", text="")
-#        row.prop(scene, "color_palette_name", text="")
-#        row.operator("my.color_palette_operator", icon_value=orb.icon_id)

@@ -33,13 +33,13 @@ from bpy.props import IntProperty
 import time
 
 from ..as_ui.space_sequencer import (
-    draw_strip_media, 
-    determine_contexts, 
+    draw_strip_media,
     draw_strip_formatter_color, 
     draw_strip_formatter_sound, 
     draw_strip_formatter_video_audio, 
     draw_strip_formatter_generator
 )
+from ..as_ui.utils import determine_sequencer_contexts
 from ..utils.utils import Utils 
 from ..utils.osc import OSC
 from ..orb import Orb
@@ -592,7 +592,7 @@ class SEQUENCER_OT_format_strip(Operator):
             sequence_editor = scene.sequence_editor
             if hasattr(sequence_editor, "active_strip") and sequence_editor.active_strip:
                 active_strip = sequence_editor.active_strip
-                alva_context, console_context = determine_contexts(sequence_editor, active_strip)
+                alva_context, console_context = determine_sequencer_contexts(sequence_editor, active_strip)
             else:
                 alva_context = "none_relevant"
                 console_context = "none"
