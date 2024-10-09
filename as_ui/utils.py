@@ -40,7 +40,7 @@ def determine_sequencer_contexts(sequence_editor, active_strip):
             console_context = "no_motif_type"
         
         for strip in sequence_editor.sequences:
-            if strip.select:
+            if strip.select or (active_strip and strip == active_strip):
                 selected_strips.append(strip)
                 if strip.type == 'COLOR':
                     selected_color_strips.append(strip)
