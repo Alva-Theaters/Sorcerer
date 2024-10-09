@@ -161,6 +161,8 @@ def register():
     Scene.energy_light_submasters = StringProperty(name="Energy Light Submasters")
     Scene.cyc_light_submasters = StringProperty(name="Background Light 1 Submasters")
 
+    Scene.offset_value = IntProperty(name="", min=-100000, max=10000)
+
     slow_tooltip = format_tooltip("Slow (or speed up) the transition for this group in this cue")
     ColorSequence.key_light_slow = FloatProperty(name="Slow", description=slow_tooltip, min=0, max=1000)
     ColorSequence.rim_light_slow = FloatProperty(name="Slow", description=slow_tooltip, min=0, max=1000)
