@@ -155,12 +155,11 @@ class BaseColorOperator(Operator):
             self.report({'INFO'}, "Cannot find group.")
             return {'CANCELLED'}
         
-        channels = [str(chan.chan) for chan in group.channels_list]
-        channels = " + ".join(channels)
-        channels = Utils.simplify_channels_list(channels)
+        channels = [chan.chan for chan in group.channels_list]
+        channels_str = Utils.simplify_channels_list(channels)
         preset_number = self.color_number + self.index_offset
         argument_template = self.record_preset_argument_template if self.is_recording else self.preset_argument_template
-        argument = argument_template.replace('#', str(channels)).replace('$', str(preset_number)).replace('^', self.preset_type)
+        argument = argument_template.replace('#', channels_str).replace('$', str(preset_number)).replace('^', self.preset_type)
         
         OSC.send_osc_lighting("/eos/newcmd", argument)
         return {'FINISHED'}
@@ -679,10 +678,13 @@ class PullFixtureSelectionOperator(bpy.types.Operator):
     bl_description = "Pull current selection from 3D view"
 
     def execute(self, context):
-        channels = [obj.str_manual_fixture_selection for obj in context.selected_objects]
-        new_list = ", ".join(channels)
-        active_object = context.active_object
-        active_object.str_manual_fixture_selection = new_list
+        channels = []
+        for obj in context.selected_objects:
+            if len(obj.list_group_channels) == 1:
+                channels.append(obj.list_group_channels[0].chan)
+
+        new_list = Utils.simplify_channels_list(channels)
+        context.scene.scene_props.add_channel_ids = new_list
         return {'FINISHED'}
     
     

@@ -51,18 +51,7 @@ class COMMON_UL_group_data_list(UIList):
             else:
                 row = layout.row(align=True)
                 row.prop(item, "name", text="", emboss=False)
-                 
-            if context.scene.scene_props.expand_toggles:
-                row.scale_x = .9
-                row.prop(item, "strobe_is_on", text="", icon='OUTLINER_DATA_LIGHTPROBE' if item.strobe_is_on else 'ADD', emboss=False)
-                row.prop(item, "color_is_on", text="", icon='COLOR' if item.color_is_on else 'ADD', emboss=False)
-                row.prop(item, "pan_tilt_is_on", text="", icon='ORIENTATION_GIMBAL' if item.pan_tilt_is_on else 'ADD', emboss=False)
-                row.prop(item, "zoom_is_on", text="", icon='LINCURVE' if item.zoom_is_on else 'ADD', emboss=False)
-                row.prop(item, "iris_is_on", text="", icon='RADIOBUT_OFF' if item.iris_is_on else 'ADD', emboss=False)
-                row.prop(item, "edge_is_on", text="", icon='SELECT_SET' if item.edge_is_on else 'ADD', emboss=False)
-                row.prop(item, "diffusion_is_on", text="", icon='MOD_CLOTH' if item.diffusion_is_on else 'ADD', emboss=False)
-                row.prop(item, "gobo_is_on", text="", icon='POINTCLOUD_DATA' if item.gobo_is_on else 'ADD', emboss=False)
-                
+
 
 class SCENE_UL_preview_cue_list(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):

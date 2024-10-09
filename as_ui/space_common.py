@@ -72,9 +72,6 @@ def draw_text_or_group_input(self, context, row_or_box, active_object, object=Fa
         row.prop(active_object, "selected_group_enum", text = "", icon='COLLECTION_NEW')
     row.prop(active_object, "str_manual_fixture_selection", text = "")
 
-    if object:
-        row.operator("object.pull_selection_operator", text="", icon='VIEW3D')
-
 
 def find_audio_type(enum_option):
     return True
@@ -424,10 +421,6 @@ def draw_fixture_groups(self, context):
     except:
         return
     
-    col.separator()
-    col.prop(item, "separator", text="", emboss=1, icon='ARROW_LEFTRIGHT')
-    col.prop(item, "label", text="", emboss=1, icon='INFO')
-    
     if item.separator or item.label:
         return
     
@@ -454,6 +447,7 @@ def draw_fixture_groups(self, context):
     if has_channels:
         row.prop(item, "highlight_or_remove_enum", expand=True, text="")
     row.prop(scene.scene_props, "add_channel_ids", text="")
+    row.operator("object.pull_selection_operator", text="", icon='VIEW3D')
 
 
 def draw_generate_fixtures(self, context):
