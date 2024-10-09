@@ -156,7 +156,7 @@ class VIEW3D_PT_alva_object_controller(Panel, View3D_Panel):
         if active_object.type == 'MESH':
             box, column = draw_object_header(self, context, scene, active_object)
             draw_parameters(self, context, column, box, active_object)
-            #draw_footer_toggles(self, context, column, active_object)
+            draw_footer_toggles(self, context, column, active_object)
         
         if active_object.type == 'SPEAKER':
             draw_speaker(self, context, active_object)
@@ -456,7 +456,7 @@ class WM_MT_button_context(Menu):
 panels = [
     VIEW3D_PT_alva_object_controller,
     VIEW3D_PT_alva_lighting_modifiers,
-    #VIEW3D_PT_alva_fixture_groups,
+    VIEW3D_PT_alva_fixture_groups,
     VIEW3D_PT_alva_fixture_generator,
     VIEW3D_PT_alva_service_mode,
 
@@ -471,7 +471,7 @@ panels = [
 
     NODE_PT_alva_node_formatter,
     NODE_PT_alva_fixture_generator,
-    #NODE_PT_alva_fixture_groups,
+    NODE_PT_alva_fixture_groups,
 
     TEXT_PT_alva_macro_generator,
     TEXT_PT_alva_import_patch,

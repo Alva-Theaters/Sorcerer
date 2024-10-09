@@ -64,18 +64,12 @@ def draw_text_or_group_input(self, context, row_or_box, active_object, object=Fa
     else:
         row = row_or_box.row(align=True)
 
-    space_type, node_tree, node_name, node_tree_name = find_tree_name_tree_name(context, active_object)
-
-    #if not object: 
-    op_copy = row.operator("alva_common.copy_patch", text="", icon='SHADERFX')
-    op_copy.space_type = space_type
-    op_copy.node_name = node_name
-    op_copy.node_tree_name = node_tree_name
-    #row.prop(active_object, "selected_profile_enum", icon_only=True, icon='SHADERFX')
+    if not object: 
+        row.prop(active_object, "selected_profile_enum", icon_only=True, icon='SHADERFX')
 
     # Decision between group and text or just group
-    #if not active_object.is_text_not_group:
-        #row.prop(active_object, "selected_group_enum", text = "", icon='COLLECTION_NEW')
+    if not active_object.is_text_not_group:
+        row.prop(active_object, "selected_group_enum", text = "", icon='COLLECTION_NEW')
     row.prop(active_object, "str_manual_fixture_selection", text = "")
 
     if object:
@@ -84,20 +78,6 @@ def draw_text_or_group_input(self, context, row_or_box, active_object, object=Fa
 
 def find_audio_type(enum_option):
     return True
-
-
-def find_tree_name_tree_name(context, active_object):
-    space_type = context.space_data.type
-    
-    if space_type == 'NODE_EDITOR':
-        node_tree = context.space_data.node_tree
-        node_name = active_object.name
-        node_tree_name = node_tree.name
-    else:
-        node_tree = None
-        node_name = ""
-        node_tree_name = ""
-    return space_type, node_tree, node_name, node_tree_name
         
 
 def draw_parameters(self, context, column, box, active_object):
@@ -109,8 +89,16 @@ def draw_parameters(self, context, column, box, active_object):
         object_type = "Strip"
     else:
         object_type = active_object.object_identities_enum
-
-    space_type, node_tree, node_name, node_tree_name = find_tree_name_tree_name(context, active_object)
+    
+    space_type = context.space_data.type
+    
+    if space_type == 'NODE_EDITOR':
+        node_tree = context.space_data.node_tree
+        node_name = active_object.name
+        node_tree_name = node_tree.name
+    else:
+        node_name = ""
+        node_tree_name = ""
     
     row = box.row(align=True)
     
