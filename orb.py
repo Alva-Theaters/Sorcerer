@@ -624,9 +624,11 @@ class Orb:
                 context.view_layer.objects.active = obj
                 
                 # Apply all array and curve modifiers on active_object.
+                is_group = False
                 array_modifiers, curve_modifiers = Orb.Eos.find_modifiers(self, context)
                 for array in array_modifiers:
                     bpy.ops.object.modifier_apply(modifier=array.name)
+                    is_group = True
                 for curve in curve_modifiers:
                     bpy.ops.object.modifier_apply(modifier=curve.name)
                 
@@ -636,11 +638,25 @@ class Orb:
                 bpy.ops.object.editmode_toggle()
                 bpy.ops.mesh.separate(type='LOOSE')
                 bpy.ops.object.mode_set(mode='OBJECT')
+
+                # Create a new collection for the separated objects
+                if is_group:
+                    collection_name = f"{obj.name}_Group"
+                    new_collection = bpy.data.collections.new(collection_name)
+                    bpy.context.scene.collection.children.link(new_collection)
+                
                 for obj in context.selected_objects:
                     if obj.type == 'MESH':
                         context.view_layer.objects.active = obj
                         bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS')
-                
+                        
+                        if is_group:
+                            new_collection.objects.link(obj)
+
+                            for coll in obj.users_collection:
+                                if coll != new_collection:
+                                    coll.objects.unlink(obj)  # Unlink from the original collections
+
                 # Find indexes.
                 starting_universe = scene.scene_props.int_array_universe
                 start_address = scene.scene_props.int_array_start_address
@@ -652,7 +668,7 @@ class Orb:
                 addresses_list = Utils.find_addresses(starting_universe, start_address, channels_to_add, total_lights)
             
                 # Loop over the channels within that object, assuming there was an array
-                yield Orb.Eos.loop_over_children(self, context, scene, addresses_list, channels_to_add, address), "Patching channels"
+                yield Orb.Eos.loop_over_children(self, context, scene, addresses_list, channels_to_add, address, is_group, obj.name), "Patching channels"
 
                 # Get out of edit mode.
                 bpy.ops.object.editmode_toggle()
@@ -673,7 +689,7 @@ class Orb:
             return array_modifiers, curve_modifiers
 
         @staticmethod
-        def loop_over_children(self, context, scene, addresses_list, channels_to_add, address):
+        def loop_over_children(self, context, scene, addresses_list, channels_to_add, address, is_group, group_name):
             relevant_channels = []
 
             # Ensure correct console mode.
@@ -687,7 +703,7 @@ class Orb:
                 chan_num = scene.scene_props.int_array_start_channel
                 current_universe, current_address = addresses_list[i]
 
-                position_x, position_y, position_z, orientation_x, orientation_y, orientation_z = Utils.get_loc_rot(chan)
+                position_x, position_y, position_z, orientation_x, orientation_y, orientation_z = Utils.get_loc_rot(chan, use_matrix=True)
 
                 # Set channel-specific UI fields inside the loop.
                 chan.str_manual_fixture_selection = str(chan_num)
@@ -716,14 +732,15 @@ class Orb:
             OSC.send_osc_lighting(address, argument)
 
             # Record group
-            group_number = scene.scene_props.int_group_number
-            Orb.Eos.record_group(group_number, relevant_channels)
-            scene.scene_props.int_group_number += 1
+            if is_group:
+                # Add group to console
+                group_number = scene.scene_props.int_group_number
+                Orb.Eos.record_group(group_number, relevant_channels)
+                scene.scene_props.int_group_number += 1
 
-            # Add group to Sorcerer group_data
-            if len(relevant_channels) > 1:
+                # Add group to Sorcerer group_data
                 new_group = scene.scene_group_data.add()
-                new_group.name = new_group.name
+                new_group.name = group_name
                 for channel in relevant_channels:
                     new_channel = new_group.channels_list.add()
                     new_channel.chan = channel

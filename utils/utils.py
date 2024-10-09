@@ -225,7 +225,7 @@ class Utils:
         # Round and rotate x by 180 degrees (pi in radians) since cone facing up is the same as a light facing down.
         orientation_x = round(math.degrees(x_rot_rad + math.pi), 2)
         orientation_y = round(math.degrees(y_rot_rad), 2)
-        orientation_z = 0  # Prevent modifiers from messing up pan/tilt. ## Add option to enable in the future.
+        orientation_z = round(math.degrees(z_rot_rad), 2)
 
         return position_x, position_y, position_z, orientation_x, orientation_y, orientation_z
     
@@ -234,14 +234,16 @@ class Utils:
         if use_matrix:
             depsgraph = bpy.context.evaluated_depsgraph_get()
             eval_obj = obj.evaluated_get(depsgraph)
-            matrix = eval_obj.matrix_world
             
+            bpy.context.view_layer.update()
+            
+            matrix = eval_obj.matrix_world
             euler = matrix.to_euler('XYZ')
 
             # Convert radians to degrees for rotation
-            x_rot_rad = euler.x  # Tilt
-            y_rot_rad = euler.z  # Pan seems to be on zed euler, not on y as y resolves to super tiny number.
-            z_rot_rad = euler.y  # Roll
+            x_rot_rad = euler.x
+            y_rot_rad = euler.y
+            z_rot_rad = euler.z
 
             position = matrix.translation
             x_pos = position.x
@@ -257,7 +259,6 @@ class Utils:
             z_rot_rad = obj.rotation_euler.z
 
         return x_pos, y_pos, z_pos, x_rot_rad, y_rot_rad, z_rot_rad 
-
 
                 
     def try_parse_int(value):
