@@ -236,24 +236,6 @@ class SequencerUpdaters:
                 active_strip.color = (.5, 1, 1)
             else:
                 active_strip.color = (1, 1, 1)
-
-
-    def motif_names_updater(self, context):
-        chosen_motif_name = context.scene.my_tool.motif_names_enum
-        sequences_all = context.scene.sequence_editor.sequences_all
-        
-        for strip in sequences_all:
-            strip.select = False
-        
-        for strip in filter_color_strips(sequences_all):
-            if strip.motif_name == chosen_motif_name:
-                context.scene.sequence_editor.active_strip = strip 
-                strip.select = True 
-                break
-            
-        for strip in filter_color_strips(bpy.context.scene.sequence_editor.sequences_all):
-            if strip.motif_name == chosen_motif_name:
-                strip.select = True
                 
             
     def color_palette_color_updater(self, context): ##

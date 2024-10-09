@@ -210,17 +210,6 @@ def draw_strip_media(self, context, scene, bake_panel=True):
 def draw_add_buttons_row(self, context, column, scene, active_strip, motif_name=False, lighting_icons=False, console_context=None):
     # Motif prefix.
     row = column.row(align=True)
-    if lighting_icons:
-        strip_type = active_strip.my_settings.motif_type_enum
-        row.prop(scene.my_tool, "motif_names_enum", text="", icon='FILE_TEXT' if strip_type == "option_eos_macro" else 'PLAY' if strip_type == "option_eos_cue" else 'OUTLINER_OB_LIGHT' if strip_type == "option_eos_flash" else 'IPO_BEZIER' if strip_type == "option_animation" else 'SETTINGS', icon_only=True)
-    else:
-        row.prop(scene.my_tool, "motif_names_enum", text="", icon='COLOR', icon_only=True)
-    
-    if motif_name:
-        if active_strip.is_linked and not console_context == "animation":
-            row.alert = 1
-        row.prop(active_strip, "motif_name", text="")
-        row.alert = 0
     
     # Add buttons.
     row.operator("my.add_macro", text="", icon='FILE_TEXT')

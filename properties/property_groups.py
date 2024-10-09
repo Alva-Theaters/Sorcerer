@@ -214,18 +214,6 @@ class MySettings(PropertyGroup):
     ) 
     
     
-class MyMotifs(PropertyGroup):
-    from ..assets.items import Items as AlvaItems
-    from ..updaters.sequencer_updaters import SequencerUpdaters 
-
-    motif_names_enum: EnumProperty(
-        name="",
-        description="List of unique motif names",
-        items=AlvaItems.get_motif_name_items,
-        update=SequencerUpdaters.motif_names_updater
-    ) 
-    
-    
 class RaiseChannels(PropertyGroup):
     chan: PointerProperty(type=bpy.types.Object) 
     original_influence: FloatProperty()  
@@ -300,7 +288,6 @@ prop_groups = [
     GroupData,
     AudioObjectSettings,
     MySettings,
-    MyMotifs,
     RaiseChannels,
     InfluencerList,
     LightingModifier,
@@ -324,8 +311,6 @@ def register():
     # This stuff has to be here for the start sequence to work.
     if not hasattr(Sequence, "my_settings"):
         Sequence.my_settings = PointerProperty(type=MySettings)
-    if not hasattr(Scene, "my_tool"):
-        Scene.my_tool = PointerProperty(type=MyMotifs)
         
     Scene.channels_list_pg = PointerProperty(type=ChannelsList)
     Scene.show_sequencer = PointerProperty(type=ShowSequencer)
@@ -354,8 +339,6 @@ def unregister():
         del Scene.show_sequencer
     if hasattr(Scene, "channels_list_pg"):
         del Scene.channels_list_pg
-    if hasattr(Scene, "my_tool"):
-        del Scene.my_tool
     
     from ..utils.utils import Utils
     from .common_properties import CommonProperties
