@@ -34,6 +34,7 @@ import time
 
 from ..utils.osc import OSC as osc 
 from ..utils.utils import Utils
+from ..updaters.common_updaters import CommonUpdaters
 from ..as_ui.space_alvapref import draw_settings 
 from ..cpvia.find import Find 
 from ..assets.dictionaries import Dictionaries
@@ -91,6 +92,52 @@ class TOPBAR_OT_splash_screen(Operator):
 #-------------------------------------------------------------------------------------------------------------------------------------------
 '''CONTROLLER Operators'''
 #-------------------------------------------------------------------------------------------------------------------------------------------
+class COMMON_OT_alva_copy_patch(Operator):
+    '''Copies active object's patch to other selected objects'''
+    bl_idname = "alva_common.copy_patch"
+    bl_label = "Copy Patch"
+
+    space_type: StringProperty()  
+    node_name: StringProperty() 
+    node_tree_name: StringProperty() 
+
+    def execute(self, context):
+        all_properties = [
+            "pan_min", "pan_max", "tilt_min", "tilt_max", "zoom_min", "zoom_max", 
+            "gobo_speed_min", "gobo_speed_max", "influence_is_on", "intensity_is_on", 
+            "pan_tilt_is_on", "color_is_on", "diffusion_is_on", "strobe_is_on", 
+            "zoom_is_on", "iris_is_on", "edge_is_on", "gobo_is_on", "prism_is_on", 
+            "str_enable_strobe_argument", "str_disable_strobe_argument", 
+            "str_enable_gobo_speed_argument", "str_disable_gobo_speed_argument", 
+            "str_gobo_id_argument", "str_gobo_speed_value_argument", 
+            "str_enable_prism_argument", "str_disable_prism_argument", "color_profile_enum",
+            "alva_white_balance"
+        ]
+
+        properties = all_properties
+        st = context.space_data.type
+
+        finders = Find
+        active_controller = finders.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
+
+        if st == 'VIEW_3D' and len(context.selected_objects) > 1:
+            for obj in context.selected_objects:
+                if obj != active_controller:
+                    CommonUpdaters._update_properties(active_controller, obj, properties)
+
+        elif st == 'NODE_EDITOR' and len(context.selected_nodes) > 1:
+            for node in context.selected_nodes:
+                if node != active_controller and node.bl_idname in ['group_controller_type', 'mixer_type']:
+                    CommonUpdaters._update_properties(active_controller, node, properties)
+
+        elif st == 'SEQUENCE_EDITOR' and len(context.selected_sequences) > 1:
+            for strip in context.selected_sequences:
+                if strip != active_controller and strip.type == 'COLOR':
+                    CommonUpdaters._update_properties(active_controller, strip, properties)
+
+        return {'FINISHED'}
+
+
 class HomeControllerButton(Operator):
     bl_idname = "alva_node.home"
     bl_label = "Home"
@@ -445,6 +492,7 @@ class WM_OT_show_message(bpy.types.Operator):
 operator_classes = [
     TOPBAR_OT_alva_settings,
     TOPBAR_OT_splash_screen,
+    COMMON_OT_alva_copy_patch,
     HomeControllerButton,
     UpdateControllerButton,
     COMMON_OT_strobe_props,
