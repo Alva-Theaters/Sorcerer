@@ -28,6 +28,7 @@
 
 
 import bpy
+from functools import partial
 
 from .space_common import draw_text_or_group_input, draw_parameters, draw_footer_toggles
 from .utils import determine_sequencer_contexts
@@ -67,6 +68,8 @@ pcoll.load("effect_eleven", os.path.join(icons_dir, "effect_eleven.png"), 'IMAGE
 pcoll.load("effect_twelve", os.path.join(icons_dir, "effect_twelve.png"), 'IMAGE')
 pcoll.load("effect_thirteen", os.path.join(icons_dir, "effect_thirteen.png"), 'IMAGE')
 pcoll.load("effect_fourteen", os.path.join(icons_dir, "effect_fourteen.png"), 'IMAGE')
+
+filter_color_strips = partial(filter, bpy.types.ColorSequence.__instancecheck__)
 
 
 def draw_alva_sequencer_view(self, layout):
@@ -673,7 +676,7 @@ def draw_strip_formatter_color(self, context, column, scene, sequence_editor, ac
     elif scene.is_filtering_left == False:
         row.alert = 0
         row.prop(scene, "is_filtering_left", icon='FILTER')
-    row.operator("my.select_similar", text="Select Magnetic:") 
+    row.operator("my.select_similar", text="Select Magnetic") 
     if scene.is_filtering_right == True:
         row.alert = 1
         row.prop(scene, "is_filtering_right", icon='FILTER')
@@ -685,76 +688,68 @@ def draw_strip_formatter_color(self, context, column, scene, sequence_editor, ac
     row = column.row(align=True)
     row.prop(scene, "color_is_magnetic", text="", icon='SNAP_OFF' if not scene.color_is_magnetic else 'SNAP_ON')
     row.prop(active_strip, "color", text="")
-    row.operator("my.copy_color_operator", text="", icon='FILE')
-    row.operator("my.color_trigger", text="", icon='RESTRICT_SELECT_OFF')
+    row.operator("alva_seq.copy_attribute", text="", icon='FILE').target = 'color'
+    row.operator("alva_seq.formatter_select", text="", icon='RESTRICT_SELECT_OFF').target = 'color'
 
     row = column.row(align=True)
     row.prop(scene, "strip_name_is_magnetic", text="", icon='SNAP_OFF' if not scene.strip_name_is_magnetic else 'SNAP_ON')
     row.prop(active_strip, "name", text="")  
-    row.operator("my.copy_strip_name_operator", text="", icon='FILE')
-    row.operator("my.strip_name_trigger", text="", icon='RESTRICT_SELECT_OFF')
+    row.operator("alva_seq.copy_attribute", text="", icon='FILE').target = 'name'
+    row.operator("alva_seq.formatter_select", text="", icon='RESTRICT_SELECT_OFF').target = 'name'
 
     row = column.row(align=True)
     row.prop(scene, "channel_is_magnetic", text="", icon='SNAP_OFF' if not scene.channel_is_magnetic else 'SNAP_ON')
     row.prop(active_strip, "channel", text_ctxt="Channel: ")
-    row.operator("my.copy_channel_operator", text="", icon='FILE')
-    row.operator("my.channel_trigger", text="", icon='RESTRICT_SELECT_OFF')  
+    row.operator("alva_seq.copy_attribute", text="", icon='FILE').target = 'channel'
+    row.operator("alva_seq.formatter_select", text="", icon='RESTRICT_SELECT_OFF').target = 'channel'
 
     row = column.row(align=True)
     row.prop(scene, "duration_is_magnetic", text="", icon='SNAP_OFF' if not scene.duration_is_magnetic else 'SNAP_ON')
     row.prop(active_strip, "frame_final_duration", text="Duration")
-    row.operator("my.copy_duration_operator", text="", icon='FILE')
-    row.operator("my.duration_trigger", text="", icon='RESTRICT_SELECT_OFF')
+    row.operator("alva_seq.copy_attribute", text="", icon='FILE').target = 'frame_final_duration'
+    row.operator("alva_seq.formatter_select", text="", icon='RESTRICT_SELECT_OFF').target = 'frame_final_duration'
 
     row = column.row(align=True)
     row.prop(scene, "start_frame_is_magnetic", text="", icon='SNAP_OFF' if not scene.start_frame_is_magnetic else 'SNAP_ON')
     row.prop(active_strip, "frame_start", text="Start Frame")
-    row.operator("my.start_frame_jump", text="", icon='PLAY')
-    row.operator("my.copy_start_frame_operator", text="", icon='FILE')
-    row.operator("my.start_frame_trigger", text="", icon='RESTRICT_SELECT_OFF')
+    row.operator("alva_seq.frame_jump", text="", icon='PLAY').direction = 1 
+    row.operator("alva_seq.copy_attribute", text="", icon='FILE').target = 'frame_start'
+    row.operator("alva_seq.formatter_select", text="", icon='RESTRICT_SELECT_OFF').target = 'frame_start'
 
     row = column.row(align=True)
     row.prop(scene, "end_frame_is_magnetic", text="", icon='SNAP_OFF' if not scene.end_frame_is_magnetic else 'SNAP_ON')
     row.prop(active_strip, "frame_final_end", text="End Frame")
-    row.operator("my.end_frame_jump", text="", icon='PLAY')
-    row.operator("my.copy_end_frame_operator", text="", icon='FILE')
-    row.operator("my.end_frame_trigger", text="", icon='RESTRICT_SELECT_OFF')
+    row.operator("alva_seq.frame_jump", text="", icon='PLAY').direction = 0
+    row.operator("alva_seq.copy_attribute", text="", icon='FILE').target = 'frame_final_end'
+    row.operator("alva_seq.formatter_select", text="", icon='RESTRICT_SELECT_OFF').target = 'frame_final_end'
 
     row = column.row(align=True)
     row.operator("alva_tool.copy", text="Copy Various to Selected", icon='FILE')
     column.separator()
     if scene.i_know_the_shortcuts == False:
         row = column.row(align=True)
-        row.operator("my.alva_extrude", text="Extrude")
+        row.operator("alva_seq.hotkey_hint", text="Extrude").message = '''Type the "E" key while in sequencer to extrude pattern of 2 strips.'''
 
         row = column.row(align=True)
-        row.operator("my.alva_scale", text="Scale")
+        row.operator("alva_seq.hotkey_hint", text="Scale").message = '''Type the "S" key while in sequencer to scale strips.'''
 
         row = column.row(align=True)
-        row.operator("my.alva_grab", text="Grab")
+        row.operator("alva_seq.hotkey_hint", text="Grab").message = '''Type the "G" key while in sequencer to grab and move strips.'''
 
         row = column.row(align=True)
-        row.operator("my.alva_grab_x", text="Grab X")
-        row.operator("my.alva_grab_y", text="Grab Y")
+        row.operator("alva_seq.hotkey_hint", text="Grab X").message = '''Type the "G" key, then the "X" key while in sequencer to grab and move strips on X axis only.'''
+        row.operator("alva_seq.hotkey_hint", text="Grab Y").message = '''Type the "G" key, then the "Y" key while in sequencer to grab and move strips on Y axis only.'''
 
         row = column.row(align=True)
-        row.operator("my.cut_operator", text="Cut")
+        row.operator("alva_seq.hotkey_hint", text="Cut").message = '''Type the "K" key while in sequencer.'''
 
         row = column.row(align=True)
-        row.operator("my.assign_to_channel_operator", text="Assign to Channel")
+        row.operator("alva_seq.hotkey_hint", text="Assign to Channel").message = '''Type the "C" key while in sequencer, then channel number, then "Enter" key.'''
 
     row = column.row(align=True)
     row.prop(scene, "i_know_the_shortcuts", text="I know the shortcuts.")
 
-    ## Can we use an existing function for this?
-    ## Or possibly just use alva_context?
-    selected_color_strips = []
-    selected_strips = []
-    for strip in sequence_editor.sequences:
-        if strip.select:
-            selected_strips.append(strip)
-            if strip.type == 'COLOR':
-                selected_color_strips.append(strip)
+    selected_color_strips = [strip for strip in filter_color_strips(context.selected_sequences) if strip.select == True]
 
     if len(selected_color_strips) > 1:
         column.separator()
@@ -764,7 +759,7 @@ def draw_strip_formatter_color(self, context, column, scene, sequence_editor, ac
         row.prop(scene, "offset_value", text="Offset in BPM")
         row.operator("my.add_offset", text="", icon='CENTER_ONLY')
         column.separator()
-        
+
 
 def draw_strip_formatter_sound(self, context, column, active_strip):
     row = column.row(align=True)
