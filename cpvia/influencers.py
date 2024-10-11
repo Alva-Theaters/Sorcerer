@@ -35,7 +35,7 @@ from ..assets.dictionaries import Dictionaries
 from ..cpvia.map import Mapping 
 from ..cpvia.cpvia_finders import CPVIAFinders 
 from ..assets.sli import SLI 
-from ..utils.utils import Utils
+from ..utils.cpvia_utils import color_object_to_tuple_and_scale_up
 from ..maintenance.logging import alva_log
 
 
@@ -81,8 +81,8 @@ class Influencers:
                         param.append(p)
                         if p == "color":
                             if not parent.is_erasing:
-                                new_release_value = Utils.color_object_to_tuple_and_scale_up(restore_value)
-                            else: new_release_value = Utils.color_object_to_tuple_and_scale_up(new_value)
+                                new_release_value = color_object_to_tuple_and_scale_up(restore_value)
+                            else: new_release_value = color_object_to_tuple_and_scale_up(new_value)
                             v.append(new_release_value)
                         else: v.append(chan.original_influence * -1)
                     
@@ -117,7 +117,7 @@ class Influencers:
                             if parent.is_erasing:
                                 new_raise_value = (1, 1, 1)
                             new_raise_value = self.invert_color(new_raise_value)
-                        new_raise_value = Utils.color_object_to_tuple_and_scale_up(new_raise_value)  
+                        new_raise_value = color_object_to_tuple_and_scale_up(new_raise_value)  
                         new_raise_value = self.apply_strength(parent, new_raise_value)
                         if type == "Brush" and p == "color":
                             r, g, b = new_raise_value

@@ -34,7 +34,7 @@ from bpy.props import *
 from bpy.types import Operator
 
 from ..cpvia.find import Find 
-from ..utils.utils import Utils 
+from ..utils.cpvia_utils import simplify_channels_list
 from ..utils.properties_utils import update_all_controller_channel_lists
 from ..utils.osc import OSC
 
@@ -157,7 +157,7 @@ class BaseColorOperator(Operator):
             return {'CANCELLED'}
         
         channels = [chan.chan for chan in group.channels_list]
-        channels_str = Utils.simplify_channels_list(channels)
+        channels_str = simplify_channels_list(channels)
         preset_number = self.color_number + self.index_offset
         argument_template = self.record_preset_argument_template if self.is_recording else self.preset_argument_template
         argument = argument_template.replace('#', channels_str).replace('$', str(preset_number)).replace('^', self.preset_type)
@@ -684,7 +684,7 @@ class PullFixtureSelectionOperator(bpy.types.Operator):
             if len(obj.list_group_channels) == 1:
                 channels.append(obj.list_group_channels[0].chan)
 
-        new_list = Utils.simplify_channels_list(channels)
+        new_list = simplify_channels_list(channels)
         context.scene.scene_props.add_channel_ids = new_list
         return {'FINISHED'}
     

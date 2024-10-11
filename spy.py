@@ -46,6 +46,7 @@ from .utils.utils import Utils
 from .utils.event_utils import EventUtils
 from .utils.sequencer_utils import calculate_flash_strip_bias, duplicate_active_strip_to_selected, find_available_channel, add_color_strip
 from .utils.properties_utils import parse_channels, parse_mixer_channels
+from .utils.cpvia_utils import color_object_to_tuple_and_scale_up, update_alva_controller, home_alva_controller
 from .cpvia.find import Find
 from .cpvia.mix import Mixer
 from .cpvia.influencers import Influencers
@@ -189,17 +190,17 @@ class SorcererPython:
         def color_object_to_tuple_and_scale_up(v):
             '''Formats Blender color objects for lighting console use. Returns 
                (r, g, b) tuple of ints scaled to 0-100 scale'''
-            return Utils.color_object_to_tuple_and_scale_up(v)
+            return color_object_to_tuple_and_scale_up(v)
         
         def update_alva_controller(controller):
             '''Logic for the Update button on the controllers. Pass controller
                as bpy object'''
-            Utils.update_alva_controller(controller)
+            update_alva_controller(controller)
             
         def home_alva_controller(controller):
             '''Logic for the Home button on the controllers. Pass controller
                as bpy object'''
-            Utils.home_alva_controller(controller)
+            home_alva_controller(controller)
 
     class find:
         def is_inside_mesh(obj, mesh_obj):

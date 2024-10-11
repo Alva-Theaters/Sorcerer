@@ -29,7 +29,7 @@
 
 # Alva Logging for this script is actually done from the event_manager.py script.
 
-from ..utils.utils import Utils
+from ..utils.cpvia_utils import simplify_channels_list
 
 
 class Harmonizer:    
@@ -114,7 +114,7 @@ class Harmonizer:
 
         simplified = []
         for (p, v, a), (channels, p, v, i, a) in simplified_dict.items():
-            combined_channels_str = Utils.simplify_channels_list(channels)
+            combined_channels_str = simplify_channels_list(channels)
             simplified.append((combined_channels_str, p, v, i, a))
 
         return simplified

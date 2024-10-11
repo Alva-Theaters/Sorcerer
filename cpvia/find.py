@@ -31,7 +31,7 @@ import bpy
 
 from ..assets.dictionaries import Dictionaries 
 from ..assets.sli import SLI 
-from ..utils.utils import Utils 
+from ..utils.cpvia_utils import update_nodes
 
 
 class Find:
@@ -202,7 +202,7 @@ class Find:
         connected_nodes = Find.find_connected_nodes(input_socket, is_input)
 
         if update_nodes:
-            Utils.update_nodes(connected_nodes)
+            update_nodes(connected_nodes)
 
         for node in connected_nodes:
             if node.bl_idname == "group_controller_type":

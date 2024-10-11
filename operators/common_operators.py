@@ -33,7 +33,7 @@ from bpy.props import StringProperty
 import time
 
 from ..utils.osc import OSC as osc 
-from ..utils.utils import Utils
+from ..utils.cpvia_utils import update_alva_controller, home_alva_controller
 from utils.sequencer_utils import duplicate_active_strip_to_selected
 from ..updaters.common_updaters import CommonUpdaters
 from ..as_ui.space_alvapref import draw_settings 
@@ -150,7 +150,7 @@ class HomeControllerButton(Operator):
     def execute(self, context):
         finders = Find
         active_controller = finders.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
-        Utils.home_alva_controller(active_controller)
+        home_alva_controller(active_controller)
         return {'FINISHED'}
 
 
@@ -165,7 +165,7 @@ class UpdateControllerButton(Operator):
     def execute(self, context):
         finders = Find
         active_controller = finders.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
-        Utils.update_alva_controller(active_controller)
+        update_alva_controller(active_controller)
         return {'FINISHED'}
     
     

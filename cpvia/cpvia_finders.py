@@ -31,6 +31,7 @@ import bpy
 import re
 
 from ..utils.utils import Utils 
+from ..utils.cpvia_utils import color_object_to_tuple_and_scale_up
 from ..cpvia.mix import Mixer 
 from ..assets.sli import SLI 
 from ..assets.dictionaries import Dictionaries 
@@ -145,7 +146,7 @@ class CPVIAFinders:
         if attribute_name:
             unmapped_value = getattr(parent, attribute_name)
             if p == "color":
-                unmapped_value = Utils.color_object_to_tuple_and_scale_up(unmapped_value)
+                unmapped_value = color_object_to_tuple_and_scale_up(unmapped_value)
             elif p in ["strobe", "pan", "tilt", "zoom", "gobo_speed"]:  # NOT "pan_graph" or "tilt_graph" since that is mapped by the node updater
                 mapping = Mapping()
                 try: 
@@ -178,7 +179,7 @@ class CPVIAFinders:
             new_value = getattr(parent, attribute_name)
             
             if p == "color":
-                new_value = Utils.color_object_to_tuple_and_scale_up(new_value)
+                new_value = color_object_to_tuple_and_scale_up(new_value)
             
             if parent.type == 'CUSTOM':
                 finders = Find()

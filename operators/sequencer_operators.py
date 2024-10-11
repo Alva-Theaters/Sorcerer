@@ -41,6 +41,7 @@ from ..as_ui.space_sequencer import (
 )
 from ..as_ui.utils import determine_sequencer_contexts
 from ..utils.utils import Utils 
+from ..utils.cpvia_utils import simplify_channels_list
 from ..utils.event_utils import EventUtils
 from ..utils.properties_utils import parse_channels
 from ..utils.sequencer_utils import calculate_flash_strip_bias, find_available_channel, add_color_strip
@@ -1554,21 +1555,21 @@ class SEQUENCER_OT_sync_cue(Operator):
                 submasters = parse_channels(getattr(context.scene, f"{param}_submasters"))
 
                 if groups:
-                    groups_str = Utils.simplify_channels_list(groups)
+                    groups_str = simplify_channels_list(groups)
                     address = "/eos/newcmd"
                     argument = f"Group {groups_str} Time {discrete_time.zfill(2)} Enter"
                     OSC.send_osc_lighting(address, argument)
                     time.sleep(.2)
 
                 if channels:
-                    channels_str = Utils.simplify_channels_list(channels)
+                    channels_str = simplify_channels_list(channels)
                     address = "/eos/newcmd"
                     argument = f"Chan {channels_str} Time {discrete_time.zfill(2)} Enter"
                     OSC.send_osc_lighting(address, argument)
                     time.sleep(.2)
 
                 if submasters:
-                    submasters_str = Utils.simplify_channels_list(submasters)
+                    submasters_str = simplify_channels_list(submasters)
                     address = "/eos/newcmd"
                     argument = f"Sub {submasters_str} Time {discrete_time.zfill(2)} Enter"
                     OSC.send_osc_lighting(address, argument)

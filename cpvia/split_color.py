@@ -237,8 +237,8 @@ class ColorSplitter:
             is_subtractive = corrected_key in ['cmy', 'raise_cmy', 'lower_cmy']
 
             wb = finders.find_my_patch(parent, chan, type, "alva_white_balance")
-            from ..utils.utils import Utils
-            white_balance = Utils.color_object_to_tuple_and_scale_up(wb)
+            from ..utils.cpvia_utils import color_object_to_tuple_and_scale_up
+            white_balance = color_object_to_tuple_and_scale_up(wb)
 
             if corrected_key in ['rgb', 'raise_rgb', 'lower_rgb']: # No need to split
                 balanced = self.balance_white(white_balance, val, is_subtractive)
