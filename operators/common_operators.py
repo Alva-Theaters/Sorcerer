@@ -34,6 +34,7 @@ import time
 
 from ..utils.osc import OSC as osc 
 from ..utils.utils import Utils
+from utils.sequencer_utils import duplicate_active_strip_to_selected
 from ..updaters.common_updaters import CommonUpdaters
 from ..as_ui.space_alvapref import draw_settings 
 from ..cpvia.find import Find 
@@ -422,7 +423,7 @@ class TOOL_OT_copy_various_to_selected(Operator):
             global stop_updating_color
             stop_updating_color = "Yes"
         
-        Utils.duplicate_active_strip_to_selected(context)
+        duplicate_active_strip_to_selected(context)
                         
         stop_updating_color = "No"
                     

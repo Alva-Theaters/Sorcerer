@@ -41,6 +41,7 @@ from ..as_ui.space_sequencer import (
 )
 from ..as_ui.utils import determine_sequencer_contexts
 from ..utils.utils import Utils 
+from ..utils.sequencer_utils import calculate_flash_strip_bias, find_available_channel, add_color_strip
 from ..utils.osc import OSC
 from ..orb import Orb
 from ..maintenance.logging import alva_log
@@ -401,7 +402,7 @@ class SEQUENCER_OT_new_strip(Operator):
         frame_end = current_frame + 25
         
         # Find an available channel where the new strip will not overlap.
-        channel = Utils.find_available_channel(sequence_editor, current_frame, frame_end, channel)
+        channel = find_available_channel(sequence_editor, current_frame, frame_end, channel)
         
         # Now create the strip on the available channel.
         if bpy.context.scene.is_armed_release:
@@ -443,7 +444,7 @@ class SEQUENCER_OT_new_kick(Operator):
             channel = sequence_editor.active_strip.channel if sequence_editor.active_strip else 1
             frame_end = current_frame + 25
             
-            channel = Utils.find_available_channel(sequence_editor, current_frame, frame_end, channel)
+            channel = (sequence_editor, current_frame, frame_end, channel)
             
             color_strip = sequence_editor.sequences.new_effect(
                     name="New Strip",
@@ -1303,11 +1304,11 @@ class SEQUENCER_OT_analyze_song(Operator):
 
             for i, beat in enumerate(beats):
                 color = color_codes[(beat_positions[i] % len(color_codes))-1]
-                Utils.add_color_strip(name="Beat", length=4, channel=(active_strip.channel + 3), color=color, strip_type='option_eos_flash', frame=beat-2)
+                add_color_strip(name="Beat", length=4, channel=(active_strip.channel + 3), color=color, strip_type='option_eos_flash', frame=beat-2)
             for downbeat in downbeats:
-                Utils.add_color_strip(name="Down Beat", length=12, channel=(active_strip.channel + 2), color=(1, 1, 0), strip_type='option_eos_flash', frame=downbeat-6)
+                add_color_strip(name="Down Beat", length=12, channel=(active_strip.channel + 2), color=(1, 1, 0), strip_type='option_eos_flash', frame=downbeat-6)
             for cue in corrected_cues:
-                Utils.add_color_strip(name="Cue", length=64, channel=(active_strip.channel + 1), color=(0, 0, 1), strip_type='option_eos_cue', frame=cue-32)
+                add_color_strip(name="Cue", length=64, channel=(active_strip.channel + 1), color=(0, 0, 1), strip_type='option_eos_cue', frame=cue-32)
             
             return {'FINISHED'}
         else:
@@ -1504,7 +1505,7 @@ class SEQUENCER_OT_sync_video_to_audio(Operator):
         video_strip = selected_video_strip[0]
         sound_strip = selected_sound_strip[0]
         
-        channel = Utils.find_available_channel(context.scene.sequence_editor, video_strip.frame_start, video_strip.frame_final_end, video_strip.channel + 1)
+        channel = find_available_channel(context.scene.sequence_editor, video_strip.frame_start, video_strip.frame_final_end, video_strip.channel + 1)
 
         if video_strip.frame_final_duration != sound_strip.frame_final_duration: 
             speed_strip = context.scene.sequence_editor.sequences.new_effect(
@@ -1821,7 +1822,7 @@ $$Software Version 3.2.2 Build 25  Fixture Library 3.2.0.75, 26.Apr.2023
                 bias = strip.flash_bias
                 frame_rate = Utils.get_frame_rate(scene)
                 strip_length_in_frames = strip.frame_final_duration
-                bias_in_frames = Utils.calculate_flash_strip_bias(bias, frame_rate, strip_length_in_frames)
+                bias_in_frames = calculate_flash_strip_bias(bias, frame_rate, strip_length_in_frames)
                 start_frame = strip.frame_start - slide_factor
                 end_flash_macro_frame = start_frame + bias_in_frames
                 end_flash_macro_frame = int(round(end_flash_macro_frame))
@@ -1928,7 +1929,7 @@ def create_motif_strip(context, motif_type_enum):
     channel = sequence_editor.active_strip.channel if sequence_editor.active_strip else 1
     frame_end = current_frame + 25
 
-    my_channel = Utils.find_available_channel(sequence_editor, current_frame, frame_end, channel)
+    my_channel = find_available_channel(sequence_editor, current_frame, frame_end, channel)
 
     color_strip = sequence_editor.sequences.new_effect(
         name="New Strip",

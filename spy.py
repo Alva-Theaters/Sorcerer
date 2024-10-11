@@ -42,6 +42,7 @@ import bpy
 
 from .utils.osc import OSC
 from .utils.utils import Utils
+from .utils.sequencer_utils import calculate_flash_strip_bias, duplicate_active_strip_to_selected, find_available_channel, add_color_strip
 from .cpvia.find import Find
 from .cpvia.mix import Mixer
 from .cpvia.influencers import Influencers
@@ -134,7 +135,7 @@ class SorcererPython:
             return Utils.time_to_frame(time, frame_rate, start_frame)
         
         def add_color_strip(name, length, channel, color, strip_type, frame):
-            Utils.add_color_strip(name, length, channel, color, strip_type, frame)
+            add_color_strip(name, length, channel, color, strip_type, frame)
         
         def analyze_song(self, context, filepath):
             '''Use AI to analyze song for beats and sections'''
@@ -142,11 +143,11 @@ class SorcererPython:
             
         def find_available_channel(sequence_editor, start_frame, end_frame, start_channel=1):
             '''Use this to avoid adding strips on top of each other'''
-            return Utils.find_available_channel(sequence_editor, start_frame, end_frame, start_channel=1)
+            return find_available_channel(sequence_editor, start_frame, end_frame, start_channel=1)
         
         def duplicate_active_strip_to_selected(context):
             '''The function used by Copy Various to Selected and others'''
-            Utils.duplicate_active_strip_to_selected(context)
+            duplicate_active_strip_to_selected(context)
 
         def find_relevant_clock_object(scene):
             '''Find most relevant sound strip with a timecode clock assignment.
@@ -156,7 +157,7 @@ class SorcererPython:
         def calculate_flash_strip_bias(bias, frame_rate, strip_length_in_frames):
             '''Used by Flash strip background logic to apply bias to flash down
                timing, Returns a float'''
-            return Utils.calculate_flash_strip_bias(bias, frame_rate, strip_length_in_frames)
+            return calculate_flash_strip_bias(bias, frame_rate, strip_length_in_frames)
 
         def render_volume(speaker, empty, sensitivity, object_size, int_mixer_channel):
             '''Calculates volume for a 3d-audio-object and speaker pair'''

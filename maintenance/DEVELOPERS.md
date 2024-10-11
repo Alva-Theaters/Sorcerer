@@ -141,17 +141,9 @@ The swap_preview_and_program function swaps the preview and program for the ALVA
 
 The frame_to_timecode function converts the current frame number to a timecode string format (00:00:00:00). You pass it the frame number and optionally the frames per second (fps), and it returns the timecode string. The time_to_frame function converts a given time of a song to a frame number. You pass it the time, frame rate, and the start frame of the song strip, and it returns the frame number.
 
-The add_color_strip function adds a color strip to the timeline. You pass it the name, length, channel, color, strip type, and start frame of the strip, and it doesn’t return anything. 
-
 The analyze_song function uses AI to analyze a song for beats and sections. You pass it the context and the file path of the song, and it returns the analysis result. It doesn't work yet unless you already have the needed library installed on your computer. If you do, it might work, but hasn't been tested yet. Right now, it just returns a dummy class, which was used to get the Sorcerer side running in preparation of the full implementation coming soon.
 
-The find_available_channel function finds an available channel to avoid overlapping strips in the sequence editor. You pass it the sequence editor, start frame, end frame, and optionally the starting channel (default is 1), and it returns the available channel. 
-
-The duplicate_active_strip_to_selected function duplicates the active strip to selected strips. You pass it the context, and it doesn’t return anything.
-
 The find_relevant_clock_strip function finds the most relevant sound strip with a timecode clock assignment. You pass it the scene object, and it returns the relevant strip object. 
-
-The calculate_flash_strip_bias function calculates bias for flash strip background timing. You pass it the bias, frame rate, and the length of the strip in frames, and it returns the calculated bias as a float.
 
 The render_volume function calculates the volume for a 3D audio object and a speaker pair. You pass it the speaker, empty object, sensitivity, object size, and the integer mixer channel, and it returns the calculated volume. 
 
