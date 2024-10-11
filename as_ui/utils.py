@@ -24,9 +24,6 @@
 '''
 
 
-## Double hashtag indicates notes for future development requiring some level of attention
-
-
 def determine_sequencer_contexts(sequence_editor, active_strip):
     """Determines the alva_context and console_context based on the selected strips in the sequence_editor."""
     if sequence_editor and active_strip:

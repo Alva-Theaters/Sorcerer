@@ -23,9 +23,6 @@
 =====================================================================
 '''
 
-
-## Double hashtag indicates notes for future development requiring some level of attention
-
 import bpy
 from functools import partial
 import time

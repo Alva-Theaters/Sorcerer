@@ -24,9 +24,6 @@
 '''
 
 
-## Double hashtag indicates notes for future development requiring some level of attention
-
-
 import bpy
 import numpy as np   # type: ignore
 from typing import List, Tuple, Union

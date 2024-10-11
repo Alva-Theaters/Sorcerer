@@ -24,9 +24,6 @@
 '''
 
 
-## Double hashtag indicates notes for future development requiring some level of attention
-
-
 import re
 
 from ..utils.cpvia_utils import color_object_to_tuple_and_scale_up

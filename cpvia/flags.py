@@ -24,9 +24,6 @@
 '''
 
 
-## Double hashtag indicates notes for future development requiring some level of attention
-
-
 from ..maintenance.logging import alva_log
 
 

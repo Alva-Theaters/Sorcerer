@@ -24,9 +24,6 @@
 '''
 
 
-## Double hashtag indicates notes for future development requiring some level of attention
-
-
 import bpy
 
 from .space_common import draw_text_or_group_input, draw_parameters_mini

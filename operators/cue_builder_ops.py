@@ -24,9 +24,6 @@
 '''
 
 
-## Double hashtag indicates notes for future development requiring some level of attention
-
-
 from bpy.types import Operator
 from ..utils.properties_utils import parse_channels
 from ..utils.osc import OSC

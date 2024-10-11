@@ -24,9 +24,6 @@
 '''
 
 
-## Double hashtag indicates notes for future development requiring some level of attention
-
-
 from ..cpvia.publish import Publisher 
 from ..cpvia.find import Find 
 from ..utils.event_utils import EventUtils
@@ -118,7 +115,7 @@ class ColorSplitter:
 
         return new_p, new_v
     
-    
+
     def calculate_closeness(self, rgb_input, target_rgb, sensitivity=1.0):
         diff = sum(abs(input_c - target_c) for input_c, target_c in zip(rgb_input, target_rgb))
         normalized_diff = diff / (300 * sensitivity)

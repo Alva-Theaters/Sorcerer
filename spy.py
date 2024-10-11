@@ -24,9 +24,6 @@
 '''
 
 
-## Double hashtag indicates notes for future development requiring some level of attention
-
-
 '''
 This script, spy, is a sort of API here to make it easier for casual users
 to interact with Sorcerer functions programmatically. Inspired by Blender's 

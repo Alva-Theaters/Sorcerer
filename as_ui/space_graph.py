@@ -24,8 +24,5 @@
 '''
 
 
-## Double hashtag indicates notes for future development requiring some level of attention
-
-
 def draw_graph_header(self, context):
     self.layout.operator("graph.view_selected", text="", icon='VIEWZOOM')

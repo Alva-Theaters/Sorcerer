@@ -24,9 +24,6 @@
 '''
 
 
-## Double hashtag indicates notes for future development requiring some level of attention
-
-
 # Alva Logging for this script is actually done from the event_manager.py script.
 
 from ..utils.cpvia_utils import simplify_channels_list

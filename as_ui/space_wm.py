@@ -24,9 +24,6 @@
 '''
 
 
-## Double hashtag indicates notes for future development requiring some level of attention
-
-
 # Custom icon stuff
 import bpy.utils.previews
 import os

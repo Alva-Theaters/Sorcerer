@@ -20,9 +20,6 @@
 '''
 
 
-## Double hashtag indicates notes for future development requiring some level of attention
-
-
 import bpy
 from bpy.props import IntProperty, StringProperty, BoolProperty, EnumProperty, FloatProperty, FloatVectorProperty, PointerProperty, CollectionProperty
 from bpy.types import PropertyGroup, Scene

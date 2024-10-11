@@ -24,9 +24,6 @@
 '''
 
 
-## Double hashtag indicates notes for future development requiring some level of attention
-
-
 class Dictionaries:
     parameter_mapping = {
         "intensity": "float_intensity",
