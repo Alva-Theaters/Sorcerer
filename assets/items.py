@@ -297,22 +297,6 @@ class Items:
         ]
         return items
     
-    # from flash node
-    def get_motif_name_items(self, context):
-        unique_names = set()
-
-        sequences = context.scene.sequence_editor.sequences_all
-        for seq in sequences:
-            if hasattr(seq, 'motif_name'): 
-                unique_names.add(seq.motif_name)
-
-        if unique_names:
-            items = [(name, name, "") for name in sorted(unique_names)]
-        else:
-            items = [('NONE', 'No Motifs', 'No motifs available')]
-
-        return items
-    
     
     def transmission_options(self, context):
         items = [

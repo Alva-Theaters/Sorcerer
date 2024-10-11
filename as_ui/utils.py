@@ -84,3 +84,11 @@ def determine_sequencer_contexts(sequence_editor, active_strip):
         console_context = "none"
 
     return alva_context, console_context
+
+
+def find_group_label(controller):
+    '''Used by Global Node UI draw.'''
+    if not controller.is_text_not_group:
+        return controller.str_group_label
+    else:
+        return f"Channels {controller.str_manual_fixture_selection}"

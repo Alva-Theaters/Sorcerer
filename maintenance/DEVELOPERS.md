@@ -137,8 +137,6 @@ The *utils.parse_channels(input_string)* function parses an input string and ret
 
 The *utils.parse_mixer_channels(input_string)* function converts a string of mixer channel numbers into a list of tuples. You pass it the input string, and it returns a list of tuples. This is typically used when you want concurrent groups when user uses () (). So for example, if you were to pass this function "(1 - 5) (6 - 10)", the function would return [(1, 2, 3, 4, 5), (6, 7, 8, 9, 10)]. Whereas the normal *parse_channels(input_string)* function would just return a list if integers regardless of () in the input string.
 
-The try_parse_int function safely converts a value to an integer, avoiding runtime errors. You pass it the value, and it returns the integer or None. 
-
 The swap_preview_and_program function swaps the preview and program for the ALVA M/E Switcher. You pass it a list of cues, and it doesn’t return anything.
 
 The frame_to_timecode function converts the current frame number to a timecode string format (00:00:00:00). You pass it the frame number and optionally the frames per second (fps), and it returns the timecode string. The time_to_frame function converts a given time of a song to a frame number. You pass it the time, frame rate, and the start frame of the song strip, and it returns the frame number.
@@ -153,7 +151,7 @@ The duplicate_active_strip_to_selected function duplicates the active strip to s
 
 The find_relevant_clock_strip function finds the most relevant sound strip with a timecode clock assignment. You pass it the scene object, and it returns the relevant strip object. 
 
-The calculate_bias_offseter function calculates bias for flash strip background timing. You pass it the bias, frame rate, and the length of the strip in frames, and it returns the calculated bias as a float.
+The calculate_flash_strip_bias function calculates bias for flash strip background timing. You pass it the bias, frame rate, and the length of the strip in frames, and it returns the calculated bias as a float.
 
 The render_volume function calculates the volume for a 3D audio object and a speaker pair. You pass it the speaker, empty object, sensitivity, object size, and the integer mixer channel, and it returns the calculated volume. 
 

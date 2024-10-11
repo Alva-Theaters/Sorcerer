@@ -72,7 +72,7 @@ class StripMapping:
             bias = strip.flash_bias
             frame_rate = Utils.get_frame_rate(scene)
             strip_length_in_frames = strip.frame_final_duration
-            bias_in_frames = Utils.calculate_bias_offseter(bias, frame_rate, strip_length_in_frames)
+            bias_in_frames = Utils.calculate_flash_strip_bias(bias, frame_rate, strip_length_in_frames)
             start_frame = strip.frame_start
             end_flash_macro_frame = start_frame + bias_in_frames
             end_flash_macro_frame = int(round(end_flash_macro_frame))

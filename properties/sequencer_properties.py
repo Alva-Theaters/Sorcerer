@@ -105,7 +105,7 @@ def register():
 
     # Cue Strips
     ColorSequence.eos_cue_number = StringProperty(name="", update=Updaters.motif_property_updater, description="This argument will be fired with the above prefix when frame 1 of the strip comes up in the sequencer. The top three fields here will definitely work on any console brand/type that has an OSC input library")
-    ColorSequence.osc_auto_cue = StringProperty(get=Utils.get_auto_cue_string)
+    ColorSequence.osc_auto_cue = StringProperty(get=Utils.form_livemap_string)
     # Livemap label for header/footer.
     Scene.livemap_label = StringProperty(name="Livemap Label", default="Livemap Cue:")
     # Cue builder

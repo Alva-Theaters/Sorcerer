@@ -29,7 +29,7 @@
 
 import bpy
 
-from ..utils.utils import Utils
+from .utils import find_group_label
 
 # Custom icon stuff
 import bpy.utils.previews
@@ -509,7 +509,7 @@ def draw_global_node(self, context, layout):
         
         for con in node_tree.nodes:
             if con.bl_idname == 'group_controller_type':
-                group_label = Utils.find_group_label(con)
+                group_label = find_group_label(con)
                 if not self.parameters_enum in ['option_color', 'option_compound']:
                     col = layout.column()
                     row = col.row()

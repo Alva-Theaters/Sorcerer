@@ -121,11 +121,6 @@ class SorcererPython:
                in mixers'''
             return Utils.parse_mixer_channels(input_string)
             
-        def try_parse_int(value):
-            '''Use this to avoid runtime errors converting to int. Returns int or none.
-               This is just a try/except for int()'''
-            return Utils.try_parse_int(value)
-            
         def swap_preview_and_program(cue_list):
             '''Used for the ALVA M/E Switcher'''
             Utils.swap_preview_and_program(cue_list)
@@ -158,10 +153,10 @@ class SorcererPython:
                Returns a bpy strip object'''
             return Utils.find_relevant_clock_object(scene)
             
-        def calculate_bias_offseter(bias, frame_rate, strip_length_in_frames):
+        def calculate_flash_strip_bias(bias, frame_rate, strip_length_in_frames):
             '''Used by Flash strip background logic to apply bias to flash down
                timing, Returns a float'''
-            return Utils.calculate_bias_offseter(bias, frame_rate, strip_length_in_frames)
+            return Utils.calculate_flash_strip_bias(bias, frame_rate, strip_length_in_frames)
 
         def render_volume(speaker, empty, sensitivity, object_size, int_mixer_channel):
             '''Calculates volume for a 3d-audio-object and speaker pair'''

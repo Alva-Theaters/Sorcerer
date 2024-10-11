@@ -70,6 +70,8 @@ class AnalysisResult:
 
 
 class Utils:
+
+    # properties_utils.py
     def register_properties(cls, properties, register=True):
         if register:
             for prop_name, prop_value in properties:
@@ -77,30 +79,6 @@ class Utils:
         else:
             for prop_name, _ in reversed(properties):
                 delattr(cls, prop_name)
-                
-
-    def find_subclass_by_name(base_class, subclass_name):
-        """
-        Find a subclass of base_class with the given subclass_name.
-        This is for when we run Sorcerer from the built-in text editor
-        and need to register properties using PropertyGroup subclasses
-        registered from another script, in this case, property_groups.py.
-        
-        Args:
-            base_class (class): The base class to search for subclasses.
-            subclass_name (str): The name of the subclass to find.
-        
-        Returns:
-            class: The found subclass.
-        """
-        for subclass in base_class.__subclasses__():
-            if subclass.__name__ == subclass_name:
-                return subclass
-        assert False, f"{subclass_name} not registered"
-        
-
-    def get_frame_rate(scene):
-        return round((scene.render.fps / scene.render.fps_base), 2)
 
 
     def parse_channels(input_string, remove=False):
@@ -186,6 +164,7 @@ class Utils:
             print(f"An error has occured within parse_channels: {e}")
             return None
 
+
     def parse_mixer_channels(input_string):
         try:
             groups = re.findall(r'\(([^)]+)\)', input_string)
@@ -213,6 +192,29 @@ class Utils:
             if hasattr(controller, "str_manual_fixture_selection"):
                 controller.str_manual_fixture_selection = controller.str_manual_fixture_selection
 
+
+    # event_utils.py
+    def get_frame_rate(scene):
+        return round((scene.render.fps / scene.render.fps_base), 2)
+    
+
+    def frame_to_timecode(frame, fps=None):
+        context = bpy.context
+        """Convert frame number to timecode format."""
+        if fps is None:
+            fps = context.scene.render.fps_base * context.scene.render.fps
+        hours = int(frame // (fps * 3600))
+        frame %= fps * 3600
+        minutes = int(frame // (fps * 60))
+        frame %= fps * 60
+        seconds = int(frame // fps)
+        frames = int(round(frame % fps))
+        return "{:02}:{:02}:{:02}:{:02}".format(hours, minutes, seconds, frames)
+    
+
+    def time_to_frame(time, frame_rate, start_frame):
+        return int(time * frame_rate) + start_frame
+    
 
     def get_loc_rot(obj, use_matrix=False):
         x_pos, y_pos, z_pos, x_rot_rad, y_rot_rad, z_rot_rad  = Utils.get_original_loc_rot(obj, use_matrix)
@@ -260,13 +262,23 @@ class Utils:
 
         return x_pos, y_pos, z_pos, x_rot_rad, y_rot_rad, z_rot_rad 
 
-                
-    def try_parse_int(value):
-        try:
-            return int(value)
-        except ValueError:
-            return None
-                
+
+    # orb_utils.py
+    def find_addresses(starting_universe, starting_address, channel_mode, total_lights):
+        address_list = []
+        universe = starting_universe
+        address = starting_address
+
+        for i in range(total_lights):
+            if address + channel_mode - 1 > 512:
+                universe += 1
+                address = 1
+            address_list.append((universe, address))
+            address += channel_mode
+        return address_list
+
+
+    # properties_utils.py
     def swap_preview_and_program(cue_list):
         if not cue_list.is_progressive:
             temp = cue_list.int_preview_index
@@ -276,23 +288,9 @@ class Utils:
         else:
             cue_list.int_program_index = (cue_list.int_preview_index)
             cue_list.int_preview_index = (cue_list.int_program_index + 1)
-                        
-    def frame_to_timecode(frame, fps=None):
-        context = bpy.context
-        """Convert frame number to timecode format."""
-        if fps is None:
-            fps = context.scene.render.fps_base * context.scene.render.fps
-        hours = int(frame // (fps * 3600))
-        frame %= fps * 3600
-        minutes = int(frame // (fps * 60))
-        frame %= fps * 60
-        seconds = int(frame // fps)
-        frames = int(round(frame % fps))
-        return "{:02}:{:02}:{:02}:{:02}".format(hours, minutes, seconds, frames)
 
-    def time_to_frame(time, frame_rate, start_frame):
-        return int(time * frame_rate) + start_frame
 
+    # sequencer_utils.py
     def add_color_strip(name, length, channel, color, strip_type, frame):
         scene = bpy.context.scene
         strip = scene.sequence_editor.sequences.new_effect(
@@ -305,6 +303,7 @@ class Utils:
         strip.color = color
         strip.my_settings.motif_type_enum = strip_type
         
+
     def analyze_song(self, filepath):
         try:
             return allin1.analyze(filepath)
@@ -366,6 +365,7 @@ class Utils:
                 ]
         )
 
+
     def find_available_channel(sequence_editor, start_frame, end_frame, start_channel=1):
         current_channel = start_channel
 
@@ -377,6 +377,7 @@ class Utils:
             if not is_occupied:
                 return current_channel
             current_channel += 1
+
 
     def duplicate_active_strip_to_selected(context):
         sequence_editor = context.scene.sequence_editor
@@ -421,24 +422,13 @@ class Utils:
             strip.select = True
 
         return True, "Strips replaced with duplicates of the active strip successfully."
-            
-    # "auto_cue" aka Livemap
-    def get_auto_cue_string(self):
-        frame_rate = bpy.context.scene.render.fps / bpy.context.scene.render.fps_base
-        strip_length_in_seconds = round(self.frame_final_duration / frame_rate, 2)
-        return "Go_to_Cue " + str(self.eos_cue_number) + " Time Enter"
 
-    def get_motif_name_items(self, context):
-        unique_names = set() 
-        sequences = context.scene.sequence_editor.sequences_all
-        for seq in sequences:
-            if hasattr(seq, 'motif_name'):  
-                unique_names.add(seq.motif_name)
-        items = [(name, name, "") for name in sorted(unique_names)]
-        return items
-            
-    # For flash end macro.
-    def calculate_bias_offseter(bias, frame_rate, strip_length_in_frames):
+
+    def form_livemap_string(self):
+        return f"Go_to_Cue {str(self.eos_cue_number)} Time Enter"
+
+
+    def calculate_flash_strip_bias(bias, frame_rate, strip_length_in_frames):
         if bias == 0:
             return strip_length_in_frames / 2
         elif bias < 0:
@@ -448,6 +438,8 @@ class Utils:
             proportion_of_second_half = bias / 49
             return round(strip_length_in_frames * (0.5 + proportion_of_second_half * 0.5))
 
+
+    # audio_utils.py
     def render_volume(speaker, empty, sensitivity, object_size, int_mixer_channel):
         '''Basically a crude form of the Dolby Atmos Renderer'''
         distance = (speaker.location - empty.location).length
@@ -472,6 +464,7 @@ class Utils:
         return volume
 
 
+    # cpvia_utils.py
     def color_object_to_tuple_and_scale_up(v):
         if type(v) == mathutils.Color:
             return (v.r * 100, v.g * 100, v.b * 100)
@@ -479,13 +472,6 @@ class Utils:
         else: 
             r, g, b = v
             return (r * 100, g * 100, b * 100)
-        
-
-    def find_group_label(controller):
-        if not controller.is_text_not_group:
-            return controller.str_group_label
-        else:
-            return f"Channels {controller.str_manual_fixture_selection}"
         
         
     def update_nodes(connected_nodes):
@@ -544,20 +530,6 @@ class Utils:
                         setattr(controller, prop_name, 0)
                 except AttributeError:
                     print(f"Attribute {prop_name} not found in controller, skipping.")
-        
-
-    def find_addresses(starting_universe, starting_address, channel_mode, total_lights):
-        address_list = []
-        universe = starting_universe
-        address = starting_address
-
-        for i in range(total_lights):
-            if address + channel_mode - 1 > 512:
-                universe += 1
-                address = 1
-            address_list.append((universe, address))
-            address += channel_mode
-        return address_list
     
 
     def simplify_channels_list(channels):
@@ -628,6 +600,7 @@ class Utils:
                 
         return results
 
+
     def add_underscores_to_keywords(input_string):
         osc_keys = Dictionaries.osc_keys
         macro_buttons = Dictionaries.macro_buttons
@@ -650,7 +623,8 @@ class Utils:
                 print(f"Error with keyword '{keyword_no_underscore}': {e}")
         
         return input_string
-        
+
+
     def tokenize(input_string):
         replacements = ["{", "}", "[", "]", "<", ">"]
         clean_string = input_string
@@ -680,6 +654,7 @@ class Utils:
 
         return Utils.add_new_index(scene, new_index, object, executor_type)
 
+
     def find_new_executor(scene, executor_type):
         executor_map = {
             'event_list': 'event_list',
@@ -703,8 +678,10 @@ class Utils:
             print(f"An error occurred within find_new_executor with argument {executor_type}. Returning default index")
             return DEFAULT_EXECUTOR_INDEX
 
+
     def get_all_executor_strip_names(scene):
         return [strip.name for strip in scene.sequence_editor.sequences if (strip.type == 'COLOR' or strip.type =='SOUND')]
+
 
     def find_unused_index(scene, range, base_attribute):
         strips = Utils.get_all_executor_strips(scene)
@@ -728,17 +705,20 @@ class Utils:
 
         return None
     
+
     def get_all_executor_strips(scene):
         strips = [strip for strip in scene.sequence_editor.sequences if (strip.type == 'COLOR' or strip.type =='SOUND')]
         strips.append(scene)
         return strips
     
+
     def add_new_index(scene, new_index, object, executor_type):
         try:
             setattr(object, f"int_{executor_type}", new_index)
         except:
             print("An error occured while trying to set property to new index.")
         return new_index 
+
 
     #-------------------------------------------------------------------------------------------------------------------------------------------
     '''Spy's make Eos macros'''
@@ -769,6 +749,7 @@ class Utils:
                 return
             
 
+# event_utils.py
 def is_rendered_mode():
     for screen in bpy.data.screens:
         for area in screen.areas:

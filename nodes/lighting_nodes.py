@@ -383,43 +383,6 @@ class NODE_NT_console_buttons(Node):
 
     def draw_buttons(self, context, layout):
         draw_console_node(self, context, layout)
-
-
-class NODE_NT_flash(Node):
-    bl_idname = 'flash_type'
-    bl_label = 'Flash'
-    bl_icon = 'LIGHT_SUN'
-    bl_width_default = 190
-    bl_description="Autofill the Flash Up and Flash Down fields of flash strips in Sequencer with node settings and noodle links. Intended primarily for pose-based choreography"
-    
-    node_tree_pointer: PointerProperty(
-        name="Node Tree Pointer",
-        type=bpy.types.NodeTree,
-        description="Pointer to the node tree"
-    ) 
-    
-    flash_motif_names_enum: EnumProperty(
-        name="",
-        description="List of unique motif names",
-        items=AlvaItems.get_motif_name_items,
-        update=NodeUpdaters.flash_node_updater,
-        default=0
-    ) 
-    
-    show_effect_preset_settings: BoolProperty(default=False, description="Show settings", update=NodeUpdaters.flash_node_updater) 
-    int_start_preset: IntProperty(default=0, description="Preset number on console", update=NodeUpdaters.flash_node_updater)  
-    int_end_preset: IntProperty(default=0, description="Preset number on console", update=NodeUpdaters.flash_node_updater)  
-    
-    def init(self, context):
-        up = self.inputs.new('FlashUpType', "Flash Up")
-        down = self.inputs.new('FlashDownType', "Flash Down")
-        up.link_limit = LINK_LIMIT
-        down.link_limit = LINK_LIMIT
-        self.node_tree_pointer = self.id_data
-        return
-    
-    def draw_buttons(self, context, layout):
-        draw_flash_node(self, context, layout)
         
         
 class NODE_NT_alva_presets(Node):
@@ -472,7 +435,6 @@ nodes = [
     NODE_NT_mixer,
     NODE_NT_motor,
     NODE_NT_console_buttons,
-    NODE_NT_flash,
     NODE_NT_pan_tilt,
     NODE_NT_global,
     NODE_NT_alva_presets,
