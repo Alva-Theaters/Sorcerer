@@ -41,6 +41,7 @@ from ..as_ui.space_sequencer import (
 )
 from ..as_ui.utils import determine_sequencer_contexts
 from ..utils.utils import Utils 
+from ..utils.event_utils import EventUtils
 from ..utils.properties_utils import parse_channels
 from ..utils.sequencer_utils import calculate_flash_strip_bias, find_available_channel, add_color_strip
 from ..utils.osc import OSC
@@ -1293,7 +1294,7 @@ class SEQUENCER_OT_analyze_song(Operator):
             result = Utils.analyze_song(self, filepath)
             
             scene = context.scene
-            frame_rate = Utils.get_frame_rate(scene)
+            frame_rate = EventUtils.get_frame_rate(scene)
             start_frame = active_sequence.frame_start
             
             beats = [Utils.time_to_frame(beat, frame_rate, start_frame) for beat in result.beats]
@@ -1531,7 +1532,7 @@ class SEQUENCER_OT_sync_cue(Operator):
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
         
-        frame_rate = Utils.get_frame_rate(context.scene)
+        frame_rate = EventUtils.get_frame_rate(context.scene)
         strip_length_in_seconds_total = int(round(active_strip.frame_final_duration / frame_rate))
         minutes = strip_length_in_seconds_total // 60
         seconds = strip_length_in_seconds_total % 60
@@ -1726,7 +1727,7 @@ class SEQUENCER_OT_generate_text(Operator):
         seq_start = context.scene.frame_start
         seq_end = context.scene.frame_end
         active_strip = context.scene.sequence_editor.active_strip
-        frames_per_second = Utils.get_frame_rate(scene)
+        frames_per_second = EventUtils.get_frame_rate(scene)
         
         #Determines if song strip starts at frame 1 and if not, by what positive or negative amount
         if active_strip.frame_start > 1:
@@ -1821,7 +1822,7 @@ $$Software Version 3.2.2 Build 25  Fixture Library 3.2.0.75, 26.Apr.2023
                 start_frame = strip.frame_start - slide_factor
                 end_frame = strip.frame_final_end
                 bias = strip.flash_bias
-                frame_rate = Utils.get_frame_rate(scene)
+                frame_rate = EventUtils.get_frame_rate(scene)
                 strip_length_in_frames = strip.frame_final_duration
                 bias_in_frames = calculate_flash_strip_bias(bias, frame_rate, strip_length_in_frames)
                 start_frame = strip.frame_start - slide_factor

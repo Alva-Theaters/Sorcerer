@@ -30,6 +30,7 @@ from bpy.types import Operator
 from bpy.props import BoolProperty
 
 from ..utils.utils import Utils 
+from ..utils.event_utils import EventUtils
 from ..utils.osc import OSC
 from ..orb import Orb
 
@@ -44,7 +45,7 @@ class ORB_OT_base_modal_operator(Operator):
     def execute(self, context):
         self._cancel = False
         if self.strip == 'qmeo':
-            frame_rate = Utils.get_frame_rate(context.scene)
+            frame_rate = EventUtils.get_frame_rate(context.scene)
             if self.is_sound:
                 active_strip = context.scene.sequence_editor.active_strip
                 start_frame = active_strip.frame_start
@@ -229,7 +230,7 @@ class SEQUENCER_OT_only_cues(Operator):
     
     def execute(self, context):
         active_strip = context.scene.sequence_editor.active_strip
-        frame_rate = Utils.get_frame_rate(context.scene)
+        frame_rate = EventUtils.get_frame_rate(context.scene)
         start_frame = active_strip.frame_start
         end_frame = active_strip.frame_final_end
         cue_list = active_strip.int_cue_list

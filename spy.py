@@ -42,6 +42,7 @@ import bpy
 
 from .utils.osc import OSC
 from .utils.utils import Utils
+from .utils.event_utils import EventUtils
 from .utils.sequencer_utils import calculate_flash_strip_bias, duplicate_active_strip_to_selected, find_available_channel, add_color_strip
 from .utils.properties_utils import parse_channels, parse_mixer_channels
 from .cpvia.find import Find
@@ -111,7 +112,7 @@ class SorcererPython:
             '''ALWAYS use this, NOT scene.render.fps. Must divide 
                render.fps by render.base and round for true fps, done 
                here'''
-            return Utils.get_frame_rate(scene)
+            return EventUtils.get_frame_rate(scene)
             
         def parse_channels(input_string):
             '''Convert user string to list of integers representing channel numbers'''

@@ -42,76 +42,6 @@ DEFAULT_EXECUTOR_INDEX = 1
 
 
 class Utils:
-    # event_utils.py
-    def get_frame_rate(scene):
-        return round((scene.render.fps / scene.render.fps_base), 2)
-    
-
-    def frame_to_timecode(frame, fps=None):
-        context = bpy.context
-        """Convert frame number to timecode format."""
-        if fps is None:
-            fps = context.scene.render.fps_base * context.scene.render.fps
-        hours = int(frame // (fps * 3600))
-        frame %= fps * 3600
-        minutes = int(frame // (fps * 60))
-        frame %= fps * 60
-        seconds = int(frame // fps)
-        frames = int(round(frame % fps))
-        return "{:02}:{:02}:{:02}:{:02}".format(hours, minutes, seconds, frames)
-    
-
-    def time_to_frame(time, frame_rate, start_frame):
-        return int(time * frame_rate) + start_frame
-    
-
-    def get_loc_rot(obj, use_matrix=False):
-        x_pos, y_pos, z_pos, x_rot_rad, y_rot_rad, z_rot_rad  = Utils.get_original_loc_rot(obj, use_matrix)
-
-        # Convert meters to feet.
-        position_x = round(x_pos / .3048, 2)
-        position_y = round(y_pos / .3048, 2)
-        position_z = round(z_pos / .3048, 2)
-
-        # Round and rotate x by 180 degrees (pi in radians) since cone facing up is the same as a light facing down.
-        orientation_x = round(math.degrees(x_rot_rad + math.pi), 2)
-        orientation_y = round(math.degrees(y_rot_rad), 2)
-        orientation_z = round(math.degrees(z_rot_rad), 2)
-
-        return position_x, position_y, position_z, orientation_x, orientation_y, orientation_z
-    
-    
-    def get_original_loc_rot(obj, use_matrix=False):
-        if use_matrix:
-            depsgraph = bpy.context.evaluated_depsgraph_get()
-            eval_obj = obj.evaluated_get(depsgraph)
-            
-            bpy.context.view_layer.update()
-            
-            matrix = eval_obj.matrix_world
-            euler = matrix.to_euler('XYZ')
-
-            # Convert radians to degrees for rotation
-            x_rot_rad = euler.x
-            y_rot_rad = euler.y
-            z_rot_rad = euler.z
-
-            position = matrix.translation
-            x_pos = position.x
-            y_pos = position.y
-            z_pos = position.z
-
-        else:
-            x_pos = obj.location.x
-            y_pos = obj.location.y
-            z_pos = obj.location.z
-            x_rot_rad = obj.rotation_euler.x
-            y_rot_rad = obj.rotation_euler.y
-            z_rot_rad = obj.rotation_euler.z
-
-        return x_pos, y_pos, z_pos, x_rot_rad, y_rot_rad, z_rot_rad 
-
-
     # orb_utils.py
     def find_addresses(starting_universe, starting_address, channel_mode, total_lights):
         address_list = []
@@ -447,14 +377,3 @@ class Utils:
             else:
                 print("Error: Macro indexes on ETC Eos only go up to 99,999.")
                 return
-            
-
-# event_utils.py
-def is_rendered_mode():
-    for screen in bpy.data.screens:
-        for area in screen.areas:
-            if area.type == 'VIEW_3D':
-                for space in area.spaces:
-                    if space.type == 'VIEW_3D' and space.shading.type == 'RENDERED':
-                        return True
-    return False

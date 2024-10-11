@@ -30,7 +30,7 @@
 import bpy
 
 from ..assets.sli import SLI
-from ..utils.utils import Utils
+from ..utils.event_utils import EventUtils
 
 # Custom icon stuff
 import bpy.utils.previews
@@ -247,7 +247,7 @@ def draw_fps(self, context, column):
     # FPS section
     box = column.box()
     row = box.row()
-    row.label(text=f"True FPS: {str(Utils.get_frame_rate(context.scene))}")
+    row.label(text=f"True FPS: {str(EventUtils.get_frame_rate(context.scene))}")
     row.prop(context.scene.render, "fps")
     row.prop(context.scene.render, "fps_base")
 

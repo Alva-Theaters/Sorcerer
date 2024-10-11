@@ -34,7 +34,7 @@ from ..cpvia.find import Find
 from ..cpvia.cpvia_finders import CPVIAFinders 
 from ..cpvia.split_color import ColorSplitter 
 from ..cpvia.flags import check_flags
-from ..utils.utils import is_rendered_mode
+from ..utils.event_utils import EventUtils
 from ..maintenance.logging import alva_log
 
 
@@ -100,7 +100,7 @@ class CPVIAGenerator:
             i.append(influence)
             a.append(argument)
 
-        #is_rendering = is_rendered_mode()
+        #is_rendering = EventUtils.is_rendered_mode()
         is_rendering = False # Until Blender fixes their stuff. Can't enable render mode without immediately crashing.
         alva_log("cpvia_generator", f"CPVIA: {c}, {p}, {v}, {i}, {a}")
         for chan, param, val, inf, arg in zip(c, p, v, i, a):

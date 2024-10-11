@@ -31,6 +31,7 @@ import re
 from collections import defaultdict
 
 from ..utils.utils import Utils
+from ..utils.event_utils import EventUtils
 from ..utils.properties_utils import parse_channels
 from ..utils.sequencer_utils import calculate_flash_strip_bias
 
@@ -72,7 +73,7 @@ class StripMapping:
         for strip in filter_eos_flash_strips(scene.sequence_editor.sequences):
             data = (strip.name, str(strip.int_end_macro))
             bias = strip.flash_bias
-            frame_rate = Utils.get_frame_rate(scene)
+            frame_rate = EventUtils.get_frame_rate(scene)
             strip_length_in_frames = strip.frame_final_duration
             bias_in_frames = calculate_flash_strip_bias(bias, frame_rate, strip_length_in_frames)
             start_frame = strip.frame_start
@@ -240,7 +241,7 @@ def generate_command_strings(command, channels):
 
 def offset_mapping_to_string(mapping, scene):
     try:
-        fps = Utils.get_frame_rate(scene)
+        fps = EventUtils.get_frame_rate(scene)
 
         result_list = []
         initial_offset = list(mapping.keys())[0]

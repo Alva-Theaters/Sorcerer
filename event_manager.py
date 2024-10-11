@@ -490,9 +490,9 @@ class EventManager:
 
             if relevant_clock_object:
                 current_frame = scene.frame_current
-                fps = NormalUtils.get_frame_rate(scene)
+                fps = Utils.get_frame_rate(scene)
                 lag = scene.timecode_expected_lag
-                timecode = NormalUtils.frame_to_timecode(current_frame+lag, fps)
+                timecode = Utils.frame_to_timecode(current_frame+lag, fps)
                 int_fps = int(fps)
                 clock = relevant_clock_object.int_event_list
                 '''C1:4'''

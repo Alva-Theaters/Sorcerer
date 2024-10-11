@@ -105,7 +105,8 @@ class Orb:
             active_strip.flash_input = active_strip.flash_input
             active_strip.flash_down_input = active_strip.flash_down_input
 
-            frame_rate = Utils.get_frame_rate(scene)
+            from .utils.event_utils import EventUtils
+            frame_rate = EventUtils.get_frame_rate(scene)
             strip_length_in_frames = active_strip.frame_final_duration
             strip_length_in_seconds = strip_length_in_frames / frame_rate
             bias = active_strip.flash_bias
@@ -546,8 +547,8 @@ class Orb:
                 for frame in action_map:
                     actions = action_map[frame]
                     for label, index in actions:
-                        fps = Utils.get_frame_rate(context.scene)
-                        timecode = Utils.frame_to_timecode(frame, fps)
+                        fps = EventUtils.get_frame_rate(context.scene)
+                        timecode = EventUtils.frame_to_timecode(frame, fps)
                         argument = f"Event {event_list} / {i} Time {timecode} Show_Control_Action {description} {index} Enter"
                         commands.append(argument)
                         i += 1
