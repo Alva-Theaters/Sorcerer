@@ -32,7 +32,7 @@ from bpy.app.handlers import persistent
 import time
 
 from .utils.event_utils import EventUtils as Utils
-from .utils.utils import Utils as NormalUtils
+from .utils.audio_utils import render_volume
 from .cpvia.find import Find
 from .utils.osc import OSC
 from .cpvia.harmonizer import Harmonizer
@@ -329,7 +329,7 @@ class EventManager:
                     speaker = strip.selected_speaker
                     if speaker and empty:
                         sensitivity = getattr(strip, 'speaker_sensitivity', 1)
-                        strip.dummy_volume = Utils.render_volume(speaker, empty, sensitivity, object_size, strip.int_mixer_channel)
+                        strip.dummy_volume = render_volume(speaker, empty, sensitivity, object_size, strip.int_mixer_channel)
 
 
     #-------------------------------------------------------------------------------------------------------------------------------------------

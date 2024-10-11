@@ -29,7 +29,6 @@ import bpy
 from bpy.types import Operator
 from bpy.props import BoolProperty
 
-from ..utils.utils import Utils 
 from ..utils.event_utils import EventUtils
 from ..utils.osc import OSC
 from ..orb import Orb

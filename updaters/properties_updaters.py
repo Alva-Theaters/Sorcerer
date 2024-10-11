@@ -28,7 +28,6 @@
 
 
 import time
-from ..utils.utils import Utils
 from ..utils.osc import OSC
 
 
@@ -60,7 +59,7 @@ class PropertiesUpdaters:
         program_cue = cue_list.cues[cue_list.int_program_index].int_number
         
         if cue_list.int_t_bar == cue_list.t_bar_target:
-            Utils.swap_preview_and_program(cue_list)
+            PropertiesUpdaters.swap_preview_and_program(cue_list)
             cue_list.t_bar_target = LOWER_TARGET if cue_list.t_bar_target == UPPER_TARGET else UPPER_TARGET
             cue_list.int_velocity_multiplier *= -1  # to reverse how we detect false starts
             scene.int_fader_bar_memory = current_value
@@ -135,3 +134,14 @@ class PropertiesUpdaters:
             return (current_value - 0) / abs(current_velocity)
         else:
             return (target_value - current_value) / current_velocity
+        
+
+    def swap_preview_and_program(cue_list):
+        if not cue_list.is_progressive:
+            temp = cue_list.int_preview_index
+            cue_list.int_preview_index = cue_list.int_program_index
+            cue_list.int_program_index = temp
+            
+        else:
+            cue_list.int_program_index = (cue_list.int_preview_index)
+            cue_list.int_preview_index = (cue_list.int_program_index + 1)

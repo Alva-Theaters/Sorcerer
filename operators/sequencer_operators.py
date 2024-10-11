@@ -40,11 +40,10 @@ from ..as_ui.space_sequencer import (
     draw_strip_formatter_generator
 )
 from ..as_ui.utils import determine_sequencer_contexts
-from ..utils.utils import Utils 
 from ..utils.cpvia_utils import simplify_channels_list
 from ..utils.event_utils import EventUtils
 from ..utils.properties_utils import parse_channels
-from ..utils.sequencer_utils import calculate_flash_strip_bias, find_available_channel, add_color_strip
+from ..utils.sequencer_utils import calculate_flash_strip_bias, find_available_channel, add_color_strip, analyze_song
 from ..utils.osc import OSC
 from ..orb import Orb
 from ..maintenance.logging import alva_log
@@ -1292,15 +1291,15 @@ class SEQUENCER_OT_analyze_song(Operator):
         if active_sequence and active_sequence.type == 'SOUND':
             active_strip = context.scene.sequence_editor.active_strip
             filepath = bpy.path.abspath(active_sequence.sound.filepath)
-            result = Utils.analyze_song(self, filepath)
+            result = analyze_song(self, filepath)
             
             scene = context.scene
             frame_rate = EventUtils.get_frame_rate(scene)
             start_frame = active_sequence.frame_start
             
-            beats = [Utils.time_to_frame(beat, frame_rate, start_frame) for beat in result.beats]
-            downbeats = [Utils.time_to_frame(downbeat, frame_rate, start_frame) for downbeat in result.downbeats]
-            cues = [Utils.time_to_frame(segment.start, frame_rate, start_frame) for segment in result.segments]
+            beats = [EventUtils.time_to_frame(beat, frame_rate, start_frame) for beat in result.beats]
+            downbeats = [EventUtils.time_to_frame(downbeat, frame_rate, start_frame) for downbeat in result.downbeats]
+            cues = [EventUtils.time_to_frame(segment.start, frame_rate, start_frame) for segment in result.segments]
             beat_positions = result.beat_positions  # Extract beat positions
 
             corrected_cues = remove_overlapping_cues(cues)
@@ -1790,7 +1789,7 @@ $$Software Version 3.2.2 Build 25  Fixture Library 3.2.0.75, 26.Apr.2023
                 strip_name = strip.name
                 start_frame = strip.frame_start - slide_factor
                 if eos_cue_number:         
-                    text_block.write("$Timecode  " + Utils.frame_to_timecode(start_frame) + "\n")
+                    text_block.write("$Timecode  " + EventUtils.frame_to_timecode(start_frame) + "\n")
                     text_block.write("Text " + strip_name + "\n")
                     text_block.write("$$SCData C 1/" + str(eos_cue_number) + "\n")
                     text_block.write("\n")
@@ -1804,13 +1803,13 @@ $$Software Version 3.2.2 Build 25  Fixture Library 3.2.0.75, 26.Apr.2023
                 start_frame = strip.frame_start - slide_factor
                 end_frame = strip.frame_final_end - slide_factor
                 if start_macro_number != 0 and not strip.start_macro_muted:         
-                    text_block.write("$Timecode  " + Utils.frame_to_timecode(start_frame) + "\n")
+                    text_block.write("$Timecode  " + EventUtils.frame_to_timecode(start_frame) + "\n")
                     text_block.write("Text " + strip_name + " (Start Macro)" + "\n")
                     text_block.write("$$SCData M " + str(start_macro_number) + "\n")  
                     text_block.write("\n")
                     text_block.write("\n")
                 if end_macro_number != 0 and not strip.end_macro_muted:         
-                    text_block.write("$Timecode  " + Utils.frame_to_timecode(end_frame) + "\n")
+                    text_block.write("$Timecode  " + EventUtils.frame_to_timecode(end_frame) + "\n")
                     text_block.write("Text " + strip_name + " (End Macro)" + "\n")
                     text_block.write("$$SCData M " + str(end_macro_number) + "\n")    
                     text_block.write("\n")
@@ -1833,13 +1832,13 @@ $$Software Version 3.2.2 Build 25  Fixture Library 3.2.0.75, 26.Apr.2023
 
                 # If only the start flash macro is provided
                 if start_flash_macro_number != 0:         
-                    text_block.write("$Timecode  " + Utils.frame_to_timecode(start_frame) + "\n")
+                    text_block.write("$Timecode  " + EventUtils.frame_to_timecode(start_frame) + "\n")
                     text_block.write("Text " + strip_name + " (Flash Up)" + "\n")
                     text_block.write("$$SCData M " + str(start_flash_macro_number) + "\n")  
                     text_block.write("\n")
                     text_block.write("\n")
                 if end_flash_macro_number != 0:         
-                    text_block.write("$Timecode  " + Utils.frame_to_timecode(end_frame) + "\n")
+                    text_block.write("$Timecode  " + EventUtils.frame_to_timecode(end_frame) + "\n")
                     text_block.write("Text " + strip_name + " (Flash Down)" + "\n")
                     text_block.write("$$SCData M " + str(end_flash_macro_number) + "\n")    
                     text_block.write("\n")

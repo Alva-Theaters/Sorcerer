@@ -42,11 +42,13 @@ import bpy
 import time
 
 from .utils.osc import OSC
-from .utils.utils import Utils
+from .utils.audio_utils import render_volume
 from .utils.event_utils import EventUtils
 from .utils.sequencer_utils import calculate_flash_strip_bias, duplicate_active_strip_to_selected, find_available_channel, add_color_strip
 from .utils.properties_utils import parse_channels, parse_mixer_channels
 from .utils.cpvia_utils import color_object_to_tuple_and_scale_up, update_alva_controller, home_alva_controller
+from .utils.sequencer_utils import analyze_song
+from .updaters.properties_updaters import PropertiesUpdaters
 from .cpvia.find import Find
 from .cpvia.mix import Mixer
 from .cpvia.influencers import Influencers
@@ -148,22 +150,22 @@ class SorcererPython:
             
         def swap_preview_and_program(cue_list):
             '''Used for the ALVA M/E Switcher'''
-            Utils.swap_preview_and_program(cue_list)
+            PropertiesUpdaters.swap_preview_and_program(cue_list)
             
         def frame_to_timecode(frame, fps=None):
             '''Convert current frame to 00:00:00:00, in string'''
-            return Utils.frame_to_timecode(frame, fps=None)
+            return EventUtils.frame_to_timecode(frame, fps=None)
         
         def time_to_frame(time, frame_rate, start_frame):
             '''Convert time of song to frame, considering start frame of song strip'''
-            return Utils.time_to_frame(time, frame_rate, start_frame)
+            return EventUtils.time_to_frame(time, frame_rate, start_frame)
         
         def add_color_strip(name, length, channel, color, strip_type, frame):
             add_color_strip(name, length, channel, color, strip_type, frame)
         
         def analyze_song(self, context, filepath):
             '''Use AI to analyze song for beats and sections'''
-            return Utils.analyze_song(self, context, filepath)
+            return analyze_song(self, context, filepath)
             
         def find_available_channel(sequence_editor, start_frame, end_frame, start_channel=1):
             '''Use this to avoid adding strips on top of each other'''
@@ -176,7 +178,7 @@ class SorcererPython:
         def find_relevant_clock_object(scene):
             '''Find most relevant sound strip with a timecode clock assignment.
                Returns a bpy strip object'''
-            return Utils.find_relevant_clock_object(scene)
+            return EventUtils.find_relevant_clock_object(scene)
             
         def calculate_flash_strip_bias(bias, frame_rate, strip_length_in_frames):
             '''Used by Flash strip background logic to apply bias to flash down
@@ -185,7 +187,7 @@ class SorcererPython:
 
         def render_volume(speaker, empty, sensitivity, object_size, int_mixer_channel):
             '''Calculates volume for a 3d-audio-object and speaker pair'''
-            Utils.render_volume(speaker, empty, sensitivity, object_size, int_mixer_channel)
+            render_volume(speaker, empty, sensitivity, object_size, int_mixer_channel)
 
         def color_object_to_tuple_and_scale_up(v):
             '''Formats Blender color objects for lighting console use. Returns 

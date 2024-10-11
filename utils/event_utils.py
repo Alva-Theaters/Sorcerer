@@ -33,7 +33,6 @@ import math
 
 from ..assets.dictionaries import Dictionaries
 from ..utils.osc import OSC
-from ..utils.utils import Utils
 from ..maintenance.logging import alva_log
 
 
@@ -171,7 +170,7 @@ class EventUtils:
     
     @staticmethod
     def trigger_sem(obj, chan_num):
-        x_focus, y_focus, z_focus, x_orientation, y_orientation, z_orientation = Utils.get_loc_rot(obj, use_matrix=True)
+        x_focus, y_focus, z_focus, x_orientation, y_orientation, z_orientation = EventUtils.get_loc_rot(obj, use_matrix=True)
         OSC.send_osc_lighting("/eos/newcmd", f"Chan {chan_num} X_Focus {x_focus} Enter, Chan {chan_num} Y_Focus {y_focus} Enter, Chan {chan_num} Z_Focus {z_focus} Enter, Chan {chan_num} X_Orientation {x_orientation} Enter, Chan {chan_num} Y_Orientation {y_orientation} Enter, Chan {chan_num} Z_Orientation {z_orientation} Enter", user=0)
                 
     @staticmethod
@@ -268,7 +267,7 @@ class EventUtils:
     
 
     def get_loc_rot(obj, use_matrix=False):
-        x_pos, y_pos, z_pos, x_rot_rad, y_rot_rad, z_rot_rad  = Utils.get_original_loc_rot(obj, use_matrix)
+        x_pos, y_pos, z_pos, x_rot_rad, y_rot_rad, z_rot_rad  = EventUtils.get_original_loc_rot(obj, use_matrix)
 
         # Convert meters to feet.
         position_x = round(x_pos / .3048, 2)

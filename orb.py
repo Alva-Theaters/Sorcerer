@@ -33,7 +33,6 @@ import logging
 import math
 
 from .updaters.sequencer_updaters import SequencerUpdaters as Updaters
-from .utils.utils import Utils
 from .utils.event_utils import EventUtils
 from .utils.orb_utils import find_addresses, tokenize_macro_line, find_executor
 from .utils.sequencer_mapping import StripMapping
@@ -495,7 +494,7 @@ class Orb:
 
             # Get ready to record the cue while also binding cue to its event.
             if event_list:
-                timecode = Utils.frame_to_timecode(frame)
+                timecode = EventUtils.frame_to_timecode(frame)
                 argument_two = f"Event {event_list} / {str(frame)} Time {str(timecode)} Show_Control_Action Cue {str(frame)} Enter"
 
             # Update progress bar to keep user in the loop.
@@ -515,7 +514,7 @@ class Orb:
 
         @staticmethod
         def final_event_stop_clock(event_list, final_frame, end_macro):
-            timecode = Utils.frame_to_timecode(final_frame) # Ensure this event has a time component even if something above got skipped
+            timecode = EventUtils.frame_to_timecode(final_frame) # Ensure this event has a time component even if something above got skipped
             Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Event {event_list} / {str(final_frame)} Time {str(timecode)} Show_Control_Action Macro {str(end_macro)} Enter")
 
 
@@ -706,7 +705,7 @@ class Orb:
                 chan_num = scene.scene_props.int_array_start_channel
                 current_universe, current_address = addresses_list[i]
 
-                position_x, position_y, position_z, orientation_x, orientation_y, orientation_z = Utils.get_loc_rot(chan, use_matrix=True)
+                position_x, position_y, position_z, orientation_x, orientation_y, orientation_z = EventUtils.get_loc_rot(chan, use_matrix=True)
 
                 # Set channel-specific UI fields inside the loop.
                 chan.str_manual_fixture_selection = str(chan_num)

@@ -30,7 +30,6 @@
 import bpy
 import re
 
-from ..utils.utils import Utils 
 from ..utils.cpvia_utils import color_object_to_tuple_and_scale_up
 from ..cpvia.mix import Mixer 
 from ..assets.sli import SLI 

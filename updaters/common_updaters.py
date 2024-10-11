@@ -31,9 +31,9 @@ import bpy
 import time
 from bpy.props import *
 
-from ..utils.utils import Utils
 from ..utils.properties_utils import parse_channels, update_all_controller_channel_lists
 from ..utils.osc import OSC
+from ..utils.orb_utils import find_addresses
 
 
 class CommonUpdaters:
@@ -283,7 +283,8 @@ class CommonUpdaters:
                 context.scene.scene_props.service_mode = not context.scene.scene_props.service_mode
             else:
                 try:
-                    with_underscores = Utils.add_underscores_to_keywords(original)
+                    from ..utils.orb_utils import add_underscores_to_keywords
+                    with_underscores = add_underscores_to_keywords(original)
                     OSC.send_osc_lighting("/eos/cmd", f"{with_underscores} Enter")
                 except:
                     OSC.send_osc_lighting("/eos/cmd", f"{original} Enter")
@@ -302,7 +303,7 @@ class CommonUpdaters:
         base_light = context.active_object
 
         if base_light and base_light.type == 'LIGHT':
-            address_list = Utils.find_addresses(self.int_array_universe, self.int_array_start_address, self.int_array_channel_mode, 300)
+            address_list = find_addresses(self.int_array_universe, self.int_array_start_address, self.int_array_channel_mode, 300)
             
             collection_name = f"Group {self.int_array_group_index}: {self.str_array_group_name}"
 

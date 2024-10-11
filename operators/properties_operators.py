@@ -28,8 +28,9 @@
 
 
 import bpy
+
 from ..utils.osc import OSC
-from ..utils.utils import Utils
+from ..updaters.properties_updaters import PropertiesUpdaters
 
 
 # These are all for the keyboard shortcuts for Cue Switcher
@@ -116,7 +117,7 @@ class CutCueOperator(bpy.types.Operator):
         
         OSC.send_osc_lighting("/eos/newcmd", f"Go_to_Cue {preview_cue} Time 0 Enter")
         
-        Utils.swap_preview_and_program(cue_list)
+        PropertiesUpdaters.swap_preview_and_program(cue_list)
         return {'FINISHED'}
     
     
@@ -130,7 +131,7 @@ class AutoCueOperator(bpy.types.Operator):
         preview_cue = cue_list.cues[cue_list.int_preview_index].int_number
         
         OSC.send_osc_lighting("/eos/newcmd", f"Go_to_Cue {cue_list.int_cue_list_number} / {preview_cue} Time {scene.float_auto_time} Enter")
-        Utils.swap_preview_and_program(cue_list)
+        PropertiesUpdaters.swap_preview_and_program(cue_list)
         return {'FINISHED'}
     
     
@@ -145,7 +146,7 @@ class SelfCueOperator(bpy.types.Operator):
         preview_cue = cue_list.cues[cue_list.int_preview_index].int_number
         
         OSC.send_osc_lighting("/eos/newcmd", f"Go_to_Cue {cue_list.int_cue_list_number} / {preview_cue} Time Enter")
-        Utils.swap_preview_and_program(cue_list)
+        PropertiesUpdaters.swap_preview_and_program(cue_list)
         return {'FINISHED'}
     
     
