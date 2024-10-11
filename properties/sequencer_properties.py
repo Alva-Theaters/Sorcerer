@@ -402,7 +402,7 @@ def unregister():
     del ColorSequence.cue_builder_texture_id
     del ColorSequence.cue_builder_band_id
     del ColorSequence.cue_builder_accent_id
-    del ColorSequence.cue_builder_cyc_id
+    del ColorSequence.cue_builder_gel_one_id
 
     del ColorSequence.key_is_recording
     del ColorSequence.rim_is_recording
