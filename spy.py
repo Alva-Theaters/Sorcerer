@@ -39,6 +39,7 @@ from bpy import spy
 
 
 import bpy
+import time
 
 from .utils.osc import OSC
 from .utils.utils import Utils
@@ -70,7 +71,27 @@ class SorcererPython:
             cancel functionality. Terminate Blender via Operating Systn if you accidentally tell it to make 
             99,999 macros, which it will gladly do otherwise.
         '''
-        Utils.make_eos_macro(macro_range, int_range, string)
+        SorcererPython.osc.press_lighting_key("live")
+        for macro, custom_int in zip(range(macro_range[0] - 1, macro_range[1]), range(int_range[0], int_range[1] + 1)):
+            if macro < 100000:
+                SorcererPython.osc.press_lighting_key("learn")
+                SorcererPython.osc.press_lighting_key("macro")
+                time.sleep(.1)
+                for digit in str(macro+1):
+                    SorcererPython.osc.press_lighting_key(f"{digit}")
+                    time.sleep(.1)
+                SorcererPython.osc.press_lighting_key("enter")
+                time.sleep(.1)
+
+                formatted_string = string.replace("*", str(custom_int))
+                SorcererPython.osc.lighting_command(formatted_string)
+                time.sleep(.1)
+                SorcererPython.osc.press_lighting_key("enter")
+                SorcererPython.osc.press_lighting_key("learn")
+                time.sleep(.2)
+            else:
+                print("Error: Macro indexes on ETC Eos only go up to 99,999.")
+                return
         
     class osc:
         def send_osc_lighting(address, argument):

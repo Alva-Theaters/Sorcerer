@@ -34,6 +34,8 @@ import math
 
 from .updaters.sequencer_updaters import SequencerUpdaters as Updaters
 from .utils.utils import Utils
+from .utils.event_utils import EventUtils
+from .utils.orb_utils import find_addresses, tokenize_macro_line, find_executor
 from .utils.sequencer_mapping import StripMapping
 from .utils.osc import OSC
 from .assets.sli import SLI
@@ -57,9 +59,9 @@ class Orb:
             active_strip = scene
 
         if strip == 'sound':
-            event_list = Utils.find_executor(scene, active_strip, 'event_list')
-            start_macro = Utils.find_executor(scene, active_strip, 'start_macro')
-            end_macro = Utils.find_executor(scene, active_strip, 'end_macro')
+            event_list = find_executor(scene, active_strip, 'event_list')
+            start_macro = find_executor(scene, active_strip, 'start_macro')
+            end_macro = find_executor(scene, active_strip, 'end_macro')
             start_cue = active_strip.str_start_cue
             end_cue = active_strip.str_start_cue
 
@@ -73,7 +75,7 @@ class Orb:
 
         elif strip == 'macro':
             Updaters.macro_update(active_strip, context)
-            macro_number = Utils.find_executor(scene, active_strip, 'start_macro')
+            macro_number = find_executor(scene, active_strip, 'start_macro')
             text = active_strip.start_frame_macro_text
             is_final = not scene.strip_end_macros
 
@@ -88,7 +90,7 @@ class Orb:
                 SLI.SLI_assert_unreachable()
 
             if scene.strip_end_macros:
-                macro_number = Utils.find_executor(scene, active_strip, 'end_macro')
+                macro_number = find_executor(scene, active_strip, 'end_macro')
                 text = active_strip.end_frame_macro_text
 
                 if console_mode == 'option_eos':
@@ -117,8 +119,8 @@ class Orb:
                 end_length = round((strip_length_in_seconds - m1_start_length), 1)
                 m2_text = f"{str(active_strip.flash_down_input_background)} Sneak Time {str(end_length)} Enter"
 
-                start_macro = Utils.find_executor(scene, active_strip, 'start_macro')
-                end_macro = Utils.find_executor(scene, active_strip, 'end_macro')
+                start_macro = find_executor(scene, active_strip, 'start_macro')
+                end_macro = find_executor(scene, active_strip, 'end_macro')
 
                 yield from Orb.Eos.generate_macro_command(context, start_macro, m1_text, first=True)
                 yield from Orb.Eos.generate_macro_command(context, end_macro, m2_text, final=True)
@@ -137,7 +139,7 @@ class Orb:
             if active_strip.friend_list == "" or active_strip.osc_trigger == "":
                 return {'CANCELLED', "Invalid text inputs."}
             
-            macro = Utils.find_executor(scene, active_strip, 'start_macro')
+            macro = find_executor(scene, active_strip, 'start_macro')
             
             if console_mode == 'option_eos':
                 yield from Orb.Eos.generate_macro_command(self, context, active_strip, macro, text, first=True, final=True)
@@ -335,7 +337,7 @@ class Orb:
         @staticmethod
         def type_tokens(text_data):
             for line in text_data:
-                tokens = Utils.tokenize_macro_line(line)
+                tokens = tokenize_macro_line(line)
                 for address, argument in tokens:
                     Orb.Eos.send_osc_with_delay(address, argument, .2)
                     time.sleep(.1)
@@ -423,11 +425,11 @@ class Orb:
                 active_strip = scene
                 execute_on_cues = False
 
-            event_list = Utils.find_executor(scene, active_strip, 'event_list')
-            start_macro = Utils.find_executor(scene, active_strip, 'start_macro')
-            end_macro = Utils.find_executor(scene, active_strip, 'end_macro')
-            cue_list = Utils.find_executor(scene, active_strip, 'cue_list')
-            timecode = Utils.frame_to_timecode(active_strip.frame_start)
+            event_list = find_executor(scene, active_strip, 'event_list')
+            start_macro = find_executor(scene, active_strip, 'start_macro')
+            end_macro = find_executor(scene, active_strip, 'end_macro')
+            cue_list = find_executor(scene, active_strip, 'cue_list')
+            timecode = EventUtils.frame_to_timecode(active_strip.frame_start)
 
             active_strip.str_parent_name = active_strip.name # Allow find_executor() to distinguish duplicates
 
@@ -666,7 +668,7 @@ class Orb:
 
                 # Create list of all valid universe/addresses beforehand since trying to calculate this
                 # dynamically is far more error-prone.
-                addresses_list = Utils.find_addresses(starting_universe, start_address, channels_to_add, total_lights)
+                addresses_list = find_addresses(starting_universe, start_address, channels_to_add, total_lights)
             
                 # Loop over the channels within that object, assuming there was an array
                 yield Orb.Eos.loop_over_children(self, context, scene, addresses_list, channels_to_add, address, is_group, obj.name), "Patching channels"

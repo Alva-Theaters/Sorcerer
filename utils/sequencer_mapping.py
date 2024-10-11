@@ -30,7 +30,6 @@
 import re
 from collections import defaultdict
 
-from ..utils.utils import Utils
 from ..utils.event_utils import EventUtils
 from ..utils.properties_utils import parse_channels
 from ..utils.sequencer_utils import calculate_flash_strip_bias
