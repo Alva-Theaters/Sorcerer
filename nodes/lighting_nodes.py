@@ -32,8 +32,8 @@ from bpy.types import NodeSocket, Node, NodeTree
 from bpy.props import *
 
 from ..assets.items import Items as AlvaItems 
-from ..updaters.node_updaters import NodeUpdaters 
-from ..utils.utils import Utils 
+from ..updaters.node_updaters import NodeUpdaters
+from ..utils.properties_utils import register_properties
 from ..properties.property_groups import MixerParameters, CustomButtonPropertyGroup
 from ..cpvia.find import Find
 from ..assets.tooltips import format_tooltip
@@ -460,35 +460,35 @@ def register():
     common_properties = CommonProperties()
     
     # Group controller node common property registrations.
-    Utils.register_properties(NODE_NT_group_controller, common_properties.controller_ids)
-    Utils.register_properties(NODE_NT_group_controller, common_properties.common_header)
-    Utils.register_properties(NODE_NT_group_controller, common_properties.common_parameters)
-    Utils.register_properties(NODE_NT_group_controller, common_properties.common_parameters_extended)
-    Utils.register_properties(NODE_NT_group_controller, common_properties.mins_maxes)
-    Utils.register_properties(NODE_NT_group_controller, common_properties.parameter_toggles)
-    Utils.register_properties(NODE_NT_group_controller, common_properties.special_arguments)
+    register_properties(NODE_NT_group_controller, common_properties.controller_ids)
+    register_properties(NODE_NT_group_controller, common_properties.common_header)
+    register_properties(NODE_NT_group_controller, common_properties.common_parameters)
+    register_properties(NODE_NT_group_controller, common_properties.common_parameters_extended)
+    register_properties(NODE_NT_group_controller, common_properties.mins_maxes)
+    register_properties(NODE_NT_group_controller, common_properties.parameter_toggles)
+    register_properties(NODE_NT_group_controller, common_properties.special_arguments)
 
     # Mixer node common property registrations.
-    Utils.register_properties(NODE_NT_mixer, common_properties.controller_ids)
-    Utils.register_properties(NODE_NT_mixer, common_properties.common_header)
-    Utils.register_properties(NODE_NT_mixer, common_properties.mins_maxes) # For white balance property
+    register_properties(NODE_NT_mixer, common_properties.controller_ids)
+    register_properties(NODE_NT_mixer, common_properties.common_header)
+    register_properties(NODE_NT_mixer, common_properties.mins_maxes) # For white balance property
 
 
 def unregister():
     from ..properties.common_properties import CommonProperties 
     common_properties = CommonProperties()
     
-    Utils.register_properties(NODE_NT_mixer, common_properties.controller_ids, register=False)
-    Utils.register_properties(NODE_NT_mixer, common_properties.common_header, register=False)
-    Utils.register_properties(NODE_NT_mixer, common_properties.mins_maxes, register=False)
+    register_properties(NODE_NT_mixer, common_properties.controller_ids, register=False)
+    register_properties(NODE_NT_mixer, common_properties.common_header, register=False)
+    register_properties(NODE_NT_mixer, common_properties.mins_maxes, register=False)
     
-    Utils.register_properties(NODE_NT_group_controller, common_properties.controller_ids, register=False)
-    Utils.register_properties(NODE_NT_group_controller, common_properties.common_header, register=False)
-    Utils.register_properties(NODE_NT_group_controller, common_properties.common_parameters, register=False)
-    Utils.register_properties(NODE_NT_group_controller, common_properties.common_parameters_extended, register=False)
-    Utils.register_properties(NODE_NT_group_controller, common_properties.mins_maxes, register=False)
-    Utils.register_properties(NODE_NT_group_controller, common_properties.parameter_toggles, register=False)
-    Utils.register_properties(NODE_NT_group_controller, common_properties.special_arguments, register=False)
+    register_properties(NODE_NT_group_controller, common_properties.controller_ids, register=False)
+    register_properties(NODE_NT_group_controller, common_properties.common_header, register=False)
+    register_properties(NODE_NT_group_controller, common_properties.common_parameters, register=False)
+    register_properties(NODE_NT_group_controller, common_properties.common_parameters_extended, register=False)
+    register_properties(NODE_NT_group_controller, common_properties.mins_maxes, register=False)
+    register_properties(NODE_NT_group_controller, common_properties.parameter_toggles, register=False)
+    register_properties(NODE_NT_group_controller, common_properties.special_arguments, register=False)
 
     unregister_nodes()
     unregister_sockets()

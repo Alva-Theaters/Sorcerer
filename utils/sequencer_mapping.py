@@ -31,6 +31,7 @@ import re
 from collections import defaultdict
 
 from ..utils.utils import Utils
+from ..utils.properties_utils import parse_channels
 from ..utils.sequencer_utils import calculate_flash_strip_bias
 
 
@@ -190,7 +191,7 @@ def get_offset_triggers(strip):
     if len(concurrent_commands) > 1:
         command_list = generate_concurrent_command_strings(strip.osc_trigger, concurrent_commands)
     else:
-        channels = Utils.parse_channels(strip.friend_list)
+        channels = parse_channels(strip.friend_list)
         command_list = generate_command_strings(strip.osc_trigger, channels)
     
     return command_list
@@ -203,12 +204,12 @@ def parse_concurrent_commands(input_string):
     
     # Parse each group separately.
     for group in concurrent_groups:
-        channels = Utils.parse_channels(group)
+        channels = parse_channels(group)
         concurrent_commands.append(channels)
 
     # If there are no concurrent groups, treat the entire input as sequential.
     if not concurrent_commands:
-        concurrent_commands.append(Utils.parse_channels(input_string))
+        concurrent_commands.append(parse_channels(input_string))
     
     return concurrent_commands
 

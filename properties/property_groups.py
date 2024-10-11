@@ -301,12 +301,12 @@ def register():
     for cls in prop_groups:
         bpy.utils.register_class(cls)
 
-    from ..utils.utils import Utils
+    from ..utils.properties_utils import register_properties
     from .common_properties import CommonProperties
-    Utils.register_properties(MixerParameters, CommonProperties.common_parameters)
-    Utils.register_properties(GroupData, CommonProperties.mins_maxes)
-    Utils.register_properties(GroupData, CommonProperties.special_arguments)
-    Utils.register_properties(GroupData, CommonProperties.parameter_toggles)
+    register_properties(MixerParameters, CommonProperties.common_parameters)
+    register_properties(GroupData, CommonProperties.mins_maxes)
+    register_properties(GroupData, CommonProperties.special_arguments)
+    register_properties(GroupData, CommonProperties.parameter_toggles)
 
     # This stuff has to be here for the start sequence to work.
     if not hasattr(Sequence, "my_settings"):
@@ -340,12 +340,12 @@ def unregister():
     if hasattr(Scene, "channels_list_pg"):
         del Scene.channels_list_pg
     
-    from ..utils.utils import Utils
+    from ..utils.properties_utils import register_properties
     from .common_properties import CommonProperties
-    Utils.register_properties(MixerParameters, CommonProperties.common_parameters, register=False)
-    Utils.register_properties(GroupData, CommonProperties.mins_maxes, register=False)
-    Utils.register_properties(GroupData, CommonProperties.special_arguments, register=False)
-    Utils.register_properties(GroupData, CommonProperties.parameter_toggles, register=False)
+    register_properties(MixerParameters, CommonProperties.common_parameters, register=False)
+    register_properties(GroupData, CommonProperties.mins_maxes, register=False)
+    register_properties(GroupData, CommonProperties.special_arguments, register=False)
+    register_properties(GroupData, CommonProperties.parameter_toggles, register=False)
 
     for cls in reversed(prop_groups):
         bpy.utils.unregister_class(cls)

@@ -32,6 +32,7 @@ import time
 from bpy.props import *
 
 from ..utils.utils import Utils
+from ..utils.properties_utils import parse_channels, update_all_controller_channel_lists
 from ..utils.osc import OSC
 
 
@@ -50,7 +51,7 @@ class CommonUpdaters:
         
         if self.str_manual_fixture_selection != "":
             self.is_text_not_group = True # Used primarily by UI
-            channels_list = Utils.parse_channels(self.str_manual_fixture_selection)
+            channels_list = parse_channels(self.str_manual_fixture_selection)
 
             num_channels = len(channels_list)
             if num_channels > 1:
@@ -204,7 +205,7 @@ class CommonUpdaters:
         if item is None:
             return
         
-        channels_to_add, channels_to_remove = Utils.parse_channels(context.scene.scene_props.add_channel_ids, remove=True) # returns list of ints
+        channels_to_add, channels_to_remove = parse_channels(context.scene.scene_props.add_channel_ids, remove=True) # returns list of ints
         
         if len(channels_to_add) == 0 and len(channels_to_remove) == 0:
             return
@@ -229,7 +230,7 @@ class CommonUpdaters:
                     item.channels_list.remove(i)
                     break
 
-        Utils.update_all_controller_channel_lists(context)
+        update_all_controller_channel_lists(context)
              
 
     @staticmethod    

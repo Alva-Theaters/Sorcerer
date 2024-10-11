@@ -31,7 +31,7 @@ import bpy
 from bpy.props import StringProperty, CollectionProperty, BoolProperty, EnumProperty, IntProperty, FloatProperty, FloatVectorProperty, PointerProperty
 from bpy.types import Object, ColorSequence, Sequence, Scene
 
-from ..utils.utils import Utils 
+from ..utils.properties_utils import register_properties
 from ..assets.items import Items as AlvaItems 
 from ..updaters.common_updaters import CommonUpdaters 
 from ..updaters.sequencer_updaters import SequencerUpdaters 
@@ -97,7 +97,7 @@ AVAILABLE PROPERTY LISTS.
 _____________________________________________________________________
 HOW TO USE.
 
-    Utils.register_properties(cls, properties, register=True)
+    register_properties(cls, properties, register=True)
     
         NOTE: When using this on a class, like when creating a PropertyGroup
               or custom node, or anytime you use the "property: property"
@@ -587,55 +587,55 @@ class CommonProperties:
 
 def register():
     # Object, excluding flash_strip_parameters
-    Utils.register_properties(Object, CommonProperties.controller_ids)
-    Utils.register_properties(Object, CommonProperties.object_only)  # Unique
-    Utils.register_properties(Object, CommonProperties.common_header)
-    Utils.register_properties(Object, CommonProperties.common_parameters)
-    Utils.register_properties(Object, CommonProperties.common_parameters_extended)
-    Utils.register_properties(Object, CommonProperties.mins_maxes)
-    Utils.register_properties(Object, CommonProperties.parameter_toggles)
-    Utils.register_properties(Object, CommonProperties.special_arguments)
+    register_properties(Object, CommonProperties.controller_ids)
+    register_properties(Object, CommonProperties.object_only)  # Unique
+    register_properties(Object, CommonProperties.common_header)
+    register_properties(Object, CommonProperties.common_parameters)
+    register_properties(Object, CommonProperties.common_parameters_extended)
+    register_properties(Object, CommonProperties.mins_maxes)
+    register_properties(Object, CommonProperties.parameter_toggles)
+    register_properties(Object, CommonProperties.special_arguments)
 
     # ColorSequence, excluding object_only
-    Utils.register_properties(ColorSequence, CommonProperties.controller_ids)
-    Utils.register_properties(ColorSequence, CommonProperties.common_header)
-    Utils.register_properties(ColorSequence, CommonProperties.common_parameters)
-    Utils.register_properties(ColorSequence, CommonProperties.common_parameters_extended)
-    Utils.register_properties(ColorSequence, CommonProperties.mins_maxes)
-    Utils.register_properties(ColorSequence, CommonProperties.parameter_toggles)
-    Utils.register_properties(ColorSequence, CommonProperties.special_arguments)
-    Utils.register_properties(ColorSequence, CommonProperties.flash_strip_parameters)  # Unique
+    register_properties(ColorSequence, CommonProperties.controller_ids)
+    register_properties(ColorSequence, CommonProperties.common_header)
+    register_properties(ColorSequence, CommonProperties.common_parameters)
+    register_properties(ColorSequence, CommonProperties.common_parameters_extended)
+    register_properties(ColorSequence, CommonProperties.mins_maxes)
+    register_properties(ColorSequence, CommonProperties.parameter_toggles)
+    register_properties(ColorSequence, CommonProperties.special_arguments)
+    register_properties(ColorSequence, CommonProperties.flash_strip_parameters)  # Unique
 
     # Sequence
-    Utils.register_properties(Sequence, CommonProperties.timecode_executors)
+    register_properties(Sequence, CommonProperties.timecode_executors)
 
     # Scene
-    Utils.register_properties(Scene, CommonProperties.timecode_executors)
+    register_properties(Scene, CommonProperties.timecode_executors)
 
 
 def unregister():
     # Object, excluding flash_strip_parameters
-    Utils.register_properties(Object, CommonProperties.controller_ids, register=False)
-    Utils.register_properties(Object, CommonProperties.object_only, register=False)  # Unique
-    Utils.register_properties(Object, CommonProperties.common_header, register=False)
-    Utils.register_properties(Object, CommonProperties.common_parameters, register=False)
-    Utils.register_properties(Object, CommonProperties.common_parameters_extended, register=False)
-    Utils.register_properties(Object, CommonProperties.mins_maxes, register=False)
-    Utils.register_properties(Object, CommonProperties.parameter_toggles, register=False)
-    Utils.register_properties(Object, CommonProperties.special_arguments, register=False)
+    register_properties(Object, CommonProperties.controller_ids, register=False)
+    register_properties(Object, CommonProperties.object_only, register=False)  # Unique
+    register_properties(Object, CommonProperties.common_header, register=False)
+    register_properties(Object, CommonProperties.common_parameters, register=False)
+    register_properties(Object, CommonProperties.common_parameters_extended, register=False)
+    register_properties(Object, CommonProperties.mins_maxes, register=False)
+    register_properties(Object, CommonProperties.parameter_toggles, register=False)
+    register_properties(Object, CommonProperties.special_arguments, register=False)
 
     # ColorSequence, excluding object_only
-    Utils.register_properties(ColorSequence, CommonProperties.controller_ids, register=False)
-    Utils.register_properties(ColorSequence, CommonProperties.common_header, register=False)
-    Utils.register_properties(ColorSequence, CommonProperties.common_parameters, register=False)
-    Utils.register_properties(ColorSequence, CommonProperties.common_parameters_extended, register=False)
-    Utils.register_properties(ColorSequence, CommonProperties.mins_maxes, register=False)
-    Utils.register_properties(ColorSequence, CommonProperties.parameter_toggles, register=False)
-    Utils.register_properties(ColorSequence, CommonProperties.special_arguments, register=False)
-    Utils.register_properties(ColorSequence, CommonProperties.flash_strip_parameters, register=False)  # Unique
+    register_properties(ColorSequence, CommonProperties.controller_ids, register=False)
+    register_properties(ColorSequence, CommonProperties.common_header, register=False)
+    register_properties(ColorSequence, CommonProperties.common_parameters, register=False)
+    register_properties(ColorSequence, CommonProperties.common_parameters_extended, register=False)
+    register_properties(ColorSequence, CommonProperties.mins_maxes, register=False)
+    register_properties(ColorSequence, CommonProperties.parameter_toggles, register=False)
+    register_properties(ColorSequence, CommonProperties.special_arguments, register=False)
+    register_properties(ColorSequence, CommonProperties.flash_strip_parameters, register=False)  # Unique
 
     # Sequence
-    Utils.register_properties(Sequence, CommonProperties.timecode_executors, register=False)
+    register_properties(Sequence, CommonProperties.timecode_executors, register=False)
 
     # Scene
-    Utils.register_properties(Scene, CommonProperties.timecode_executors, register=False)  
+    register_properties(Scene, CommonProperties.timecode_executors, register=False)  

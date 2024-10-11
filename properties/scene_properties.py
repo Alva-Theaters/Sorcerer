@@ -29,7 +29,7 @@ from bpy.types import PropertyGroup, Scene
 
 from ..updaters.common_updaters import CommonUpdaters 
 from ..updaters.properties_updaters import PropertiesUpdaters 
-from ..utils.utils import Utils 
+from ..utils.properties_utils import register_properties
 from ..properties.common_properties import CommonProperties 
 from ..assets.items import Items as AlvaItems 
 from .property_groups import LightingModifier, Errors
@@ -364,16 +364,16 @@ def register():
     Scene.active_modifier_index = IntProperty(default=-1)
     
     common_properties = CommonProperties()
-    Utils.register_properties(SceneProperties, common_properties.mins_maxes)
-    Utils.register_properties(SceneProperties, common_properties.parameter_toggles)
-    Utils.register_properties(SceneProperties, common_properties.special_arguments)
+    register_properties(SceneProperties, common_properties.mins_maxes)
+    register_properties(SceneProperties, common_properties.parameter_toggles)
+    register_properties(SceneProperties, common_properties.special_arguments)
 
 
 def unregister():
     common_properties = CommonProperties()
-    Utils.register_properties(SceneProperties, common_properties.mins_maxes, register=False)
-    Utils.register_properties(SceneProperties, common_properties.parameter_toggles, register=False)
-    Utils.register_properties(SceneProperties, common_properties.special_arguments, register=False)
+    register_properties(SceneProperties, common_properties.mins_maxes, register=False)
+    register_properties(SceneProperties, common_properties.parameter_toggles, register=False)
+    register_properties(SceneProperties, common_properties.special_arguments, register=False)
 
     del Scene.active_modifier_index
     del Scene.lighting_modifiers
@@ -381,9 +381,9 @@ def unregister():
 
 def unregister():
     common_properties = CommonProperties()
-    Utils.register_properties(SceneProperties, common_properties.mins_maxes, register=False)
-    Utils.register_properties(SceneProperties, common_properties.parameter_toggles, register=False)
-    Utils.register_properties(SceneProperties, common_properties.special_arguments, register=False)
+    register_properties(SceneProperties, common_properties.mins_maxes, register=False)
+    register_properties(SceneProperties, common_properties.parameter_toggles, register=False)
+    register_properties(SceneProperties, common_properties.special_arguments, register=False)
 
     if hasattr(Scene, "active_modifier_index"):
         del Scene.active_modifier_index

@@ -35,6 +35,7 @@ from bpy.types import Operator
 
 from ..cpvia.find import Find 
 from ..utils.utils import Utils 
+from ..utils.properties_utils import update_all_controller_channel_lists
 from ..utils.osc import OSC
 
 # pyright: reportInvalidTypeForm=false
@@ -126,7 +127,7 @@ class RemoveChannelFromGroupOperator(bpy.types.Operator):
             time.sleep(.5)
             OSC.send_osc_lighting("/eos/newcmd", f"{self.channel} at + - 100 Sneak Time 1 Enter")
 
-        Utils.update_all_controller_channel_lists(context)
+        update_all_controller_channel_lists(context)
         
         return {'FINISHED'}
     

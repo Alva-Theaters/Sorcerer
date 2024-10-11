@@ -28,7 +28,7 @@
 
 
 from bpy.types import Operator
-from ..utils.utils import Utils
+from ..utils.properties_utils import parse_channels
 from ..utils.osc import OSC
 
 
@@ -729,7 +729,7 @@ class SEQUENCER_OT_focus_energy(Operator):
         active_strip = scene.sequence_editor.active_strip
         
         if context.screen:
-            groups = Utils.parse_channels(scene.energy_light_groups)
+            groups = parse_channels(scene.energy_light_groups)
             active_strip.cue_builder_effect_id = str(self.effect_number)
             
             for group in groups:
@@ -812,7 +812,7 @@ class SEQUENCER_OT_focus_energy_fourteen(SEQUENCER_OT_focus_energy):
 def send_cue_builder_group_command(id, group_type, recording, context):
     scene = context.scene
     active_strip = scene.sequence_editor.active_strip
-    groups = Utils.parse_channels(getattr(scene, "{}_light_groups".format(group_type)))
+    groups = parse_channels(getattr(scene, "{}_light_groups".format(group_type)))
 
     if not recording:
         command_suffix = "Preset " + str(id + scene.cue_builder_id_offset) + " Enter"
@@ -836,7 +836,7 @@ class SEQUENCER_OT_stop_effect(Operator):
         active_strip = scene.sequence_editor.active_strip
         
         if context.screen:
-            groups = Utils.parse_channels(scene.energy_light_groups)
+            groups = parse_channels(scene.energy_light_groups)
             active_strip.cue_builder_effect_id = ""
             
             for group in groups:

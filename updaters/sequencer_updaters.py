@@ -36,7 +36,7 @@ from bpy.types import ColorSequence
 from ..updaters.common_updaters import CommonUpdaters as CommonUpdaters
 from ..assets.dictionaries import Dictionaries as Dictionaries
 from ..utils.osc import OSC
-from ..utils.utils import Utils
+from ..utils.properties_utils import parse_channels
     
 
 stop_updating_color = "No"
@@ -251,13 +251,13 @@ class SequencerUpdaters:
                 return
             
             if param in ["cyc_one_light", "cyc_two_light", "cyc_three_light", "cyc_four_light"]:
-                groups = Utils.parse_channels(getattr(context.scene, f"{param}_groups"))
+                groups = parse_channels(getattr(context.scene, f"{param}_groups"))
                 channels = []
                 submasters = []
             else:
-                groups = Utils.parse_channels(getattr(context.scene, f"{param}_groups"))
-                channels = Utils.parse_channels(getattr(context.scene, f"{param}_channels"))
-                submasters = Utils.parse_channels(getattr(context.scene, f"{param}_submasters"))
+                groups = parse_channels(getattr(context.scene, f"{param}_groups"))
+                channels = parse_channels(getattr(context.scene, f"{param}_channels"))
+                submasters = parse_channels(getattr(context.scene, f"{param}_submasters"))
 
             light_str = str(light_value)
 

@@ -41,6 +41,7 @@ from ..as_ui.space_sequencer import (
 )
 from ..as_ui.utils import determine_sequencer_contexts
 from ..utils.utils import Utils 
+from ..utils.properties_utils import parse_channels
 from ..utils.sequencer_utils import calculate_flash_strip_bias, find_available_channel, add_color_strip
 from ..utils.osc import OSC
 from ..orb import Orb
@@ -1547,9 +1548,9 @@ class SEQUENCER_OT_sync_cue(Operator):
             discrete_time = str(getattr(active_strip, prop))
             if discrete_time != "0.0":
                 param = prop.replace("_slow", "")
-                groups = Utils.parse_channels(getattr(context.scene, f"{param}_groups"))
-                channels = Utils.parse_channels(getattr(context.scene, f"{param}_channels"))
-                submasters = Utils.parse_channels(getattr(context.scene, f"{param}_submasters"))
+                groups = parse_channels(getattr(context.scene, f"{param}_groups"))
+                channels = parse_channels(getattr(context.scene, f"{param}_channels"))
+                submasters = parse_channels(getattr(context.scene, f"{param}_submasters"))
 
                 if groups:
                     groups_str = Utils.simplify_channels_list(groups)

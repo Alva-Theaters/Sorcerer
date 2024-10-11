@@ -43,6 +43,7 @@ import bpy
 from .utils.osc import OSC
 from .utils.utils import Utils
 from .utils.sequencer_utils import calculate_flash_strip_bias, duplicate_active_strip_to_selected, find_available_channel, add_color_strip
+from .utils.properties_utils import parse_channels, parse_mixer_channels
 from .cpvia.find import Find
 from .cpvia.mix import Mixer
 from .cpvia.influencers import Influencers
@@ -114,13 +115,13 @@ class SorcererPython:
             
         def parse_channels(input_string):
             '''Convert user string to list of integers representing channel numbers'''
-            return Utils.parse_channels(input_string)
+            return parse_channels(input_string)
             
         def parse_mixer_channels(input_string):
             '''Convert user string to list of tuples, the tuples containing integers 
                that represent channel numbers. Used to create concurrent offset groups
                in mixers'''
-            return Utils.parse_mixer_channels(input_string)
+            return parse_mixer_channels(input_string)
             
         def swap_preview_and_program(cue_list):
             '''Used for the ALVA M/E Switcher'''
