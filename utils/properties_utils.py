@@ -1,28 +1,6 @@
-# This file is part of Alva Sorcerer
-# Copyright (C) 2024 Alva Theaters
-
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-'''
-=====================================================================
-                      DESIGNED BY ALVA THEATERS
-                       FOR THE SOLE PURPOSE OF
-                         MAKING PEOPLE HAPPY
-=====================================================================
-'''
-
+# SPDX-FileCopyrightText: 2024 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
 
@@ -146,3 +124,19 @@ def update_all_controller_channel_lists(context):
     for controller in controllers:
         if hasattr(controller, "str_manual_fixture_selection"):
             controller.str_manual_fixture_selection = controller.str_manual_fixture_selection
+
+
+def apply_patch(item, object):
+    properties = [
+        "pan_min", "pan_max", "tilt_min", "tilt_max", "zoom_min", "zoom_max", 
+        "gobo_speed_min", "gobo_speed_max", "influence_is_on", "intensity_is_on", 
+        "pan_tilt_is_on", "color_is_on", "diffusion_is_on", "strobe_is_on", 
+        "zoom_is_on", "iris_is_on", "edge_is_on", "gobo_is_on", "prism_is_on", 
+        "str_enable_strobe_argument", "str_disable_strobe_argument", 
+        "str_enable_gobo_speed_argument", "str_disable_gobo_speed_argument", 
+        "str_gobo_id_argument", "str_gobo_speed_value_argument", 
+        "str_enable_prism_argument", "str_disable_prism_argument", "color_profile_enum"
+    ]
+
+    for prop in properties:
+        setattr(object, prop, getattr(item, prop))

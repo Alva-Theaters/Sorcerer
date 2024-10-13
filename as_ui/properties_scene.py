@@ -1,40 +1,8 @@
-# This file is part of Alva Sorcerer
-# Copyright (C) 2024 Alva Theaters
+# SPDX-FileCopyrightText: 2024 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-'''
-=====================================================================
-                      DESIGNED BY ALVA THEATERS
-                       FOR THE SOLE PURPOSE OF
-                         MAKING PEOPLE HAPPY
-=====================================================================
-'''
-
-
-import bpy
-
-# Custom icon stuff
-import bpy.utils.previews
-import os
-preview_collections = {}
-pcoll = bpy.utils.previews.new()
-preview_collections["main"] = pcoll
-addon_dir = os.path.dirname(__file__)
-pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
-
+from .utils import get_orb_icon
 
 poll_one = ""
 poll_two = ""
@@ -43,8 +11,7 @@ poll_four = ""
 
 
 def draw_alva_properties_navigation(self, context): # To indicate to user that Sorcerer has stuff here
-    pcoll = preview_collections["main"]
-    orb = pcoll["orb"]
+    orb = get_orb_icon()
 
     layout = self.layout
     row = layout.row()
@@ -74,8 +41,8 @@ def draw_alva_cue_switcher(self, context):
         row.template_list("SCENE_UL_preview_cue_list", "", cue_list, "cues", cue_list, "int_preview_index")
         
         col_buttons = row.column(align=True)
-        col_buttons.operator("cue.add_cue", text="", icon='ADD')
-        col_buttons.operator("cue.remove_cue", text="", icon='REMOVE')
+        col_buttons.operator("alva_cue.add_cue", text="", icon='ADD')
+        col_buttons.operator("alva_cue.remove_cue", text="", icon='REMOVE')
         
         col_buttons.separator()
         col_buttons.prop(cue_list, "is_progressive", text="", icon='FORWARD' if cue_list.is_progressive else 'ARROW_LEFTRIGHT', emboss=False)
@@ -90,7 +57,6 @@ def draw_alva_cue_switcher(self, context):
         row.template_list("SCENE_UL_program_cue_list", "", cue_list, "cues", cue_list, "int_program_index")
         row.alert=0
         
-
         layout.separator()
         
         t_bar_split = layout.split(factor=.15)
@@ -98,8 +64,8 @@ def draw_alva_cue_switcher(self, context):
         col1 = t_bar_split.column()
         col1.scale_y = 3
         col1.alert = 1
-        col1.operator("cue.cut", text="Cut")
-        col1.operator("cue.self", text="Self")
+        col1.operator("alva_cue.cut", text="Cut")
+        col1.operator("alva_cue.self", text="Self")
         
         col2 = t_bar_split.column()
         col2.scale_y = 6
@@ -124,15 +90,13 @@ def draw_alva_cue_switcher(self, context):
         col3 = inner_split.column()
         col4 = inner_split.column()
 
-        # Create boxes for each group and organize them into the columns
-
         # Box for Auto
         box_restore = col1.box()
         box_restore.label(text="Fade to Preview:")
         row = box_restore.row()
         row.scale_y = 3
         row.alert = 1
-        row.operator("cue.auto", text="Auto")
+        row.operator("alva_cue.auto", text="Auto")
         row.alert = 0
         box_restore.prop(scene, "float_auto_time", text="Rate:")
         box_restore.label(text="(Preview cue)")
@@ -143,7 +107,7 @@ def draw_alva_cue_switcher(self, context):
         row = box_restore.row()
         row.scale_y = 3
         row.alert = 1
-        row.operator("cue.restore", text="Restore")
+        row.operator("alva_cue.restore", text="Restore")
         row.alert = 0
         box_restore.prop(scene, "float_restore_time", text="Rate:")
         box_restore.prop(scene, "string_restore_cue", text="Cue")
@@ -154,7 +118,7 @@ def draw_alva_cue_switcher(self, context):
         row = box_black.row()
         row.scale_y = 3
         row.alert = 1
-        row.operator("cue.black", text="Black")
+        row.operator("alva_cue.black", text="Black")
         row.alert = 0
         box_black.prop(scene, "float_black_time", text="Rate:")
         box_black.prop(scene, "string_black_cue", text="Cue")
@@ -165,7 +129,7 @@ def draw_alva_cue_switcher(self, context):
         row = box_blue.row()
         row.scale_y = 3
         row.alert = 1
-        row.operator("cue.blue", text="Blue")
+        row.operator("alva_cue.blue", text="Blue")
         row.alert = 0
         box_blue.prop(scene, "float_blue_time", text="Rate:")
         box_blue.prop(scene, "string_blue_cue", text="Cue")
@@ -180,14 +144,14 @@ def draw_alva_cue_switcher(self, context):
 
         # Add/Remove buttons for the master cue list
         col = row.column(align=True)
-        col.operator("cue_list.add_list", text="", icon='ADD')
-        col.operator("cue_list.remove_list", text="", icon='REMOVE')
+        col.operator("alva_cue.add_list", text="", icon='ADD')
+        col.operator("alva_cue.remove_list", text="", icon='REMOVE')
         
         row = box.row()
         row.prop(cue_list, "int_cue_list_number", text="Cue List:")
         
     else:
-        layout.operator("cue_list.add_list", text="Add Song", icon='ADD')
+        layout.operator("alva_cue.add_list", text="Add Song", icon='ADD')
 
 
 def draw_alva_stage_manager(self, context):

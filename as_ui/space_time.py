@@ -1,44 +1,14 @@
-# This file is part of Alva Sorcerer
-# Copyright (C) 2024 Alva Theaters
+# SPDX-FileCopyrightText: 2024 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+import bpy
 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-'''
-=====================================================================
-                      DESIGNED BY ALVA THEATERS
-                       FOR THE SOLE PURPOSE OF
-                         MAKING PEOPLE HAPPY
-=====================================================================
-'''
-
-
-# Custom icon stuff
-import bpy.utils.previews
-import os
-
-preview_collections = {}
-pcoll = bpy.utils.previews.new()
-preview_collections["main"] = pcoll
-
-addon_dir = os.path.dirname(__file__)
-pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
+from .utils import get_orb_icon
 
 
 def draw_alva_time_header(self, context):
-    pcoll = preview_collections["main"]
-    orb = pcoll["orb"]
+    orb = get_orb_icon()
 
     if (hasattr(context.scene, "sync_timecode") and
         hasattr(context.scene, "timecode_expected_lag") and
@@ -101,8 +71,7 @@ def is_qmeo_parent_a_sound_strip(context):
 
 def draw_alva_time_view(self, layout):
     if bpy.context.scene.scene_props.console_type_enum == 'option_eos':
-        pcoll = preview_collections["main"]
-        orb = pcoll["orb"]
+        orb = get_orb_icon()
 
         layout = self.layout
         layout.separator()

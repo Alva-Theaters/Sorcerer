@@ -1,0 +1,1 @@
+'''Called RNA, borrowed from Blender source, to avoid confusion with space_properties.'''

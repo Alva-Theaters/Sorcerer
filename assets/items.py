@@ -1,28 +1,6 @@
-# This file is part of Alva Sorcerer
-# Copyright (C) 2024 Alva Theaters
-
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-'''
-=====================================================================
-                      DESIGNED BY ALVA THEATERS
-                       FOR THE SOLE PURPOSE OF
-                         MAKING PEOPLE HAPPY
-=====================================================================
-'''
-
+# SPDX-FileCopyrightText: 2024 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 import bpy
 
@@ -370,9 +348,9 @@ class Items:
     
     def enum_items(self, context):
         items = [
-            ('option_eos_macro', "", "Build and fire macros based on strip length", 'FILE_TEXT', 0),
-            ('option_eos_cue', "", "Use strip length to define cue duration", 'PLAY', 1),
-            ('option_eos_flash', "", "Flash intensity up and down with strip length", 'LIGHT_SUN', 2),
+            ('option_macro', "", "Build and fire macros based on strip length", 'FILE_TEXT', 0),
+            ('option_cue', "", "Use strip length to define cue duration", 'PLAY', 1),
+            ('option_flash', "", "Flash intensity up and down with strip length", 'LIGHT_SUN', 2),
             ('option_animation', "", "Use keyframes, or inverted cues, to control parameters", 'IPO_BEZIER', 3),
             #('option_offset', "", "Rapidly make offset effects like wipes and chases using parameters or palettes", 'UV_SYNC_SELECT', 4),
             ('option_trigger', "", "Send discrete trigger at strip's start and/or end frame. Eos does not record this", 'SETTINGS', 5)

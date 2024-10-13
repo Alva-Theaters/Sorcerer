@@ -1,32 +1,8 @@
-# This file is part of Alva Sorcerer
-# Copyright (C) 2024 Alva Theaters
-
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-'''
-=====================================================================
-                      DESIGNED BY ALVA THEATERS
-                       FOR THE SOLE PURPOSE OF
-                         MAKING PEOPLE HAPPY
-=====================================================================
-'''
+# SPDX-FileCopyrightText: 2024 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 import bpy
-
-## Double hashtag indicates notes for future development requiring some level of attention
-
 
 '''
 Minimizing Design Drag Coefficient (DDC) with Longer Tooltips
@@ -103,19 +79,7 @@ def format_tooltip(tooltip):
 
 
 def is_automatic_period():
-    version = bpy.app.version
-
-    # Major, return prematurely if not 4
-    if version[0] < 4:
-        return True
-    elif version[0] > 4:
-        return False
-    
-    # Minor, return False if at or above 4.3 per Blender PR #125460
-    if version[1] >= 3:
-        return False
-    else:
-        return True
+    return bpy.app.version < (4, 3)
     
 
 def is_paragraph(text):

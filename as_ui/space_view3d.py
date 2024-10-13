@@ -1,50 +1,17 @@
-# This file is part of Alva Sorcerer
-# Copyright (C) 2024 Alva Theaters
-
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-'''
-=====================================================================
-                      DESIGNED BY ALVA THEATERS
-                       FOR THE SOLE PURPOSE OF
-                         MAKING PEOPLE HAPPY
-=====================================================================
-'''
-
+# SPDX-FileCopyrightText: 2024 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 import bpy
 
 from .space_common import draw_text_or_group_input, draw_parameters_mini
-
-# Custom icon stuff
-import bpy.utils.previews
-import os
+from .utils import get_orb_icon
 
 DISASTER_THRESHOLD = 3
 
-preview_collections = {}
-pcoll = bpy.utils.previews.new()
-preview_collections["main"] = pcoll
-
-addon_dir = os.path.dirname(__file__)
-pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
-
 
 def draw_alva_view_3d_view(self, layout):
-    pcoll = preview_collections["main"]
-    orb = pcoll["orb"]
+    orb = get_orb_icon()
 
     layout = self.layout
     layout.separator()
@@ -123,7 +90,10 @@ def draw_tool_settings(self, context):
                     row = layout.row()
                     row.scale_x = .9
                     row.prop(context.scene, "int_audio_port", text=":")
-
+                    
+        if context.area.type != 'VIEW_3D':
+            return
+        
         obj = context.active_object
         if obj and obj.type == 'MESH' and context.scene.scene_props.view_parameters_header:
             draw_parameters_mini(self, context, layout, obj, use_slider=True, expand=False)
@@ -159,7 +129,7 @@ def draw_object_header(self, context, scene, active_object, node_layout=None):
     if identity == "Stage Object":
         row = box.row(align=True)
         row.prop(ao, "str_call_fixtures_command", text="Summon")
-        row.operator("viewport.call_fixtures_operator", text = "", icon='LOOP_BACK')
+        row.operator("alva_object.summon_movers", text = "", icon='LOOP_BACK')
         if ao.audio_is_on:
             row = box.row()
             row.prop(ao, "sound_source_enum", text="", icon='SOUND')
@@ -185,7 +155,7 @@ def draw_object_header(self, context, scene, active_object, node_layout=None):
 def draw_lighting_modifiers(self, context):
     scene = bpy.context.scene
     layout = self.layout
-    layout.operator_menu_enum("viewport.lighting_modifier_add", "type")
+    layout.operator_menu_enum("alva_object.add_lighting_modifier", "type")
     layout.label(text="These don't actually do stuff yet.")
 
     for mod in scene.lighting_modifiers:
@@ -200,14 +170,14 @@ def draw_lighting_modifiers(self, context):
         row.use_property_decorate = True
 
         sub = row.row(align=True)
-        props = sub.operator("viewport.lighting_modifier_move", text="", icon='TRIA_UP', emboss=False)
+        props = sub.operator("alva_object.bump_lighting_modifier", text="", icon='TRIA_UP', emboss=False)
         props.name = mod.name
         props.direction = 'UP'
-        props = sub.operator("viewport.lighting_modifier_move", text="", icon='TRIA_DOWN', emboss=False)
+        props = sub.operator("alva_object.bump_lighting_modifier", text="", icon='TRIA_DOWN', emboss=False)
         props.name = mod.name
         props.direction = 'DOWN'
 
-        row.operator("viewport.lighting_modifier_remove", text="", icon='X', emboss=False).name = mod.name
+        row.operator("alva_object.remove_lighting_modifier", text="", icon='X', emboss=False).name = mod.name
 
         if mod.show_expanded:
             if mod.type == 'option_brightness_contrast':

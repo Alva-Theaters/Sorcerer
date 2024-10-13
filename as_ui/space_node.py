@@ -1,48 +1,14 @@
-# This file is part of Alva Sorcerer
-# Copyright (C) 2024 Alva Theaters
-
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-'''
-=====================================================================
-                      DESIGNED BY ALVA THEATERS
-                       FOR THE SOLE PURPOSE OF
-                         MAKING PEOPLE HAPPY
-=====================================================================
-'''
-
+# SPDX-FileCopyrightText: 2024 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 import bpy
 
-from .utils import find_group_label
-
-# Custom icon stuff
-import bpy.utils.previews
-import os
-preview_collections = {}
-pcoll = bpy.utils.previews.new()
-preview_collections["main"] = pcoll
-addon_dir = os.path.dirname(__file__)
-pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
-pcoll = preview_collections["main"]
-orb = pcoll["orb"]
+from .utils import find_group_label, get_orb_icon
 
 
 def draw_alva_node_view(self, layout):
-    pcoll = preview_collections["main"]
-    orb = pcoll["orb"]
+    orb = get_orb_icon()
 
     layout = self.layout
     layout.separator()
@@ -55,6 +21,8 @@ def draw_alva_node_view(self, layout):
 
 
 def draw_alva_node_menu(self, layout):
+    orb = get_orb_icon()
+
     layout = self.layout
     layout.separator()
     layout.label(text="Sorcerer", icon_value=orb.icon_id)
@@ -79,7 +47,7 @@ def draw_node_formatter_group(self, context, active_node):
         column.separator()
 
 
-def draw_node_formatter_mixer(self, context, active_node): ## This whole thing needs update
+def draw_node_formatter_mixer(self, context, active_node):
     row = self.layout.row(align=True)
     row.prop(active_node, "str_manual_fixture_selection", text="")
     row = self.layout.row(align=True)
@@ -228,14 +196,14 @@ def draw_node_mixer(self, context, layout):
     layout.separator()
     if self.show_settings:
         row = layout.row()
-        row.operator("node.add_choice", icon='ADD', text="")
-        row.operator("node.remove_choice", icon='REMOVE', text="")
+        row.operator("alva_node.mixer_add_choice", icon='ADD', text="")
+        row.operator("alva_node.mixer_remove_choice", icon='REMOVE', text="")
         row.prop(self, "columns", text="Columns:")
         row.prop(self, "scale", text="Size:")
         layout.separator() 
         
 
-def draw_node_formatter(self, context): ## All this needs to be redone.
+def draw_node_formatter(self, context):
     layout = self.layout
     column = layout.column(align=True)
     row = column.row()
@@ -282,62 +250,6 @@ def draw_node_formatter(self, context): ## All this needs to be redone.
     row.prop(active_node, "use_custom_color", text="", icon='HIDE_ON' if not active_node.use_custom_color else 'HIDE_OFF')
     row.prop(active_node, "color", text="")
     
-    
-def draw_flash_node(self, context, layout):
-    node_tree = context.space_data.node_tree
-    
-    # Top row
-    layout.prop(self, "flash_motif_names_enum", text="", icon='SEQ_SEQUENCER')
-    
-    column = layout.column()
-    
-    # 2nd row
-    row = column.row(align=True)
-    row.prop(self, "show_effect_preset_settings", icon='PREFERENCES', emboss=True, icon_only=True)
-    op = row.operator("node.flash_preset_search_operator", text="", icon='VIEWZOOM')
-    op.node_name = self.name
-    row.prop(self, "int_start_preset", text="Up Preset:")
-    op = row.operator("node.record_effect_preset_operator", text="", icon_value=orb.icon_id)
-    op.node_name = self.name
-    op.node_tree_name = node_tree.name
-    
-    # 3rd row
-    row = column.row(align=True)
-    row.prop(self, "int_end_preset", text="Down Preset:")
-    op = row.operator("node.record_down_effect_preset_operator", text="", icon_value=orb.icon_id)
-    op.node_name = self.name
-    op.node_tree_name = node_tree.name
-    
-    world = context.scene.world
-    conflict = False
-    conflict_node_name = ""
-    
-    if world is not None and world.node_tree and self.int_start_preset not in (0, 1) and self.int_end_preset not in (0, 1):
-        node_tree = world.node_tree
-        for controller in node_tree.nodes:
-            if controller.bl_idname == 'flash_type' and controller.name != self.name and controller.int_start_preset == self.int_start_preset:
-                conflict = True
-                conflict_node_name = str(controller.label)
-                if conflict_node_name == "":
-                    conflict_node_name = str(controller.name)
-                    if conflict_node_name == "":
-                        conflict_node_name = "Another"
-                break
-            
-    if conflict:
-        row = column.row()
-        row.label(text=f"{conflict_node_name} uses same preset.", icon='ERROR')
-        
-    if self.show_effect_preset_settings:
-        column.separator()
-        column.separator()
-        row = column.row()
-        row.label(text="Argument Template")
-        row = column.row()
-        row.prop(context.scene.scene_props, "str_preset_assignment_argument", text="")
-
-    layout.separator()
-
 
 def draw_console_node(self, context, layout):
     st = context.space_data.type
@@ -363,7 +275,7 @@ def draw_console_node(self, context, layout):
 
                 if not self.expand_settings:
                     row.scale_y = self.scale * 1.5 # Boosting this because the box in other mode boosts it, we want them to stay in same spot between modes
-                    op = row.operator("node.custom_button", text=f"{button.constant_index}{colon} {button.button_label}")
+                    op = row.operator("alva_node.direct_select", text=f"{button.constant_index}{colon} {button.button_label}")
                     op.button_index = button_index
                     op.space_type = st
                     op.node_name = node_name
@@ -374,17 +286,16 @@ def draw_console_node(self, context, layout):
                     
                     sub_row = box.row(align=True)
                     sub_row.scale_y = self.scale / 2
-                    sub_row.operator("node.bump_up_custom_button", icon='TRIA_LEFT', text="").button_index = button_index
+                    sub_row.operator("alva_node.bump_direct_select_up", icon='TRIA_LEFT', text="").button_index = button_index
                     sub_row.prop(button, "constant_index", text="")
-                    sub_row.operator("node.bump_down_custom_button", icon='TRIA_RIGHT', text="").button_index = button_index
+                    sub_row.operator("alva_node.bump_direct_select_down", icon='TRIA_RIGHT', text="").button_index = button_index
 
                     sub_row = box.row(align=True)
                     sub_row.scale_y = self.scale / 2
                     sub_row.prop(button, "button_label", text="")
-                    sub_row.operator("node.remove_custom_button", icon='X', text="")
+                    sub_row.operator("alva_node.remove_direct_select", icon='X', text="")
 
     if self.expand_settings:
-        counter_two = 0
         column = layout.column()
         box = column.box()
 
@@ -397,7 +308,7 @@ def draw_console_node(self, context, layout):
         row = box.row()
         row.scale_y = 1.5
         row.scale_x = 2
-        row.operator("node.add_custom_button", icon='ADD', text="")
+        row.operator("alva_node.add_direct_select", icon='ADD', text="")
         row.prop(self, "number_of_columns", icon='CENTER_ONLY', text="Columns")
         row.prop(self, "scale", text="Scale")
         row.prop(self, "boost_index", text="Boost #'s by")

@@ -1,42 +1,11 @@
-# This file is part of Alva Sorcerer
-# Copyright (C) 2024 Alva Theaters
-
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-'''
-=====================================================================
-                      DESIGNED BY ALVA THEATERS
-                       FOR THE SOLE PURPOSE OF
-                         MAKING PEOPLE HAPPY
-=====================================================================
-'''
-
-
-import bpy
+# SPDX-FileCopyrightText: 2024 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..assets.sli import SLI
 from ..utils.event_utils import EventUtils
 
-# Custom icon stuff
-import bpy.utils.previews
-import os
-preview_collections = {}
-pcoll = bpy.utils.previews.new()
-preview_collections["main"] = pcoll
-addon_dir = os.path.dirname(__file__)
-pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
+from .utils import get_orb_icon
 
 
 def draw_settings(self, context, layout=None):
@@ -92,8 +61,7 @@ def draw_settings(self, context, layout=None):
 
 
 def draw_network(self, context, column):
-    pcoll = preview_collections["main"]
-    orb = pcoll["orb"]
+    orb = get_orb_icon()
 
     scene = context.scene
     vt = scene.alva_settings_view_enum
@@ -117,9 +85,9 @@ def draw_network(self, context, column):
             box = box = column.box()
             row = box.row()
         row.alert = scene.scene_props.is_democratic
-        row.operator("my.democratic_operator", text="Democratic", icon='HEART')
+        row.operator("alva_pref.democratic", text="Democratic", icon='HEART')
         row.alert = scene.scene_props.is_not_democratic
-        row.operator("my.non_democratic_operator", text="Non-democratic", icon='ORPHAN_DATA')
+        row.operator("alva_pref.nondemocratic", text="Non-democratic", icon='ORPHAN_DATA')
         row.alert = 0
     
     # Lighting
@@ -169,7 +137,7 @@ def draw_network(self, context, column):
         row = box.row()
         row.enabled=False
         row.prop(scene.scene_props, "core_drives_enum", text="", icon='DISC')
-        row.operator("main.save_dtp_operator", icon='FILE_TICK')
+        row.operator("alva_pref.save_dtp", icon='FILE_TICK')
 
     column.separator()
     column.separator()
@@ -209,7 +177,7 @@ def draw_sequencer(self, context, column):
 
     box = column.box()
     row = box.row()
-    row.operator("view3d.alva_set_context_to_scene", text="", icon='SCENE_DATA')
+    row.operator("alva_pref.context_to_scene", text="", icon='SCENE_DATA')
     row.label(text=f"Showing properties for {target.name}:")
 
     if is_scene or (has_strip and target.type == 'SOUND'):

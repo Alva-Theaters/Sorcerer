@@ -1,33 +1,11 @@
-# This file is part of Alva Sorcerer
-# Copyright (C) 2024 Alva Theaters
-
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-'''
-=====================================================================
-                      DESIGNED BY ALVA THEATERS
-                       FOR THE SOLE PURPOSE OF
-                         MAKING PEOPLE HAPPY
-=====================================================================
-'''
-
+# SPDX-FileCopyrightText: 2024 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 import bpy
 from functools import partial
 
-from .space_common import draw_text_or_group_input, draw_parameters, draw_footer_toggles
+from .space_common import draw_text_or_group_input, draw_parameters_mini, draw_play_bar, draw_footer_toggles
 from .utils import determine_sequencer_contexts
 
 # Custom icon stuff
@@ -91,12 +69,12 @@ def draw_alva_sequencer_add_menu(self, layout):
         layout = self.layout
         layout.separator()
         layout.label(text="Alva Sorcerer", icon_value=orb.icon_id)
-        layout.operator("my.add_macro", text="Macro", icon='FILE_TEXT')
-        layout.operator("my.add_cue", text="Cue", icon='PLAY')
-        layout.operator("my.add_flash", text="Flash", icon='LIGHT_SUN')
-        layout.operator("my.add_animation", text="Animation", icon='IPO_BEZIER')
-        #layout.operator("my.add_offset_strip", text="Offset", icon='UV_SYNC_SELECT')
-        layout.operator("my.add_trigger", text="Trigger", icon='SETTINGS')
+        layout.operator("alva_seq.add", text="Macro", icon='FILE_TEXT').Option = "option_macro"
+        layout.operator("alva_seq.add", text="Cue", icon='PLAY').Option = "option_cue"
+        layout.operator("alva_seq.add", text="Flash", icon='LIGHT_SUN').Option = "option_flash"
+        layout.operator("alva_seq.add", text="Animation", icon='IPO_BEZIER').Option = "option_animation"
+        #layout.operator("alva_seq.add", text="Offset", icon='UV_SYNC_SELECT').Option = "option_offset"
+        layout.operator("alva_seq.add", text="Trigger", icon='SETTINGS').option = "Option_trigger"
 
 
 def draw_alva_sequencer_strip(self, context):
@@ -135,7 +113,7 @@ def draw_strip_media(self, context, scene, bake_panel=True):
         return
     
     if not hasattr(scene, "sequence_editor") and scene.sequence_editor:
-        draw_intro_header(self, context, None, scene, None, motif_name=False)
+        draw_intro_header(self, context, None, scene, None)
 
     # Check if the sequence editor and active strip exist
     elif hasattr(scene, "sequence_editor") and scene.sequence_editor:
@@ -184,7 +162,9 @@ def draw_strip_media(self, context, scene, bake_panel=True):
                 
             elif console_context == "animation":
                 draw_text_or_group_input(self, context, box, active_strip, object=False)
-                draw_parameters(self, context, column, box, active_strip)
+                draw_parameters_mini(self, context, box, active_strip, use_slider=True, expand=True, text=False)
+                box.separator()
+                draw_play_bar(self, context, box)
                 draw_footer_toggles(self, context, column, active_strip)
 
             elif console_context == "offset":
@@ -194,7 +174,7 @@ def draw_strip_media(self, context, scene, bake_panel=True):
                 draw_strip_trigger(self, context, column, box, active_strip)
         
         else:
-            draw_add_buttons_row(self, context, column, scene, active_strip, motif_name=False)
+            draw_add_buttons_row(self, context, column, scene, active_strip)
             column.separator()
             box = draw_text_insert(self, context, column, text="No active color strip.")
             return box    
@@ -208,17 +188,14 @@ def draw_strip_media(self, context, scene, bake_panel=True):
             draw_strip_footer(self, context, box)
         
 
-def draw_add_buttons_row(self, context, column, scene, active_strip, motif_name=False, lighting_icons=False, console_context=None):
-    # Motif prefix.
+def draw_add_buttons_row(self, context, column, scene, active_strip, lighting_icons=False, console_context=None):
     row = column.row(align=True)
-    
-    # Add buttons.
-    row.operator("my.add_macro", text="", icon='FILE_TEXT')
-    row.operator("my.add_cue", text="", icon='PLAY')
-    row.operator("my.add_flash", text="", icon='LIGHT_SUN')
-    row.operator("my.add_animation", text="", icon='IPO_BEZIER')
-    #row.operator("my.add_offset_strip", text="", icon='UV_SYNC_SELECT')
-    row.operator("my.add_trigger", text="", icon='SETTINGS')
+    row.operator("alva_seq.add", text="", icon='FILE_TEXT').Option = "option_macro"
+    row.operator("alva_seq.add", text="", icon='PLAY').Option = "option_cue"
+    row.operator("alva_seq.add", text="", icon='LIGHT_SUN').Option = "option_flash"
+    row.operator("alva_seq.add", text="", icon='IPO_BEZIER').Option = "option_animation"
+    #row.operator("alva_seq.add", text="", icon='UV_SYNC_SELECT').Option = "option_offset"
+    row.operator("alva_seq.add", text="", icon='SETTINGS').option = "Option_trigger"
     
 
 def draw_text_insert(self, context, column, text):
@@ -269,7 +246,7 @@ def draw_only_sound(self, context, column, active_strip):
     orb = pcoll["orb"]
 
     row = column.row(align=True)
-    row.operator("my.mute_button", icon='HIDE_OFF' if not active_strip.mute else 'HIDE_ON')
+    row.operator("alva_seq.mute", icon='HIDE_OFF' if not active_strip.mute else 'HIDE_ON')
     row.prop(active_strip, "name", text="")
 
     column.separator()
@@ -278,22 +255,20 @@ def draw_only_sound(self, context, column, active_strip):
     box = column.box()  
 
     row = box.row(align=True)
-    row.operator("my.bump_tc_left_five", text="", icon='BACK')
-    row.operator("my.bump_tc_left_one", text="", icon='TRIA_LEFT')
-    row.operator("my.bump_tc_right_one", text="", icon='TRIA_RIGHT')
-    row.operator("my.bump_tc_right_five", text="", icon='FORWARD')
+    row.operator("alva_seq.tc_left_five", text="", icon='BACK')
+    row.operator("alva_seq.tc_left_one", text="", icon='TRIA_LEFT')
+    row.operator("alva_seq.tc_right_one", text="", icon='TRIA_RIGHT')
+    row.operator("alva_seq.tc_right_five", text="", icon='FORWARD')
     row.prop(active_strip, "int_event_list", text="Event List #")
-    row.operator("my.clear_timecode_clock", icon="CANCEL")
-    row.operator("my.execute_on_cue_operator", icon_value=orb.icon_id, text="")
+    row.operator("alva_seq.clear_tc_clock", icon="CANCEL")
+    row.operator("alva_orb.execute_on_cue", icon_value=orb.icon_id, text="")
 
     row = box.row()
-    row.operator("seq.analyze_song", icon='SHADERFX')
+    row.operator("alva_seq.analyze_song", icon='SHADERFX')
     return box
 
 
 def draw_color_header(self, context, column, scene, active_strip, console_context):
-    # draw_add_buttons_row(self, context, column, scene, active_strip, motif_name=True, lighting_icons=True, console_context=console_context) 
-    # column.separator()
     box = draw_color_subheader(self, context, column, active_strip, console_context)
     return box
     
@@ -304,13 +279,6 @@ def draw_color_subheader(self, context, column, active_strip, console_context):
     my_settings = active_strip.my_settings
     row.prop(my_settings, "motif_type_enum", expand=True)
     draw_strip_type_label(console_context, row)
-    if console_context != 'animation' and active_strip.motif_name != "":
-        if active_strip.is_linked and console_context != "animation":
-            row.alert = 1
-            row.prop(active_strip, "is_linked", icon='LINKED')
-        else:
-            row.alert = 0
-            row.prop(active_strip, "is_linked", icon='UNLINKED')
     box = column.box()
     return box
 
@@ -338,12 +306,12 @@ def draw_strip_macro(self, context, column, box, active_strip):
     row.label(text='* = "Sneak Time " + [Strip length]')
     row = box.row(align=True)
     row.prop(active_strip, "start_frame_macro_text_gui")
-    row.operator("my.generate_start_frame_macro", icon_value=orb.icon_id)
+    row.operator("alva_orb.generate_start_frame_macro", icon_value=orb.icon_id)
     if context.scene.strip_end_macros:
         row = box.separator()
         row = box.row(align=True)
         row.prop(active_strip, "end_frame_macro_text_gui")
-        row.operator("my.generate_end_frame_macro", icon_value=orb.icon_id)
+        row.operator("alva_orb.generate_end_frame_macro", icon_value=orb.icon_id)
             
 
 def draw_strip_cue(self, context, column, box, active_strip):
@@ -356,7 +324,7 @@ def draw_strip_cue(self, context, column, box, active_strip):
     if context.scene.cue_builder_toggle:
         row.operator("my.update_builder", text="", icon='FILE_REFRESH')
     row.operator("my.record_cue", text="", icon='REC')
-    row.operator("my.sync_cue", icon_value=orb.icon_id)
+    row.operator("alva_orb.generate_cue", icon_value=orb.icon_id)
     row = box.row(align=True)
     row.scale_y = 2
     row.scale_x = .6
@@ -490,7 +458,7 @@ def draw_strip_flash_manual(self, context, box, active_strip):
     row = box.row(align=True)
     row.enabled = is_manual_enabled
     row.prop(active_strip, "flash_input", text="")
-    row.operator("my.flash_copy_down", text="", icon='DOWNARROW_HLT')
+    row.operator("alva_seq.flash_copy_down", text="", icon='DOWNARROW_HLT')
     
     row = box.row()
     row = box.label(text=f"Flash Down: {active_strip.flash_down_input_background}")
@@ -506,12 +474,9 @@ def draw_strip_flash_controllers(self, context, box, active_strip):
     row = box.row(align=True)
     row.operator("alva_node.home", icon='HOME', text="")
     row.operator("alva_node.update", icon='FILE_REFRESH', text="")
-    ## Use of row.alert logic here is probably redundant per existing Blender UI rules.
     if active_strip.str_manual_fixture_selection == "":
         if not active_strip.selected_group_enum:
-            row.alert = 1
-        row.prop(active_strip, "selected_group_enum", text="", icon_only=False, icon='LIGHT')
-        row.alert = 0
+            row.prop(active_strip, "selected_group_enum", text="", icon_only=False, icon='LIGHT')
     row.prop(active_strip, "str_manual_fixture_selection", text="")
     row.operator("alva_node.home", icon='HOME', text="")
     row.operator("alva_node.update", icon='FILE_REFRESH', text="")
@@ -548,7 +513,7 @@ def draw_strip_flash_footer(self, context, box, active_strip):
 
     row = box.row(align=True)
     row.prop(active_strip, "flash_bias", text="Bias", slider=True)
-    row.operator("my.build_flash_macros", text="", icon_value=orb.icon_id)
+    row.operator("alva_orb.generate_flash_macros", text="", icon_value=orb.icon_id)
 
     row = box.row()
     if active_strip.flash_bias > 0:
@@ -610,19 +575,19 @@ def draw_strip_offset(self, context, column, box, active_strip):
     row = box.row(align=True)
     row.prop(active_strip, 'offset_channels', text="")
     row.prop(active_strip, "use_macro", text="", icon='FILE_TEXT')
-    row.operator("my.generate_offset_macro", text="", icon_value=orb.icon_id)
+    row.operator("alva_orb.generate_offset_macro", text="", icon_value=orb.icon_id)
     
     box.separator(factor=.01)
 
 
 def draw_strip_footer(self, context, column):
     row = column.row(align=True)
-    row.operator("my.bump_left_five", icon='BACK')
-    row.operator("my.bump_left_one", icon='BACK')
-    row.operator("my.bump_up", icon='TRIA_UP')
-    row.operator("my.bump_down", icon='TRIA_DOWN')
-    row.operator("my.bump_right_one", icon='FORWARD')
-    row.operator("my.bump_right_five", icon='FORWARD')
+    row.operator("alva_seq.bump_horizontal", text="-5", icon='BACK').direction = -5
+    row.operator("alva_seq.bump_horizontal", text="-1", icon='BACK').direction = -1
+    row.operator("alva_seq.bump_horizontal", icon='TRIA_UP').direction = -1
+    row.operator("alva_seq.bump_horizontal", icon='TRIA_DOWN').direction = 1
+    row.operator("alva_seq.bump_vertical", text="1", icon='FORWARD').direction = 1
+    row.operator("alva_seq.bump_vertical", text="5", icon='FORWARD').direction = 5
     
 
 def draw_strip_sound_object(self, context, column, active_strip):
@@ -633,10 +598,10 @@ def draw_strip_sound_object(self, context, column, active_strip):
     column.separator()
 
     row = column.row()
-    row.operator("seq.bake_audio_operator", text="Render to Sound Files", icon='FILE_TICK')
+    row.operator("alva_seq.bake_audio", text="Render to Sound Files", icon='FILE_TICK')
 
 
-## Does this need to be rewritten or deleted?
+# Does this need to be rewritten or deleted?
 def draw_strip_speaker(self, context, column, active_strip):
 #     column.separator()
 #     row = column.row()
@@ -648,10 +613,10 @@ def draw_strip_speaker(self, context, column, active_strip):
 #     row.prop(active_strip, "speaker_sensitivity", text="Sensitivity:", slider=True)
 #     layout.separator()
 #     row = layout.row()
-#     row.operator("seq.bake_audio_operator", text="Bake Audio (Scene)")
+#     row.operator("alva_seq.bake_audio", text="Bake Audio (Scene)")
 #     row = layout.row()
 #     row.operator("seq.solo_track_operator", text="Solo Track")
-#     row.operator("seq.export_audio_operator", text="Export Channel")
+#     row.operator("alva_seq.export_audio", text="Export Channel")
 #     layout.separator()
     return
     
@@ -666,15 +631,15 @@ def draw_strip_video(self, context):
 
 def draw_strip_formatter_color(self, context, column, scene, sequence_editor, active_strip):
     row = column.row(align=True)
-    if scene.is_filtering_left == True:
+    if scene.is_filtering_left:
         row.alert = 1
         row.prop(scene, "is_filtering_left", icon='FILTER')
         row.alert = 0
     elif scene.is_filtering_left == False:
         row.alert = 0
         row.prop(scene, "is_filtering_left", icon='FILTER')
-    row.operator("my.select_similar", text="Select Magnetic") 
-    if scene.is_filtering_right == True:
+    row.operator("alva_seq.select_similar", text="Select Magnetic") 
+    if scene.is_filtering_right:
         row.alert = 1
         row.prop(scene, "is_filtering_right", icon='FILTER')
         row.alert = 0
@@ -746,7 +711,7 @@ def draw_strip_formatter_color(self, context, column, scene, sequence_editor, ac
     row = column.row(align=True)
     row.prop(scene, "i_know_the_shortcuts", text="I know the shortcuts.")
 
-    selected_color_strips = [strip for strip in filter_color_strips(context.selected_sequences) if strip.select == True]
+    selected_color_strips = [strip for strip in filter_color_strips(context.selected_sequences) if strip.select]
 
     if len(selected_color_strips) > 1:
         column.separator()
@@ -754,13 +719,13 @@ def draw_strip_formatter_color(self, context, column, scene, sequence_editor, ac
 
         row = column.row(align=True)
         row.prop(scene, "offset_value", text="Offset in BPM")
-        row.operator("my.add_offset", text="", icon='CENTER_ONLY')
+        row.operator("alva_seq.offset", text="", icon='CENTER_ONLY')
         column.separator()
 
 
 def draw_strip_formatter_sound(self, context, column, active_strip):
     row = column.row(align=True)
-    row.operator("my.mute_button", icon='HIDE_OFF' if not active_strip.mute else 'HIDE_ON')
+    row.operator("alva_seq.mute", icon='HIDE_OFF' if not active_strip.mute else 'HIDE_ON')
     row.prop(active_strip, "name", text="")
     row = column.row(align=True)
     row.prop(active_strip, "song_bpm_input", text="Beats per minute (BPM)")
@@ -768,12 +733,12 @@ def draw_strip_formatter_sound(self, context, column, active_strip):
     row.prop(active_strip, "beats_per_measure", text="Beats per measure")
     row = column.row(align=True)
     row.prop(active_strip, "song_bpm_channel", text="Generate on channel")
-    row.operator("my.generate_strips", text="", icon='COLOR')
+    row.operator("alva_seq.generate_on_song", text="", icon='COLOR')
     column.separator()
     row = column.row(align=True)
-    row.operator("my.start_end_frame_mapping", icon='PREVIEW_RANGE')
+    row.operator("alva_seq.start_end_frame_mapping", icon='PREVIEW_RANGE')
     row = column.row(align=True)
-    row.operator("my.time_map", text="Zero Timecode", icon='TIME')
+    row.operator("alva_seq.set_timecode", text="Zero Timecode", icon='TIME')
     column.separator()
     row = column.row(align=True)
     row.prop(active_strip, "show_waveform", slider=True)
@@ -797,25 +762,25 @@ def draw_strip_formatter_video_audio(self, context, column, active_strip, sequen
     selected_video_strip = selected_video_strips[0]
 
     row = column.row(align=True)
-    row.operator("my.mute_button", icon='HIDE_OFF' if not active_strip.mute else 'HIDE_ON')
+    row.operator("alva_seq.mute", icon='HIDE_OFF' if not active_strip.mute else 'HIDE_ON')
     row.prop(active_strip, "name", text="")
 
     row = column.row(align=True)
     if selected_sound_strip.frame_start != selected_video_strip.frame_start or selected_sound_strip.frame_final_duration != selected_video_strip.frame_final_duration:
         row.alert = 1
-        row.operator("my.sync_video")
+        row.operator("alva_seq.sync_video")
 
     row = column.row(align=True)
-    row.operator("my.start_end_frame_mapping", icon='PREVIEW_RANGE')
+    row.operator("alva_seq.start_end_frame_mapping", icon='PREVIEW_RANGE')
 
     row = column.row(align=True)
-    row.operator("my.time_map", icon='TIME')
+    row.operator("alva_seq.set_timecode", icon='TIME')
     
 
 def draw_strip_formatter_generator(self, context, column, scene):
     row = column.row(align=True)            
     row.prop(scene, "channel_selector", text="Channel")
-    row.operator("my.select_channel", text="", icon='RESTRICT_SELECT_OFF')   
+    row.operator("alva_seq.select_channel", text="", icon='RESTRICT_SELECT_OFF')   
 
     row = column.row(align=True)
     row.prop(scene, "generate_quantity", text="Quantity")
@@ -825,6 +790,6 @@ def draw_strip_formatter_generator(self, context, column, scene):
         row.prop(scene, "normal_offset", text="Offset by")
 
     row = column.row(align=True)
-    row.operator("my.add_color_strip", icon='COLOR')  
+    row.operator("alva_seq.generate", icon='COLOR')  
 
     column.separator()

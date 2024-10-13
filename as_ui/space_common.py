@@ -1,28 +1,6 @@
-# This file is part of Alva Sorcerer
-# Copyright (C) 2024 Alva Theaters
-
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-'''
-=====================================================================
-                      DESIGNED BY ALVA THEATERS
-                       FOR THE SOLE PURPOSE OF
-                         MAKING PEOPLE HAPPY
-=====================================================================
-'''
-
+# SPDX-FileCopyrightText: 2024 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 import bpy
 
@@ -115,7 +93,7 @@ def draw_parameters(self, context, column, box, active_object):
     row = box.row(align=True)
     
     # MUTE
-    op_mute = row.operator("object.toggle_object_mute_operator", icon='HIDE_ON' if active_object.mute else 'HIDE_OFF', text="")
+    op_mute = row.operator("alva_object.toggle_object_mute", icon='HIDE_ON' if active_object.mute else 'HIDE_OFF', text="")
     op_mute.space_type = space_type
     op_mute.node_name = node_name
     op_mute.node_tree_name = node_tree_name
@@ -343,7 +321,7 @@ def draw_volume_monitor(self, context, sequence_editor):
         row = box.row()
         row.label(text="No participating speaker strips found.")
 
-def draw_parameters_mini(self, context, layout, active_object, use_slider=False, expand=True):
+def draw_parameters_mini(self, context, layout, active_object, use_slider=False, expand=True, text=True):
     ao = active_object
 
     layout.use_property_split = expand
@@ -356,7 +334,9 @@ def draw_parameters_mini(self, context, layout, active_object, use_slider=False,
         row.scale_x = .7
         element = row
 
-    element.prop(ao, "str_manual_fixture_selection", text="")
+    if text:
+        element.prop(ao, "str_manual_fixture_selection", text="")
+        
     if ao.intensity_is_on:
         element.prop(ao, "float_intensity", slider=use_slider)
     if ao.strobe_is_on:
@@ -420,12 +400,12 @@ def draw_fixture_groups(self, context):
     row.template_list("COMMON_UL_group_data_list", "", scene, "scene_group_data", scene.scene_props, "group_data_index")
 
     col = row.column(align=True)
-    col.operator("patch.add_group_item", text="", icon='ADD')
-    col.operator("patch.remove_group_item", text="", icon='REMOVE')
+    col.operator("alva_common.add_group", text="", icon='ADD')
+    col.operator("alva_common.remove_group", text="", icon='REMOVE')
     if len(scene.scene_group_data) > 1:
         col.separator()
-        col.operator("patch.bump_group_item", text="", icon='TRIA_UP').direction = -1
-        col.operator("patch.bump_group_item", text="", icon='TRIA_DOWN').direction = 1
+        col.operator("alva_common.bump_group", text="", icon='TRIA_UP').direction = -1
+        col.operator("alva_common.bump_group", text="", icon='TRIA_DOWN').direction = 1
     col.separator()
     col.alert = scene.scene_props.highlight_mode
     col.prop(scene.scene_props, "highlight_mode", icon='OUTLINER_OB_LIGHT' if scene.scene_props.highlight_mode else 'LIGHT_DATA', text="")
@@ -462,7 +442,7 @@ def draw_fixture_groups(self, context):
     if has_channels:
         row.prop(item, "highlight_or_remove_enum", expand=True, text="")
     row.prop(scene.scene_props, "add_channel_ids", text="")
-    row.operator("object.pull_selection_operator", text="", icon='VIEW3D')
+    row.operator("alva_object.pull_selection", text="", icon='VIEW3D')
 
 
 def draw_generate_fixtures(self, context):

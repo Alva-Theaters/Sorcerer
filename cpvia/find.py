@@ -1,34 +1,11 @@
-# This file is part of Alva Sorcerer
-# Copyright (C) 2024 Alva Theaters
-
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-'''
-=====================================================================
-                      DESIGNED BY ALVA THEATERS
-                       FOR THE SOLE PURPOSE OF
-                         MAKING PEOPLE HAPPY
-=====================================================================
-'''
-
+# SPDX-FileCopyrightText: 2024 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 import bpy
 
 from ..assets.dictionaries import Dictionaries 
-from ..assets.sli import SLI 
-from ..utils.cpvia_utils import update_nodes
+from ..assets.sli import SLI
 
 
 class Find:
@@ -120,7 +97,7 @@ class Find:
         Returns:
             parent: A bpy object that may be a node, strip, or object
         """
-        from ..updaters.node_updaters import NodeUpdaters 
+        from ..updaters.node import NodeUpdaters 
         
         if not isinstance(object, bpy.types.PropertyGroup):
             return object
@@ -176,23 +153,6 @@ class Find:
     #-------------------------------------------------------------------------------------------------------------------------------------------
     '''NODE finders'''
     #-------------------------------------------------------------------------------------------------------------------------------------------
-    @staticmethod
-    def find_flash_node_channels(self, update_nodes=False):
-        '''Returns the channel numbers that the flash node needs to know about.
-            Optionally passes argument to tell upstream nodes to update and send
-            their CPVIAs'''
-        up_groups_list = []
-        down_groups_list = []
-        
-        for input_socket in Find.inputs:
-            if input_socket.bl_idname == 'FlashUpType':
-                Find.find_channels_from_node_links(input_socket, up_groups_list, update_nodes)
-            elif input_socket.bl_idname == 'FlashDownType':
-                Find.find_channels_from_node_links(input_socket, down_groups_list, update_nodes)
-
-        return up_groups_list, down_groups_list
-
-
     @staticmethod
     def find_channels_from_node_links(input_socket, group_list, update_nodes, is_input=True):
         '''Finds the channels inside just one socket'''

@@ -1,28 +1,6 @@
-# This file is part of Alva Sorcerer
-# Copyright (C) 2024 Alva Theaters
-
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-'''
-=====================================================================
-                      DESIGNED BY ALVA THEATERS
-                       FOR THE SOLE PURPOSE OF
-                         MAKING PEOPLE HAPPY
-=====================================================================
-'''
-
+# SPDX-FileCopyrightText: 2024 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 import bpy
 import mathutils
@@ -159,7 +137,7 @@ class EventUtils:
                     setattr(obj, prop, value)
                 elif isinstance(value, mathutils.Color) and any(v != 1 for v in value):
                     setattr(obj, prop, value)
-            else:  ## Temporary fix. This needs to be way smarter.
+            else:  # TODO Temporary fix. This needs to be way smarter.
                 if isinstance(value, int) and value != 100:
                     setattr(obj, prop, value)
                 elif isinstance(value, mathutils.Color) and any(v != 1 for v in value):
@@ -207,7 +185,7 @@ class EventUtils:
 
     @staticmethod
     def find_livemap_cue(scene, current_frame, active_strip):
-        relevant_strips = [strip for strip in scene.sequence_editor.sequences if getattr(strip, 'eos_cue_number', 0) != 0 and strip.my_settings.motif_type_enum == 'option_eos_cue' and not strip.mute]
+        relevant_strips = [strip for strip in scene.sequence_editor.sequences if getattr(strip, 'eos_cue_number', 0) != 0 and strip.my_settings.motif_type_enum == 'option_cue' and not strip.mute]
         closest_strip = None
         for strip in relevant_strips:
             if strip.frame_start <= current_frame:

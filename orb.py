@@ -1,35 +1,12 @@
-# This file is part of Alva Sorcerer
-# Copyright (C) 2024 Alva Theaters
-
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-'''
-=====================================================================
-                      DESIGNED BY ALVA THEATERS
-                       FOR THE SOLE PURPOSE OF
-                         MAKING PEOPLE HAPPY
-=====================================================================
-'''
-
+# SPDX-FileCopyrightText: 2024 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 import bpy
 import time
 import logging
-import math
 
-from .updaters.sequencer_updaters import SequencerUpdaters as Updaters
+from .updaters.sequencer import SequencerUpdaters as Updaters
 from .utils.event_utils import EventUtils
 from .utils.orb_utils import find_addresses, tokenize_macro_line, find_executor
 from .utils.sequencer_mapping import StripMapping
@@ -38,9 +15,21 @@ from .assets.sli import SLI
 
 
 '''
-Any operator that talks to the console MUST ONLY call an Orb static method.
-This is the ONLY place to check lighting console type inside operators. All
-@staticmethods here are direct standins for operators, for organization.
+This script's job is to automate repetitive, boring tasks on lighting consoles.
+We use this tool because "creating macros" != "art".
+
+This is the ONLY place to check lighting console type inside operators.
+
+This whole script really needs to be rewritten. Ideally there is a single
+orb.py that is very readable and there is a orb folder with separated scripts
+for Eos and MA. orb_utilities.py would also be moved to that folder. But doing
+this would require extensive testing to ensure no bugs were introduced. 
+
+Ideal New Structure:
+   - Change find_executor function so it accepts multiple strings in same call
+   - initiate_orb function name is vague, delete altogether if possible
+   - Use global orb_start, orb_finish, orb_cancel functions at the operator level, not here
+   - Refactor the console_mode check so it is not repeated
 '''
 
 

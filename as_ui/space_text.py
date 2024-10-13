@@ -1,42 +1,8 @@
-# This file is part of Alva Sorcerer
-# Copyright (C) 2024 Alva Theaters
+# SPDX-FileCopyrightText: 2024 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-'''
-=====================================================================
-                      DESIGNED BY ALVA THEATERS
-                       FOR THE SOLE PURPOSE OF
-                         MAKING PEOPLE HAPPY
-=====================================================================
-'''
-
-
-import bpy
-
-
-# Custom icon stuff
-import bpy.utils.previews
-import os
-preview_collections = {}
-pcoll = bpy.utils.previews.new()
-preview_collections["main"] = pcoll
-addon_dir = os.path.dirname(__file__)
-pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
-pcoll = preview_collections["main"]
-orb = pcoll["orb"]
+from .utils import get_orb_icon
 
 
 def draw_text_view(self, context):
@@ -46,13 +12,15 @@ def draw_text_view(self, context):
 
 
 def draw_macro_generator(self, context):
+    orb = get_orb_icon()
+
     active_text = context.space_data.text
     layout = self.layout
     col = layout.column()
     
     row = col.row(align=True)
     row.prop(active_text, 'text_macro', text="Macro Number:")
-    row.operator("text.generate_text_macro", icon_value=orb.icon_id)
+    row.operator("alva_orb.generate_text_macro", icon_value=orb.icon_id)
 
     col.separator()
 
@@ -89,5 +57,4 @@ def draw_macro_generator(self, context):
 def draw_import_usitt_ascii(self, context):
     layout = self.layout
     col = layout.column()
-    col.operator("my.send_usitt_ascii_to_3d", text="Fixtures to 3D", icon='SHADERFX')
-    col.operator("my.send_usitt_ascii_to_sequencer", text="Events to Sequencer", icon='SHADERFX')
+    col.operator("alva_text.text_to_3d", text="Fixtures to 3D", icon='SHADERFX')

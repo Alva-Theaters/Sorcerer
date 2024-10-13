@@ -1,27 +1,28 @@
-# This file is part of Alva Sorcerer
-# Copyright (C) 2024 Alva Theaters
+# SPDX-FileCopyrightText: 2024 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+import bpy.utils.previews
+import os
 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+preview_collections = {}
 
 
-'''
-=====================================================================
-                      DESIGNED BY ALVA THEATERS
-                       FOR THE SOLE PURPOSE OF
-                         MAKING PEOPLE HAPPY
-=====================================================================
-'''
+def get_orb_icon():
+    global preview_collections
+    if "main" not in preview_collections:
+        pcoll = bpy.utils.previews.new()
+        addon_dir = os.path.dirname(__file__)
+        pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
+        preview_collections["main"] = pcoll
+    return preview_collections["main"]["orb"]
+
+
+def unregister_previews():
+    global preview_collections
+    for pcoll in preview_collections.values():
+        bpy.utils.previews.remove(pcoll)
+    preview_collections.clear()
 
 
 def determine_sequencer_contexts(sequence_editor, active_strip):
@@ -64,11 +65,11 @@ def determine_sequencer_contexts(sequence_editor, active_strip):
             alva_context = "none_relevant"
         
         if alva_context == "only_color":
-            if motif_type == "option_eos_macro":
+            if motif_type == "option_macro":
                 console_context = "macro"
-            elif motif_type == "option_eos_cue":
+            elif motif_type == "option_cue":
                 console_context = "cue"
-            elif motif_type == "option_eos_flash":
+            elif motif_type == "option_flash":
                 console_context = "flash"
             elif motif_type == "option_animation":
                 console_context = "animation"

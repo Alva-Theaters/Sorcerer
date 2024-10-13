@@ -1,39 +1,6 @@
-# This file is part of Alva Sorcerer
-# Copyright (C) 2024 Alva Theaters
-
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-'''
-=====================================================================
-                      DESIGNED BY ALVA THEATERS
-                       FOR THE SOLE PURPOSE OF
-                         MAKING PEOPLE HAPPY
-=====================================================================
-'''
-
-
-'''
-This script, spy, is a sort of API here to make it easier for casual users
-to interact with Sorcerer functions programmatically. Inspired by Blender's 
-bpy API. End users shall access this API from built-in text editor through:
-
-import bpy
-from bpy import spy
-
-'''
-
+# SPDX-FileCopyrightText: 2024 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 import bpy
 
@@ -48,13 +15,23 @@ from .cpvia.mix import Mixer
 from .cpvia.influencers import Influencers
 from .utils.osc import OSC
 from .utils.event_utils import EventUtils
-from .updaters.properties_updaters import PropertiesUpdaters
+from .updaters.properties import PropertiesUpdaters
 
 from .utils.audio_utils import render_volume
 from .utils.cpvia_utils import color_object_to_tuple_and_scale_up, update_alva_controller, home_alva_controller
 from .utils.properties_utils import parse_channels, parse_mixer_channels
 from .utils.sequencer_utils import calculate_flash_strip_bias, duplicate_active_strip_to_selected, find_available_channel, add_color_strip
 from .utils.sequencer_utils import analyze_song, AnalysisResult
+
+'''
+This script, spy, is a sort of API here to make it easier for casual users
+to interact with Sorcerer functions programmatically. Inspired by Blender's 
+bpy API. End users shall access this API from built-in text editor through:
+
+import bpy
+from bpy import spy
+
+'''
 
 
 class SorcererPython:

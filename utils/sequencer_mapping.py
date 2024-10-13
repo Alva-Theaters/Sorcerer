@@ -1,28 +1,6 @@
-# This file is part of Alva Sorcerer
-# Copyright (C) 2024 Alva Theaters
-
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-'''
-=====================================================================
-                      DESIGNED BY ALVA THEATERS
-                       FOR THE SOLE PURPOSE OF
-                         MAKING PEOPLE HAPPY
-=====================================================================
-'''
-
+# SPDX-FileCopyrightText: 2024 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
 from collections import defaultdict
@@ -159,7 +137,7 @@ class StripMapping:
 
 # Defines lists of strips with relevant enumerator and checkbox choices.
 def filter_eos_cue_strips(sequences):
-    return [strip for strip in sequences if strip.type == 'COLOR' and strip.my_settings.motif_type_enum == 'option_eos_cue' and not strip.mute]
+    return [strip for strip in sequences if strip.type == 'COLOR' and strip.my_settings.motif_type_enum == 'option_cue' and not strip.mute]
 
 def filter_animation_strips(sequences):
     return [strip for strip in sequences if strip.type == 'COLOR' and strip.my_settings.motif_type_enum == 'option_animation' and not strip.mute]
@@ -171,16 +149,16 @@ def filter_trigger_strips(sequences):
     return [strip for strip in sequences if strip.type == 'COLOR' and strip.my_settings.motif_type_enum == 'option_trigger' and strip.use_macro and not strip.mute]
 
 def filter_timecode_learn_strips(sequences):
-    return [strip for strip in sequences if strip.type == 'SOUND' and strip.int_event_list != 0 and strip.my_learning_checkbox == True and not strip.mute]
+    return [strip for strip in sequences if strip.type == 'SOUND' and strip.int_event_list != 0 and strip.my_learning_checkbox and not strip.mute]
 
 def filter_timecode_strips(sequences):
-    return [strip for strip in sequences if strip.type == 'SOUND' and strip.int_event_list != 0 and strip.my_learning_checkbox == False and not strip.mute]
+    return [strip for strip in sequences if strip.type == 'SOUND' and strip.int_event_list != 0 and not strip.my_learning_checkbox and not strip.mute]
 
 def filter_eos_macro_strips(sequences):
-    return [strip for strip in sequences if strip.type == 'COLOR' and strip.my_settings.motif_type_enum == 'option_eos_macro' and not strip.mute]
+    return [strip for strip in sequences if strip.type == 'COLOR' and strip.my_settings.motif_type_enum == 'option_macro' and not strip.mute]
 
 def filter_eos_flash_strips(sequences):
-    return [strip for strip in sequences if strip.type == 'COLOR' and strip.my_settings.motif_type_enum == 'option_eos_flash' and not strip.mute]
+    return [strip for strip in sequences if strip.type == 'COLOR' and strip.my_settings.motif_type_enum == 'option_flash' and not strip.mute]
 
 
 def get_offset_triggers(strip):

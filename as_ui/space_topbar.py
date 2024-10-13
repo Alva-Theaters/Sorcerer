@@ -1,49 +1,14 @@
-# This file is part of Alva Sorcerer
-# Copyright (C) 2024 Alva Theaters
-
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-'''
-=====================================================================
-                      DESIGNED BY ALVA THEATERS
-                       FOR THE SOLE PURPOSE OF
-                         MAKING PEOPLE HAPPY
-=====================================================================
-'''
-
-
-import bpy
+# SPDX-FileCopyrightText: 2024 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from .space_time import is_qmeo_parent_a_sound_strip
+from .utils import get_orb_icon
 
-# Custom icon stuff
-import bpy.utils.previews
-import os
-
-preview_collections = {}
-pcoll = bpy.utils.previews.new()
-preview_collections["main"] = pcoll
-
-addon_dir = os.path.dirname(__file__)
-pcoll.load("orb", os.path.join(addon_dir, "alva_orb.png"), 'IMAGE')
+orb = get_orb_icon()
 
 
 def draw_alva_topbar(self, context):
-    pcoll = preview_collections["main"]
-    orb = pcoll["orb"]
-
     if (hasattr(context, "scene") and 
         hasattr(context.scene, "scene_props") and 
         context.scene.scene_props.view_topbar):
@@ -60,9 +25,6 @@ def draw_alva_topbar(self, context):
 
 
 def draw_alva_edit(self, context):
-    pcoll = preview_collections["main"]
-    orb = pcoll["orb"]
-
     if (hasattr(context, "scene") and 
         hasattr(context.scene, "scene_props")): # Avoid unregistration error
         layout = self.layout
@@ -71,9 +33,6 @@ def draw_alva_edit(self, context):
 
 
 def draw_alva_render(self, context):
-    pcoll = preview_collections["main"]
-    orb = pcoll["orb"]
-
     if (hasattr(context, "scene") and 
         hasattr(context.scene, "scene_props") and
         context.scene.scene_props.console_type_enum == 'option_eos'):
@@ -92,9 +51,6 @@ def draw_alva_window(self, context):
 
 
 def draw_alva_help(self, context):
-    pcoll = preview_collections["main"]
-    orb = pcoll["orb"]
-
     if (hasattr(context, "scene") and
         hasattr(context.scene, "scene_props")): # Avoid unregistration error
         scene = context.scene.scene_props
