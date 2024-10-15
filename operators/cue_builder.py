@@ -10,7 +10,7 @@ from ..utils.osc import OSC
 
 
 class SEQUENCER_OT_update_cue_builder(Operator):
-    bl_idname = "my.update_builder"
+    bl_idname = "alva_seq.update_builder"
     bl_label = "Update builder"
     bl_description = "Send all builder settings to console"
     
@@ -39,7 +39,7 @@ class SEQUENCER_OT_update_cue_builder(Operator):
     
     
 class SEQUENCER_OT_record_cue(Operator):
-    bl_idname = "my.record_cue"
+    bl_idname = "alva_seq.record_cue"
     bl_label = "Record cue"
     bl_description = "Record the cue on the console as is"
     
@@ -54,7 +54,7 @@ class SEQUENCER_OT_record_cue(Operator):
  
 # Focus key
 class SEQUENCER_OT_focus_one(Operator):
-    bl_idname = "my.focus_one"
+    bl_idname = "alva_seq.focus_one"
     bl_label = "Preset 1"
     bl_description = "Set to preset one, possibly for general look"
     
@@ -64,7 +64,7 @@ class SEQUENCER_OT_focus_one(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_two(Operator):
-    bl_idname = "my.focus_two"
+    bl_idname = "alva_seq.focus_two"
     bl_label = "Preset 2"
     bl_description = "Set to preset two, possibly for side lighting"
     
@@ -74,7 +74,7 @@ class SEQUENCER_OT_focus_two(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_three(Operator):
-    bl_idname = "my.focus_three"
+    bl_idname = "alva_seq.focus_three"
     bl_label = "Preset 3"
     bl_description = "Set to preset three, possibly for paramount lighting"
     
@@ -84,7 +84,7 @@ class SEQUENCER_OT_focus_three(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_four(Operator):
-    bl_idname = "my.focus_four"
+    bl_idname = "alva_seq.focus_four"
     bl_label = "Preset 4"
     bl_description = "Set to preset four, possibly for McCandless lighting"
     
@@ -94,7 +94,7 @@ class SEQUENCER_OT_focus_four(Operator):
         return {'FINISHED'}
     
 class SEQUENCER_OT_focus_five(Operator):
-    bl_idname = "my.focus_five"
+    bl_idname = "alva_seq.focus_five"
     bl_label = "Preset 5"
     bl_description = "Set to preset five"
     
@@ -104,7 +104,7 @@ class SEQUENCER_OT_focus_five(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_six(Operator):
-    bl_idname = "my.focus_six"
+    bl_idname = "alva_seq.focus_six"
     bl_label = "Preset 6"
     bl_description = "Set to preset six"
     
@@ -114,7 +114,7 @@ class SEQUENCER_OT_focus_six(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_seven(Operator):
-    bl_idname = "my.focus_seven"
+    bl_idname = "alva_seq.focus_seven"
     bl_label = "Preset 7"
     bl_description = "Set to preset seven"
     
@@ -124,7 +124,7 @@ class SEQUENCER_OT_focus_seven(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_eight(Operator):
-    bl_idname = "my.focus_eight"
+    bl_idname = "alva_seq.focus_eight"
     bl_label = "Preset 8"
     bl_description = "Set to preset eight"
     
@@ -134,7 +134,7 @@ class SEQUENCER_OT_focus_eight(Operator):
         return {'FINISHED'}
     
 class SEQUENCER_OT_focus_nine(Operator):
-    bl_idname = "my.focus_nine"
+    bl_idname = "alva_seq.focus_nine"
     bl_label = "Preset 9"
     bl_description = "Set to preset nine"
     
@@ -146,7 +146,7 @@ class SEQUENCER_OT_focus_nine(Operator):
 
 # Focus rim.
 class SEQUENCER_OT_focus_rim_one(Operator):
-    bl_idname = "my.focus_rim_one"
+    bl_idname = "alva_seq.focus_rim_one"
     bl_label = "Preset 1"
     bl_description = "Set to preset one, possibly for wide wash"
     
@@ -156,7 +156,7 @@ class SEQUENCER_OT_focus_rim_one(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_rim_two(Operator):
-    bl_idname = "my.focus_rim_two"
+    bl_idname = "alva_seq.focus_rim_two"
     bl_label = "Preset 2"
     bl_description = "Set to preset two, possibly for SR wash"
     
@@ -166,7 +166,7 @@ class SEQUENCER_OT_focus_rim_two(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_rim_three(Operator):
-    bl_idname = "my.focus_rim_three"
+    bl_idname = "alva_seq.focus_rim_three"
     bl_label = "Preset 3"
     bl_description = "Set to preset three, possibly for SL wash"
     
@@ -176,7 +176,7 @@ class SEQUENCER_OT_focus_rim_three(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_rim_four(Operator):
-    bl_idname = "my.focus_rim_four"
+    bl_idname = "alva_seq.focus_rim_four"
     bl_label = "Preset 4"
     bl_description = "Set to preset four, possibly for CS"
     
@@ -186,7 +186,7 @@ class SEQUENCER_OT_focus_rim_four(Operator):
         return {'FINISHED'}
     
 class SEQUENCER_OT_focus_rim_five(Operator):
-    bl_idname = "my.focus_rim_five"
+    bl_idname = "alva_seq.focus_rim_five"
     bl_label = "Preset 5"
     bl_description = "Set to preset five"
     
@@ -196,7 +196,7 @@ class SEQUENCER_OT_focus_rim_five(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_rim_six(Operator):
-    bl_idname = "my.focus_rim_six"
+    bl_idname = "alva_seq.focus_rim_six"
     bl_label = "Preset 6"
     bl_description = "Set to preset six"
     
@@ -206,7 +206,7 @@ class SEQUENCER_OT_focus_rim_six(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_rim_seven(Operator):
-    bl_idname = "my.focus_rim_seven"
+    bl_idname = "alva_seq.focus_rim_seven"
     bl_label = "Preset 7"
     bl_description = "Set to preset seven"
     
@@ -216,7 +216,7 @@ class SEQUENCER_OT_focus_rim_seven(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_rim_eight(Operator):
-    bl_idname = "my.focus_rim_eight"
+    bl_idname = "alva_seq.focus_rim_eight"
     bl_label = "Preset 8"
     bl_description = "Set to preset eight"
     
@@ -226,7 +226,7 @@ class SEQUENCER_OT_focus_rim_eight(Operator):
         return {'FINISHED'}
     
 class SEQUENCER_OT_focus_rim_nine(Operator):
-    bl_idname = "my.focus_rim_nine"
+    bl_idname = "alva_seq.focus_rim_nine"
     bl_label = "Preset 9"
     bl_description = "Set to preset nine"
     
@@ -238,7 +238,7 @@ class SEQUENCER_OT_focus_rim_nine(Operator):
 
 # Focus fill
 class SEQUENCER_OT_focus_fill_one(Operator):
-    bl_idname = "my.focus_fill_one"
+    bl_idname = "alva_seq.focus_fill_one"
     bl_label = "Preset 1"
     bl_description = "Set to preset one"
     
@@ -248,7 +248,7 @@ class SEQUENCER_OT_focus_fill_one(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_fill_two(Operator):
-    bl_idname = "my.focus_fill_two"
+    bl_idname = "alva_seq.focus_fill_two"
     bl_label = "Preset 2"
     bl_description = "Set to preset two"
     
@@ -258,7 +258,7 @@ class SEQUENCER_OT_focus_fill_two(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_fill_three(Operator):
-    bl_idname = "my.focus_fill_three"
+    bl_idname = "alva_seq.focus_fill_three"
     bl_label = "Preset 3"
     bl_description = "Set to preset three"
     
@@ -268,7 +268,7 @@ class SEQUENCER_OT_focus_fill_three(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_fill_four(Operator):
-    bl_idname = "my.focus_fill_four"
+    bl_idname = "alva_seq.focus_fill_four"
     bl_label = "Preset 4"
     bl_description = "Set to preset four"
     
@@ -278,7 +278,7 @@ class SEQUENCER_OT_focus_fill_four(Operator):
         return {'FINISHED'}
     
 class SEQUENCER_OT_focus_fill_five(Operator):
-    bl_idname = "my.focus_fill_five"
+    bl_idname = "alva_seq.focus_fill_five"
     bl_label = "Preset 5"
     bl_description = "Set to preset five"
     
@@ -288,7 +288,7 @@ class SEQUENCER_OT_focus_fill_five(Operator):
         return {'FINISHED'}
     
 class SEQUENCER_OT_focus_fill_six(Operator):
-    bl_idname = "my.focus_fill_six"
+    bl_idname = "alva_seq.focus_fill_six"
     bl_label = "Preset 6"
     bl_description = "Set to preset six"
     
@@ -298,7 +298,7 @@ class SEQUENCER_OT_focus_fill_six(Operator):
         return {'FINISHED'}
     
 class SEQUENCER_OT_focus_fill_seven(Operator):
-    bl_idname = "my.focus_fill_seven"
+    bl_idname = "alva_seq.focus_fill_seven"
     bl_label = "Preset 7"
     bl_description = "Set to preset seven"
     
@@ -308,7 +308,7 @@ class SEQUENCER_OT_focus_fill_seven(Operator):
         return {'FINISHED'}
     
 class SEQUENCER_OT_focus_fill_eight(Operator):
-    bl_idname = "my.focus_fill_eight"
+    bl_idname = "alva_seq.focus_fill_eight"
     bl_label = "Preset 8"
     bl_description = "Set to preset eight"
     
@@ -318,7 +318,7 @@ class SEQUENCER_OT_focus_fill_eight(Operator):
         return {'FINISHED'}
     
 class SEQUENCER_OT_focus_fill_nine(Operator):
-    bl_idname = "my.focus_fill_nine"
+    bl_idname = "alva_seq.focus_fill_nine"
     bl_label = "Preset 9"
     bl_description = "Set to preset nine"
     
@@ -330,7 +330,7 @@ class SEQUENCER_OT_focus_fill_nine(Operator):
 
 # Focus texture.
 class SEQUENCER_OT_focus_texture_one(Operator):
-    bl_idname = "my.focus_texture_one"
+    bl_idname = "alva_seq.focus_texture_one"
     bl_label = "Preset 1"
     bl_description = "Set to preset one"
     
@@ -340,7 +340,7 @@ class SEQUENCER_OT_focus_texture_one(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_texture_two(Operator):
-    bl_idname = "my.focus_texture_two"
+    bl_idname = "alva_seq.focus_texture_two"
     bl_label = "Preset 2"
     bl_description = "Set to preset two"
     
@@ -350,7 +350,7 @@ class SEQUENCER_OT_focus_texture_two(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_texture_three(Operator):
-    bl_idname = "my.focus_texture_three"
+    bl_idname = "alva_seq.focus_texture_three"
     bl_label = "Preset 3"
     bl_description = "Set to preset three"
     
@@ -360,7 +360,7 @@ class SEQUENCER_OT_focus_texture_three(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_texture_four(Operator):
-    bl_idname = "my.focus_texture_four"
+    bl_idname = "alva_seq.focus_texture_four"
     bl_label = "Preset 4"
     bl_description = "Set to preset four"
     
@@ -370,7 +370,7 @@ class SEQUENCER_OT_focus_texture_four(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_texture_five(Operator):
-    bl_idname = "my.focus_texture_five"
+    bl_idname = "alva_seq.focus_texture_five"
     bl_label = "Preset 5"
     bl_description = "Set to preset five"
     
@@ -380,7 +380,7 @@ class SEQUENCER_OT_focus_texture_five(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_texture_six(Operator):
-    bl_idname = "my.focus_texture_six"
+    bl_idname = "alva_seq.focus_texture_six"
     bl_label = "Preset 6"
     bl_description = "Set to preset six"
     
@@ -390,7 +390,7 @@ class SEQUENCER_OT_focus_texture_six(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_texture_seven(Operator):
-    bl_idname = "my.focus_texture_seven"
+    bl_idname = "alva_seq.focus_texture_seven"
     bl_label = "Preset 7"
     bl_description = "Set to preset seven"
     
@@ -400,7 +400,7 @@ class SEQUENCER_OT_focus_texture_seven(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_texture_eight(Operator):
-    bl_idname = "my.focus_texture_eight"
+    bl_idname = "alva_seq.focus_texture_eight"
     bl_label = "Preset 8"
     bl_description = "Set to preset eight"
     
@@ -410,7 +410,7 @@ class SEQUENCER_OT_focus_texture_eight(Operator):
         return {'FINISHED'}
     
 class SEQUENCER_OT_focus_texture_nine(Operator):
-    bl_idname = "my.focus_texture_nine"
+    bl_idname = "alva_seq.focus_texture_nine"
     bl_label = "Preset 9"
     bl_description = "Set to preset nine"
     
@@ -422,7 +422,7 @@ class SEQUENCER_OT_focus_texture_nine(Operator):
 
 # Focus band.
 class SEQUENCER_OT_focus_band_one(Operator):
-    bl_idname = "my.focus_band_one"
+    bl_idname = "alva_seq.focus_band_one"
     bl_label = "Preset 1"
     bl_description = "Set to preset one"
     
@@ -432,7 +432,7 @@ class SEQUENCER_OT_focus_band_one(Operator):
         return {'FINISHED'}  
     
 class SEQUENCER_OT_focus_band_two(Operator):
-    bl_idname = "my.focus_band_two"
+    bl_idname = "alva_seq.focus_band_two"
     bl_label = "Preset 2"
     bl_description = "Set to preset two"
     
@@ -442,7 +442,7 @@ class SEQUENCER_OT_focus_band_two(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_band_three(Operator):
-    bl_idname = "my.focus_band_three"
+    bl_idname = "alva_seq.focus_band_three"
     bl_label = "Preset 3"
     bl_description = "Set to preset three"
     
@@ -452,7 +452,7 @@ class SEQUENCER_OT_focus_band_three(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_band_four(Operator):
-    bl_idname = "my.focus_band_four"
+    bl_idname = "alva_seq.focus_band_four"
     bl_label = "Preset 4"
     bl_description = "Set to preset four"
     
@@ -462,7 +462,7 @@ class SEQUENCER_OT_focus_band_four(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_band_five(Operator):
-    bl_idname = "my.focus_band_five"
+    bl_idname = "alva_seq.focus_band_five"
     bl_label = "Preset 5"
     bl_description = "Set to preset five"
     
@@ -472,7 +472,7 @@ class SEQUENCER_OT_focus_band_five(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_band_six(Operator):
-    bl_idname = "my.focus_band_six"
+    bl_idname = "alva_seq.focus_band_six"
     bl_label = "Preset 6"
     bl_description = "Set to preset six"
     
@@ -482,7 +482,7 @@ class SEQUENCER_OT_focus_band_six(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_band_seven(Operator):
-    bl_idname = "my.focus_band_seven"
+    bl_idname = "alva_seq.focus_band_seven"
     bl_label = "Preset 7"
     bl_description = "Set to preset seven"
     
@@ -492,7 +492,7 @@ class SEQUENCER_OT_focus_band_seven(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_band_eight(Operator):
-    bl_idname = "my.focus_band_eight"
+    bl_idname = "alva_seq.focus_band_eight"
     bl_label = "Preset 8"
     bl_description = "Set to preset eight"
     
@@ -502,7 +502,7 @@ class SEQUENCER_OT_focus_band_eight(Operator):
         return {'FINISHED'}
     
 class SEQUENCER_OT_focus_band_nine(Operator):
-    bl_idname = "my.focus_band_nine"
+    bl_idname = "alva_seq.focus_band_nine"
     bl_label = "Preset 9"
     bl_description = "Set to preset nine"
     
@@ -514,7 +514,7 @@ class SEQUENCER_OT_focus_band_nine(Operator):
 
 # Focus accent.
 class SEQUENCER_OT_focus_accent_one(Operator):
-    bl_idname = "my.focus_accent_one"
+    bl_idname = "alva_seq.focus_accent_one"
     bl_label = "Preset 1"
     bl_description = "Set to preset one"
     
@@ -524,7 +524,7 @@ class SEQUENCER_OT_focus_accent_one(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_accent_two(Operator):
-    bl_idname = "my.focus_accent_two"
+    bl_idname = "alva_seq.focus_accent_two"
     bl_label = "Preset 2"
     bl_description = "Set to preset two"
     
@@ -534,7 +534,7 @@ class SEQUENCER_OT_focus_accent_two(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_accent_three(Operator):
-    bl_idname = "my.focus_accent_three"
+    bl_idname = "alva_seq.focus_accent_three"
     bl_label = "Preset 3"
     bl_description = "Set to preset three"
     
@@ -544,7 +544,7 @@ class SEQUENCER_OT_focus_accent_three(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_accent_four(Operator):
-    bl_idname = "my.focus_accent_four"
+    bl_idname = "alva_seq.focus_accent_four"
     bl_label = "Preset 4"
     bl_description = "Set to preset four"
     
@@ -554,7 +554,7 @@ class SEQUENCER_OT_focus_accent_four(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_accent_five(Operator):
-    bl_idname = "my.focus_accent_five"
+    bl_idname = "alva_seq.focus_accent_five"
     bl_label = "Preset 5"
     bl_description = "Set to preset five"
     
@@ -564,7 +564,7 @@ class SEQUENCER_OT_focus_accent_five(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_accent_six(Operator):
-    bl_idname = "my.focus_accent_six"
+    bl_idname = "alva_seq.focus_accent_six"
     bl_label = "Preset 6"
     bl_description = "Set to preset six"
     
@@ -574,7 +574,7 @@ class SEQUENCER_OT_focus_accent_six(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_accent_seven(Operator):
-    bl_idname = "my.focus_accent_seven"
+    bl_idname = "alva_seq.focus_accent_seven"
     bl_label = "Preset 7"
     bl_description = "Set to preset seven"
     
@@ -584,7 +584,7 @@ class SEQUENCER_OT_focus_accent_seven(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_accent_eight(Operator):
-    bl_idname = "my.focus_accent_eight"
+    bl_idname = "alva_seq.focus_accent_eight"
     bl_label = "Preset 8"
     bl_description = "Set to preset eight"
     
@@ -594,7 +594,7 @@ class SEQUENCER_OT_focus_accent_eight(Operator):
         return {'FINISHED'}
     
 class SEQUENCER_OT_focus_accent_nine(Operator):
-    bl_idname = "my.focus_accent_nine"
+    bl_idname = "alva_seq.focus_accent_nine"
     bl_label = "Preset 9"
     bl_description = "Set to preset nine"
     
@@ -606,7 +606,7 @@ class SEQUENCER_OT_focus_accent_nine(Operator):
 
 # Focus cyc.
 class SEQUENCER_OT_focus_cyc_one(Operator):
-    bl_idname = "my.focus_cyc_one"
+    bl_idname = "alva_seq.focus_cyc_one"
     bl_label = "Preset 1"
     bl_description = "Set to preset one"
     
@@ -616,7 +616,7 @@ class SEQUENCER_OT_focus_cyc_one(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_cyc_two(Operator):
-    bl_idname = "my.focus_cyc_two"
+    bl_idname = "alva_seq.focus_cyc_two"
     bl_label = "Preset 2"
     bl_description = "Set to preset two"
     
@@ -626,7 +626,7 @@ class SEQUENCER_OT_focus_cyc_two(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_cyc_three(Operator):
-    bl_idname = "my.focus_cyc_three"
+    bl_idname = "alva_seq.focus_cyc_three"
     bl_label = "Preset 3"
     bl_description = "Set to preset three"
     
@@ -636,7 +636,7 @@ class SEQUENCER_OT_focus_cyc_three(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_cyc_four(Operator):
-    bl_idname = "my.focus_cyc_four"
+    bl_idname = "alva_seq.focus_cyc_four"
     bl_label = "Preset 4"
     bl_description = "Set to preset four"
     
@@ -646,7 +646,7 @@ class SEQUENCER_OT_focus_cyc_four(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_cyc_five(Operator):
-    bl_idname = "my.focus_cyc_five"
+    bl_idname = "alva_seq.focus_cyc_five"
     bl_label = "Preset 5"
     bl_description = "Set to preset five"
     
@@ -656,7 +656,7 @@ class SEQUENCER_OT_focus_cyc_five(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_cyc_six(Operator):
-    bl_idname = "my.focus_cyc_six"
+    bl_idname = "alva_seq.focus_cyc_six"
     bl_label = "Preset 6"
     bl_description = "Set to preset six"
     
@@ -666,7 +666,7 @@ class SEQUENCER_OT_focus_cyc_six(Operator):
         return {'FINISHED'}
     
 class SEQUENCER_OT_focus_cyc_seven(Operator):
-    bl_idname = "my.focus_cyc_seven"
+    bl_idname = "alva_seq.focus_cyc_seven"
     bl_label = "Preset 7"
     bl_description = "Set to preset seven"
     
@@ -676,7 +676,7 @@ class SEQUENCER_OT_focus_cyc_seven(Operator):
         return {'FINISHED'}
     
 class SEQUENCER_OT_focus_cyc_eight(Operator):
-    bl_idname = "my.focus_cyc_eight"
+    bl_idname = "alva_seq.focus_cyc_eight"
     bl_label = "Preset 8"
     bl_description = "Set to preset eight"
     
@@ -686,7 +686,7 @@ class SEQUENCER_OT_focus_cyc_eight(Operator):
         return {'FINISHED'} 
     
 class SEQUENCER_OT_focus_cyc_nine(Operator):
-    bl_idname = "my.focus_cyc_nine"
+    bl_idname = "alva_seq.focus_cyc_nine"
     bl_label = "Preset 9"
     bl_description = "Set to preset nine"
     
@@ -716,72 +716,72 @@ class SEQUENCER_OT_focus_energy(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_focus_energy_one(SEQUENCER_OT_focus_energy):
-    bl_idname = "my.focus_energy_one"
+    bl_idname = "alva_seq.focus_energy_one"
     bl_label = "Effect 1"
     effect_number = 1
 
 class SEQUENCER_OT_focus_energy_two(SEQUENCER_OT_focus_energy):
-    bl_idname = "my.focus_energy_two"
+    bl_idname = "alva_seq.focus_energy_two"
     bl_label = "Effect 2"
     effect_number = 2
 
 class SEQUENCER_OT_focus_energy_three(SEQUENCER_OT_focus_energy):
-    bl_idname = "my.focus_energy_three"
+    bl_idname = "alva_seq.focus_energy_three"
     bl_label = "Effect 3"
     effect_number = 3
 
 class SEQUENCER_OT_focus_energy_four(SEQUENCER_OT_focus_energy):
-    bl_idname = "my.focus_energy_four"
+    bl_idname = "alva_seq.focus_energy_four"
     bl_label = "Effect 4"
     effect_number = 4
 
 class SEQUENCER_OT_focus_energy_five(SEQUENCER_OT_focus_energy):
-    bl_idname = "my.focus_energy_five"
+    bl_idname = "alva_seq.focus_energy_five"
     bl_label = "Effect 5"
     effect_number = 5
 
 class SEQUENCER_OT_focus_energy_six(SEQUENCER_OT_focus_energy):
-    bl_idname = "my.focus_energy_six"
+    bl_idname = "alva_seq.focus_energy_six"
     bl_label = "Effect 6"
     effect_number = 6
 
 class SEQUENCER_OT_focus_energy_seven(SEQUENCER_OT_focus_energy):
-    bl_idname = "my.focus_energy_seven"
+    bl_idname = "alva_seq.focus_energy_seven"
     bl_label = "Effect 7"
     effect_number = 7
 
 class SEQUENCER_OT_focus_energy_eight(SEQUENCER_OT_focus_energy):
-    bl_idname = "my.focus_energy_eight"
+    bl_idname = "alva_seq.focus_energy_eight"
     bl_label = "Effect 8"
     effect_number = 8
 
 class SEQUENCER_OT_focus_energy_nine(SEQUENCER_OT_focus_energy):
-    bl_idname = "my.focus_energy_nine"
+    bl_idname = "alva_seq.focus_energy_nine"
     bl_label = "Effect 9"
     effect_number = 9
 
 class SEQUENCER_OT_focus_energy_ten(SEQUENCER_OT_focus_energy):
-    bl_idname = "my.focus_energy_ten"
+    bl_idname = "alva_seq.focus_energy_ten"
     bl_label = "Effect 10"
     effect_number = 10
 
 class SEQUENCER_OT_focus_energy_eleven(SEQUENCER_OT_focus_energy):
-    bl_idname = "my.focus_energy_eleven"
+    bl_idname = "alva_seq.focus_energy_eleven"
     bl_label = "Effect 11"
     effect_number = 11
 
 class SEQUENCER_OT_focus_energy_twelve(SEQUENCER_OT_focus_energy):
-    bl_idname = "my.focus_energy_twelve"
+    bl_idname = "alva_seq.focus_energy_twelve"
     bl_label = "Effect 12"
     effect_number = 12
 
 class SEQUENCER_OT_focus_energy_thirteen(SEQUENCER_OT_focus_energy):
-    bl_idname = "my.focus_energy_thirteen"
+    bl_idname = "alva_seq.focus_energy_thirteen"
     bl_label = "Effect 13"
     effect_number = 13
 
 class SEQUENCER_OT_focus_energy_fourteen(SEQUENCER_OT_focus_energy):
-    bl_idname = "my.focus_energy_fourteen"
+    bl_idname = "alva_seq.focus_energy_fourteen"
     bl_label = "Effect 14"
     effect_number = 14
 
@@ -804,7 +804,7 @@ def send_cue_builder_group_command(id, group_type, recording, context):
     setattr(active_strip, f"cue_builder_{group_type}_id", str(id))
     
 class SEQUENCER_OT_stop_effect(Operator):
-    bl_idname = "my.stop_effect"
+    bl_idname = "alva_seq.stop_effect"
     bl_label = ""
     bl_description = "Stop effect"
     
@@ -827,7 +827,7 @@ class SEQUENCER_OT_stop_effect(Operator):
 
 # Channel list pop-ups.    
 class SEQUENCER_OT_key_groups(Operator):
-    bl_idname = "my.key_groups"
+    bl_idname = "alva_seq.key_groups"
     bl_label = "Settings"
     bl_description = "Set groups for key light"
     
@@ -846,7 +846,7 @@ class SEQUENCER_OT_key_groups(Operator):
         self.layout.prop(active_strip, "key_light_slow")
      
 class SEQUENCER_OT_rim_groups(Operator):
-    bl_idname = "my.rim_groups"
+    bl_idname = "alva_seq.rim_groups"
     bl_label = "Settings"
     bl_description = "Set groups for rim light"
     
@@ -865,7 +865,7 @@ class SEQUENCER_OT_rim_groups(Operator):
         self.layout.prop(active_strip, "rim_light_slow")
               
 class SEQUENCER_OT_fill_groups(Operator):
-    bl_idname = "my.fill_groups"
+    bl_idname = "alva_seq.fill_groups"
     bl_label = "Settings"
     bl_description = "Set groups for fill light"
     
@@ -884,7 +884,7 @@ class SEQUENCER_OT_fill_groups(Operator):
         self.layout.prop(active_strip, "fill_light_slow")
              
 class SEQUENCER_OT_texture_groups(Operator):
-    bl_idname = "my.texture_groups"
+    bl_idname = "alva_seq.texture_groups"
     bl_label = "Settings"
     bl_description = "Set groups for texture light"
     
@@ -903,7 +903,7 @@ class SEQUENCER_OT_texture_groups(Operator):
         self.layout.prop(active_strip, "texture_light_slow")
              
 class SEQUENCER_OT_band_groups(Operator):
-    bl_idname = "my.band_groups"
+    bl_idname = "alva_seq.band_groups"
     bl_label = "Settings"
     bl_description = "Set groups for band light"
     
@@ -922,7 +922,7 @@ class SEQUENCER_OT_band_groups(Operator):
         self.layout.prop(active_strip, "band_light_slow")
            
 class SEQUENCER_OT_accent_groups(Operator):
-    bl_idname = "my.accent_groups"
+    bl_idname = "alva_seq.accent_groups"
     bl_label = "Settings"
     bl_description = "Set groups for accent light"
     
@@ -941,7 +941,7 @@ class SEQUENCER_OT_accent_groups(Operator):
         self.layout.prop(active_strip, "accent_light_slow")
         
 class SEQUENCER_OT_energy_groups(Operator):
-    bl_idname = "my.energy_groups"
+    bl_idname = "alva_seq.energy_groups"
     bl_label = "Settings"
     bl_description = "Set groups for energy light"
     
@@ -960,7 +960,7 @@ class SEQUENCER_OT_energy_groups(Operator):
         self.layout.prop(active_strip, "energy_light_slow")
         
 class SEQUENCER_OT_gel_one_groups(Operator):
-    bl_idname = "my.gel_one_groups"
+    bl_idname = "alva_seq.gel_one_groups"
     bl_label = "Settings"
     bl_description = "Set groups for gel 1 light"
     
