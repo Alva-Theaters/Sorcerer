@@ -101,6 +101,7 @@ class SceneProperties(PropertyGroup):
     print_mix: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="mix.py") 
     print_publish: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="publish.py") 
     print_split_color: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="split_color.py") 
+    print_audio: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="3D Audio") 
     # Operators
     print_common_operators: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="common_operators.py") 
     print_cue_builder_operators: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="cue_builder_operators.py") 

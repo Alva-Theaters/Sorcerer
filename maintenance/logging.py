@@ -38,6 +38,7 @@ scripts = [
     "print_mix",
     "print_publish",
     "print_split_color",
+    "print_audio",
 
     # Operators
     "print_common_operators",

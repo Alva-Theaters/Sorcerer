@@ -305,7 +305,7 @@ class SequencerUpdaters:
     def selected_stage_object_updater(self, context):
         sound_object = bpy.data.objects[self.selected_stage_object.name]
         sound_object.speaker_list.clear()
-        speaker_objects = [obj for obj in bpy.data.objects if obj.type == 'SPEAKER' and obj.int_speaker_number != 0]
+        speaker_objects = [obj for obj in bpy.data.objects if obj.type == 'SPEAKER' and obj.users > 0 and obj.int_speaker_number != 0]
 
         new_speaker_list = sound_object.speaker_list.add()
         new_speaker_list.name = self.name  # Set to active sound strip's name

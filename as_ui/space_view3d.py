@@ -264,6 +264,7 @@ def draw_service_mode(self, context):
     col.prop(scene, "print_mix")
     col.prop(scene, "print_publish")
     col.prop(scene, "print_split_color")
+    col.prop(scene, "print_audio")
 
     # Operators
     col = layout.column(heading="Operators")

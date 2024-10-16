@@ -523,7 +523,7 @@ class Orb:
             
             commands = []
             from .utils.event_utils import EventUtils
-            event_object = EventUtils.find_relevant_clock_object(context.scene)
+            event_object, sound_strip = EventUtils.find_relevant_clock_objects(context.scene)
             if event_object == None:
                 return {'CANCELLED'}
             

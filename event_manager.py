@@ -455,18 +455,21 @@ class EventManager:
         # Go timecode sync.
         if scene.sync_timecode:
             '''C1:3'''
-            relevant_clock_object = Utils.find_relevant_clock_object(scene)
+            relevant_lighting_clock_object, relevant_sound_strip = Utils.find_relevant_clock_objects(scene)
 
-            if relevant_clock_object:
+            if relevant_lighting_clock_object:
                 current_frame = scene.frame_current
                 fps = Utils.get_frame_rate(scene)
                 lag = scene.timecode_expected_lag
                 timecode = Utils.frame_to_timecode(current_frame+lag, fps)
                 int_fps = int(fps)
-                clock = relevant_clock_object.int_event_list
+                clock = relevant_lighting_clock_object.int_event_list
                 '''C1:4'''
                 OSC.send_osc_lighting("/eos/newcmd", f"Event {clock} / Frame_Rate {int_fps} Enter", user=0)
                 OSC.send_osc_lighting("/eos/newcmd", f"Event {clock} / Internal Time {timecode} Enter, Event {clock} / Internal Enable Enter", user=0)
+
+                if hasattr(relevant_sound_strip, "int_sound_cue"):
+                    OSC.send_osc_audio(f"/cue/{relevant_sound_strip.int_sound_cue}/start", "")
 
         # Go livemap.
         '''C1:5'''
@@ -500,11 +503,14 @@ class EventManager:
         # End timecode.    
         if scene.sync_timecode:
             '''C3:2'''
-            relevant_sound_strip = Utils.find_relevant_clock_object(scene)
+            relevant_lighting_clock_object, relevant_sound_strip = Utils.find_relevant_clock_objects(scene)
                 
-            if relevant_sound_strip:
-                clock = relevant_sound_strip.int_event_list
+            if relevant_lighting_clock_object:
+                clock = relevant_lighting_clock_object.int_event_list
                 OSC.send_osc_lighting("/eos/newcmd", f"Event {clock} / Internal Disable Enter", user=0)
+
+                if hasattr(relevant_sound_strip, "int_sound_cue"):
+                    OSC.send_osc_audio(f"/cue/{relevant_sound_strip.int_sound_cue}/pause", "")
 
         '''C3:3'''
         self.start_mapping = None
