@@ -5,14 +5,18 @@
 import bpy
 import math
 
-from .osc import OSC
 from ..maintenance.logging import alva_log
+from .osc import OSC
+
+SPEAKER_SCALE_MULTIPLIER = 5
 
 
 def render_volume(speaker, sound_object, audio_cue):
     '''Basically a crude form of the Dolby Atmos Renderer'''
-    distance = round((speaker.location - sound_object.location).length, 2)
-    scale_factor = ((speaker.scale[0] + speaker.scale[1] + speaker.scale[2]) / 3) * \
+    sound_object_world_location = sound_object.matrix_world.to_translation()
+    distance = round((speaker.location - sound_object_world_location).length, 2)
+
+    scale_factor = SPEAKER_SCALE_MULTIPLIER * ((speaker.scale[0] + speaker.scale[1] + speaker.scale[2]) / 3) * \
                    ((sound_object.scale[0] + sound_object.scale[1] + sound_object.scale[2]) / 3)
 
     adjusted_distance = max(distance / scale_factor, 1e-6)  # Division reduces the impact of scale on attenuation
