@@ -12,7 +12,7 @@ from ..updaters.common import CommonUpdaters
 from ..updaters.sequencer import SequencerUpdaters 
 from ..updaters.node import NodeUpdaters 
 from ..cpvia.cpvia_generator import CPVIAGenerator 
-from .property_groups import InfluencerList, ChannelsList
+from .property_groups import InfluencerList, ChannelsList, VIEW3D_PG_alva_speaker_list
 from ..assets.tooltips import find_tooltip
 
 
@@ -133,7 +133,7 @@ class CommonProperties:
         ('float_object_strength', FloatProperty(name="Strength", default=1, min=0, max=1, description=find_tooltip("strength"), update=CommonUpdaters.controller_ids_updater)),
         ('alva_is_absolute', BoolProperty(name="Absolute", default=False, description=find_tooltip("absolute"))),
         ('int_alva_sem', IntProperty(name="SEM", default=0, min=0, max=9999, description=find_tooltip("sem"))),
-        
+
         # Pan/Tilt node properties. Registered on object for patch reasons.
         ('float_vec_pan_tilt_graph', FloatVectorProperty(
             name="",
@@ -170,8 +170,10 @@ class CommonProperties:
         ('is_approaching_limit', BoolProperty(default=False)),
         
         # 3D Audio Properties
-        ('int_speaker_number', IntProperty(name="Speaker Number", description="Number of speaker in Qlab or on sound mixer. You're seeing this here because you selected a Speaker object, and speaker objects represent real, physical speakers in your theater for the purpose of spatial audio. To pan microphones left or right, you don't use an encoder, you just move the microphone or sound object closer to the left or right inside 3D view", default=0)),
-        ('sound_source_enum', EnumProperty(name="Sound Source", items=AlvaItems.get_sound_sources, description="Select either a sound strip in the sequencer or a microphone in Audio Patch", update=CommonUpdaters.sound_source_updater))
+        ('speaker_list', CollectionProperty(type=VIEW3D_PG_alva_speaker_list)),
+        ('falloff_types', EnumProperty(name="Falloff Types", items=AlvaItems.audio_panning_falloff_types, description="Determines the fade curve when an audio object starts leaving or approaching a speaker")),
+        ('int_speaker_number', IntProperty(name="Speaker Number", update=CommonUpdaters.speaker_number_updater, description="Number of speaker in Qlab or on sound mixer. You're seeing this here because you selected a Speaker object, and speaker objects represent real, physical speakers in your theater for the purpose of spatial audio. To pan microphones left or right, you don't use an encoder, you just move the microphone or sound object closer to the left or right inside 3D view", default=0)),
+        ('sound_source_enum', EnumProperty(name="Sound Source", items=AlvaItems.get_sound_sources, description="Select either a sound strip in the sequencer or a microphone in Audio Patch"))
     ]
 
     flash_strip_parameters = [

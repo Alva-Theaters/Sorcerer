@@ -988,8 +988,31 @@ class SEQUENCER_OT_alva_add(Operator):
         color_strip.my_settings.motif_type_enum = motif_type_enum
 
         return {'FINISHED'}
-
     
+ 
+class SEQUENCER_OT_alva_bake_audio(Operator):
+    bl_idname = "alva_seq.export_audio"
+    bl_label = "Export Audio"
+    bl_description = "Create separate audio files for external playback, with 3D mixing built into the files. Route each sound file to the correct speaker inside a group cue"
+    bl_options = {'UNDO'}
+    
+    def execute(self, context):
+        scene = context.scene
+        active_strip = scene.sequence_editor.active_strip
+        speakers = []
+
+        for speaker in speakers:
+            active_strip.alva_speaker = speaker
+            for frame in range(active_strip.frame_start, active_strip.frame_end):
+                scene.frame_set(frame)
+                active_strip.volume = active_strip.dummy_volume
+                active_strip.keyframe_insert(data_path="volume", frame=frame)
+        
+        self.report({'INFO'}, "Bake complete.")
+        
+        return {'FINISHED'}
+    
+
 misc_operators = [
     SEQUENCER_OT_alva_analyze_song,
     SEQUENCER_OT_alva_add_offset,
@@ -998,60 +1021,8 @@ misc_operators = [
     SEQUENCER_OT_alva_delete_events,
     SEQUENCER_OT_alva_command_line,
     TOOL_OT_alva_duplicate_strip_to_above,
-    SEQUENCER_OT_alva_add
-]
-    
- 
-class SEQUENCER_OT_alva_bake_audio(Operator):
-    bl_idname = "alva_seq.bake_audio"
-    bl_label = "Bake Audio"
-    bl_description = "Bake spatial information to volume keyframes so it will show up after mixdown. Then, import them into audio-activated Qlab and play them all at the same time through a multi-output USB audio interface connected to the sound mixer"
-    bl_options = {'UNDO'}
-    
-    def execute(self, context):
-        scene = context.scene
-        sequences = scene.sequence_editor.sequences_all
-        active_strip = scene.sequence_editor.active_strip
-        correct_frame_start = active_strip.frame_start
-        correct_frame_end = active_strip.frame_final_duration
-        matching_strips = [strip for strip in sequences if strip.type == 'SOUND' and strip.audio_type_enum == "option_speaker" and strip.frame_start == correct_frame_start and strip.frame_final_duration == correct_frame_end]
-        
-        for frame in range(scene.frame_start, scene.frame_end + 1):
-            scene.frame_set(frame)
-            for strip in matching_strips:
-                strip.volume = strip.dummy_volume
-                strip.keyframe_insert(data_path="volume", frame=frame)
-        
-        self.report({'INFO'}, "Bake complete.")
-        
-        return {'FINISHED'}
-    
-    
-class SEQUENCER_OT_alva_export_audio(Operator):
-    bl_idname = "alva_seq.export_audio"
-    bl_label = "Export Channel"
-    bl_description = "Export an audio file for this speaker channel to Qlab"
-    bl_options = {'UNDO'}
-    
-    def execute(self, context):
-        bpy.ops.sound.mixdown('INVOKE_DEFAULT')
-        return {'FINISHED'}
-    
-    
-class SEQUENCER_OT_alva_render_all_objects(Operator):
-    bl_idname = "alva_seq.render_all_audio_objects"
-    bl_label = "Render all Audio Objects to Files"
-    bl_description = "Export audio files for all audio objects for Qlab"
-    bl_options = {'UNDO'}
-    
-    def execute(self, context):
-        return {'FINISHED'}
-    
-    
-three_dee_audio_operators = [
-    SEQUENCER_OT_alva_bake_audio,
-    SEQUENCER_OT_alva_export_audio,
-    SEQUENCER_OT_alva_render_all_objects,
+    SEQUENCER_OT_alva_add,
+    SEQUENCER_OT_alva_bake_audio
 ]
 
 
@@ -1062,8 +1033,6 @@ def register():
         bpy.utils.register_class(cls)
     for cls in misc_operators:
         bpy.utils.register_class(cls)
-    for cls in three_dee_audio_operators:
-        bpy.utils.register_class(cls)
     
     
 def unregister():
@@ -1072,6 +1041,4 @@ def unregister():
     for cls in reversed(macro_operators):
         bpy.utils.unregister_class(cls)
     for cls in reversed(misc_operators):
-        bpy.utils.unregister_class(cls)
-    for cls in reversed(three_dee_audio_operators):
         bpy.utils.unregister_class(cls)

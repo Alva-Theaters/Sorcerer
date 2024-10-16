@@ -357,3 +357,16 @@ class Items:
         ]
 
         return items
+    
+
+    def audio_panning_falloff_types(self, context):
+        items = [
+            ('linear', 'Linear', '', 'IPO_LINEAR', 0),
+            ('bezier', 'Bezier', '', 'IPO_BEZIER', 1),
+            ('quadratic', 'Quadratic', '', 'IPO_QUADRATIC', 2),
+            ('cubic', 'Cubic', '', 'IPO_CUBIC', 3),
+            ('exponential', 'Exponential', '', 'IPO_EXPONENTIAL', 4),
+            ('sinusoidal', 'Sinusoidal', '', 'IPO_SINUSOIDAL', 5)
+        ]
+
+        return items

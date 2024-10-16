@@ -99,18 +99,33 @@ def draw_tool_settings(self, context):
             draw_parameters_mini(self, context, layout, obj, use_slider=True, expand=False)
                 
 
-def draw_speaker(self, context, active_object):
+def draw_speaker(self, context, active_object, use_split=True):
     ao = active_object
+    scene = context.scene.scene_props
+
+    channel_labels = {
+        'option_qlab': "Qlab Channel:",
+        'option_m32': "M32/X32 Bus:"
+    }
+
+    try:
+        label = channel_labels[scene.mixer_type_enum]
+    except:
+        label = "Invalid audio mixer"
+
     layout = self.layout
-    box = layout.box()
+    if use_split:
+        box = layout.box()
+    else:
+        box = layout
+    box.use_property_split = use_split
+    box.use_property_decorate = False
+
     row = box.row()
-    if ao.mixer_type_enum == 'option_qlab':
-        row.label(text="Qlab Output:", icon='PLAY_SOUND')
-        row.prop(ao, "int_speaker_number", text="crosspoint:")
-    elif ao.mixer_type_enum == 'option_m32':
-        row.label(text="M32/X32:", icon='PLAY_SOUND')
-        row.prop(ao, "int_speaker_number", text="Bus:")
-    
+    row.prop(ao, "int_speaker_number", text=label)
+    # row = box.row()
+    # row.prop(ao, "falloff_types", text="Falloff:" if use_split else "Falloff")
+
 
 def draw_object_header(self, context, scene, active_object, node_layout=None):
     ao = active_object

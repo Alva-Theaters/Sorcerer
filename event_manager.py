@@ -285,26 +285,20 @@ class EventManager:
         
         
     #-------------------------------------------------------------------------------------------------------------------------------------------
-    '''Depsgraph PRE handler'''
+    '''Depsgraph PRE and Frame Change PRE handler'''
     #-------------------------------------------------------------------------------------------------------------------------------------------
     def render_audio_objects(self, scene):
-        '''This all needs to be redone. May also need to switch to deps post?'''
         if not hasattr(scene, "sequence_editor") or not scene.sequence_editor:
             return
         
-        audio_objects = {}
         for strip in scene.sequence_editor.sequences_all:
-            if strip.type == 'SOUND' and strip.audio_type_enum == "option_object" and strip.audio_object_activated:
-                audio_objects[strip.sound.filepath] = (strip.selected_stage_object, strip.audio_object_size)
+            if strip.type == 'SOUND' and strip.selected_stage_object != None:
+                sound_object = bpy.data.objects[strip.selected_stage_object.name]
 
-        for strip in scene.sequence_editor.sequences_all:
-            if strip.type == 'SOUND' and strip.audio_type_enum == "option_speaker":
-                if strip.sound.filepath in audio_objects:
-                    empty, object_size = audio_objects[strip.sound.filepath]
-                    speaker = strip.selected_speaker
-                    if speaker and empty:
-                        sensitivity = getattr(strip, 'speaker_sensitivity', 1)
-                        strip.dummy_volume = render_volume(speaker, empty, sensitivity, object_size, strip.int_mixer_channel)
+                for speaker_list in sound_object.speaker_list:
+                    if speaker_list.name == strip.name:
+                        for speaker in speaker_list.speakers:
+                            speaker.dummy_volume = render_volume(speaker.speaker_pointer, sound_object, strip.int_sound_cue)
 
 
     #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -566,9 +560,9 @@ def load_macro_buttons(string):
         item = scene.macro_buttons.add()
         item.name = button
 
-# @persistent
-# def on_depsgraph_update_pre(scene):
-#     event_manager_instance.render_audio_objects(scene)
+@persistent
+def on_depsgraph_update_pre(scene):
+    event_manager_instance.render_audio_objects(scene)
 
 @persistent
 def on_depsgraph_update_post(scene, depsgraph):
@@ -580,6 +574,7 @@ def on_frame_change_pre(scene):
     event_manager_instance.timecode_scrubbing_and_fire_strip_mapping(scene)
     event_manager_instance.fire_parameter_updaters(scene)
     event_manager_instance.update_livemap(scene)
+    event_manager_instance.render_audio_objects(scene)
     alva_log('time', f"on_frame_change_pre took {time.time() - start} seconds")
 
 @persistent
@@ -597,7 +592,7 @@ def on_frame_change_post(scene):
                     
 def register():
     bpy.app.handlers.load_post.append(load_macro_buttons)
-    #bpy.app.handlers.depsgraph_update_pre.append(on_depsgraph_update_pre)
+    bpy.app.handlers.depsgraph_update_pre.append(on_depsgraph_update_pre)
     bpy.app.handlers.depsgraph_update_post.append(on_depsgraph_update_post)
     bpy.app.handlers.frame_change_pre.append(on_frame_change_pre)
     bpy.app.handlers.frame_change_post.append(on_frame_change_post)
@@ -607,7 +602,7 @@ def register():
 
 def unregister():
     bpy.app.handlers.load_post.remove(load_macro_buttons)
-    #bpy.app.handlers.depsgraph_update_pre.remove(on_depsgraph_update_pre)
+    bpy.app.handlers.depsgraph_update_pre.remove(on_depsgraph_update_pre)
     bpy.app.handlers.depsgraph_update_post.remove(on_depsgraph_update_post)
     bpy.app.handlers.frame_change_pre.remove(on_frame_change_pre)
     bpy.app.handlers.frame_change_post.remove(on_frame_change_post)

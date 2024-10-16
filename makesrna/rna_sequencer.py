@@ -14,12 +14,7 @@ from ..utils.sequencer_utils import form_livemap_string
 
 def empty_objects_poll(self, object):
     '''Only returns true for Empty bpy object. Used for [?]'''
-    return object.type == 'MESH' and object.object_identities_enum == 'Stage Object'
-
-
-def speaker_objects_poll(self, object):
-    '''Only returns true for Speaker bpy object. Used for [?]'''
-    return object.type == 'SPEAKER'
+    return object.type == 'MESH'
 
 
 def register(): 
@@ -43,29 +38,15 @@ def register():
     SoundSequence.beats_per_measure = IntProperty(name="", min=1, max=16, description='Use this to determine how many beats are in each measure. In a time signature like 3/4, this would be the top number 3')
 
     # Sound strips
-    SoundSequence.audio_type_enum = EnumProperty(
-        items=AlvaItems.get_audio_object_items,
-        name="Audio Types",
-        description="Choose whether the strip represents a speaker or audio object",
-        default=1
-    )
     SoundSequence.selected_stage_object = PointerProperty(
         type=Object,
         poll=empty_objects_poll,
+        update=Updaters.selected_stage_object_updater,
         name="Selected Empty",
         description='You are supposed to link this audio object strip to an object set to Stage Object over in 3D view',
-        update=CommonUpdaters.sound_source_updater
     )
-    SoundSequence.selected_speaker = PointerProperty(
-        type=Object,
-        poll=speaker_objects_poll,
-        name="Selected Speaker",
-        description='You are supposed to link this speaker strip to a "speaker" object over in 3D view'
-    )
-    SoundSequence.speaker_sensitivity = FloatProperty(name="Sensitivity", description="Sensitivity of speaker", default=.5, min=0, max=1)
-    SoundSequence.audio_object_activated = BoolProperty(default=False, name="Activate Audio Object", description="Activate renderer for this audio object. Leaving this on when not needed may introduce lag")
     SoundSequence.dummy_volume = FloatProperty(default=0, name="Dummy Volume", min=0, max=1)
-    SoundSequence.audio_object_size = FloatProperty(default=1, name="Dummy Volume", min=0, max=20)
+    SoundSequence.int_sound_cue = IntProperty(default=1, name="Cue #", min=1, max=99999, description="Sound cue number in Qlab (for real-time monitoring)")
     SoundSequence.int_mixer_channel = IntProperty(default=1, name="Channel/fader number on mixer", min=1, max=9999, description='This is for the OSC real-time monitor below. This is talking about the fader on the audio mixer. It will be replace "#" in the OSC templates below')
 
     # Macro strips
@@ -279,13 +260,8 @@ def unregister():
     del SoundSequence.song_bpm_input
     del SoundSequence.song_bpm_channel
     del SoundSequence.beats_per_measure
-    del SoundSequence.audio_type_enum
     del SoundSequence.selected_stage_object
-    del SoundSequence.selected_speaker
-    del SoundSequence.speaker_sensitivity
-    del SoundSequence.audio_object_activated
     del SoundSequence.dummy_volume
-    del SoundSequence.audio_object_size
     del SoundSequence.int_mixer_channel
 
     del ColorSequence.start_frame_macro_text

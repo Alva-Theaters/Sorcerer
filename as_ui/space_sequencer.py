@@ -74,7 +74,7 @@ def draw_alva_sequencer_add_menu(self, layout):
         layout.operator("alva_seq.add", text="Flash", icon='LIGHT_SUN').Option = "option_flash"
         layout.operator("alva_seq.add", text="Animation", icon='IPO_BEZIER').Option = "option_animation"
         #layout.operator("alva_seq.add", text="Offset", icon='UV_SYNC_SELECT').Option = "option_offset"
-        layout.operator("alva_seq.add", text="Trigger", icon='SETTINGS').option = "Option_trigger"
+        layout.operator("alva_seq.add", text="Trigger", icon='SETTINGS').Option = "Option_trigger"
 
 
 def draw_alva_sequencer_strip(self, context):
@@ -591,34 +591,11 @@ def draw_strip_footer(self, context, column):
     
 
 def draw_strip_sound_object(self, context, column, active_strip):
+    row = column.row(align=True)
+    row.prop_search(active_strip, "selected_stage_object", bpy.data, "objects", text="", icon='VIEW3D')
+    row.operator("alva_seq.export_audio", text="", icon='FILE_TICK')
     row = column.row()
-    row.prop_search(active_strip, "selected_stage_object", bpy.data, "objects", text="", icon='HOME')
-    row.prop(active_strip, "audio_object_activated", text="", slider=True)
-
-    column.separator()
-
-    row = column.row()
-    row.operator("alva_seq.bake_audio", text="Render to Sound Files", icon='FILE_TICK')
-
-
-# Does this need to be rewritten or deleted?
-def draw_strip_speaker(self, context, column, active_strip):
-#     column.separator()
-#     row = column.row()
-#     row.label(text="Select a speaker in 3D view.")
-#     row.prop_search(active_strip, "selected_speaker", bpy.data, "objects", text="", icon='SPEAKER')
-#     column.separator()
-#     row = column.row()
-#     row.prop(active_strip, "int_mixer_channel", text="Fader #:")
-#     row.prop(active_strip, "speaker_sensitivity", text="Sensitivity:", slider=True)
-#     layout.separator()
-#     row = layout.row()
-#     row.operator("alva_seq.bake_audio", text="Bake Audio (Scene)")
-#     row = layout.row()
-#     row.operator("seq.solo_track_operator", text="Solo Track")
-#     row.operator("alva_seq.export_audio", text="Export Channel")
-#     layout.separator()
-    return
+    row.prop(active_strip, 'int_sound_cue', text="Sound Cue")
     
 
 def draw_strip_video(self, context):

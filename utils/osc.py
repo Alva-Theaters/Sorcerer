@@ -48,17 +48,17 @@ class OSC:
         
     def send_osc_video(address, argument):
         scene = bpy.context.scene.scene_props
-        ip_address = scene.str_osc_ip_address
-        port = scene.int_osc_port
-        alva_log("osc_video", argument)
+        ip_address = scene.str_video_ip_address
+        port = scene.int_video_port
+        alva_log("osc_video", f"Address: {address} | Argument: {argument}")
         OSC.send_osc_string(address, ip_address, port, argument)
         
         
     def send_osc_audio(address, argument):
-        scene = bpy.context.scene.scene_props
-        ip_address = scene.str_osc_ip_address
-        port = scene.int_osc_port
-        alva_log("osc_audio", argument)
+        scene = bpy.context.scene
+        ip_address = scene.str_audio_ip_address
+        port = scene.int_audio_port
+        alva_log("osc_audio", f"Address: {address} | Argument: {argument}")
         OSC.send_osc_string(address, ip_address, port, argument)
 
 

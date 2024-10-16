@@ -304,20 +304,34 @@ def draw_footer_toggles(self, context, column, active_object, box=True, vertical
 
                 
 def draw_volume_monitor(self, context, sequence_editor):
+    active_strip = sequence_editor.active_strip
     layout = self.layout
     box = layout.box()
     row = box.row()
     row.label(text="Volume Monitor (Read-only)")
-    counter = 0
-    for strip in sequence_editor.sequences:
-        if strip.type == 'SOUND':
-            if hasattr(strip, "selected_speaker") and strip.selected_speaker is not None:
-                label = strip.selected_speaker.name
-                row = box.row()
-                row.enabled = False
-                row.prop(strip, "dummy_volume", text=f"{label} Volume", slider=True)
-                counter += 1
-    if counter == 0:
+    is_nothing = True
+
+    if active_strip.selected_stage_object is None:
+        return
+    
+    sound_object = bpy.data.objects[active_strip.selected_stage_object.name]
+
+    object_speakers = None
+    for speaker_list in sound_object.speaker_list:
+        if speaker_list.name == active_strip.name:
+            object_speakers = speaker_list
+
+    if not object_speakers:
+        return
+    
+    speakers = [speaker for speaker in object_speakers.speakers]
+    for speaker in speakers:
+        if hasattr(active_strip, "selected_stage_object") and active_strip.selected_stage_object is not None:
+            row = box.row()
+            row.enabled = False
+            row.prop(speaker, "dummy_volume", text=f"{speaker.speaker_name} Volume ({speaker.speaker_number})", slider=True)
+            is_nothing = False
+    if is_nothing:
         row = box.row()
         row.label(text="No participating speaker strips found.")
 

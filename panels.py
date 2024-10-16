@@ -71,8 +71,7 @@ from .as_ui.space_time import (
     draw_alva_time_flags
 )
 from .as_ui.space_sequencer import (
-    draw_strip_sound_object, 
-    draw_strip_speaker, 
+    draw_strip_sound_object,
     draw_strip_video,
     draw_strip_media, 
     draw_alva_sequencer_add_menu, 
@@ -283,10 +282,6 @@ class SEQUENCER_PT_alva_Audio(Panel, SequencerPanel):
     '''This is for the 3D audio system on the Sequencer side.'''
     bl_label = "Audio"
 
-    @classmethod
-    def poll(cls, context):
-        return False # Temporarily disabled until it's rebuilt
-
     def draw(self, context):
         scene = context.scene
         column = self.layout.column(align=True)
@@ -294,12 +289,8 @@ class SEQUENCER_PT_alva_Audio(Panel, SequencerPanel):
         sequence_editor = scene.sequence_editor
 
         if active_strip.type == 'SOUND':
-            if active_strip.audio_type_enum == "option_object":
-                draw_strip_sound_object(self, context, column, active_strip)
-                draw_volume_monitor(self, context, sequence_editor)
-            elif active_strip.audio_type_enum == "option_speaker":
-                draw_strip_speaker(self, context, column, active_strip)
-                draw_volume_monitor(self, context)
+            draw_strip_sound_object(self, context, column, active_strip)
+            draw_volume_monitor(self, context, sequence_editor)
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------

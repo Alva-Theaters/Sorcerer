@@ -152,24 +152,6 @@ class CommonUpdaters:
     def ui_list_label_updater(self, context):
         if self.separator and self.label:
             self.separator = False
-            
-            
-    @staticmethod
-    def sound_source_updater(self, context):
-        '''Keeps the enum on the object controller synced with that on 
-           the sound strip. Ensures that an object does not point to a 
-           sound strip that isn't pointing back'''
-        space_type = context.space_data.type
-        
-        if space_type == 'VIEW_3D' and self.type == 'MESH':
-            strip = context.scene.sequence_editor.sequences_all.get(self.sound_source_enum)
-            if strip:
-                strip.selected_stage_object = self
-
-        elif space_type == 'SEQUENCE_EDITOR' and self.type == 'SOUND':
-            mesh = self.selected_stage_object
-            if mesh:
-                mesh.sound_source_enum = self.name
 
 
     @staticmethod
@@ -247,6 +229,16 @@ class CommonUpdaters:
     
     def call_fixtures_updater(self, context):
         bpy.ops.alva_object.summon_movers()
+
+
+    def speaker_number_updater(self, context):
+        if self.int_speaker_number == 0:
+            return
+        
+        for obj in bpy.data.objects:
+            if obj.type == 'SPEAKER' and obj != self:
+                if obj.int_speaker_number == self.int_speaker_number:
+                    self.int_speaker_number = 0
 
 
     def view3d_cmd_line_updater(self, context):

@@ -4,6 +4,7 @@
 
 import re
 from functools import partial
+import bpy
 from bpy.props import *
 from bpy.types import ColorSequence
 
@@ -299,3 +300,18 @@ class SequencerUpdaters:
 
     def background_four_light_updater(self, context):
         SequencerUpdaters.light_updater(self, context, self.background_light_four, "cyc_four_light")
+
+
+    def selected_stage_object_updater(self, context):
+        sound_object = bpy.data.objects[self.selected_stage_object.name]
+        sound_object.speaker_list.clear()
+        speaker_objects = [obj for obj in bpy.data.objects if obj.type == 'SPEAKER' and obj.int_speaker_number != 0]
+
+        new_speaker_list = sound_object.speaker_list.add()
+        new_speaker_list.name = self.name  # Set to active sound strip's name
+    
+        for speaker in speaker_objects:
+            new_speaker = new_speaker_list.speakers.add()
+            new_speaker.speaker_number = speaker.int_speaker_number
+            new_speaker.speaker_name = speaker.name
+            new_speaker.speaker_pointer = speaker

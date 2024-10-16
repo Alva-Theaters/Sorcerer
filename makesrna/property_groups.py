@@ -165,16 +165,6 @@ class GroupData(PropertyGroup):
     # Others registered in register section
 
 
-class AudioObjectSettings(PropertyGroup):
-    from ..assets.items import Items as AlvaItems
-    audio_type_enum:  EnumProperty(
-        items=AlvaItems.get_audio_object_items,
-        name="Audio Types",
-        description="Choose what the strip should do",
-        default=1
-    ) 
-
-
 class MySettings(PropertyGroup):
     from ..assets.items import Items as AlvaItems
     from ..updaters.sequencer import SequencerUpdaters 
@@ -249,6 +239,18 @@ class MixerParameters(PropertyGroup):
     # Common property registrations in register() section.
 
 
+class VIEW3D_PG_alva_speakers(PropertyGroup):
+    speaker_number: IntProperty()  # Stores the int_speaker_number of associated speaker
+    speaker_name: StringProperty()
+    dummy_volume: FloatProperty(min=0, max=1)  # Stores the panned volume level data for this strip/speaker pair
+    speaker_pointer: PointerProperty(type=bpy.types.Object)
+
+
+class VIEW3D_PG_alva_speaker_list(PropertyGroup):  # Registered to mesh objects
+    name: StringProperty()  # Stores the name of the associated sound strip from sequencer
+    speakers: CollectionProperty(type=VIEW3D_PG_alva_speakers)  # List of all speakers in 3D scene
+
+
 class MacroButtonItem(PropertyGroup):
     name: StringProperty() 
 
@@ -260,13 +262,14 @@ prop_groups = [
     ShowSequencer,
     ChannelsList,
     GroupData,
-    AudioObjectSettings,
     MySettings,
     RaiseChannels,
     InfluencerList,
     LightingModifier,
     CustomButtonPropertyGroup,
     MixerParameters,
+    VIEW3D_PG_alva_speakers,
+    VIEW3D_PG_alva_speaker_list,
     MacroButtonItem
 ]
 
