@@ -592,6 +592,7 @@ def draw_strip_footer(self, context, column):
 
 def draw_strip_sound_object(self, context, column, active_strip):
     row = column.row(align=True)
+    row.operator('alva_seq.refresh_audio_object_selection', icon='FILE_REFRESH', text="")
     row.prop_search(active_strip, "selected_stage_object", bpy.data, "objects", text="", icon='VIEW3D')
     row.operator("alva_seq.export_audio", text="", icon='FILE_TICK')
     row = column.row()

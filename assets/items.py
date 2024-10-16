@@ -74,7 +74,7 @@ class Items:
 
     def mixer_types(self, context):
         items = [
-            ('option_m32', "M32/X32", "AUse an M32/X32 mixer for real-time 3D audio monitoring"),
+            #('option_m32', "M32/X32", "AUse an M32/X32 mixer for real-time 3D audio monitoring"),
             ('option_qlab', "Qlab", "Use Qlab for real-time 3D audio monitoring")
         ]
         

@@ -68,8 +68,8 @@ def register():
     # Audio
     Scene.audio_osc_address = StringProperty(default="", description="Type # for channel/fader/ouput number and $ for value, to be autofilled in background by .. Use this for realtime feedback during design, then bake/export to Qlab. Set up the mixer as if these are IEM's")
     Scene.audio_osc_argument = StringProperty(default="", description="Type # for channel/fader/ouput number and $ for value, to be autofilled in background by .. Use this for realtime feedback during design, then bake/export to Qlab. Set up the mixer as if these are IEM's")
-    Scene.str_audio_ip_address = StringProperty(default="192.168.1.3", description="IP address of audio mixer. Leave blank to deactivate background process", update=CommonUpdaters.network_settings_updater)
-    Scene.int_audio_port = IntProperty(default=10023, description="Port where audio mixer expects to recieve UDP messages", update=CommonUpdaters.network_settings_updater)
+    Scene.str_audio_ip_address = StringProperty(default="192.168.1.5", description="IP address of audio mixer. Leave blank to deactivate background process", update=CommonUpdaters.network_settings_updater)
+    Scene.int_audio_port = IntProperty(default=53000, description="Port where audio mixer expects to recieve UDP messages", update=CommonUpdaters.network_settings_updater)
 
     # Video
     Scene.str_video_ip_address = StringProperty(default="192.168.1.2", description="IP address of video system. Leave blank to deactivate background process", update=CommonUpdaters.network_settings_updater)

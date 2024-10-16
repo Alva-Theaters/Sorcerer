@@ -989,6 +989,17 @@ class SEQUENCER_OT_alva_add(Operator):
 
         return {'FINISHED'}
     
+
+class SEQUENCER_OT_alva_refresh_audio_object_selection(Operator):
+    bl_idname = "alva_seq.refresh_audio_object_selection"
+    bl_label = ""
+    bl_description = "Refresh after making changes to speaker routing"
+
+    def execute(self, context):
+        strip = context.scene.sequence_editor.active_strip
+        strip.selected_stage_object = strip.selected_stage_object
+        return {'FINISHED'}
+    
  
 class SEQUENCER_OT_alva_bake_audio(Operator):
     bl_idname = "alva_seq.export_audio"
@@ -1022,6 +1033,7 @@ misc_operators = [
     SEQUENCER_OT_alva_command_line,
     TOOL_OT_alva_duplicate_strip_to_above,
     SEQUENCER_OT_alva_add,
+    SEQUENCER_OT_alva_refresh_audio_object_selection,
     SEQUENCER_OT_alva_bake_audio
 ]
 

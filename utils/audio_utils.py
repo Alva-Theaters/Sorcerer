@@ -18,13 +18,17 @@ def render_volume(speaker, sound_object, audio_cue):
     base_volume = 1.0
     volume = base_volume / final_distance
     volume = max(0, min(volume, 1))
+
+    REMAP_MINIMUM = -50
+    remapped_volume = volume * (0 - (REMAP_MINIMUM)) + (REMAP_MINIMUM)
+    remapped_volume = max(REMAP_MINIMUM, min(remapped_volume, 0))
     
     if bpy.context.screen:
         for area in bpy.context.screen.areas:
             if area.type == 'SEQUENCE_EDITOR':
                 area.tag_redraw()
     
-    publish_volume(speaker.int_speaker_number, audio_cue, volume)
+    publish_volume(speaker.int_speaker_number, audio_cue, remapped_volume)
 
     return volume
 
