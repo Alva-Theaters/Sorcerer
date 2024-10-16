@@ -9,6 +9,7 @@ from ..maintenance.logging import alva_log
 from .osc import OSC
 
 SPEAKER_SCALE_MULTIPLIER = 5
+REMAP_MINIMUM = -59
 
 
 def render_volume(speaker, sound_object, audio_cue):
@@ -29,7 +30,6 @@ def render_volume(speaker, sound_object, audio_cue):
     alva_log('audio', f"distance: {distance}; scale_factor: {scale_factor}, adjusted_distance: {adjusted_distance}; rendered_volume: {volume}")
 
     # Remap the volume to the -50 to 0 range
-    REMAP_MINIMUM = -50
     remapped_volume = volume * (0 - REMAP_MINIMUM) + REMAP_MINIMUM
     remapped_volume = max(REMAP_MINIMUM, min(remapped_volume, 0))
 
