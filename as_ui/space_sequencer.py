@@ -584,10 +584,10 @@ def draw_strip_footer(self, context, column):
     row = column.row(align=True)
     row.operator("alva_seq.bump_horizontal", text="-5", icon='BACK').direction = -5
     row.operator("alva_seq.bump_horizontal", text="-1", icon='BACK').direction = -1
-    row.operator("alva_seq.bump_horizontal", icon='TRIA_UP').direction = -1
-    row.operator("alva_seq.bump_horizontal", icon='TRIA_DOWN').direction = 1
-    row.operator("alva_seq.bump_vertical", text="1", icon='FORWARD').direction = 1
-    row.operator("alva_seq.bump_vertical", text="5", icon='FORWARD').direction = 5
+    row.operator("alva_seq.bump_vertical", icon='TRIA_UP').direction = 1
+    row.operator("alva_seq.bump_vertical", icon='TRIA_DOWN').direction = -1
+    row.operator("alva_seq.bump_horizontal", text="1", icon='FORWARD').direction = 1
+    row.operator("alva_seq.bump_horizontal", text="5", icon='FORWARD').direction = 5
     
 
 def draw_strip_sound_object(self, context, column, active_strip):
