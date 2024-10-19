@@ -2,6 +2,14 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+'''
+This file is only for defining the stuff we put into the UI and when, and only very rarely do we
+put runtime UI logic here. We want this file to just be for quickly seeing what is going where.
+
+DO: Add polls, panels, header appends, menu appends, and very-high-level UI logic
+DO NOT: Add line after line after line of UI logic. Put that in the as_ui folder.
+'''
+
 import bpy
 from bpy.types import Panel, Menu
 from bpy.types import (
