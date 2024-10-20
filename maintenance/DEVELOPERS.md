@@ -18,6 +18,7 @@ Script and Folder Specific Explanations:
 Detailed developer documentation for each folder will be added either to the script itself at the top, or to the __init__.py of the folder, whichever applies. A great place to start is the event_manager.py
 
 
+<br>
 
 Design Philosophy
 =================
