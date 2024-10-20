@@ -6,6 +6,7 @@ import bpy
 from bpy.types import Operator
 from bpy.props import IntProperty, StringProperty
 import time
+import os
 
 from ..as_ui.space_sequencer import (
     draw_strip_media,
@@ -18,6 +19,7 @@ from ..as_ui.utils import determine_sequencer_contexts
 from ..utils.event_utils import EventUtils
 from ..utils.sequencer_utils import find_available_channel, add_color_strip, analyze_song
 from ..utils.osc import OSC
+from ..utils.audio_utils import render_volume
 from ..maintenance.logging import alva_log
 
 # pyright: reportInvalidTypeForm=false
@@ -1004,20 +1006,71 @@ class SEQUENCER_OT_alva_refresh_audio_object_selection(Operator):
 class SEQUENCER_OT_alva_bake_audio(Operator):
     bl_idname = "alva_seq.export_audio"
     bl_label = "Export Audio"
-    bl_description = "Create separate audio files for external playback, with 3D mixing built into the files. Route each sound file to the correct speaker inside a group cue"
+    bl_description = "Create separate audio files for external playback, with 3D mixing built into the files. Route each sound file to the correct speaker inside a group cue. WARNING: Can take a very long time to complete"
     bl_options = {'UNDO'}
-    
+
+    filepath: StringProperty(
+        name="File Path",
+        description="Filepath for exporting the audio",
+        default="",
+        maxlen=1024,
+        subtype='FILE_PATH'
+    )
+
+    def invoke(self, context, event):
+        # Prompt the user to select a file path and provide the main folder name
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
     def execute(self, context):
         scene = context.scene
-        active_strip = scene.sequence_editor.active_strip
-        speakers = []
+        sounds = [strip for strip in context.sequences if strip.type == 'SOUND']
+        for strip in sounds:
+            if strip.selected_stage_object is None:
+                continue
 
-        for speaker in speakers:
-            active_strip.alva_speaker = speaker
-            for frame in range(active_strip.frame_start, active_strip.frame_end):
-                scene.frame_set(frame)
-                active_strip.volume = active_strip.dummy_volume
-                active_strip.keyframe_insert(data_path="volume", frame=frame)
+            self.report({'INFO'}, f"Working on {strip.name}")
+
+            for other_strip in sounds:
+                if other_strip != strip:
+                    other_strip.mute = True
+                else:
+                    strip.mute = False
+            
+            sound_object = bpy.data.objects[strip.selected_stage_object.name]
+
+            # Extract the base directory from the user-selected file path
+            base_directory = os.path.dirname(self.filepath)
+
+            # Create the main folder based on user input
+            main_folder_path = os.path.join(base_directory, "Sound Scene")
+            if not os.path.exists(main_folder_path):
+                os.makedirs(main_folder_path)
+
+            # Create a subfolder based on the strip name inside the main folder
+            subfolder_path = os.path.join(main_folder_path, strip.name)
+            if not os.path.exists(subfolder_path):
+                os.makedirs(subfolder_path)
+
+            for speaker_list in sound_object.speaker_list:
+                if speaker_list.name == strip.name:
+                    for speaker in speaker_list.speakers:
+                        self.report({'INFO'}, "Baking keyframes")
+                        for frame in range(int(strip.frame_start), int(strip.frame_final_end)):
+                            scene.frame_set(frame)
+                            strip.volume = render_volume(speaker.speaker_pointer, sound_object, strip.int_sound_cue)
+                            strip.keyframe_insert(data_path="volume", frame=frame)
+                            if frame % 100 == 0:
+                                bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
+                
+                        # Customize output path to save the audio in the subfolder, using speaker_number as filename
+                        output_path = os.path.join(subfolder_path, f"{speaker.speaker_number}.wav")
+                        self.report({'INFO'}, "Mixing down")
+                        bpy.ops.sound.mixdown(filepath=output_path, 
+                                            container='WAV', 
+                                            codec='PCM', 
+                                            format='F32', 
+                                            split_channels=False)
         
         self.report({'INFO'}, "Bake complete.")
         

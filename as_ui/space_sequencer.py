@@ -195,7 +195,7 @@ def draw_add_buttons_row(self, context, column, scene, active_strip, lighting_ic
     row.operator("alva_seq.add", text="", icon='LIGHT_SUN').Option = "option_flash"
     row.operator("alva_seq.add", text="", icon='IPO_BEZIER').Option = "option_animation"
     #row.operator("alva_seq.add", text="", icon='UV_SYNC_SELECT').Option = "option_offset"
-    row.operator("alva_seq.add", text="", icon='SETTINGS').option = "Option_trigger"
+    row.operator("alva_seq.add", text="", icon='SETTINGS').Option = "Option_trigger"
     
 
 def draw_text_insert(self, context, column, text):

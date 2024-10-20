@@ -47,6 +47,8 @@ class OSC:
         
         
     def send_osc_video(address, argument):
+        if not bpy.context.scene.scene_props.enable_video:
+            return
         scene = bpy.context.scene.scene_props
         ip_address = scene.str_video_ip_address
         port = scene.int_video_port
@@ -55,6 +57,8 @@ class OSC:
         
         
     def send_osc_audio(address, argument):
+        if not bpy.context.scene.scene_props.enable_audio:
+            return
         scene = bpy.context.scene
         ip_address = scene.str_audio_ip_address
         port = scene.int_audio_port
