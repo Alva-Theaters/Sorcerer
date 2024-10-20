@@ -167,7 +167,7 @@ class NODE_NT_group_controller(Node):
             draw_parameters(self, context, column, column, self)
             draw_footer_toggles(self, context, column, self, box=False)
 
-    
+
 class NODE_NT_mixer(Node):
     bl_idname = 'mixer_type'
     bl_label = 'Mixer'
