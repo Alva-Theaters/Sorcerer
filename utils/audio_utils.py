@@ -24,42 +24,40 @@ class VolumeRenderer:
         self.audio_cue = audio_cue
 
     def render(self):
-        # Use matrix to allow the speaker field to move through a static scene on a path
+        '''
+        Figure out how much of each sound strip should be in each speaker. 
+        
+        1. Use matrix to ensure constraints have a say.
+        2. Use the closest vertice as sound_object center if scaling is not uniform.
+        3. Multiply sound_object scale by 5 for better experience if scaling is uniform.
+        4. Find total scale factor by considering both sound_object and speaker scales
+        5. Calculate the volume by dividing distance and total scale factor
+        6. Apply logarithmic falloff for better experience
+        7. Expand volume from 0-1 scale to scale needed for selected audio system (like Qlab)
+        8. Send the expanded volume over the network with (channel, parameter, value) format
+        9. Return the original 0-1 volume for internal Blender needs, like the UI property
+        '''
         speaker_location = self.speaker.matrix_world.to_translation()
-
-        # If sound object is congruently scaled, use bounding box center and normal SPEAKER_SCALE_MULTIPLIER
-        # Otherwise, use the closest vertice instead and ignore the SPEAKER_SCALE_MULTIPLIER
-        sound_object_world_location, adjusted_multiplier = self._adjust_by_congruency()
-
-        distance = round((speaker_location - sound_object_world_location).length, 2)
-        scale_factor = self._find_scale_factor(adjusted_multiplier)
-        adjusted_distance = max(distance / scale_factor, 1e-6)  # Division reduces the impact of scale on attenuation
-
-        # Use logarithmic-like falloff to smooth the volume transition
-        volume = self._apply_logarithmic_falloff(adjusted_distance)
-
-        alva_log('audio', f"distance: {distance}; scale_factor: {scale_factor}, adjusted_distance: {adjusted_distance}; rendered_volume: {volume}")
-
-        # Remap Blender's 0-1 scale to Qlab's -59 - 0 decibel scale.
-        remapped_volume = self._map_volume(volume)
-
+        sound_object_location, adjustment_multiplier = self._adjust_by_congruency()
+        distance = round((speaker_location - sound_object_location).length, 2)
+        scale_factor = self._find_scale_factor(adjustment_multiplier)
+        volume = max(distance / scale_factor, 1e-6)
+        logarithmic_volume = self._apply_logarithmic_falloff(volume)
+        alva_log('audio', f"distance: {distance}; scale_factor: {scale_factor}, logarithmic_volume: {logarithmic_volume}")
+        expanded_volume = self._map_volume(logarithmic_volume)
         self._redraw_ui()
-
-        # Use remapped volume for OSC/Qlab
-        OSCInterface.publish_volume(self.speaker.int_speaker_number, self.audio_cue, remapped_volume)
-
-        # Use original 0-1 volume for the dummy_volume Blender property for UI
-        return volume
+        OSCInterface.publish_volume(self.speaker.int_speaker_number, self.audio_cue, expanded_volume)
+        return logarithmic_volume
 
     def _adjust_by_congruency(self):
         scale_x, scale_y, scale_z = self.sound_object.scale
-        if not round(scale_x, 2) == round(scale_y, 2) == round(scale_z, 2):
+        if round(scale_x, 2) == round(scale_y, 2) == round(scale_z, 2):
+            sound_object_world_location = self.sound_object.matrix_world.to_translation()
+            adjusted_multiplier = SPEAKER_SCALE_MULTIPLIER
+        else:
             closest_vertex = GeometryHelper.find_closest_vertex_to_speaker(self.speaker, self.sound_object)
             sound_object_world_location = closest_vertex
             adjusted_multiplier = 1
-        else:
-            sound_object_world_location = self.sound_object.matrix_world.to_translation()
-            adjusted_multiplier = SPEAKER_SCALE_MULTIPLIER
 
         return sound_object_world_location, adjusted_multiplier
 
