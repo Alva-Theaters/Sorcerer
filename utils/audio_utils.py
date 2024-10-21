@@ -24,14 +24,14 @@ class VolumeRenderer:
         self.audio_cue = audio_cue
 
     def render(self):
-        # Ensure constraints can impact results by using matrix.
-        sound_object_world_location = self.sound_object.matrix_world.to_translation()
+        # Use matrix to allow the speaker field to move through a static scene on a path
+        speaker_location = self.speaker.matrix_world.to_translation()
 
         # If sound object is congruently scaled, use bounding box center and normal SPEAKER_SCALE_MULTIPLIER
         # Otherwise, use the closest vertice instead and ignore the SPEAKER_SCALE_MULTIPLIER
         sound_object_world_location, adjusted_multiplier = self._adjust_by_congruency()
 
-        distance = round((self.speaker.location - sound_object_world_location).length, 2)
+        distance = round((speaker_location - sound_object_world_location).length, 2)
         scale_factor = self._find_scale_factor(adjusted_multiplier)
         adjusted_distance = max(distance / scale_factor, 1e-6)  # Division reduces the impact of scale on attenuation
 
