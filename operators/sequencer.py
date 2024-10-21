@@ -1005,7 +1005,7 @@ class SEQUENCER_OT_alva_refresh_audio_object_selection(Operator):
  
 class SEQUENCER_OT_alva_bake_audio(Operator):
     bl_idname = "alva_seq.export_audio"
-    bl_label = "Export Audio"
+    bl_label = "May Take > 1 Hour"
     bl_description = "Create separate audio files for external playback, with 3D mixing built into the files. Route each sound file to the correct speaker inside a group cue. WARNING: Can take a very long time to complete"
     bl_options = {'UNDO'}
 
@@ -1017,65 +1017,91 @@ class SEQUENCER_OT_alva_bake_audio(Operator):
         subtype='FILE_PATH'
     )
 
+    REDRAW_INTERVAL = 100  # UI redraws must be limited because they slow the program considerably
+
     def invoke(self, context, event):
-        # Prompt the user to select a file path and provide the main folder name
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
 
     def execute(self, context):
+        '''
+        This operator is responsible for creating a folder hierarchy that allows any many-channel
+        audio player to play back 3D audio. A "many-channel audio player" is a software, like 
+        Qlab, that can play back more than 2 tracks simultaneously while sending each track to 
+        a different speaker. 
+
+        The folder hierarchy created by this operator includes the files for all 3D audio objects
+        in the scene. 
+
+        1. Mute all other track other than the current one so they don't bleed
+        2. Create main folder for entire scene based on user-specified directory (invoke method)
+        3. Create a subfolder to contain all the speaker tracks for current sound strip
+        4. Bake volume keyframes for entire scene for that speaker/sound_strip pair
+        5. Mixdown that file with its volume keyframes in a vacuum
+        6. Go back to Step 4 for the next speaker until all speakers are done
+        7. Go back to Step 3 for the next sound strip until all the sound strips are done
+        '''
         scene = context.scene
         sounds = [strip for strip in context.sequences if strip.type == 'SOUND']
         for strip in sounds:
             if strip.selected_stage_object is None:
                 continue
 
-            self.report({'INFO'}, f"Working on {strip.name}")
-
-            for other_strip in sounds:
-                if other_strip != strip:
-                    other_strip.mute = True
-                else:
-                    strip.mute = False
-            
+            self.mute_others(sounds, strip)
+            main_folder_path = self.make_main_folder()
+            subfolder_path = self.make_subfolder(main_folder_path, strip)
             sound_object = bpy.data.objects[strip.selected_stage_object.name]
+            speaker_lists = [sl for sl in sound_object.speaker_list if sl.name == strip.name]
+            
+            for speaker_list in speaker_lists:
+                for speaker in speaker_list.speakers:
+                    self.bake_keyframes(strip, scene, speaker, sound_object)
+                    self.create_sound_file_in_subfolder(subfolder_path, speaker)
 
-            # Extract the base directory from the user-selected file path
-            base_directory = os.path.dirname(self.filepath)
-
-            # Create the main folder based on user input
-            main_folder_path = os.path.join(base_directory, "Sound Scene")
-            if not os.path.exists(main_folder_path):
-                os.makedirs(main_folder_path)
-
-            # Create a subfolder based on the strip name inside the main folder
-            subfolder_path = os.path.join(main_folder_path, strip.name)
-            if not os.path.exists(subfolder_path):
-                os.makedirs(subfolder_path)
-
-            for speaker_list in sound_object.speaker_list:
-                if speaker_list.name == strip.name:
-                    for speaker in speaker_list.speakers:
-                        self.report({'INFO'}, "Baking keyframes")
-                        for frame in range(int(strip.frame_start), int(strip.frame_final_end)):
-                            scene.frame_set(frame)
-                            strip.volume = render_volume(speaker.speaker_pointer, sound_object, strip.int_sound_cue)
-                            strip.keyframe_insert(data_path="volume", frame=frame)
-                            if frame % 100 == 0:
-                                bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
-                
-                        # Customize output path to save the audio in the subfolder, using speaker_number as filename
-                        output_path = os.path.join(subfolder_path, f"{speaker.speaker_number}.wav")
-                        self.report({'INFO'}, "Mixing down")
-                        bpy.ops.sound.mixdown(filepath=output_path, 
-                                            container='WAV', 
-                                            codec='PCM', 
-                                            format='F32', 
-                                            split_channels=False)
-        
-        self.report({'INFO'}, "Bake complete.")
-        
+        self.report({'INFO'}, "Folders created")
         return {'FINISHED'}
-    
+
+    def mute_others(self, sounds, strip):
+        for other_strip in sounds:
+            if other_strip != strip:
+                other_strip.mute = True
+        strip.mute = False
+
+    def make_main_folder(self):
+        base_directory = os.path.dirname(self.filepath)
+        main_folder_path = os.path.join(base_directory, "Sound Scene")
+        if not os.path.exists(main_folder_path):
+            os.makedirs(main_folder_path)
+        return main_folder_path
+
+    def make_subfolder(self, main_folder_path, strip):
+        subfolder_path = os.path.join(main_folder_path, strip.name)
+        if not os.path.exists(subfolder_path):
+            os.makedirs(subfolder_path)
+        return subfolder_path
+
+    def render_frame(self, scene, frame, strip, speaker, sound_object):
+        scene.frame_set(frame)
+        strip.volume = render_volume(speaker.speaker_pointer, sound_object, strip.int_sound_cue)
+        strip.keyframe_insert(data_path="volume", frame=frame)
+        self.update_ui(frame)
+
+    def update_ui(self, frame):
+        if frame % self.REDRAW_INTERVAL == 0:
+            bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
+
+    def bake_keyframes(self, strip, scene, speaker, sound_object):
+        for frame in range(int(strip.frame_start), int(strip.frame_final_end)):
+            self.render_frame(scene, frame, strip, speaker, sound_object)
+
+    def create_sound_file_in_subfolder(self, subfolder_path, speaker):
+        output_path = os.path.join(subfolder_path, f"{speaker.speaker_number}.wav")
+        bpy.ops.sound.mixdown(filepath=output_path, 
+                            container='WAV', 
+                            codec='PCM', 
+                            format='F32', 
+                            split_channels=False)
+
 
 misc_operators = [
     SEQUENCER_OT_alva_analyze_song,
