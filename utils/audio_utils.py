@@ -27,15 +27,35 @@ class VolumeRenderer:
         '''
         Figure out how much of each sound strip should be in each speaker. 
         
-        1. Use matrix to ensure constraints have a say.
-        2. Use the closest vertice as sound_object center if scaling is not uniform.
-        3. Multiply sound_object scale by 5 for better experience if scaling is uniform.
-        4. Find total scale factor by considering both sound_object and speaker scales
-        5. Calculate the volume by dividing distance and total scale factor
-        6. Apply logarithmic falloff for better experience
-        7. Expand volume from 0-1 scale to scale needed for selected audio system (like Qlab)
-        8. Send the expanded volume over the network with (channel, parameter, value) format
-        9. Return the original 0-1 volume for internal Blender needs, like the UI property
+        1. Use matrix to ensure constraints have a say since we want user to be able 
+           to put both speaker rigs and audio objects on follow_paths.
+
+        2. Use the closest vertice as sound_object center if scaling is not uniform since 
+           we don't have a better way figure out how close a point is to an iregular mesh.
+
+        3. Multiply sound_object scale by 5 for better experience if scaling is uniform since
+           the default scale of one results in too small a fade radius. Fade radius meaning
+           if the fade radius is too small, the volume goes down to 0 way too fast.
+
+        4. Find total scale factor by considering both sound_object and speaker scales since
+           we want user to change speaker sensitivity and object size intuitively, not 
+           with numerical inputs. Allow them to just use the normal scale modal with S key.
+
+        5. Calculate the volume by dividing distance and total scale factor.
+
+        6. Apply logarithmic falloff for better experience. Without this, it was falling off
+           in a funky way that didn't feel natural.
+
+        7. Expand volume from 0-1 scale to scale needed for selected audio system (like Qlab).
+           0 in Qlab means 0 decibels, so it doesn't do anything to it. Volume is 0 at -59 db 
+           in Qlab. A mixer like the M32 will probably be similar.
+
+        8. Send the expanded volume over the network with (channel, parameter, value) format.
+           In the future, this may be incorporated directly into the CPVIA folder. For now,
+           we're just mimicking its format.
+
+        9. Return the original 0-1 volume for internal Blender needs, like the UI property. 
+           We're using 0-1 in Blender because... maybe this should be switched to expanded db?
         '''
         speaker_location = self.speaker.matrix_world.to_translation()
         sound_object_location, adjustment_multiplier = self._adjust_by_congruency()
@@ -96,6 +116,7 @@ class GeometryHelper:
             if distance_to_speaker < min_distance:
                 min_distance = distance_to_speaker
                 closest_vertex = vertex_world_position
+
         return closest_vertex
 
 
