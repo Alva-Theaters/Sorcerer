@@ -10,7 +10,7 @@ import time
 from ..utils.osc import OSC
 from ..utils.cpvia_utils import update_alva_controller, home_alva_controller
 from utils.sequencer_utils import duplicate_active_strip_to_selected
-from ..utils.properties_utils import update_all_controller_channel_lists, apply_patch
+from ..utils.rna_utils import update_all_controller_channel_lists, apply_patch
 from ..updaters.common import CommonUpdaters
 from ..as_ui.space_alvapref import draw_settings 
 from ..cpvia.find import Find

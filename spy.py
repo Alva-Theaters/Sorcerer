@@ -19,7 +19,7 @@ from .updaters.properties import PropertiesUpdaters
 
 from .utils.audio_utils import render_volume
 from .utils.cpvia_utils import color_object_to_tuple_and_scale_up, update_alva_controller, home_alva_controller
-from .utils.properties_utils import parse_channels, parse_mixer_channels
+from .utils.rna_utils import parse_channels, parse_mixer_channels
 from .utils.sequencer_utils import duplicate_active_strip_to_selected, find_available_channel, add_color_strip
 from .utils.sequencer_utils import analyze_song, AnalysisResult
 

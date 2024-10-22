@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from bpy.types import Operator
-from ..utils.properties_utils import parse_channels
+from ..utils.rna_utils import parse_channels
 from ..utils.osc import OSC
 
 # TODO This entire script is a DRY abomination.

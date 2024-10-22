@@ -6,7 +6,7 @@ import bpy
 import time
 from bpy.props import *
 
-from ..utils.properties_utils import parse_channels, update_all_controller_channel_lists
+from ..utils.rna_utils import parse_channels, update_all_controller_channel_lists
 from ..utils.osc import OSC
 from ..utils.orb_utils import find_addresses
 

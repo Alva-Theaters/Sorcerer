@@ -8,7 +8,7 @@ from bpy.types import PropertyGroup, Scene
 
 from ..updaters.common import CommonUpdaters 
 from ..updaters.properties import PropertiesUpdaters 
-from ..utils.properties_utils import register_properties
+from ..utils.rna_utils import register_properties
 from .rna_common import CommonProperties 
 from ..assets.items import Items as AlvaItems 
 from .property_groups import LightingModifier, Errors

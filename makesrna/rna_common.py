@@ -6,7 +6,7 @@ import bpy
 from bpy.props import StringProperty, CollectionProperty, BoolProperty, EnumProperty, IntProperty, FloatProperty, FloatVectorProperty, PointerProperty
 from bpy.types import Object, ColorSequence, Sequence, Scene
 
-from ..utils.properties_utils import register_properties
+from ..utils.rna_utils import register_properties
 from ..assets.items import Items as AlvaItems 
 from ..updaters.common import CommonUpdaters 
 from ..updaters.sequencer import SequencerUpdaters 

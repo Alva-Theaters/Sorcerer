@@ -6,7 +6,7 @@ import re
 from collections import defaultdict
 
 from ..utils.event_utils import EventUtils
-from ..utils.properties_utils import parse_channels
+from .rna_utils import parse_channels
 from ..utils.sequencer_utils import BiasCalculator
 
 
@@ -55,7 +55,7 @@ class StripMapping:
 
             BiasCalculator_Instance = BiasCalculator(bias, strip_length_in_frames)
             bias_in_frames = BiasCalculator_Instance.calculate_flash_strip_bias()
-            
+
             start_frame = strip.frame_start
             end_flash_macro_frame = start_frame + bias_in_frames
             end_flash_macro_frame = int(round(end_flash_macro_frame))

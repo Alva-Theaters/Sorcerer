@@ -208,7 +208,7 @@ class ORB_OT_alva_sync_cue(Operator):
 
                 import time
 
-                from ..utils.properties_utils import parse_channels
+                from ..utils.rna_utils import parse_channels
                 from ..utils.cpvia_utils import simplify_channels_list
 
                 groups = parse_channels(getattr(context.scene, f"{param}_groups"))

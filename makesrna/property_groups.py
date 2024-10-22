@@ -278,7 +278,7 @@ def register():
     for cls in prop_groups:
         bpy.utils.register_class(cls)
 
-    from ..utils.properties_utils import register_properties
+    from ..utils.rna_utils import register_properties
     from .rna_common import CommonProperties
     register_properties(MixerParameters, CommonProperties.common_parameters)
     register_properties(GroupData, CommonProperties.mins_maxes)
@@ -317,7 +317,7 @@ def unregister():
     if hasattr(Scene, "channels_list_pg"):
         del Scene.channels_list_pg
     
-    from ..utils.properties_utils import register_properties
+    from ..utils.rna_utils import register_properties
     from .rna_common import CommonProperties
     register_properties(MixerParameters, CommonProperties.common_parameters, register=False)
     register_properties(GroupData, CommonProperties.mins_maxes, register=False)

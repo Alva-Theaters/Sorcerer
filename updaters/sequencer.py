@@ -11,7 +11,7 @@ from bpy.types import ColorSequence
 from .common import CommonUpdaters as CommonUpdaters
 from ..assets.dictionaries import Dictionaries as Dictionaries
 from ..utils.osc import OSC
-from ..utils.properties_utils import parse_channels
+from ..utils.rna_utils import parse_channels
     
 
 stop_updating_color = "No"

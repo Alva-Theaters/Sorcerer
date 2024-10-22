@@ -8,7 +8,7 @@ from bpy.props import *
 
 from ..assets.items import Items as AlvaItems 
 from ..updaters.node import NodeUpdaters
-from ..utils.properties_utils import register_properties
+from ..utils.rna_utils import register_properties
 from ..makesrna.property_groups import MixerParameters, CustomButtonPropertyGroup
 from ..cpvia.find import Find
 from ..assets.tooltips import format_tooltip
