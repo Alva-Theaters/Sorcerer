@@ -20,7 +20,7 @@ from .updaters.properties import PropertiesUpdaters
 from .utils.audio_utils import render_volume
 from .utils.cpvia_utils import color_object_to_tuple_and_scale_up, update_alva_controller, home_alva_controller
 from .utils.properties_utils import parse_channels, parse_mixer_channels
-from .utils.sequencer_utils import calculate_flash_strip_bias, duplicate_active_strip_to_selected, find_available_channel, add_color_strip
+from .utils.sequencer_utils import duplicate_active_strip_to_selected, find_available_channel, add_color_strip
 from .utils.sequencer_utils import analyze_song, AnalysisResult
 
 '''
@@ -159,11 +159,6 @@ class SorcererPython:
         '''Find most relevant sound strip with a timecode clock assignment.
             Returns 2 bpy strip objects, the first may be scene'''
         return EventUtils.find_relevant_clock_objects(scene)
-        
-    def calculate_flash_strip_bias(bias: int, frame_rate: float, strip_length_in_frames: int) -> float:
-        '''Used by Flash strip background logic to apply bias to flash down
-            timing, Returns a float'''
-        return calculate_flash_strip_bias(bias, frame_rate, strip_length_in_frames)
 
     def render_volume(speaker: bpy.types.Speaker, empty: bpy.types.Object, sensitivity: float, object_size: float, int_mixer_channel: int) -> float:
         '''Calculates volume for a 3d-audio-object and speaker pair'''

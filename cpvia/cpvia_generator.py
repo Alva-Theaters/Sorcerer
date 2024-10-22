@@ -77,6 +77,7 @@ class CPVIAGenerator:
 
         #is_rendering = EventUtils.is_rendered_mode()
         is_rendering = False # Until Blender fixes their stuff. Can't enable render mode without immediately crashing.
+        # Update on 10/21/2024: Blender fixed their stuff.
         alva_log("cpvia_generator", f"CPVIA: {c}, {p}, {v}, {i}, {a}")
         for chan, param, val, inf, arg in zip(c, p, v, i, a):
             if param in ["intensity", "raise_intensity", "lower_intensity", "color", "raise_color", "lower_color"] and is_rendering:

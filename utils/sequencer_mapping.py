@@ -7,10 +7,14 @@ from collections import defaultdict
 
 from ..utils.event_utils import EventUtils
 from ..utils.properties_utils import parse_channels
-from ..utils.sequencer_utils import calculate_flash_strip_bias
+from ..utils.sequencer_utils import BiasCalculator
 
 
 class StripMapping:
+    '''
+    These are here to tell us what non-animation strips in the VSE need to do what stuff 
+    when, for lighting
+    '''
     def get_start_macro_map(scene):
         mapping = defaultdict(list)  
         
@@ -47,9 +51,11 @@ class StripMapping:
         for strip in filter_eos_flash_strips(scene.sequence_editor.sequences):
             data = (strip.name, str(strip.int_end_macro))
             bias = strip.flash_bias
-            frame_rate = EventUtils.get_frame_rate(scene)
             strip_length_in_frames = strip.frame_final_duration
-            bias_in_frames = calculate_flash_strip_bias(bias, frame_rate, strip_length_in_frames)
+
+            BiasCalculator_Instance = BiasCalculator(bias, strip_length_in_frames)
+            bias_in_frames = BiasCalculator_Instance.calculate_flash_strip_bias()
+            
             start_frame = strip.frame_start
             end_flash_macro_frame = start_frame + bias_in_frames
             end_flash_macro_frame = int(round(end_flash_macro_frame))
@@ -59,7 +65,6 @@ class StripMapping:
                         
         return dict(mapping)
         
-
     def get_trigger_start_map(scene):
         mapping = defaultdict(list)
 

@@ -64,6 +64,7 @@ class ColorSplitter:
             mode = pf.replace("option_", "")
             corrected_key = p[0].replace("color", mode)
             
+            # TODO. There was a big issue with getting this to add materials correctly. Blender did fix their stuff though.
             # is_rendering = EventUtils.is_rendered_mode()
             # if is_rendering:
             #     publisher = Publisher()

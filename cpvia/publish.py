@@ -12,7 +12,7 @@ change_requests = []
 
 
 class Publisher:
-          
+    # TODO. Why?
     def format_channel_and_value(self, c, v):
         """
         This function formats the channel and value numbers as string and then formats them

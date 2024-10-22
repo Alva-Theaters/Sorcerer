@@ -9,15 +9,32 @@ except:
     pass
 
 
-def calculate_flash_strip_bias(bias, frame_rate, strip_length_in_frames):
-    if bias == 0:
-        return strip_length_in_frames / 2
-    elif bias < 0:
-        proportion_of_first_half = (49 + bias) / 49
-        return round(strip_length_in_frames * proportion_of_first_half * 0.5)
-    else:
-        proportion_of_second_half = bias / 49
-        return round(strip_length_in_frames * (0.5 + proportion_of_second_half * 0.5))
+class BiasCalculator():
+    def __init__(self, bias, strip_length_in_frames):
+        self.bias = bias
+        self.strip_length_in_frames = strip_length_in_frames
+        
+    def calculate_flash_strip_bias(self):
+        self.bias = self.bias
+        self.strip_length_in_frames = self.strip_length_in_frames
+
+        if self.bias == 0:
+            return self._divide_in_half()
+        elif self.bias < 0:
+            return self._make_it_start_faster_and_end_slower()
+        else:
+            return self._make_it_start_slower_and_end_faster()
+        
+    def _divide_in_half(self):
+        return self.strip_length_in_frames / 2
+
+    def _make_it_start_faster_and_end_slower(self):
+        proportion_of_first_half = (49 + self.bias) / 49  # It's 49 because UI shows scale of -49 to 49
+        return round(self.strip_length_in_frames * proportion_of_first_half * 0.5)
+
+    def _make_it_start_slower_and_end_faster(self):
+        proportion_of_second_half = self.bias / 49  # It's 49 because UI shows scale of -49 to 49
+        return round(self.strip_length_in_frames * (0.5 + proportion_of_second_half * 0.5))
     
 
 def form_livemap_string(self):
