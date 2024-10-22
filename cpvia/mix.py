@@ -22,61 +22,46 @@ class Mixer:
         """Receives a bpy object mesh, parent, and returns three lists for channels list (c), parameters list (p), 
             and values list (v)"""
         start = time.time()
-
-        cumulative_c = []
-        cumulative_p = []
-        cumulative_v = []
         
         from .cpvia_finders import CPVIAFinders
         cpvia_finders = CPVIAFinders()
-        channels_list = []
         channels_list = cpvia_finders._find_channels_list(parent)
+
         if len(channels_list) == 0:
             return [], [], []
-
+        
         c, p, v = self.mix(parent, param, channels_list)
-        cumulative_c.extend(c)
-        cumulative_p.extend(p)
-        cumulative_v.extend(v)
-
         alva_log('time', f"mix_my_values took {time.time() - start} seconds\n")
-        return cumulative_c, cumulative_p, cumulative_v
+        return c, p, v
         
     def mix(self, parent, parameter, channels):
         values_list = parent.parameters
-        offset = parent.float_offset * OFFSET_SENSITIVITY
         subdivisions = parent.int_subdivisions
         mode = parent.mix_method_enum
         param_mode = parameter
-        param = parameter
-        if parameter == "color":
-            param = "vec_color"
-        param = f"float_{param}"
+
+        offset = self.apply_offset_sensitivity(parent)
+        param = self.add_vec_prefix_if_color(parameter)
+        param = self.add_float_prefix_to_param(param)
+
         p = [parameter for _ in channels]
         
         if mode in ['option_gradient', 'option_pattern']:
-            # Establish values list.
-            values = [getattr(choice, param) for choice in values_list]
-            alva_log('mix', f"Values before subdivision: {values}\n")
-
-            # Subdivide values list.
-            values = self.subdivide_values(subdivisions, values)
-            alva_log('mix', f"Values after subdivision: {values}\n")
-            
-            # Make channels and values the same length by placing keys in the appropriate spots.
-            sorted_channels, sorted_values = self.sort(channels, values)
+            sorted_channels, sorted_values = self.subdivide_and_sort(param, values_list, subdivisions, channels)
             alva_log('mix', f"sorted_channels, sorted_values: {sorted_channels}, {sorted_values}\n")
 
-        # Apply the desired effect to the values.
-        if mode == "option_gradient": # Interpolate smoothly between the keys
+        if mode == "option_gradient":
             mixed = self.interpolate(sorted_channels, sorted_values, subdivisions, channels, param_mode, offset)
             alva_log('mix', f"Interpolated: {mixed}\n")
-        elif mode == "option_pattern": # Alternate between the keys
+
+        elif mode == "option_pattern":
             mixed = self.patternize(sorted_values, channels, param_mode, offset)
             alva_log('mix', f"Patternized: {mixed}\n")
-        elif mode == "option_pose": # Push all channels through the choices as one, don't mix the choices together across the channels
+
+        elif mode == "option_pose":
             mixed = self.pose(channels, param_mode, parent)
             alva_log('mix', f"Posed: {mixed}\n")
+
         else:
             SLI.SLI_assert_unreachable()
 
@@ -84,6 +69,41 @@ class Mixer:
 
         alva_log('mix', f"mix.py is returning : {mapped_channels, p, mapped_values}")
         return mapped_channels, p, mapped_values
+    
+    @staticmethod
+    def apply_offset_sensitivity(parent):
+        return parent.float_offset * OFFSET_SENSITIVITY
+    
+    @staticmethod
+    def add_vec_prefix_if_color(parameter):
+        if parameter == "color":
+            return "vec_color"
+        return parameter
+    
+    @staticmethod
+    def add_float_prefix_to_param(param):
+        return f"float_{param}"
+    
+    def subdivide_and_sort(self, param, values_list, subdivisions, channels):
+        values = [getattr(choice, param) for choice in values_list]
+        alva_log('mix', f"Values before subdivision: {values}\n")
+        values = self.subdivide_values(subdivisions, values)
+        alva_log('mix', f"Values after subdivision: {values}\n")
+        return self.sort_channels_and_values(channels, values)
+    
+    def subdivide_values(self, subdivisions: int, values: List[float]) -> List[float]:
+        if subdivisions > 0:
+            for _ in range(subdivisions):
+                values += values
+        return values
+
+    def sort_channels_and_values(self, channels: List[int], values: List[float]) -> Tuple[List[int], List[float]]:
+        """Sort channels and values together so they are of same length, important for numpy."""
+        if len(channels) < len(values): # Handle cases where there are more value choices than channels
+            values = self.simplify_values(values, len(channels))
+        sorted_channels_values = sorted(zip(channels, values))
+        sorted_channels, sorted_values = zip(*sorted_channels_values)
+        return list(sorted_channels), list(sorted_values)
 
 
     '''EFFECTS'''
@@ -156,21 +176,6 @@ class Mixer:
 
 
     '''HELPERS'''
-    def subdivide_values(self, subdivisions: int, values: List[float]) -> List[float]:
-        """Subdivide the values based on the number of subdivisions."""
-        if subdivisions > 0:
-            for _ in range(subdivisions):
-                values += values
-        return values
-
-    def sort(self, channels: List[int], values: List[float]) -> Tuple[List[int], List[float]]:
-        """Sort channels and values together so they are of same length, important for numpy."""
-        if len(channels) < len(values): # Handle cases where there are more value choices than channels
-            values = self.simplify_values(values, len(channels))
-        sorted_channels_values = sorted(zip(channels, values))
-        sorted_channels, sorted_values = zip(*sorted_channels_values)
-        return list(sorted_channels), list(sorted_values)
-
     def simplify_values(self, values_list: List[Union[float, Tuple[float, float, float]]], num_channels: int) -> List[Union[float, Tuple[float, float, float]]]:
         """Simplifies the values list to match the number of channels by averaging groups of values."""
         group_size = len(values_list) / num_channels

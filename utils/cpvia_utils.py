@@ -23,7 +23,6 @@ def update_alva_controller(controller):
     from ..makesrna.rna_common import CommonProperties 
     props = CommonProperties
 
-    # Redirect to mixer node's PropertyGroup if controller is a mixer node
     if hasattr(controller, "bl_idname") and controller.bl_idname == 'mixer_type':
         for choice in controller.parameters:
             for prop_name, _ in props.common_parameters:
@@ -38,7 +37,6 @@ def home_alva_controller(controller):
     from ..makesrna.rna_common import CommonProperties 
     props = CommonProperties
 
-    # Redirect to mixer node's PropertyGroup if controller is a mixer node
     if hasattr(controller, "bl_idname") and controller.bl_idname == 'mixer_type':
         controller.float_offset = 0
         controller.int_subdivisions = 0
