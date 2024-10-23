@@ -11,7 +11,7 @@ from ..updaters.properties import PropertiesUpdaters
 from ..utils.rna_utils import register_properties
 from .rna_common import CommonProperties 
 from ..assets.items import Items as AlvaItems 
-from .property_groups import LightingModifier, Errors
+from .property_groups import LightingModifier, COMMON_PG_alva_maintenance_errors
 from ..assets.tooltips import format_tooltip
 
 # pyright: reportInvalidTypeForm=false
@@ -82,7 +82,7 @@ class SceneProperties(PropertyGroup):
     # Service Mode
     service_mode: BoolProperty(default=False)
     limp_mode: BoolProperty(default=False)
-    errors: CollectionProperty(type=Errors) 
+    errors: CollectionProperty(type=COMMON_PG_alva_maintenance_errors) 
     number_of_systems_down: IntProperty(default=0)
     user_limp_mode_explanation: StringProperty()
     errors_index: IntProperty(default=0)

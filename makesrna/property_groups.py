@@ -19,22 +19,22 @@ from ..assets.tooltips import format_tooltip
 # pyright: reportInvalidTypeForm=false
 
 
-class Errors(PropertyGroup):
+class COMMON_PG_alva_maintenance_errors(PropertyGroup):
     error_type: StringProperty()
     explanation: StringProperty()
     severity: IntProperty()
 
 
-class Cue(PropertyGroup):
+class PROPERTIES_PG_alva_cue_switcher_cue(PropertyGroup):
     int_number: FloatProperty()  # Why is this named int when it's float?
     str_label: StringProperty() 
     is_live: BoolProperty() 
     
 
-class CueLists(PropertyGroup):
+class PROPERTIES_PG_alva_cue_lists(PropertyGroup):
     from ..updaters.properties import PropertiesUpdaters
 
-    cues: CollectionProperty(type=Cue) 
+    cues: CollectionProperty(type=PROPERTIES_PG_alva_cue_switcher_cue) 
     int_preview_index: IntProperty(default=0)   
     int_program_index: IntProperty(default=1) 
     int_number: IntProperty() 
@@ -45,7 +45,7 @@ class CueLists(PropertyGroup):
     int_cue_list_number: IntProperty(name="Cue List", description=format_tooltip("Cue list for this song's cues on the console"), default=1)  
 
 
-class ShowSequencer(PropertyGroup):
+class PROPERTIES_PG_alva_stage_manager(PropertyGroup):
     '''All the properties for the show start sequencer, basically a rocket launch
        go-no-go poll UI for stage managers to ensure shows start with everything 
        completed properly and on time.'''
@@ -256,10 +256,10 @@ class MacroButtonItem(PropertyGroup):
 
         
 prop_groups = [
-    Errors,
-    Cue,
-    CueLists,
-    ShowSequencer,
+    COMMON_PG_alva_maintenance_errors,
+    PROPERTIES_PG_alva_cue_switcher_cue,
+    PROPERTIES_PG_alva_cue_lists,
+    PROPERTIES_PG_alva_stage_manager,
     ChannelsList,
     GroupData,
     MySettings,
@@ -290,11 +290,11 @@ def register():
         Sequence.my_settings = PointerProperty(type=MySettings)
         
     Scene.channels_list_pg = PointerProperty(type=ChannelsList)
-    Scene.show_sequencer = PointerProperty(type=ShowSequencer)
+    Scene.show_sequencer = PointerProperty(type=PROPERTIES_PG_alva_stage_manager)
         
     # Need to cross-register this
     Scene.scene_group_data = CollectionProperty(type=GroupData)
-    Scene.cue_lists = CollectionProperty(type=CueLists)
+    Scene.cue_lists = CollectionProperty(type=PROPERTIES_PG_alva_cue_lists)
 
     Scene.macro_buttons = CollectionProperty(type=MacroButtonItem)
     Scene.macro_buttons_index = IntProperty(update=CommonUpdaters.update_macro_buttons_index)
