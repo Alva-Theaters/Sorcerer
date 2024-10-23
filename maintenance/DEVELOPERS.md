@@ -85,3 +85,81 @@ If you’re already familiar with Blender, you likely associate the term “proc
 Non-Oscillating Effects:
 ------------------------
 Effects on lighting consoles sort of have an internal motor that makes them continuously do stuff for forever until you tell them to stop. Effects in Sorcerer/Blender don’t work like that. Almost all the effects you can make here need to be manually “spun” to get them to move. (That analogy is why we have “Motor Nodes”.) You do that with keyframes. This is sort of like the difference between designing something on a potter’s wheel or on a lathe, and carving something that isn’t spinning. Effects on lighting consoles are pretty much always spinning, so you’re limited in how specific changes can be through time. But with animation effects, there are no limitations to where changes can be made. It’s not spinning, so super localized changes are super easy. This however comes at the cost of some of the speed and efficiency that you get with lighting consoles. 
+
+
+<br>
+
+Areas to Dive Into:
+===================
+Below are the general areas contributions can focus on, ordered from simplest to most complex.
+
+
+Properties (makesrna):
+----------------------
+Within the file system, Sorcerer calls properties, the things we register to the Blender scene via bpy, "rna". This term is borrowed from the Blender C++ source code (which itself is of course borrowing from biology.) We call properties rna, not properties, to avoid confusion with space_properties, the part of the Blender UI called Properties.
+
+Some of Sorcerer's properties need to be registered the same way to many different things (scene, nodes, objects, sequencer strips, etc). Those properties are found in the rna_common.py file. Review that script to learn how that system works: it's kind of like the menu at a restaurant. It uses a dictionary data structure to store the property registration data so that you can register dozens of properties to a new bpy type with a simple, single-line function call. 
+
+Currently, some of the tooltips use a special find_tooltip function. In the future, all tooltips will be stored in a single file in a dictionary. That way, we can find inconsistencies, typos, and style variations quickly. This will also make translations signficicantly easier in the future. 
+
+The format_tooltip function is there to correct problems related to Blender's C++ code that sometimes adds the period to the end and sometimes doesn't. In Blender 4.3, Blender is modifying this behavior, but at this time the final behavior has not been set in stone. 
+
+**The Tooltip Equation:** The tooltip equation, detailed in tooltips.py (in assets folder), basically states that paragraph-length tooltips are actually better for the user experience than short sentence tooltips. At least for more complex buttons/values. That's because RTFM's devastate the artist's experience in a way that long tooltips can never compete with. We want to do everything we can to increase in-software communication to decrease RTFM's. Every RTFM is a colossal failure of the software. The manual should be in the tooltips.
+
+Primary needs for this area are tooltip writing and getting all tooltips over to tooltips.py.
+
+
+UI:
+----
+Sorcerer's UI system uses a ton of helper draw functions. That's because we have a lot of UI elements that we want drawn in multiple space_types. (A space_type in Blender scripting is a type of display, like the sequencer display, 3D view display, graph editor display, etc.)
+
+The UI is specifically designed to be as lean and minimal as possible. To solve problems, we delete parts: we don't first add parts. You earn a cookie any time you figure out how to delete a part. You delete a part by showing how the same end result can be achieved easier without the part. We do that by reasoning from first-principles.
+
+**Lazy Pixel Count Index (LPCI):** Occasionally take a screenshot of the main UI and take it into a paint program where you can draw on it with a marker. Find all areas on the Sorcerer UI that are not white space and cannot be made useful to the user. Mark those all up with red marker. That's your LPCI. Make that area be as small as possible.
+
+Rules:
+
+   - Never try to fix a broken part without first trying to delete the part
+   - Always question the requirement or constraint that prompts the part's existence
+   - Try to avoid UI parts that only serve a technical purpose, not an artistic purpose
+   - Never force the user to click more than 3 times to control something
+   - Minimize LPCI by creating the simplest possible form of the UI
+   - The longer a central design remains unchanged, the more apparent its flaws become to users
+   - No UI part shall take up more space than it truly needs.
+
+Primary needs for this area are refactoring and none_type error handling.
+
+
+Orb:
+-----
+TBC
+
+
+Spy:
+-----
+TBC
+
+
+Event Manager:
+---------------
+TBC
+
+
+Sequencer:
+-----------
+TBC
+
+
+Nodes:
+-------
+TBC
+
+
+Misc. Tools:
+------------
+TBC
+
+
+CPVIA:
+-------
+TBC
