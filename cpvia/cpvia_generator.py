@@ -11,6 +11,8 @@ from ..cpvia.cpvia_finders import CPVIAFinders
 from ..cpvia.split_color import ColorSplitter 
 from ..cpvia.flags import check_flags
 from ..maintenance.logging import alva_log
+from .publish import Publisher
+from ..utils.event_utils import EventUtils
 
 
 '''
@@ -42,46 +44,38 @@ class CPVIAGenerator:
         property_name (str): The name of the property to update.
         find_function (function): The function that finds the channels and values for the given property.
         """
-        start = time.time()
-
-        finders = Find()
         alva_log("cpvia_generator", f"CPVIA Initial: {property_name}, {self}")
 
-        p = property_name  # Inherited from the partial.
-        mode = p
-        parent = finders.find_parent(self)
-
-        from .publish import Publisher
+        start = time.time()
+        finders = Find()
         publisher = Publisher()
-        if isinstance(context.space_data, bpy.types.SpaceView3D):
-            publisher.update_other_selections(context, parent, p)
+        parent = finders.find_parent(self)
+        influence = parent.influence
+        c, p, v, type = find_function(parent, property_name)  # find_function() is find_my_channels_and_values().
+        i = []
+        a = []
 
-        c, p, v, type = find_function(parent, p)  # Should return 3 lists and a string. find_function() is find_my_channels_and_values().
+        if isinstance(context.space_data, bpy.types.SpaceView3D):
+            publisher.update_other_selections(context, parent, property_name)
 
         if not check_flags(context, parent, c, p, v, type):
             return
 
-        if mode == "color":
+        if property_name == "color":
             color_splitter = ColorSplitter()
             p, v = color_splitter.split_color(parent, c, p, v, type)
 
-        i = []
-        a = []
-        influence = parent.influence
-
         alva_log("cpvia_generator", f"CPV: {c}, {p}, {v}")
+
         for chan, param, val in zip(c, p, v):
             argument = finders.find_my_argument_template(parent, type, chan, param, val)
             i.append(influence)
             a.append(argument)
 
         #is_rendering = EventUtils.is_rendered_mode()
-        is_rendering = False # Until Blender fixes their stuff. Can't enable render mode without immediately crashing.
-        # Update on 10/21/2024: Blender fixed their stuff.
-        alva_log("cpvia_generator", f"CPVIA: {c}, {p}, {v}, {i}, {a}")
         for chan, param, val, inf, arg in zip(c, p, v, i, a):
-            if param in ["intensity", "raise_intensity", "lower_intensity", "color", "raise_color", "lower_color"] and is_rendering:
-                publisher.render_in_viewport(parent, chan, param, val)
+            # if param in ["intensity", "raise_intensity", "lower_intensity", "color", "raise_color", "lower_color"] and is_rendering:
+            #     publisher.render_in_viewport(parent, chan, param, val)
             publisher.send_cpvia(chan, param, val, inf, arg)
 
         alva_log('time', f"cpvia_generator took {time.time() - start} seconds")
