@@ -5,6 +5,25 @@
 import mathutils
 
 
+def add_influence_and_argument(c, p, v, parent, cpvia_finders, controller_type):
+    i = []
+    a = []
+    for chan, param, val in zip(c, p, v):
+        argument = cpvia_finders.find_my_argument_template(parent, controller_type, chan, param, val)
+        i.append(parent.influence)
+        a.append(argument)
+
+    return i, a
+
+
+def publish_updates(c, p, v, i, a, publisher):
+    #is_rendering = EventUtils.is_rendered_mode()
+    for chan, param, val, inf, arg in zip(c, p, v, i, a):
+        # if param in ["intensity", "raise_intensity", "lower_intensity", "color", "raise_color", "lower_color"] and is_rendering:
+        #     publisher.render_in_viewport(parent, chan, param, val)
+        publisher.send_cpvia(chan, param, val, inf, arg)
+
+
 def color_object_to_tuple_and_scale_up(v):
     if type(v) == mathutils.Color:
         return (v.r * 100, v.g * 100, v.b * 100)

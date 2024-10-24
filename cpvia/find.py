@@ -9,38 +9,6 @@ from ..assets.sli import SLI
 
 
 class Find:
-    def find_my_argument_template(self, parent, type, chan, param, value):
-        console_mode = bpy.context.scene.scene_props.console_type_enum
-        if console_mode == "option_eos":
-            argument = Dictionaries.eos_arguments_dict.get(f"str_{param}_argument", "Unknown Argument")
-        elif console_mode == 'option_ma3':
-            argument = Dictionaries.ma3_arguments_dict.get(f"str_{param}_argument", "Unknown Argument")
-        elif console_mode == 'option_ma2':
-            argument = Dictionaries.ma2_arguments_dict.get(f"str_{param}_argument", "Unknown Argument")
-        else:
-            SLI.SLI_assert_unreachable()
-            return "Invalid console mode."
-
-        needs_special = False
-        if param in ['strobe', 'prism']:
-            needs_special = True
-            if value == 0:
-                special_argument = self.find_my_patch(parent, chan, type, f"str_disable_{param}_argument")
-            else: special_argument = self.find_my_patch(parent, chan, type, f"str_enable_{param}_argument")
-
-        if needs_special:
-            if param == 'strobe':
-                if value == 0:
-                    argument = f"{special_argument}"
-                else:
-                    argument = f"{special_argument}, {argument}"
-            else:
-                argument = special_argument
-
-        return argument
-                
-
-
     def find_my_patch(self, parent, chan, type, desired_property):
         """
         [EDIT 6/29/24: This docustring is slightly outdated now after revising the code for 
@@ -83,51 +51,6 @@ class Find:
                     return getattr(obj, desired_property)
                 
         return getattr(parent, desired_property)
-
-
-    '''NOTE: If random stuff broke that used to be fine, it's probably this function's fault.'''
-    def find_parent(self, object):
-        """
-        Catches and corrects cases where the object is a collection property instead of 
-        a node, sequencer strip, object, etc. This function returns the bpy object so
-        that the rest of the harmonizer can find what it needs.
-        
-        Parameters: 
-            object: A bpy object that may be a node, strip, object, or collection property
-        Returns:
-            parent: A bpy object that may be a node, strip, or object
-        """
-        from ..updaters.node import NodeUpdaters 
-        
-        if not isinstance(object, bpy.types.PropertyGroup):
-            return object
-
-        node = None
-        try:
-            node = Find.find_node_by_tree(object.node_name, object.node_tree_pointer, pointer=True)
-        except:
-            pass
-        
-        if node:
-            return node
-                    
-        # Run the program that's supposed to set this up since it must not have run yet
-        nodes = Find.find_nodes(bpy.context.scene)
-        for node in nodes:
-            if node.bl_idname == 'mixer_type':
-                NodeUpdaters.update_node_name(node)
-                
-        # Try again
-        try:
-            node = Find.find_node_by_tree(object.node_name, object.node_tree_pointer, pointer=True)
-        except:
-            pass
-        
-        if node:
-            return node
-            
-        print(f"find_parent could not find parent for {object}.")
-        return None
         
         
     def find_controller_by_space_type(context, space_type, node_name, node_tree_name):

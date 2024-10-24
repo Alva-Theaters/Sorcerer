@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import bpy
 import re
 
 from ..utils.cpvia_utils import color_object_to_tuple_and_scale_up
@@ -16,10 +17,86 @@ NUMBER_TO_ADD_IF_NULL = 1
 
 
 class CPVIAFinders:
-    def find_my_channels_and_values(self, parent, p):  # aka find_function
+    '''NOTE: If random stuff broke that used to be fine, it's probably this function's fault.'''
+    def find_parent(self, object):
         """
-        Intensity updater function called from universal_updater that returns 2 lists for channels and values,
-        as well as the controller type for use when building the osc argument
+        Catches and corrects cases where the object is a collection property instead of 
+        a node, sequencer strip, object, etc. This function returns the bpy object so
+        that the rest of the harmonizer can find what it needs.
+        
+        Parameters: 
+            object: A bpy object that may be a node, strip, object, or collection property
+        Returns:
+            parent: A bpy object that may be a node, strip, or object
+        """
+        from ..updaters.node import NodeUpdaters 
+        
+        if not isinstance(object, bpy.types.PropertyGroup):
+            return object
+
+        node = None
+        try:
+            node = Find.find_node_by_tree(object.node_name, object.node_tree_pointer, pointer=True)
+        except:
+            pass
+        
+        if node:
+            return node
+                    
+        # Run the program that's supposed to set this up since it must not have run yet
+        nodes = Find.find_nodes(bpy.context.scene)
+        for node in nodes:
+            if node.bl_idname == 'mixer_type':
+                NodeUpdaters.update_node_name(node)
+                
+        # Try again
+        try:
+            node = Find.find_node_by_tree(object.node_name, object.node_tree_pointer, pointer=True)
+        except:
+            pass
+        
+        if node:
+            return node
+            
+        print(f"find_parent could not find parent for {object}.")
+        return None
+
+
+    def find_my_argument_template(self, parent, type, chan, param, value):
+        console_mode = bpy.context.scene.scene_props.console_type_enum
+        if console_mode == "option_eos":
+            argument = Dictionaries.eos_arguments_dict.get(f"str_{param}_argument", "Unknown Argument")
+        elif console_mode == 'option_ma3':
+            argument = Dictionaries.ma3_arguments_dict.get(f"str_{param}_argument", "Unknown Argument")
+        elif console_mode == 'option_ma2':
+            argument = Dictionaries.ma2_arguments_dict.get(f"str_{param}_argument", "Unknown Argument")
+        else:
+            SLI.SLI_assert_unreachable()
+            return "Invalid console mode."
+
+        needs_special = False
+        if param in ['strobe', 'prism']:
+            needs_special = True
+            if value == 0:
+                special_argument = self.find_my_patch(parent, chan, type, f"str_disable_{param}_argument")
+            else: special_argument = self.find_my_patch(parent, chan, type, f"str_enable_{param}_argument")
+
+        if needs_special:
+            if param == 'strobe':
+                if value == 0:
+                    argument = f"{special_argument}"
+                else:
+                    argument = f"{special_argument}, {argument}"
+            else:
+                argument = special_argument
+
+        return argument
+    
+    
+    def add_channel_parameter_value(self, parent, property_name, controller_type):
+        """
+        Intensity updater function called from universal_updater that returns 3 lists for channel,
+        parameter, and value.
 
         Parameters:
         self: The object from which this function is called.
@@ -30,41 +107,34 @@ class CPVIAFinders:
         v: Values list
         type: Controller type
         """
-        alva_log("find", f"Find my Channels and Values: {parent}, {p}")
-        if p in ['pan_graph', 'tilt_graph']:
-            controller_type = self._find_my_controller_type(parent, pan_tilt_node=True)  # Should return a string.
-        else:
-            controller_type = self._find_my_controller_type(parent, pan_tilt_node=False)  # Should return a string.
+        alva_log("find", f"Find my Channels and Values: {parent}, {property_name}")
         
         if controller_type in ["Influencer", "Brush"]:
             alva_log("find", f"Is Influencer or Brush.")
             from .influencers import Influencers
             influencers = Influencers()  # Must be instance.
-            c, p, v = influencers.find_my_influencer_values(parent, p, controller_type)
-            return c, p, v, controller_type
+            return influencers.find_my_influencer_values(parent, property_name, controller_type)
         
         elif controller_type in ["Fixture", "Pan/Tilt Fixture", "Pan/Tilt"]:
             alva_log("find", f"Is Channel.")
             channel = self.find_channel_number(parent)
-            value = self._find_my_value(parent, p, controller_type, channel)
-            p = self._strip_graph_suffix(p)  # Change [pan or tilt]_graph to simple
-            return [channel], [p], [value], controller_type
+            value = self._find_my_value(parent, property_name, controller_type, channel)
+            parameter = self._strip_graph_suffix(property_name)  # Change [pan or tilt]_graph to simple
+            return [channel], [parameter], [value]
         
         elif controller_type in  ["group", "strip", "Stage Object"]:
             alva_log("find", f"Is Group.")
-            c, p, v = self._find_my_group_values(parent, p, controller_type)
-            return c, p, v, controller_type
-        
+            return self._find_my_group_values(parent, property_name, controller_type)
+            
         elif controller_type == "mixer":
             alva_log("find", f"Is Mixer.")
             mixing = Mixer()
-            c, p, v = mixing.mix_my_values(parent, p)
-            return c, p, v, controller_type
-                    
-        else: return None, None, None, None
+            return mixing.mix_my_values(parent, property_name)
+              
+        else: return None, None, None
         
         
-    def _find_my_controller_type(self, parent, pan_tilt_node=False):
+    def _find_controller_type(self, parent, p):
         """
         Function called by find_my_channels_and_[parameter values] functions to find controller type.
 
@@ -74,11 +144,13 @@ class CPVIAFinders:
         Returns:
         type: The controller type in string, to be used to determine how to find channel list.
         """
+        is_pan_tilt_node = p in ['pan_graph', 'tilt_graph']
+           
         if hasattr(parent, "type"):
             if parent.type == 'MESH':
-                if hasattr(parent, "object_identities_enum") and not pan_tilt_node:
+                if hasattr(parent, "object_identities_enum") and not is_pan_tilt_node:
                     return parent.object_identities_enum
-                elif hasattr(parent, "object_identities_enum") and pan_tilt_node:
+                elif hasattr(parent, "object_identities_enum") and is_pan_tilt_node:
                     return "Pan/Tilt"
                 else: SLI.SLI_assert_unreachable()
             

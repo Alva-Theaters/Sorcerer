@@ -210,7 +210,7 @@ class SorcererPython:
     def find_parent(self, object: Union[bpy.types.Object, bpy.types.Node, bpy.types.Sequence, bpy.types.Collection]) -> Union[bpy.types.Object, bpy.types.Node, bpy.types.Sequence]:
         '''Catches and corrects cases where the self is a collection 
         property instead of a node, sequencer strip, object, etc.'''
-        return Find.find_parent(self, object)  
+        return CPVIAFinders.find_parent(self, object)  
         
     def find_controllers(scene: bpy.types.Scene) -> Tuple[list, list]:
         '''Find strips, objects, and nodes in scene relevant to Sorcerer.
