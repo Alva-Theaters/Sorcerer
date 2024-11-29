@@ -8,13 +8,13 @@ to maintain.
 
 Alva Sorcerer
 ==============
-Sorcerer is a Blender add-on intended for theatrical lighting designers who struggle with the procedural complexity of conventional lighting consoles. Blender is ["the free and open source 3D creation suite. It supports the entirety of the 3D pipeline-modeling, rigging, animation, simulation, rendering, compositing, motion tracking and video editing."](https://projects.blender.org/blender/blender/) Sorcerer links many of Blender's editors directly to ETC Eos and grandMA3, including:
+Sorcerer is a Blender add-on that lets Blender animate a performance venue's control booth. Blender is ["the free and open source 3D creation suite. It supports the entirety of the 3D pipeline-modeling, rigging, animation, simulation, rendering, compositing, motion tracking and video editing."](https://projects.blender.org/blender/blender/) Sorcerer links many of Blender's editors directly to QLab for 3D audio and to ETC Eos or grandMA3 for lighting, including:
 
-- **3D Viewport:** Control lights with 3D objects
-- **Video Sequence Editor:** Sequence timecode events intuitively (Eos only)
-- **Node Editor:** Use multiple ML Editors at once
-- **Graph Editor:** Adjust fade curves with near-analog precision
-- **Text Editor:** Generate Eos macros using QWERTY and Copy/Paste
+- **3D Viewport:** Control lights and sounds with 3D objects
+- **Video Sequence Editor:** Sequence events intuitively
+- **Node Editor:** Use node layouts for controllers
+- **Graph Editor:** Animate parameters with maximum precision
+- **Text Editor:** Interact with Sorcerer with scripting
 
 ![Alva Sorcerer/Blender](images/alva_sorcerer_fcurves.png)
 
