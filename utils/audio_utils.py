@@ -32,9 +32,10 @@ class VolumeRenderer:
 
         2. Use the closest vertice as sound_object center if scaling is not uniform since 
            we don't have a better way figure out how close a point is to an iregular mesh.
+           User can subdivide for better experience.
 
         3. Multiply sound_object scale by 5 for better experience if scaling is uniform since
-           the default scale of one results in too small a fade radius. Fade radius meaning
+           the default scale of 1 results in too small a fade radius. Fade radius meaning
            if the fade radius is too small, the volume goes down to 0 way too fast.
 
         4. Find total scale factor by considering both sound_object and speaker scales since
@@ -51,7 +52,7 @@ class VolumeRenderer:
            in Qlab. A mixer like the M32 will probably be similar.
 
         8. Send the expanded volume over the network with (channel, parameter, value) format.
-           In the future, this may be incorporated directly into the CPVIA folder. For now,
+           In the future, this may be incorporated directly into the CPV folder. For now,
            we're just mimicking its format.
 
         9. Return the original 0-1 volume for internal Blender needs, like the UI property. 

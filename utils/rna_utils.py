@@ -15,6 +15,12 @@ def register_properties(cls, properties, register=True):
 
 
 def parse_channels(input_string, remove=False):
+    '''
+    Parses input to extract specified ranges, exclusions, additions, and filters for evens/odds.
+    Examples:
+    "I want 1-10 evens but I don't want 4-7 but keep 5" => [2, 6, 8, 10]
+    "I want odds from 1-10" => [1, 3, 5, 7, 9]
+    '''
     try:
         input_string = input_string.replace("do not want", "not").replace("don't want", "not").replace(".", "").replace("!", "").replace("?", "")
         input_string = input_string.lower()
@@ -41,6 +47,8 @@ def parse_channels(input_string, remove=False):
             "save", "preserve", "plus", "with", "addition", "+", "want",
             "do"
         )
+        keywords_evens = {"even", "evens"}
+        keywords_odds = {"odd", "odds"}
 
         channels = []
         exclusions = []
@@ -48,12 +56,15 @@ def parse_channels(input_string, remove=False):
         i = 0
         exclude_mode = False
         add_mode = False
+        filter_evens = False
+        filter_odds = False
         
         while i < len(tokens):
             token = tokens[i]
             
             if token in versions_of_add:
                 exclude_mode = False
+                add_mode = False
             elif token in ["keep", "keeping"]:
                 exclude_mode = False
                 add_mode = True
@@ -65,6 +76,10 @@ def parse_channels(input_string, remove=False):
                 end = int(tokens[i+1])
                 step = 1 if start < end else -1
                 range_list = list(range(start, end + step, step))
+                if filter_evens:
+                    range_list = [n for n in range_list if n % 2 == 0]
+                elif filter_odds:
+                    range_list = [n for n in range_list if n % 2 != 0]
                 if exclude_mode:
                     exclusions.extend(range_list)
                 elif add_mode:
@@ -80,13 +95,27 @@ def parse_channels(input_string, remove=False):
                     additions.append(num)
                 else:
                     channels.append(num)
+            elif token in keywords_evens:
+                filter_evens = True
+                filter_odds = False
+            elif token in keywords_odds:
+                filter_odds = True
+                filter_evens = False
             i += 1
         
+        # Apply exclusions
         channels = [ch for ch in channels if ch not in exclusions]
+        
+        # Apply additions
         channels.extend(additions)
         
+        # Deduplicate, sort, and apply final filters
         channels = list(set(channels))
         channels.sort()
+        if filter_evens:
+            channels = [ch for ch in channels if ch % 2 == 0]
+        elif filter_odds:
+            channels = [ch for ch in channels if ch % 2 != 0]
         
         if not remove:
             return channels
@@ -94,7 +123,7 @@ def parse_channels(input_string, remove=False):
             return channels, exclusions
     
     except Exception as e:
-        print(f"An error has occured within parse_channels: {e}")
+        print(f"An error has occurred within parse_channels: {e}")
         return None
 
 
@@ -117,7 +146,7 @@ def parse_mixer_channels(input_string):
 
 
 def update_all_controller_channel_lists(context):
-    from ..cpvia.find import Find
+    from ..cpv.find import Find
 
     controllers, mixers_and_motors = Find.find_controllers(context.scene)
 

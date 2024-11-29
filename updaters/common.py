@@ -16,7 +16,7 @@ class CommonUpdaters:
     def controller_ids_updater(self, context):
         """This intuits what mode the user must want the object to be,
            based on what is or isn't typed into the manual selection 
-           field. That mode is used by CPVIA when the controller happens 
+           field. That mode is used by CPV when the controller happens 
            to be an object.
 
            It also is responsible for updating all background properties
@@ -114,7 +114,7 @@ class CommonUpdaters:
         
     @staticmethod
     def solo_updater(self, context):
-        from ..cpvia.find import Find
+        from ..cpv.find import Find
         all_controllers, mixers_and_motors = Find.find_controllers(context.scene)
 
         for controller in all_controllers:

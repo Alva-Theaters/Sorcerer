@@ -6,6 +6,8 @@ import bpy
 
 from .utils import find_group_label, get_orb_icon
 
+MIXER_CHOICES_VISIBLE = True
+
 
 def draw_alva_node_view(self, layout):
     orb = get_orb_icon()
@@ -73,7 +75,7 @@ def draw_expanded_color(self, context, layout, row):
     row.label(text="")
 
     row = layout.row()
-    row.template_color_picker(self, "float_vec_color", value_slider=False)
+    row.template_color_picker(self, "alva_color", value_slider=False)
 
 def draw_node_header(self, context, active_node=None):
     if not active_node:
@@ -106,7 +108,16 @@ def draw_node_header(self, context, active_node=None):
         col.prop(active_node, "scale", text="Scale")
 
 
-def draw_node_mixer(self, context, layout):
+def draw_node_mixer(self, context, layout): 
+    draw_mixer_settings_row(self, context, layout)
+    draw_mixer_header_row(self, layout)
+    if MIXER_CHOICES_VISIBLE:
+        layout.separator()
+        draw_mixer_choices(self, layout)
+        layout.separator()
+        draw_choice_settings(self, layout)
+
+def draw_mixer_settings_row(self, context, layout):
     space_type = context.space_data.type
     
     if space_type == 'NODE_EDITOR':
@@ -116,7 +127,7 @@ def draw_node_mixer(self, context, layout):
     else:
         node_name = ""
         node_tree_name = ""
-        
+
     if self.show_settings:
         row = layout.row(align=True)
         op_home = row.operator("alva_node.home", icon='HOME', text="")
@@ -134,7 +145,8 @@ def draw_node_mixer(self, context, layout):
         row.prop(self, "str_manual_fixture_selection", text="")
         if self.mix_method_enum != "option_pose":
             row.prop(self, "parameters_enum", expand=True, text="")
-    
+
+def draw_mixer_header_row(self, layout):
     row = layout.row(align=True)
     row.prop(self, "show_settings", text="", expand=False, icon='TRIA_DOWN' if self.show_settings else 'TRIA_RIGHT')
     row.prop(self, "mix_method_enum", expand=True, icon_only=True)
@@ -144,9 +156,8 @@ def draw_node_mixer(self, context, layout):
             row.prop(self, "int_subdivisions", text="Subdivisions:")
     if self.parameters_enum == "option_color" or self.mix_method_enum == 'option_pose':
         row.prop(self, "color_profile_enum", text="", icon='COLOR', icon_only=True)
-        
-    layout.separator()
 
+def draw_mixer_choices(self, layout):
     num_columns = self.columns
 
     flow = layout.grid_flow(row_major=True, columns=num_columns, even_columns=True, even_rows=False, align=True)
@@ -156,51 +167,56 @@ def draw_node_mixer(self, context, layout):
     
     for par in self.parameters:
         if self.mix_method_enum != 'option_pose':
-            if self.parameters_enum == 'option_intensity':
-                flow.prop(par, "float_intensity", slider=True)
-            elif self.parameters_enum == 'option_color':
-                flow.template_color_picker(par, "float_vec_color")
-            elif self.parameters_enum == 'option_pan_tilt':
-                box = flow.box()
-                row = box.row()
-                split = row.split(factor=0.5)
-                col = split.column()
-                col.prop(par, "float_pan", text="Pan", slider=True)
-                col = split.column()
-                col.prop(par, "float_tilt", text="Tilt", slider=True)
-            elif self.parameters_enum == 'option_zoom':
-                flow.prop(par, "float_zoom", slider=True)
-            else:
-                flow.prop(par, "float_iris", slider=True)
-        
+            draw_pose_choice(self, flow, par)
         else:
-            box = flow.box()
-            row = box.row()
-            row.label(text=f"Pose {i}:", icon='POSE_HLT')
-            split = box.split(factor=0.5)
+            i = draw_choice(flow, par, i)
 
-            # Left side: existing properties
-            col = split.column()
-            col.prop(par, "float_intensity", slider=True)
-            col.prop(par, "float_pan", text="Pan", slider=True)
-            col.prop(par, "float_tilt", text="Tilt", slider=True)
-            col.prop(par, "float_zoom", text="Zoom", slider=True)
-            col.prop(par, "float_iris", text="Iris", slider=True)
+def draw_pose_choice(self, flow, par):
+    if self.parameters_enum == 'option_intensity':
+        flow.prop(par, "alva_intensity", slider=True)
+    elif self.parameters_enum == 'option_color':
+        flow.template_color_picker(par, "alva_color")
+    elif self.parameters_enum == 'option_pan_tilt':
+        box = flow.box()
+        row = box.row()
+        split = row.split(factor=0.5)
+        col = split.column()
+        col.prop(par, "alva_pan", text="Pan", slider=True)
+        col = split.column()
+        col.prop(par, "alva_tilt", text="Tilt", slider=True)
+    elif self.parameters_enum == 'option_zoom':
+        flow.prop(par, "alva_zoom", slider=True)
+    else:
+        flow.prop(par, "alva_iris", slider=True)
 
-            # Right side: float_vec_color
-            col = split.column()
-            col.template_color_picker(par, "float_vec_color")
-            
-            i += 1
-            
-    layout.separator()
-    if self.show_settings:
-        row = layout.row()
-        row.operator("alva_node.mixer_add_choice", icon='ADD', text="")
-        row.operator("alva_node.mixer_remove_choice", icon='REMOVE', text="")
-        row.prop(self, "columns", text="Columns:")
-        row.prop(self, "scale", text="Size:")
-        layout.separator() 
+def draw_choice(flow, par, i):
+    box = flow.box()
+    row = box.row()
+    row.label(text=f"Pose {i}:", icon='POSE_HLT')
+    split = box.split(factor=0.5)
+
+    # Left side: existing properties
+    col = split.column()
+    col.prop(par, "alva_intensity", slider=True)
+    col.prop(par, "alva_pan", text="Pan", slider=True)
+    col.prop(par, "alva_tilt", text="Tilt", slider=True)
+    col.prop(par, "alva_zoom", text="Zoom", slider=True)
+    col.prop(par, "alva_iris", text="Iris", slider=True)
+
+    # Right side: alva_color
+    col = split.column()
+    col.template_color_picker(par, "alva_color")
+    
+    return i + 1
+
+def draw_choice_settings(self, layout):
+    row = layout.row()
+    row.operator("alva_node.mixer_add_choice", icon='ADD', text="")
+    row.operator("alva_node.mixer_remove_choice", icon='REMOVE', text="")
+    row.prop(self, "columns", text="Columns:")
+    row.prop(self, "scale", text="Size:")
+
+    layout.separator() 
         
 
 def draw_node_formatter(self, context):
@@ -431,35 +447,35 @@ def draw_global_node(self, context, layout):
                     
                     # Left side: existing properties
                     col = split.column()
-                    col.prop(con, "float_intensity", text="Intensity:", slider=True)
-                    col.prop(con, "float_pan", text="Pan:", slider=True)
-                    col.prop(con, "float_tilt", text="Tilt:", slider=True)
-                    col.prop(con, "float_zoom", text="Zoom:", slider=True)
-                    col.prop(con, "float_iris", text="Iris:", slider=True)
+                    col.prop(con, "alva_intensity", text="Intensity:", slider=True)
+                    col.prop(con, "alva_pan", text="Pan:", slider=True)
+                    col.prop(con, "alva_tilt", text="Tilt:", slider=True)
+                    col.prop(con, "alva_zoom", text="Zoom:", slider=True)
+                    col.prop(con, "alva_iris", text="Iris:", slider=True)
 
-                    # Right side: float_vec_color
+                    # Right side: alva_color
                     col = split.column()
-                    col.template_color_picker(con, "float_vec_color")
+                    col.template_color_picker(con, "alva_color")
                             
                 elif self.parameters_enum == 'option_intensity':
-                    row.prop(con, "float_intensity", text=f"{group_label}'s Intensity:", slider=True)
+                    row.prop(con, "alva_intensity", text=f"{group_label}'s Intensity:", slider=True)
                 elif self.parameters_enum == 'option_color':
                     box = flow.box()
                     row = box.row()
                     row.label(text=f"{group_label}'s Color:")
                     row = box.row()
                     row.scale_y = self.scale
-                    row.template_color_picker(con, "float_vec_color")
+                    row.template_color_picker(con, "alva_color")
                 elif self.parameters_enum == 'option_pan_tilt':
-                    row.prop(con, "float_pan", text=f"{group_label}'s Pan:", slider=True)  
+                    row.prop(con, "alva_pan", text=f"{group_label}'s Pan:", slider=True)  
                     row = col.row()
                     row.scale_y = self.scale
-                    row.prop(con, "float_tilt", text=f"{group_label}'s Tilt:", slider=True)
+                    row.prop(con, "alva_tilt", text=f"{group_label}'s Tilt:", slider=True)
                     row.separator()                      
                 elif self.parameters_enum == 'option_zoom':
-                    row.prop(con, "float_zoom", text=f"{group_label}'s Zoom:", slider=True)
+                    row.prop(con, "alva_zoom", text=f"{group_label}'s Zoom:", slider=True)
                 elif self.parameters_enum == 'option_iris':
-                    row.prop(con, "float_iris", text=f"{group_label}'s Iris:", slider=True)
+                    row.prop(con, "alva_iris", text=f"{group_label}'s Iris:", slider=True)
         if self.parameters_enum in ['option_color', 'option_compound']:
             col = layout.column()
             row = col.row()

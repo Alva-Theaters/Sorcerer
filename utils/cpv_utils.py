@@ -2,26 +2,72 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import bpy
 import mathutils
 
-
-def add_influence_and_argument(c, p, v, parent, cpvia_finders, controller_type):
-    i = []
-    a = []
-    for chan, param, val in zip(c, p, v):
-        argument = cpvia_finders.find_my_argument_template(parent, controller_type, chan, param, val)
-        i.append(parent.influence)
-        a.append(argument)
-
-    return i, a
+from ..assets.sli import SLI
+from ..cpv.find import Find 
 
 
-def publish_updates(c, p, v, i, a, publisher):
-    #is_rendering = EventUtils.is_rendered_mode()
-    for chan, param, val, inf, arg in zip(c, p, v, i, a):
-        # if param in ["intensity", "raise_intensity", "lower_intensity", "color", "raise_color", "lower_color"] and is_rendering:
-        #     publisher.render_in_viewport(parent, chan, param, val)
-        publisher.send_cpvia(chan, param, val, inf, arg)
+def find_parent(object):
+    """
+    Catches and corrects cases where the object is a collection property instead of 
+    a node, sequencer strip, object, etc. This function returns the bpy object so
+    that the rest of the harmonizer can find what it needs.
+    """
+    from ..updaters.node import NodeUpdaters 
+    
+    if not isinstance(object, bpy.types.PropertyGroup):
+        return object
+
+    node = None
+    try:
+        node = Find.find_node_by_tree(object.node_name, object.node_tree_pointer, pointer=True)
+    except:
+        pass
+    
+    if node:
+        return node
+                
+    # Run the program that's supposed to set this up since it must not have run yet
+    nodes = Find.find_nodes(bpy.context.scene)
+    for node in nodes:
+        if node.bl_idname == 'mixer_type':
+            NodeUpdaters.update_node_name(node)
+            
+    # Try again
+    try:
+        node = Find.find_node_by_tree(object.node_name, object.node_tree_pointer, pointer=True)
+    except:
+        pass
+    
+    if node:
+        return node
+        
+    print(f"find_parent could not find parent for {object}.")
+    return None
+
+
+def find_controller_type(parent, property_name):
+    is_pan_tilt_node = property_name in ['pan_graph', 'tilt_graph']
+        
+    if hasattr(parent, "type"):
+        if parent.type == 'MESH' and hasattr(parent, "object_identities_enum"):
+            if is_pan_tilt_node:
+                return "Pan/Tilt"
+            return parent.object_identities_enum
+        
+        elif parent.type == 'COLOR':
+            return "strip"
+        
+        elif parent.type == 'CUSTOM': # Nodes
+            controller_types = {
+            'group_controller_type': "group",
+            'mixer_type': "mixer",
+            }
+            return controller_types.get(parent.bl_idname, None)
+    else:
+        SLI.SLI_assert_unreachable()
 
 
 def color_object_to_tuple_and_scale_up(v):
@@ -64,11 +110,11 @@ def home_alva_controller(controller):
             for prop_name, prop in props.common_parameters:
                 try:
                     current_value = getattr(choice, prop_name)
-                    if prop_name == "float_iris":
+                    if prop_name == "alva_iris":
                         setattr(choice, prop_name, 100)
-                    elif prop_name == "float_vec_color":
+                    elif prop_name == "alva_color":
                         setattr(choice, prop_name, tuple(1.0 for _ in current_value))
-                    elif prop_name in ["float_intensity", "float_pan", "float_tilt", "float_zoom"]:
+                    elif prop_name in ["alva_intensity", "alva_pan", "alva_tilt", "alva_zoom"]:
                         setattr(choice, prop_name, 0)
                 except AttributeError:
                     print(f"Attribute {prop_name} not found in controller, skipping.")
@@ -77,13 +123,13 @@ def home_alva_controller(controller):
         for prop_name, prop in props.common_parameters + props.common_parameters_extended:
             try:
                 current_value = getattr(controller, prop_name)
-                if prop_name == "float_iris":
+                if prop_name == "alva_iris":
                     setattr(controller, prop_name, 100)
-                elif prop_name == "float_vec_color":
+                elif prop_name == "alva_color":
                     setattr(controller, prop_name, tuple(1.0 for _ in current_value))
                 elif prop_name in [
-                    "float_intensity", "float_pan", "float_tilt", "float_zoom", "float_strobe", 
-                    "float_edge", "float_diffusion", "float_gobo_speed", "int_gobo_id", "int_prism"]:
+                    "alva_intensity", "alva_pan", "alva_tilt", "alva_zoom", "alva_strobe", 
+                    "alva_edge", "alva_diffusion", "alva_gobo_speed", "alva_gobo_id", "alva_prism"]:
                     setattr(controller, prop_name, 0)
             except AttributeError:
                 print(f"Attribute {prop_name} not found in controller, skipping.")

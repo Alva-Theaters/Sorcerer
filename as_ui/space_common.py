@@ -114,7 +114,7 @@ def draw_parameters(self, context, column, box, active_object):
     op_update.node_tree_name = node_tree_name
     
     # INTENSITY
-    row.prop(active_object, "float_intensity", slider=True, text="Intensity")
+    row.prop(active_object, "alva_intensity", slider=True, text="Intensity")
     
     # SHORTENED STROBE/COLOR
     if not context.scene.scene_props.expand_strobe:
@@ -131,11 +131,11 @@ def draw_parameters(self, context, column, box, active_object):
         if active_object.color_is_on:
             sub = row.column(align=True)
             sub.scale_x = 0.3
-            sub.prop(active_object, "float_vec_color", text="")
+            sub.prop(active_object, "alva_color", text="")
             if hasattr(active_object, "object_identities_enum") and object_type == "Influencer":
                 sub_two = row.column(align=True)
                 sub_two.scale_x = .3
-                sub_two.prop(active_object, "float_vec_color_restore", text="")
+                sub_two.prop(active_object, "alva_color_restore", text="")
             sub_two = row.column(align=True)
             # Do not allow students/volunteers to mess up the color profile setting.
             if not context.scene.scene_props.school_mode_enabled:
@@ -153,12 +153,12 @@ def draw_parameters(self, context, column, box, active_object):
                 op.node_name = node_name
                 op.node_tree_name = node_tree_name
 
-                row.prop(active_object, "float_strobe", text="Strobe", slider = True)
+                row.prop(active_object, "alva_strobe", text="Strobe", slider = True)
 
             if active_object.color_is_on:
-                row.prop(active_object, "float_vec_color", text="")
+                row.prop(active_object, "alva_color", text="")
                 if hasattr(active_object, "object_identities_enum") and object_type == "Influencer":
-                    row.prop(active_object, "float_vec_color_restore", text="")
+                    row.prop(active_object, "alva_color_restore", text="")
                 # Do not allow students/volunteers to mess up the color profile setting.
                 if not context.scene.scene_props.school_mode_enabled:
                     row.prop(active_object, "color_profile_enum", text="", icon='COLOR', icon_only=True)
@@ -170,7 +170,7 @@ def draw_parameters(self, context, column, box, active_object):
             row.alert = active_object.mic_is_linked
             row.prop(active_object, "mic_is_linked", text="", icon='LINKED' if active_object.mic_is_linked else 'UNLINKED')
             row.alert = False
-            row.prop(active_object, "float_volume", text = "Volume", slider=True)
+            row.prop(active_object, "alva_volume", text = "Volume", slider=True)
 
     # PAN/TILT    
     if active_object.pan_tilt_is_on and object_type not in ["Stage Object", "Influencer", "Brush"]:
@@ -181,8 +181,8 @@ def draw_parameters(self, context, column, box, active_object):
             op.node_name = node_name
             op.node_tree_name = node_tree_name
             
-            row.prop(active_object, "float_pan", text="Pan", slider=True)
-            row.prop(active_object, "float_tilt", text="Tilt", slider=True)
+            row.prop(active_object, "alva_pan", text="Pan", slider=True)
+            row.prop(active_object, "alva_tilt", text="Tilt", slider=True)
     
     # ZOOM/IRIS
     if active_object.zoom_is_on or active_object.iris_is_on:
@@ -193,9 +193,9 @@ def draw_parameters(self, context, column, box, active_object):
         op.node_tree_name = node_tree_name
         
         if active_object.zoom_is_on:
-            row.prop(active_object, "float_zoom", slider=True, text="Zoom")
+            row.prop(active_object, "alva_zoom", slider=True, text="Zoom")
         if active_object.iris_is_on:
-            row.prop(active_object, "float_iris", slider=True, text="Iris")
+            row.prop(active_object, "alva_iris", slider=True, text="Iris")
     
     # EDGE/DIFFUSION
     if (active_object.edge_is_on or active_object.diffusion_is_on) and object_type not in ["Influencer", "Brush"]:
@@ -206,9 +206,9 @@ def draw_parameters(self, context, column, box, active_object):
         op.node_tree_name = node_tree_name
 
         if active_object.edge_is_on:
-            row.prop(active_object, "float_edge", slider=True, text="Edge")
+            row.prop(active_object, "alva_edge", slider=True, text="Edge")
         if active_object.diffusion_is_on:
-            row.prop(active_object, "float_diffusion", slider=True, text="Diffusion")
+            row.prop(active_object, "alva_diffusion", slider=True, text="Diffusion")
 
     # GOBO
     if active_object.gobo_is_on and object_type not in ["Influencer", "Brush"]:
@@ -218,9 +218,9 @@ def draw_parameters(self, context, column, box, active_object):
         op.node_name = node_name
         op.node_tree_name = node_tree_name
 
-        row.prop(active_object, "int_gobo_id", text="Gobo")
-        row.prop(active_object, "float_gobo_speed", slider=True, text="Speed")
-        row.prop(active_object, "int_prism", slider=True, text="Prism")
+        row.prop(active_object, "alva_gobo", text="Gobo")
+        row.prop(active_object, "alva_gobo_speed", slider=True, text="Speed")
+        row.prop(active_object, "alva_prism", slider=True, text="Prism")
 
 
 def draw_footer_toggles(self, context, column, active_object, box=True, vertical=False):
@@ -352,27 +352,27 @@ def draw_parameters_mini(self, context, layout, active_object, use_slider=False,
         element.prop(ao, "str_manual_fixture_selection", text="")
         
     if ao.intensity_is_on:
-        element.prop(ao, "float_intensity", slider=use_slider)
+        element.prop(ao, "alva_intensity", slider=use_slider)
     if ao.strobe_is_on:
-        element.prop(ao, "float_strobe", slider=use_slider)
+        element.prop(ao, "alva_strobe", slider=use_slider)
     if ao.color_is_on:
-        element.prop(ao, "float_vec_color", slider=use_slider, text="Color" if expand else "")
+        element.prop(ao, "alva_color", slider=use_slider, text="Color" if expand else "")
     if ao.pan_tilt_is_on:
         if not (context.scene.scene_props.school_mode_enabled and context.scene.scene_props.restrict_pan_tilt):
-            element.prop(ao, "float_pan", slider=use_slider)
-            element.prop(ao, "float_tilt", slider=use_slider)
+            element.prop(ao, "alva_pan", slider=use_slider)
+            element.prop(ao, "alva_tilt", slider=use_slider)
     if ao.zoom_is_on:
-        element.prop(ao, "float_zoom", slider=use_slider)
+        element.prop(ao, "alva_zoom", slider=use_slider)
     if ao.iris_is_on:
-        element.prop(ao, "float_iris", slider=use_slider)
+        element.prop(ao, "alva_iris", slider=use_slider)
     if ao.edge_is_on:
-        element.prop(ao, "float_edge", slider=use_slider)
+        element.prop(ao, "alva_edge", slider=use_slider)
     if ao.diffusion_is_on:
-        element.prop(ao, "float_diffusion", slider=use_slider)
+        element.prop(ao, "alva_diffusion", slider=use_slider)
     if ao.gobo_is_on:
-        element.prop(ao, "int_gobo_id", slider=use_slider)
-        element.prop(ao, "float_gobo_speed", slider=use_slider)
-        element.prop(ao, "int_prism", slider=use_slider)
+        element.prop(ao, "alva_gobo", slider=use_slider)
+        element.prop(ao, "alva_gobo_speed", slider=use_slider)
+        element.prop(ao, "alva_prism", slider=use_slider)
 
 
 def draw_play_bar(self, context, layout):

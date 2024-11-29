@@ -6,8 +6,8 @@ import bpy
 from bpy.props import *
 from bpy.types import Operator
 
-from ..cpvia.find import Find 
-from ..utils.cpvia_utils import simplify_channels_list
+from ..cpv.find import Find 
+from ..utils.cpv_utils import simplify_channels_list
 from ..utils.osc import OSC
 
 # pyright: reportInvalidTypeForm=false

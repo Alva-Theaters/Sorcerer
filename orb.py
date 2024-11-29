@@ -474,7 +474,7 @@ class Orb:
 
         @staticmethod
         def qmeo_frame(frame, scene, cue_list, event_list, cue_duration, wm, frames, i):
-            # Get ready to record cue with the new CPVIA updates.
+            # Get ready to record cue with the new CPV updates.
             current_frame_number = scene.frame_current
             argument_one = f"Record Cue {str(cue_list)} / {str(current_frame_number)} Time {str(cue_duration)} Enter Enter"
 
@@ -582,8 +582,8 @@ class Orb:
             yield Orb.Eos.record_snapshot(context.scene), "Orb is running"
             yield Orb.Eos.save_console_file(context.scene), "Orb is running"
             
-            # Prevent random CPVIA updates from interfering.
-            scene.scene_props.freeze_cpvia = True
+            # Prevent random CPV updates from interfering.
+            scene.scene_props.freeze_cpv = True
 
             # Setup the patch screen.
             OSC.send_osc_lighting("/eos/key/blind", "1")
@@ -595,8 +595,8 @@ class Orb:
             # Loop over the selected objects.
             yield from Orb.Eos.loop_over_parents(self, context, original_objects, scene, address)
             
-            # Re-nable CPVIA.
-            scene.scene_props.freeze_cpvia = False
+            # Re-nable CPV.
+            scene.scene_props.freeze_cpv = False
 
             Orb.Eos.restore_snapshot(scene)
 

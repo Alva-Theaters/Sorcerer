@@ -5,24 +5,23 @@
 from ..maintenance.logging import alva_log
 
 
-def check_flags(context, parent, c, p, v, type):
-    if not parent or not type or not p or not c or not v:
-        alva_log("flags", "Stopping CPVIA per nonetypes.")
+def check_flags(context, parent, property_name, controller_type):
+    if not parent or not controller_type:
+        alva_log("stop", "STOP: Stopping CPV per nonetypes.\n")
         return False
 
     if hasattr(parent, "mute") and parent.mute:
-        alva_log("flags", "Stopping CPVIA per mute.")
+        alva_log("stop", "STOP: Stopping CPV per mute.\n")
         return False
 
     scene = context.scene.scene_props
-    p = p[0]
 
-    if scene.freeze_cpvia:
-        alva_log("flags", "Stopping CPVIA per freezing.")
+    if scene.freeze_cpv:
+        alva_log("stop", "STOP: Stopping CPV per freezing.\n")
         return False
 
     if not scene.enable_lighting:
-        alva_log("flags", "Stopping CPVIA per enable_lighting.")
+        alva_log("stop", "STOP: Stopping CPV per enable_lighting.\n")
         return False
     
     # Check type-related flags
@@ -32,21 +31,21 @@ def check_flags(context, parent, c, p, v, type):
         'strip': scene.enable_strips,
     }
 
-    if type in type_checks:
-        if not type_checks[type]:
-            alva_log("flags", "Stopping CPVIA per type_checks.")
+    if controller_type in type_checks:
+        if not type_checks[controller_type]:
+            alva_log("stop", "STOP: Stopping CPV per type_checks.\n")
             return False
     elif not scene.enable_objects:
-        alva_log("flags", "Stopping CPVIA per type_checks.")
+        alva_log("stop", "STOP: Stopping CPV per type_checks.\n")
         return False
     
     if scene.has_solos and (scene.is_playing or scene.in_frame_change):
         if not parent.alva_solo:
-            alva_log("flags", "Stopping CPVIA per solos.")
+            alva_log("stop", "STOP: Stopping CPV per solos.\n")
             return False
         
-    if type == 'mixer': # Bypass parameter toggles for mixers since they don't have them.
-        alva_log("flags", "CPVIA passes all flags, continuing.")
+    if controller_type == 'mixer': # Bypass parameter toggles for mixers since they don't have them.
+        alva_log("stop", "STOP: CPV passes all flags, continuing.\n")
         return True
 
     # Check parameter-related flags
@@ -64,8 +63,8 @@ def check_flags(context, parent, c, p, v, type):
         'prism': parent.gobo_is_on,
     }
 
-    if p in param_flags and not param_flags[p]:
-        alva_log("flags", "Stopping CPVIA per parameter toggles.")
+    if property_name in param_flags and not param_flags[property_name]:
+        alva_log("stop", "STOP: Stopping CPV per parameter toggles.\n")
         return False
 
     # Check for freeze mode
@@ -74,20 +73,20 @@ def check_flags(context, parent, c, p, v, type):
         freeze_mode = parent.freezing_mode_enum
         if freeze_mode == 'option_seconds':
             if not scene.enable_seconds:
-                alva_log("flags", "Stopping CPVIA per render freezing (seconds globally disabled).")
+                alva_log("stop", "STOP: Stopping CPV per render freezing (seconds globally disabled).\n")
                 return False
             if frame % 2 != 0:
-                alva_log("flags", "Stopping CPVIA per render freezing (seconds).")
+                alva_log("stop", "STOP: Stopping CPV per render freezing (seconds).\n")
                 return False
         elif freeze_mode == 'option_thirds':
             if not scene.enable_thirds:
-                alva_log("flags", "Stopping CPVIA per render freezing (thirds globally disabled).")
+                alva_log("stop", "STOP: Stopping CPV per render freezing (thirds globally disabled).\n")
                 return False
             if frame % 3 != 0:
-                alva_log("flags", "Stopping CPVIA per render freezing (thirds).")
+                alva_log("stop", "STOP: Stopping CPV per render freezing (thirds).\n")
                 return False
         
-    alva_log("flags", "CPVIA passes all flags, continuing.")
+    alva_log("stop", "STOP: CPV passes all flags, continuing.\n")
     return True
 
 

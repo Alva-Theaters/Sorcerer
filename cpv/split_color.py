@@ -2,95 +2,64 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from ..cpvia.find import Find
 
 
 class ColorSplitter:
-    def split_color(self, parent, c, p, v, type):
-        """
-        Splits the input (r, g, b) tuple for value (v) into tuples like (r, g, b, a, m)
-        for the value entries and updates the parameter (p) value for each entry to the 
-        color profile (pf) enumerator option found with find_my_patch().
-        
-        This function prepares the parameters and values for later processing by the 
-        find_my_argument() function, ensuring that the correct argument is formed based 
-        on the received v tuple. The updated parameter p indirectly reflects the 
-        color_profile choice, allowing the publisher to interpret the v tuple correctly.
+    def __init__(self, generator, publisher):
+        self.generator = generator
+        self.publisher = publisher
 
-        Also processes wwhite balance.
-        
-        Parameters:
-            parent: The parent controller object.
-            c: The channel list.
-            p: The parameter, as list
-            v: The value list.
-            type: The controller type.
+    def execute(self):
+        pf = getattr(self.publisher.patch_controller, "color_profile_enum")
 
-        Returns:
-            new_p: The updated parameter list.
-            new_v: The updated value list.
-        """
-        new_p = []
-        new_v = []
-        for chan, val in zip(c, v):  # 4chan lol
-            finders = Find() # needs to be an instance
-            pf = finders.find_my_patch(parent, chan, type, "color_profile_enum") # this returns option_rgb, option_rgba, etc.
-            profile_converters = {
-                # Absolute Arguments
-                'rgba': (self.rgba_converter, 4),
-                'rgbw': (self.rgbw_converter, 4),
-                'rgbaw': (self.rgbaw_converter, 5),
-                'rgbl': (self.rgbl_converter, 4),
-                'cmy': (self.cmy_converter, 3),
-                'rgbam': (self.rgbam_converter, 5),
+        profile_converters = {
+            # Absolute Arguments
+            'rgba': (self.rgba_converter, 4),
+            'rgbw': (self.rgbw_converter, 4),
+            'rgbaw': (self.rgbaw_converter, 5),
+            'rgbl': (self.rgbl_converter, 4),
+            'cmy': (self.cmy_converter, 3),
+            'rgbam': (self.rgbam_converter, 5),
 
-                # Raise Arguments
-                'raise_rgba': (self.rgba_converter, 4),
-                'raise_rgbw': (self.rgbw_converter, 4),
-                'raise_rgbaw': (self.rgbaw_converter, 5),
-                'raise_rgbl': (self.rgbl_converter, 4),
-                'raise_cmy': (self.cmy_converter, 3),
-                'raise_rgbam': (self.rgbam_converter, 5),
+            # Raise Arguments
+            'raise_rgba': (self.rgba_converter, 4),
+            'raise_rgbw': (self.rgbw_converter, 4),
+            'raise_rgbaw': (self.rgbaw_converter, 5),
+            'raise_rgbl': (self.rgbl_converter, 4),
+            'raise_cmy': (self.cmy_converter, 3),
+            'raise_rgbam': (self.rgbam_converter, 5),
 
-                # Lower Arguments
-                'lower_rgba': (self.rgba_converter, 4),
-                'lower_rgbw': (self.rgbw_converter, 4),
-                'lower_rgbaw': (self.rgbaw_converter, 5),
-                'lower_rgbl': (self.rgbl_converter, 4),
-                'lower_cmy': (self.cmy_converter, 3),
-                'lower_rgbam': (self.rgbam_converter, 5)
-            }
+            # Lower Arguments
+            'lower_rgba': (self.rgba_converter, 4),
+            'lower_rgbw': (self.rgbw_converter, 4),
+            'lower_rgbaw': (self.rgbaw_converter, 5),
+            'lower_rgbl': (self.rgbl_converter, 4),
+            'lower_cmy': (self.cmy_converter, 3),
+            'lower_rgbam': (self.rgbam_converter, 5)
+        }
 
-            mode = pf.replace("option_", "")
-            corrected_key = p[0].replace("color", mode)
+        mode = pf.replace("option_", "")
+        corrected_key = self.publisher.property_name.replace("color", mode)
+
+        is_subtractive = corrected_key in ['cmy', 'raise_cmy', 'lower_cmy']
+
+        white_balance = getattr(self.publisher.patch_controller, "alva_white_balance")
+        from ..utils.cpv_utils import color_object_to_tuple_and_scale_up
+        white_balance = color_object_to_tuple_and_scale_up(white_balance)
+
+        color_value = color_object_to_tuple_and_scale_up(self.publisher.value)
+
+        if corrected_key in ['rgb', 'raise_rgb', 'lower_rgb']: # No need to split
+            balanced = self.balance_white(white_balance, color_value, is_subtractive)
+            return corrected_key, balanced
             
-            # TODO. There was a big issue with getting this to add materials correctly. Blender did fix their stuff though.
-            # is_rendering = EventUtils.is_rendered_mode()
-            # if is_rendering:
-            #     publisher = Publisher()
-            #     publisher.render_in_viewport(parent, chan, corrected_key, val)
-
-            is_subtractive = corrected_key in ['cmy', 'raise_cmy', 'lower_cmy']
-
-            wb = finders.find_my_patch(parent, chan, type, "alva_white_balance")
-            from ..utils.cpvia_utils import color_object_to_tuple_and_scale_up
-            white_balance = color_object_to_tuple_and_scale_up(wb)
-
-            if corrected_key in ['rgb', 'raise_rgb', 'lower_rgb']: # No need to split
-                balanced = self.balance_white(white_balance, val, is_subtractive)
-                new_p.append(corrected_key)
-                new_v.append(balanced)
-                
-            elif corrected_key in profile_converters: # Must split
-                converter, num_values = profile_converters[corrected_key]
-                converted_values = converter(*val[:3])
-                balanced = self.balance_white(white_balance, converted_values, is_subtractive)
-                
-                new_p.append(corrected_key)
-                new_v.append(balanced[:num_values])
-            else: raise ValueError(f"Unknown color profile: {corrected_key}")
-
-        return new_p, new_v
+        elif corrected_key in profile_converters: # Must split
+            converter, num_values = profile_converters[corrected_key]
+            converted_values = converter(*color_value[:3])
+            balanced = self.balance_white(white_balance, converted_values, is_subtractive)
+            return corrected_key, balanced[:num_values]
+        
+        else: raise ValueError(f"Unknown color profile: {corrected_key}")
     
 
     def calculate_closeness(self, rgb_input, target_rgb, sensitivity=1.0):

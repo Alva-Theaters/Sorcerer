@@ -41,7 +41,7 @@ For example, for 3D audio, the only things we can be absolutely sure of are:
 
 In the UI, the only things that can be created in relation to 3D audio are speakers, audio objects (regular meshes), sound sources (sound strips in the video editor), and keyframes. There are no beds, zones, layers, formats, metadata, cues, fades, or anything like that.
 
-Sound strips are trying to be reconect to physical objects. That's the stuff trying to do stuff.
+Sound strips are trying to reconnect to physical objects. That's the stuff trying to do stuff.
 
 
 Idiot Parts:
@@ -160,6 +160,6 @@ Misc. Tools:
 TBC
 
 
-CPVIA:
+CPV:
 -------
 TBC

@@ -11,8 +11,8 @@ from ..assets.items import Items as AlvaItems
 from ..updaters.common import CommonUpdaters 
 from ..updaters.sequencer import SequencerUpdaters 
 from ..updaters.node import NodeUpdaters 
-from ..cpvia.cpvia_generator import CPVIAGenerator 
-from .property_groups import InfluencerList, ChannelsList, VIEW3D_PG_alva_speaker_list
+from ..cpv.cpv_generator import CPVGenerator 
+from .property_groups import VIEW3D_PG_alva_influencer_property_group, ChannelsList, VIEW3D_PG_alva_speaker_list
 from ..assets.tooltips import find_tooltip
 
 
@@ -129,7 +129,7 @@ class CommonProperties:
             update=CommonUpdaters.call_fixtures_updater
         )),
         ('is_erasing', BoolProperty(name="Eraser", description="Erase instead of add")),
-        ('influencer_list', CollectionProperty(type=InfluencerList)),
+        ('influencer_list', CollectionProperty(type=VIEW3D_PG_alva_influencer_property_group)),
         ('float_object_strength', FloatProperty(name="Strength", default=1, min=0, max=1, description=find_tooltip("strength"), update=CommonUpdaters.controller_ids_updater)),
         ('alva_is_absolute', BoolProperty(name="Absolute", default=False, description=find_tooltip("absolute"))),
         ('int_alva_sem', IntProperty(name="SEM", default=0, min=0, max=9999, description=find_tooltip("sem"))),
@@ -155,12 +155,12 @@ class CommonProperties:
         ('pan_graph', FloatProperty(
             name="Pan",
             default=0.0,
-            update=CPVIAGenerator.pan_graph_updater
+            update=CPVGenerator.pan_graph_updater
         )),
         ('tilt_graph', FloatProperty(
             name="Tilt",
             default=0.0,
-            update=CPVIAGenerator.tilt_graph_updater
+            update=CPVGenerator.tilt_graph_updater
         )),
         ('pan_is_inverted', BoolProperty(default=True, description="Light is hung facing forward, for example, in FOH")),
         ('last_hue', FloatProperty(default=0)),
@@ -177,7 +177,7 @@ class CommonProperties:
     ]
 
     flash_strip_parameters = [
-        ('float_flash_intensity_up', FloatProperty(name="Intensity Up", default=0, min=0, max=100, description="Intensity value", update=CPVIAGenerator.intensity_updater)),
+        ('float_flash_intensity_up', FloatProperty(name="Intensity Up", default=0, min=0, max=100, description="Intensity value", update=CPVGenerator.intensity_updater)),
         ('float_vec_flash_color_up', FloatVectorProperty(
             name="Color Up",
             subtype='COLOR',
@@ -186,15 +186,15 @@ class CommonProperties:
             min=0.0,
             max=1.0,
             description="Color value",
-            update=CPVIAGenerator.color_updater
+            update=CPVGenerator.color_updater
         )), 
-        ('float_flash_pan_up', FloatProperty(name="Pan Up", default=0, min=-315, max=315, description="Pan value", update=CPVIAGenerator.pan_updater)),
-        ('float_flash_tilt_up', FloatProperty(name="Tilt Up", default=0, min=-135, max=135, description="Tilt value", update=CPVIAGenerator.tilt_updater)),
-        ('float_flash_strobe_up', FloatProperty(name="Strobe Up", default=0, min=0, max=100, description="Strobe value", update=CPVIAGenerator.strobe_updater)),
-        ('float_flash_zoom_up', FloatProperty(name="Zoom Up", default=0, min=0, max=100, description="Zoom value", update=CPVIAGenerator.zoom_updater)),
-        ('float_flash_iris_up', FloatProperty(name="Iris Up", default=0, min=0, max=100, description="Iris value", update=CPVIAGenerator.iris_updater)),
-        ('int_flash_gobo_id_up', IntProperty(name="Gobo ID Up", default=1, min=0, max=20, description="Gobo selection", update=CPVIAGenerator.gobo_id_updater)),
-        ('float_flash_intensity_down', FloatProperty(name="Inensity Down", default=0, min=0, max=100, description="Intensity value", update=CPVIAGenerator.intensity_updater)),
+        ('float_flash_pan_up', FloatProperty(name="Pan Up", default=0, min=-315, max=315, description="Pan value", update=CPVGenerator.pan_updater)),
+        ('float_flash_tilt_up', FloatProperty(name="Tilt Up", default=0, min=-135, max=135, description="Tilt value", update=CPVGenerator.tilt_updater)),
+        ('float_flash_strobe_up', FloatProperty(name="Strobe Up", default=0, min=0, max=100, description="Strobe value", update=CPVGenerator.strobe_updater)),
+        ('float_flash_zoom_up', FloatProperty(name="Zoom Up", default=0, min=0, max=100, description="Zoom value", update=CPVGenerator.zoom_updater)),
+        ('float_flash_iris_up', FloatProperty(name="Iris Up", default=0, min=0, max=100, description="Iris value", update=CPVGenerator.iris_updater)),
+        ('int_flash_gobo_id_up', IntProperty(name="Gobo ID Up", default=1, min=0, max=20, description="Gobo selection", update=CPVGenerator.gobo_id_updater)),
+        ('float_flash_intensity_down', FloatProperty(name="Inensity Down", default=0, min=0, max=100, description="Intensity value", update=CPVGenerator.intensity_updater)),
         ('float_vec_flash_color_down', FloatVectorProperty(
             name="Color Down",
             subtype='COLOR',
@@ -203,14 +203,14 @@ class CommonProperties:
             min=0.0,
             max=1.0,
             description="Color value",
-            update=CPVIAGenerator.color_updater
+            update=CPVGenerator.color_updater
         )),
-        ('float_flash_pan_down', FloatProperty(name="Pan Down", default=0, min=-315, max=315, description="Pan value", update=CPVIAGenerator.pan_updater)),
-        ('float_flash_tilt_down', FloatProperty(name="Tilt Down", default=0, min=-135, max=135, description="Tilt value", update=CPVIAGenerator.tilt_updater)),
-        ('float_flash_strobe_down', FloatProperty(name="Strobe Down", default=0, min=0, max=100, description="Strobe value", update=CPVIAGenerator.strobe_updater)),
-        ('float_flash_zoom_down', FloatProperty(name="Zoom Down", default=0, min=0, max=100, description="Zoom value", update=CPVIAGenerator.zoom_updater)),
-        ('float_flash_iris_down', FloatProperty(name="Iris Down", default=0, min=0, max=100, description="Iris value", update=CPVIAGenerator.iris_updater)),
-        ('int_flash_gobo_id_down', IntProperty(name="Gobo ID Down", default=1, min=0, max=20, description="Gobo selection", update=CPVIAGenerator.gobo_id_updater))
+        ('float_flash_pan_down', FloatProperty(name="Pan Down", default=0, min=-315, max=315, description="Pan value", update=CPVGenerator.pan_updater)),
+        ('float_flash_tilt_down', FloatProperty(name="Tilt Down", default=0, min=-135, max=135, description="Tilt value", update=CPVGenerator.tilt_updater)),
+        ('float_flash_strobe_down', FloatProperty(name="Strobe Down", default=0, min=0, max=100, description="Strobe value", update=CPVGenerator.strobe_updater)),
+        ('float_flash_zoom_down', FloatProperty(name="Zoom Down", default=0, min=0, max=100, description="Zoom value", update=CPVGenerator.zoom_updater)),
+        ('float_flash_iris_down', FloatProperty(name="Iris Down", default=0, min=0, max=100, description="Iris value", update=CPVGenerator.iris_updater)),
+        ('int_flash_gobo_id_down', IntProperty(name="Gobo ID Down", default=1, min=0, max=20, description="Gobo selection", update=CPVGenerator.gobo_id_updater))
     ]  
 
     common_header = [
@@ -252,16 +252,16 @@ class CommonProperties:
     common_parameters = [
         ('influence', IntProperty(
             default=1, description="How many votes this controller gets when there are conflicts", min=1, max=10)),
-        ('float_intensity', IntProperty(
+        ('alva_intensity', IntProperty(
             name="Intensity",
             default=0,
             min=0,
             max=100,
             description=find_tooltip("intensity"),
             options={'ANIMATABLE'},
-            update=CPVIAGenerator.intensity_updater
+            update=CPVGenerator.intensity_updater
         )),
-        ('float_vec_color', FloatVectorProperty(
+        ('alva_color', FloatVectorProperty(
             name="Color",
             subtype='COLOR',
             size=3,
@@ -269,48 +269,48 @@ class CommonProperties:
             min=0.0,
             max=1.0,
             description=find_tooltip("color"),
-            update=CPVIAGenerator.color_updater
+            update=CPVGenerator.color_updater
         )),
-        ('float_pan', IntProperty(
+        ('alva_pan', IntProperty(
             name="Pan",
             default=0,
             min=-100,
             max=100,
             description=find_tooltip("pan"),
             options={'ANIMATABLE'},
-            update=CPVIAGenerator.pan_updater
+            update=CPVGenerator.pan_updater
         )),
-        ('float_tilt', IntProperty(
+        ('alva_tilt', IntProperty(
             name="Tilt",
             default=0,
             min=-100,
             max=100,
             description=find_tooltip("tilt"),
             options={'ANIMATABLE'},
-            update=CPVIAGenerator.tilt_updater
+            update=CPVGenerator.tilt_updater
         )),
-        ('float_zoom', IntProperty(
+        ('alva_zoom', IntProperty(
             name="Zoom",
             default=0,
             min=0,
             max=100,
             description=find_tooltip("tilt"),
             options={'ANIMATABLE'},
-            update=CPVIAGenerator.zoom_updater
+            update=CPVGenerator.zoom_updater
         )),
-        ('float_iris', IntProperty(
+        ('alva_iris', IntProperty(
             name="Iris",
             default=100,
             min=0,
             max=100,
             description=find_tooltip("iris"),
             options={'ANIMATABLE'},
-            update=CPVIAGenerator.iris_updater
+            update=CPVGenerator.iris_updater
         ))
     ]
         
     common_parameters_extended = [
-        ('float_vec_color_restore', FloatVectorProperty(
+        ('alva_color_restore', FloatVectorProperty(
             name="Color (restore)",
             subtype='COLOR',
             size=3,
@@ -319,7 +319,7 @@ class CommonProperties:
             max=1.0,
             description=find_tooltip("color_restore"),
         )),
-        ('float_volume', IntProperty(
+        ('alva_volume', IntProperty(
             name="Volume",
             default=0,
             min=0,
@@ -327,59 +327,59 @@ class CommonProperties:
             description=find_tooltip("volume"),
             options={'ANIMATABLE'}
         )),
-        ('float_diffusion', IntProperty(
+        ('alva_diffusion', IntProperty(
             name="Diffusion",
             default=0,
             min=0,
             max=100,
             description=find_tooltip("diffusion"),
             options={'ANIMATABLE'},
-            update=CPVIAGenerator.diffusion_updater
+            update=CPVGenerator.diffusion_updater
         )),
-        ('float_strobe', IntProperty(
+        ('alva_strobe', IntProperty(
             name="Strobe",
             default=0,
             min=0,
             max=100,
             description=find_tooltip("strobe"),
             options={'ANIMATABLE'},
-            update=CPVIAGenerator.strobe_updater
+            update=CPVGenerator.strobe_updater
         )),
-        ('float_edge', IntProperty(
+        ('alva_edge', IntProperty(
             name="Edge",
             default=0,
             min=0,
             max=100,
             description=find_tooltip("edge"),
             options={'ANIMATABLE'},
-            update=CPVIAGenerator.edge_updater
+            update=CPVGenerator.edge_updater
         )),
-        ('int_gobo_id', IntProperty(
+        ('alva_gobo', IntProperty(
             name="Gobo ID",
             default=1,
             min=0,
             max=20,
             description=find_tooltip("gobo"),
             options={'ANIMATABLE'},
-            update=CPVIAGenerator.gobo_id_updater
+            update=CPVGenerator.gobo_id_updater
         )),
-        ('float_gobo_speed', IntProperty(
+        ('alva_gobo_speed', IntProperty(
             name="Speed",
             default=0,
             min=-100,
             max=100,
             description=find_tooltip("speed"),
             options={'ANIMATABLE'},
-            update=CPVIAGenerator.gobo_speed_updater
+            update=CPVGenerator.gobo_speed_updater
         )),
-        ('int_prism', IntProperty(
+        ('alva_prism', IntProperty(
             name="Prism",
             default=0,
             min=0,
             max=1,
             description=find_tooltip("prism"),
             options={'ANIMATABLE'},
-            update=CPVIAGenerator.prism_updater
+            update=CPVGenerator.prism_updater
         ))
     ]
         

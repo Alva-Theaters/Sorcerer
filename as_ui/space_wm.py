@@ -172,7 +172,7 @@ def draw_alva_right_click(self, context):
     except:
         pass
 
-    if is_property and prop.identifier not in ['float_vec_color', 'float_intensity']:
+    if is_property and prop.identifier not in ['alva_color', 'alva_intensity']:
         return
     
     orb = get_orb_icon()
@@ -181,7 +181,7 @@ def draw_alva_right_click(self, context):
     layout = self.layout
     has_separated = False
 
-    if is_property and prop.identifier == 'float_vec_color':
+    if is_property and prop.identifier == 'alva_color':
         if st == 'NODE_EDITOR':
             node_tree = context.space_data.node_tree
             node_name = context.active_node.name
@@ -199,7 +199,7 @@ def draw_alva_right_click(self, context):
         if st == 'VIEW_3D' and context.active_object and context.active_object.type == 'MESH':
             self.layout.prop(context.active_object, "color_profile_enum", text="")
 
-    if is_property and prop.identifier == 'float_intensity' and st == 'VIEW_3D':
+    if is_property and prop.identifier == 'alva_intensity' and st == 'VIEW_3D':
         if not has_separated:
             self.layout.separator()
         layout.operator("alva_object.driver_add", text="Add Driver", icon_value=orb.icon_id)

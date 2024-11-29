@@ -13,16 +13,16 @@ class NodeUpdaters:
     def mixer_param_updater(self, context):
         if self.parameters:
             if self.parameters_enum == "option_intensity":
-                self.parameters[0].float_intensity = self.parameters[0].float_intensity
+                self.parameters[0].alva_intensity = self.parameters[0].alva_intensity
             elif self.parameters_enum == "option_color":
-                self.parameters[0].float_vec_color = self.parameters[0].float_vec_color
+                self.parameters[0].alva_color = self.parameters[0].alva_color
             elif self.parameters_enum == "option_pan_tilt":
-                self.parameters[0].float_pan = self.parameters[0].float_pan
-                self.parameters[0].float_tilt = self.parameters[0].float_tilt
+                self.parameters[0].alva_pan = self.parameters[0].alva_pan
+                self.parameters[0].alva_tilt = self.parameters[0].alva_tilt
             elif self.parameters_enum == "option_zoom":
-                self.parameters[0].float_zoom = self.parameters[0].float_zoom
+                self.parameters[0].alva_zoom = self.parameters[0].alva_zoom
             elif self.parameters_enum == "option_iris":
-                self.parameters[0].float_iris = self.parameters[0].float_iris
+                self.parameters[0].alva_iris = self.parameters[0].alva_iris
 
                     
     @staticmethod                
@@ -108,23 +108,23 @@ class NodeUpdaters:
         
         if connected_node:  # All parameters are active in pose mode, so update all
             if connected_node.mix_method_enum == 'option_pose':
-                attributes = ['float_intensity', 'float_vec_color', 'float_pan', 'float_tilt', 'float_zoom', 'float_iris']
+                attributes = ['alva_intensity', 'alva_color', 'alva_pan', 'alva_tilt', 'alva_zoom', 'alva_iris']
                 for attr in attributes:
                     current_value = getattr(connected_node.parameters[0], attr)
                     setattr(connected_node.parameters[0], attr, current_value)
             
             else:  # Avoid pointlessly updating inactive parameters when not in pose mode
                 if connected_node.parameters_enum == "option_intensity":
-                    connected_node.parameters[0].float_intensity = connected_node.parameters[0].float_intensity
+                    connected_node.parameters[0].alva_intensity = connected_node.parameters[0].alva_intensity
                 elif connected_node.parameters_enum == "option_color":
-                    connected_node.parameters[0].float_vec_color = connected_node.parameters[0].float_vec_color
+                    connected_node.parameters[0].alva_color = connected_node.parameters[0].alva_color
                 elif connected_node.parameters_enum == "option_pan_tilt":
-                    connected_node.parameters[0].float_pan = connected_node.parameters[0].float_pan
-                    connected_node.parameters[0].float_tilt = connected_node.parameters[0].float_tilt
+                    connected_node.parameters[0].alva_pan = connected_node.parameters[0].alva_pan
+                    connected_node.parameters[0].alva_tilt = connected_node.parameters[0].alva_tilt
                 elif connected_node.parameters_enum == "option_zoom":
-                    connected_node.parameters[0].float_zoom = connected_node.parameters[0].float_zoom
+                    connected_node.parameters[0].alva_zoom = connected_node.parameters[0].alva_zoom
                 elif connected_node.parameters_enum == "option_iris":
-                    connected_node.parameters[0].float_iris = connected_node.parameters[0].float_iris
+                    connected_node.parameters[0].alva_iris = connected_node.parameters[0].alva_iris
 
                 connected_node.float_offset = (self.float_progress * .01)
     

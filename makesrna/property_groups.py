@@ -46,7 +46,7 @@ class PROPERTIES_PG_alva_cue_lists(PropertyGroup):
 
 
 class PROPERTIES_PG_alva_stage_manager(PropertyGroup):
-    '''All the properties for the show start sequencer, basically a rocket launch
+    '''All the properties for the Stage Manager, which is basically a rocket launch
        go-no-go poll UI for stage managers to ensure shows start with everything 
        completed properly and on time.'''
     from ..assets.items import Items as AlvaItems
@@ -178,15 +178,15 @@ class MySettings(PropertyGroup):
     ) 
     
     
-class RaiseChannels(PropertyGroup):
-    chan: PointerProperty(type=bpy.types.Object) 
-    original_influence: FloatProperty()  
-    original_influence_color: FloatVectorProperty() 
+class VIEW3D_PG_alva_influenced_object_property_group(PropertyGroup):
+    channel_object: PointerProperty(type=bpy.types.Object) 
+    current_influence: FloatProperty()  
+    current_influence_color: FloatVectorProperty() 
     
         
-class InfluencerList(PropertyGroup):
-    parameter: StringProperty() 
-    raise_channels: CollectionProperty(type=RaiseChannels)
+class VIEW3D_PG_alva_influencer_property_group(PropertyGroup):
+    parameter_name: StringProperty()
+    influenced_object_property_group: CollectionProperty(type=VIEW3D_PG_alva_influenced_object_property_group)
     
     
 class LightingModifier(PropertyGroup):
@@ -263,8 +263,8 @@ prop_groups = [
     ChannelsList,
     GroupData,
     MySettings,
-    RaiseChannels,
-    InfluencerList,
+    VIEW3D_PG_alva_influenced_object_property_group,
+    VIEW3D_PG_alva_influencer_property_group,
     LightingModifier,
     CustomButtonPropertyGroup,
     MixerParameters,

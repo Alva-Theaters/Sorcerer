@@ -10,7 +10,7 @@ from ..assets.items import Items as AlvaItems
 from ..updaters.node import NodeUpdaters
 from ..utils.rna_utils import register_properties
 from ..makesrna.property_groups import MixerParameters, CustomButtonPropertyGroup
-from ..cpvia.find import Find
+from ..cpv.find import Find
 from ..assets.tooltips import format_tooltip
 
 from ..as_ui.space_common import draw_text_or_group_input, draw_parameters, draw_footer_toggles
@@ -218,11 +218,11 @@ class NODE_NT_mixer(Node):
         choices = self.parameters
         mode = self.parameters_enum
         attribute_mapping = {
-            'option_intensity': ["float_intensity"],
-            'option_color': ["float_vec_color"],
-            'option_pan_tilt': ["float_pan", "float_tilt"],
-            'option_zoom': ["float_zoom"],
-            'option_iris': ["float_iris"],
+            'option_intensity': ["alva_intensity"],
+            'option_color': ["alva_color"],
+            'option_pan_tilt': ["alva_pan", "alva_tilt"],
+            'option_zoom': ["alva_zoom"],
+            'option_iris': ["alva_iris"],
         }
 
         for node, choice in zip(connected_nodes, choices):

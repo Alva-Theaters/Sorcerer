@@ -6,14 +6,14 @@ import bpy
 from bpy.app.handlers import persistent
 import time
 
-from .utils.event_utils import EventUtils as Utils
-from .utils.audio_utils import render_volume
-from .cpvia.find import Find
-from .utils.osc import OSC
-from .cpvia.harmonizer import Harmonizer
-from .utils.sequencer_mapping import StripMapping
 from .assets.dictionaries import Dictionaries
+from .cpv.find import Find
+from .cpv.harmonize import Harmonizer
 from .maintenance.logging import alva_log
+from .utils.audio_utils import render_volume
+from .utils.event_utils import EventUtils as Utils
+from .utils.osc import OSC
+from .utils.sequencer_mapping import StripMapping
 
 
 stored_channels = set()
@@ -22,6 +22,10 @@ stored_channels = set()
 '''
 __________________________________________________________________________________
 EVENT MANAGER OBJECTIVES:
+
+This script is here to define what happens on events like play, stop, 
+scrub, frame change, and translate/transform. This script encompasses
+3D audio and lighting, but most of the code is for lighting.
 
 We need to basically simulate a full-blown theatrical lighting console
 and Dolby Atmos sound system inside Blender. Unlike a lighting console,
@@ -34,8 +38,8 @@ challenges.
         controlling hundreds of completely separate objects at once, 
         outside simulations at least. For this reason, we need to use
         a controller-based approach where you control objects more 
-        indirectly. You can have hundreds of different controllers and 
-        each controller can target whatever it wants whenever it wants.
+        indirectly. However, you can have hundreds of different controllers, 
+        and each controller can target whatever it wants whenever it wants.
         As a result, they can tend to disagree. So we need to harmonize
         the disagreements so we don't spam the lighting console with 
         contradictory commands. We also want to simplify them as best
@@ -130,7 +134,7 @@ challenges.
         See orb.py to learn how we do it.
 
 
-    Objective 5 (solved by the CPVIA folder).
+    Objective 5 (solved by the CPV folder).
         Sorcerer is almost its own full blown lighting console with its own army 
         of different controller types that can all be trying to do stuff to the 
         same stuff at once. That creates two problems:
@@ -141,12 +145,12 @@ challenges.
 
             2. We can't have all our controllers speaking whatever language they 
                choose. They need to all speak the same language. That language is 
-               called CPVIA. A CPVIA request is a tuple in the form of
+               called CPV. A CPV request is a tuple in the form of
 
-               (Channel, Parameter, Value, Influence, Argument)
+               (Channel, Parameter, Value)
 
         Every single controller that ever wants to make a change to a parameter
-        on the console must make a change request in the CPVIA format. This 
+        on the console must make a change request in the CPV format. This 
         is how we keep everything sorted out in the data flow.
 
         We need to keep this so organized because we often need to do a ton of 
@@ -156,15 +160,17 @@ challenges.
         want the user to have to manually enable such things. If they increase 
         strobe value, we can reasonably infer they want the strobe on), and 
         setting the argument to be relative or absolute based on the controller
-        type. We complete all these operations at various stages, so the CPVIA
+        type. We complete all these operations at various stages, so the CPV
         format is very important.
 
-        See the cpvia folder to see how we manage the primary control flow.
+        See the cpv folder to see how we manage the primary control flow.
 
         
     Objective 6. 3D Audio Panner.
         This is currently out of order, but will be repaired soon. If you need 
         it, go back to Alva Sequencer where it still works.
+
+        Actually just kidding, it's fixed now, just need to update this...
 
 
 Hopefully that provides you a general idea of what Sorcerer does, what kinds 
@@ -189,10 +195,10 @@ Sequence of events when frame changes BEGINS and we are NOT in playback:
     
     A1:2. We look for updates in parameters on those controllers...
        
-    A1:4. We trigger the cpvia generator for those parameters...
+    A1:4. We trigger the cpv generator for those parameters...
     
-    A1:5. The cpvia generator creates Channel, Parameter, Value, Influence
-          Argument (CPVIA) tuple requests and adds to global change_requests...
+    A1:5. The cpv generator creates Channel, Parameter, Value (CPV) tuple 
+          requests and adds to global change_requests...
        
     A1:6. We unbind the updater from the harmonizer so that manual updates 
           can fire normally
@@ -204,14 +210,14 @@ Sequence of events when frame changes BEGINS and we are NOT in playback:
           livemap cue is in the Sequencer header display.
        
        
-    DOCUMENTATION CODE A2
-    Then, when the frame change has COMPLETED, meaning all CPVIA requests are in:
+    DOCUMENTATION CODE A2 TODO: This needs to be updated post CPVIA => CPV
+    Then, when the frame change has COMPLETED, meaning all CPV requests are in:
            
         A2:1. Then, we take global change_requests...
         
-        A2:2. We harmonize and simplify those cpvia's with the harmonizer...
+        A2:2. We harmonize and simplify those cpv's with the harmonizer...
         
-        A2:3. We convert the cpvia's to (address, argument) with the publisher...
+        A2:3. We convert the cpv's to (address, argument) with the publisher...
         
         A2:4. We send them to the console via Utils.osc.send_osc_lighting...
         
@@ -267,8 +273,6 @@ Sequence of events when playback STARTS:
         C3:2. We stop the timecode clock on the console...
         
         C3:3. And we clear the mapping for trigger strips.
-    
-    
 '''
 
 class EventManager:
@@ -304,8 +308,8 @@ class EventManager:
     #-------------------------------------------------------------------------------------------------------------------------------------------
     '''Depsgraph POST handler'''
     #-------------------------------------------------------------------------------------------------------------------------------------------
-    def find_transform_updates_and_trigger_cpvia(self, scene, depsgraph):
-        '''Starts CPVIA updates on meshes currently transforming.'''
+    def find_transform_updates_and_trigger_cpv(self, scene, depsgraph):
+        '''Starts CPV updates on meshes currently transforming.'''
         if not depsgraph or scene.scene_props.in_frame_change or scene.scene_props.is_playing:
             return
         
@@ -316,11 +320,14 @@ class EventManager:
             if not isinstance(obj, bpy.types.Object):
                 continue
 
+            if obj.object_identities_enum not in ["Influencer", "Brush"]:
+                continue
+
             if update.is_updated_transform:
                 start = time.time()
                 alva_log("event_manager", f"Transform found for object {obj}. Triggering special update.")
                 Utils.trigger_special_update(obj)
-                alva_log('time', f"trigger_special_update and is_updated_transform took {time.time() - start} seconds")
+                alva_log('time', f"TIME: trigger_special_update and is_updated_transform took {time.time() - start} seconds")
                 
                 if obj.int_alva_sem != 0:
                     alva_log("event_manager", f"Triggering SEM update for {obj}.")
@@ -330,7 +337,7 @@ class EventManager:
         updated_objects = {update.id for update in depsgraph.updates if isinstance(update.id, bpy.types.Object)}
         alva_log("event_manager", f"Updated objects from depsgraph_post: {updated_objects}")
         Utils.check_and_trigger_drivers(updated_objects)
-        alva_log('time', f"check_and_trigger_drivers took {time.time() - start} seconds")
+        alva_log('time', f"TIME: check_and_trigger_drivers took {time.time() - start} seconds")
 
 
     #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -521,44 +528,48 @@ class EventManager:
     #-------------------------------------------------------------------------------------------------------------------------------------------
     '''Frame Change POST handler'''
     #-------------------------------------------------------------------------------------------------------------------------------------------     
-    def publish_pending_cpvia_requests(self, scene):
+    def publish_pending_cpv_requests(self, scene):
         '''DOCUMENTATION CODE A2'''
         '''A2:1'''
-        from .cpvia.publish import change_requests
+        from .cpv.publish import change_requests
 
         '''A2:2'''
-        alva_log("harmonizer", f"Harmonizer change_requests input: {change_requests}")
+        alva_log("harmonize", f"HARMONIZER SESSION:\nchange_requests: {[request[1:] for request in change_requests]}")
         no_duplicates = Harmonizer.remove_duplicates(change_requests)
-        alva_log("harmonizer", f"no_duplicates: {no_duplicates}")
+        alva_log("harmonize", f"no_duplicates: {[request[1:] for request in no_duplicates]}")
         if scene.scene_props.is_democratic:
             no_conflicts = Harmonizer.democracy(no_duplicates)
-            alva_log("harmonizer", f"Democratic. no_conflicts: {no_conflicts}")
+            alva_log("harmonize", f"Democratic. no_conflicts: {[request[1:] for request in no_conflicts]}")
         else:
             no_conflicts = Harmonizer.highest_takes_precedence(no_duplicates)
-            alva_log("harmonizer", f"HTP. no_conflicts: {no_conflicts}")
+            alva_log("harmonize", f"HTP. no_conflicts: {[request[1:] for request in no_conflicts]}")
         simplified = Harmonizer.simplify(no_conflicts)
-        alva_log("harmonizer", f"simplified: {simplified}")
+        alva_log("harmonize", f"simplified: {[request[1:] for request in simplified]}\n")
 
         '''A2:3'''
-        from .cpvia.publish import Publisher
-        publisher = Publisher()
+        from .cpv.publish import Publish, clear_requests
         for request in simplified:
-            address, argument = publisher.form_osc(*request)  # Should return 2 strings
+            publisher = Publish(*request, is_harmonized=True)
             '''A2:4'''
-            OSC.send_osc_lighting(address, argument, user=0)
+            publisher.execute()
 
         if not scene.scene_props.is_playing:
             scene.scene_props.in_frame_change = False
 
         '''A2:5'''
-        publisher.clear_requests()
-        
-      
+        clear_requests()
+
+
 event_manager_instance = EventManager()  # Must use () here for binding
 
 
 @persistent
-def load_macro_buttons(string):
+def load_macro_buttons(string): # bpy passes string, but we don't need it here.
+    '''This is for the UI List that gives the user the known macro buttons to choose from in Text Editor when
+       they use QWERTY to write Eos macros. You can just type them in with QWERTY, but you have these to click
+       as well. This needs to run from Sorcerer's main __init__.py because it needs to run from the correct
+       bpy.context. It also needs to have already run before the user has a chance to go over there and look
+       at it and catch it empty. User should not come up to an empty UI List here.'''
     scene = bpy.context.scene
     scene.macro_buttons.clear()
 
@@ -572,7 +583,7 @@ def on_depsgraph_update_pre(scene):
 
 @persistent
 def on_depsgraph_update_post(scene, depsgraph):
-    event_manager_instance.find_transform_updates_and_trigger_cpvia(scene, depsgraph)
+    event_manager_instance.find_transform_updates_and_trigger_cpv(scene, depsgraph)
 
 @persistent
 def on_frame_change_pre(scene):
@@ -581,7 +592,7 @@ def on_frame_change_pre(scene):
     event_manager_instance.fire_parameter_updaters(scene)
     event_manager_instance.update_livemap(scene)
     event_manager_instance.render_audio_objects(scene)
-    alva_log('time', f"on_frame_change_pre took {time.time() - start} seconds")
+    alva_log('time', f"TIME: on_frame_change_pre took {time.time() - start} seconds")
 
 @persistent
 def on_animation_playback(scene):
@@ -593,7 +604,7 @@ def on_animation_playback_end(scene):
 
 @persistent
 def on_frame_change_post(scene):
-    event_manager_instance.publish_pending_cpvia_requests(scene)
+    event_manager_instance.publish_pending_cpv_requests(scene)
           
                     
 def register():

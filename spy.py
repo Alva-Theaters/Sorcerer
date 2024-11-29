@@ -8,17 +8,13 @@ import time
 from typing import Tuple, Union
 import mathutils
 
-from .cpvia.find import Find
-from .cpvia.cpvia_finders import CPVIAFinders
-from .cpvia.split_color import ColorSplitter
-from .cpvia.mix import Mixer
-from .cpvia.influencers import Influencers
+from .cpv.find import Find
 from .utils.osc import OSC
 from .utils.event_utils import EventUtils
 from .updaters.properties import PropertiesUpdaters
 
 from .utils.audio_utils import render_volume
-from .utils.cpvia_utils import color_object_to_tuple_and_scale_up, update_alva_controller, home_alva_controller
+from .utils.cpv_utils import color_object_to_tuple_and_scale_up, update_alva_controller, home_alva_controller
 from .utils.rna_utils import parse_channels, parse_mixer_channels
 from .utils.sequencer_utils import duplicate_active_strip_to_selected, find_available_channel, add_color_strip
 from .utils.sequencer_utils import analyze_song, AnalysisResult
@@ -38,7 +34,7 @@ class SorcererPython:
     def make_eos_macros(macro_range: Tuple[int, int], int_range: Tuple[int, int], string: str):
         '''
         spy function for iterative macro generation on ETC Eos using custom ranges/strings.
-        
+   
         arguments:
             macro_range: Something like (1, 10) creates macros 1-10.
             int_range: Something like (50, 60) lets you make the macros say something like Go_to_Cue 50, 
@@ -56,25 +52,25 @@ class SorcererPython:
         '''
         SorcererPython.press_lighting_key("live")
         for macro, custom_int in zip(range(macro_range[0] - 1, macro_range[1]), range(int_range[0], int_range[1] + 1)):
-            if macro < 100000:
-                SorcererPython.press_lighting_key("learn")
-                SorcererPython.press_lighting_key("macro")
-                time.sleep(.1)
-                for digit in str(macro+1):
-                    SorcererPython.press_lighting_key(f"{digit}")
-                    time.sleep(.1)
-                SorcererPython.press_lighting_key("enter")
-                time.sleep(.1)
-
-                formatted_string = string.replace("*", str(custom_int))
-                SorcererPython.lighting_command(formatted_string)
-                time.sleep(.1)
-                SorcererPython.press_lighting_key("enter")
-                SorcererPython.press_lighting_key("learn")
-                time.sleep(.2)
-            else:
+            if macro > 100000:
                 print("Error: Macro indexes on ETC Eos only go up to 99,999.")
-                return
+
+            SorcererPython.press_lighting_key("learn")
+            SorcererPython.press_lighting_key("macro")
+            time.sleep(.1)
+            for digit in str(macro+1):
+                SorcererPython.press_lighting_key(f"{digit}")
+                time.sleep(.1)
+            SorcererPython.press_lighting_key("enter")
+            time.sleep(.1)
+
+            formatted_string = string.replace("*", str(custom_int))
+            SorcererPython.lighting_command(formatted_string)
+            time.sleep(.1)
+            SorcererPython.press_lighting_key("enter")
+            SorcererPython.press_lighting_key("learn")
+            time.sleep(.2)
+            return
         
 
     # OSC
@@ -179,39 +175,6 @@ class SorcererPython:
 
 
     # Finders
-    def is_inside_mesh(obj: bpy.types.Object, possible_container: bpy.types.Object) -> bool:
-        '''Returns true if obj is inside possible_container. Doesn't work well
-            for shapes much more complicated than cubes'''
-        return Influencers.is_inside_mesh(obj, possible_container)
-        
-    def invert_color(self, value: tuple) -> tuple:
-        '''Used for influencer calculations'''
-        return Influencers.invert_color(self, value)
-            
-    def find_int(string: str) -> int:
-        """Tries to find an integer inside the string and returns it 
-            as an int. Returns hardcoded CONSTANT if no integer is found."""
-        return CPVIAFinders._find_int(string)
-        
-    def mix_my_values(parent: Union[bpy.types.Object, bpy.types.Node, bpy.types.Sequence], param: str) -> Tuple[list[int], list[int], list[int]]:
-        '''Used by Alva's cpvia_generator for mixer nodes'''
-        return Mixer.mix_my_values(parent, param)
-        
-    def split_color(parent: Union[bpy.types.Object, bpy.types.Node, bpy.types.Sequence], c: list[int], p: list[str], v: list[Tuple], type: list) -> Tuple[list[str], list[Tuple]]:
-        '''Used across Sorcerer for converting Blender's RGB space 
-        to correct color space for the fixture. Returns list of
-        parameters and list of values.'''
-        return ColorSplitter.split_color(parent, c, p, v, type)
-
-    def find_my_patch(parent, chan: int, type: str, desired_property: str) -> Union[int, float, Tuple]:
-        '''This function finds the best patch for a given channel.'''
-        return Find.find_my_patch(parent, chan, type, desired_property)
-        
-    def find_parent(self, object: Union[bpy.types.Object, bpy.types.Node, bpy.types.Sequence, bpy.types.Collection]) -> Union[bpy.types.Object, bpy.types.Node, bpy.types.Sequence]:
-        '''Catches and corrects cases where the self is a collection 
-        property instead of a node, sequencer strip, object, etc.'''
-        return CPVIAFinders.find_parent(self, object)  
-        
     def find_controllers(scene: bpy.types.Scene) -> Tuple[list, list]:
         '''Find strips, objects, and nodes in scene relevant to Sorcerer.
         Also returns separate list of just the mixers and motors in the

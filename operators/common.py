@@ -8,12 +8,12 @@ from bpy.props import StringProperty, IntProperty
 import time
 
 from ..utils.osc import OSC
-from ..utils.cpvia_utils import update_alva_controller, home_alva_controller
+from ..utils.cpv_utils import update_alva_controller, home_alva_controller
 from utils.sequencer_utils import duplicate_active_strip_to_selected
 from ..utils.rna_utils import update_all_controller_channel_lists, apply_patch
 from ..updaters.common import CommonUpdaters
 from ..as_ui.space_alvapref import draw_settings 
-from ..cpvia.find import Find
+from ..cpv.find import Find
 from ..as_ui.space_wm import (
     draw_edge_diffusion_settings, 
     draw_gobo_settings, 
@@ -273,13 +273,13 @@ class COMMON_OT_alva_white_balance(Operator):
 
     def execute(self, context):
         active_controller = Find.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
-        if hasattr(active_controller, "float_vec_color"):
-            active_controller.alva_white_balance = active_controller.float_vec_color
+        if hasattr(active_controller, "alva_color"):
+            active_controller.alva_white_balance = active_controller.alva_color
         else:
             self.report({'INFO'}, "Cannot white balance mixers")
             return {'CANCELLED'}
         time.sleep(.2) # Because it threw an error without, I think?
-        active_controller.float_vec_color = (1.0, 1.0, 1.0)
+        active_controller.alva_color = (1.0, 1.0, 1.0)
         return {'FINISHED'}
     
 

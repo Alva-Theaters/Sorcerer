@@ -4,19 +4,22 @@
 
 import bpy
 
-from ..cpvia.mix import test_mixer
-from ..cpvia.map import test_mapping
-from ..cpvia.cpvia_generator import test_cpvia_generator
-from ..cpvia.flags import test_flags
-from ..cpvia.publish import test_publisher
-from ..cpvia.harmonizer import test_harmonizer
-from ..cpvia.influencers import test_influencers
-from ..cpvia.split_color import test_split_color
+from ..cpv.mix import test_mixer
+from ..cpv.map import test_mapping
+from ..cpv.cpv_generator import test_cpv_generator
+from ..cpv.stop import test_flags
+from ..cpv.publish import test_publisher
+from ..cpv.harmonize import test_harmonizer
+from ..cpv.influence import test_influencers
+from ..cpv.split_color import test_split_color
+
+
+# TODO: This currently does nothing. It should probably do stuff.
 
 
 def test_sorcerer():
-    cpvia_fails, cpvia_fail_explanation, cpvia_fail_severity = test_cpvia(
-        CPVIA_GENERATOR_SENSITIVITY = .5,
+    cpv_fails, cpv_fail_explanation, cpv_fail_severity = test_cpv(
+        CPV_GENERATOR_SENSITIVITY = .5,
         FLAGS_SENSITIVITY = .5,
         HARMONIZER_SENSITIVITY = .5,
         INFLUENCERS_SENSITIVITY = .5,
@@ -37,12 +40,12 @@ def test_sorcerer():
     scene = bpy.context.scene.scene_props
     scene.errors.clear()
 
-    if cpvia_fails:
+    if cpv_fails:
         scene.limp_mode = True
         new_error = scene.errors.add()
-        new_error.error_type = "CPVIA"
-        new_error.explanation = cpvia_fail_explanation
-        new_error.severity = cpvia_fail_severity
+        new_error.error_type = "CPV"
+        new_error.explanation = cpv_fail_explanation
+        new_error.severity = cpv_fail_severity
 
     if orb_fails:
         scene.limp_mode = True
@@ -51,21 +54,21 @@ def test_sorcerer():
         new_error.explanation = orb_fail_explanation
         new_error.severity = orb_fail_severity
 
-    if not orb_fails and not cpvia_fails:
+    if not orb_fails and not cpv_fails:
         scene.limp_mode = False
 
     num_errors = 0
     if orb_fails:
         scene.user_limp_mode_explanation = orb_fail_explanation
         num_errors = 1
-    if cpvia_fails:
-        scene.user_limp_mode_explanation = cpvia_fail_explanation # Overwrite with the more important error
+    if cpv_fails:
+        scene.user_limp_mode_explanation = cpv_fail_explanation # Overwrite with the more important error
         num_errors += 1
     scene.number_of_systems_down = num_errors
 
 
-def test_cpvia(
-        CPVIA_GENERATOR_SENSITIVITY,
+def test_cpv(
+        CPV_GENERATOR_SENSITIVITY,
         FLAGS_SENSITIVITY,
         HARMONIZER_SENSITIVITY,
         INFLUENCERS_SENSITIVITY,
@@ -74,10 +77,10 @@ def test_cpvia(
         PUBLISHER_SENSITIVITY,
         SPLIT_COLOR_SENSITIVITY,
         THRESHOLD
-    ): # Returns True for fail, False for pass
+    ): # Returns True for fail, False for pass, which I here is opposite of how it's supposed to be.
 
     test_results = {
-        'cpvia_generator_fails': test_cpvia_generator(CPVIA_GENERATOR_SENSITIVITY),
+        'cpv_generator_fails': test_cpv_generator(CPV_GENERATOR_SENSITIVITY),
         'flags_fails': test_flags(FLAGS_SENSITIVITY),
         'harmonizer_fails': test_harmonizer(HARMONIZER_SENSITIVITY),
         'influencers_fails': test_influencers(INFLUENCERS_SENSITIVITY),
@@ -90,7 +93,7 @@ def test_cpvia(
     severity_dictionary = {
         'mixer_fails': (1, "Mixer has failed a quality control test."),
         'mapping_fails': (2, "Mapping has failed a quality control test."),
-        'cpvia_generator_fails': (5, "CPVIA Generator has failed a quality control test."),
+        'cpv_generator_fails': (5, "CPV Generator has failed a quality control test."),
         'flags_fails': (3, "Flags has failed a quality control test."),
         'publisher_fails': (3, "Publisher has failed a quality control test."),
         'harmonizer_fails': (2, "Harmonizer has failed a quality control test."),
@@ -106,7 +109,7 @@ def test_cpvia(
     else:
         for warning in warnings:
             print(warning)
-        return True, "CPVIA fail", severity
+        return True, "CPV fail", severity
 
 
 def test_orb(

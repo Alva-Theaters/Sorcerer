@@ -66,7 +66,7 @@ def find_tooltip(name):
 
 def format_tooltip(tooltip):
     if is_automatic_period():
-        if tooltip.endswith("."): # In case dev forgot to remove period
+        if tooltip.endswith("."): # In case dev forgot to remove period.
             tooltip = tooltip[:-1]
         return tooltip
     
@@ -79,7 +79,7 @@ def format_tooltip(tooltip):
 
 
 def is_automatic_period():
-    return bpy.app.version < (4, 3)
+    return bpy.app.version < (4, 3) # Because Blender messed with stuff on 4.3.
     
 
 def is_paragraph(text):

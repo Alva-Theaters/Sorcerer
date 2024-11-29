@@ -91,12 +91,12 @@ class SceneProperties(PropertyGroup):
     print_osc_video: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="OSC Video") 
     print_osc_audio: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="OSC Audio") 
     print_osc: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="All OSC") 
-    # CPVIA
-    print_cpvia_generator: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="cpvia_generator.py") 
-    print_find: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="cpvia_finders.py") 
-    print_flags: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="flags.py") 
-    print_harmonizer: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="harmonizer.py") 
-    print_influencers: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="influencers.py") 
+    # CPV
+    print_cpv_generator: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="cpv_generator.py") 
+    print_find: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="find.py") 
+    print_stop: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="stop.py") 
+    print_harmonize: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="harmonize.py") 
+    print_influence: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="influence.py") 
     print_map: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="map.py") 
     print_mix: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="mix.py") 
     print_publish: BoolProperty(default=False, description="Enable built-in debug prints to external command line for this script", name="publish.py") 
@@ -130,7 +130,7 @@ class SceneProperties(PropertyGroup):
     is_baking: BoolProperty(default=False, description="Sorcerer is currently baking")  
     is_cue_baking: BoolProperty(default=False, description="Sorcerer is currently baking")  
     is_event_baking: BoolProperty(default=False, description="Sorcerer is currently baking")  
-    freeze_cpvia: BoolProperty(default=False, description="Used by Patch Console Remotely orb operator to prevent random CPVIA updates interfering with patching operations") 
+    freeze_cpv: BoolProperty(default=False, description="Used by Patch Console Remotely orb operator to prevent random CPV updates interfering with patching operations") 
 
     show_presets: BoolProperty(default=False, description="Shows buttons on intensities panel")  
     

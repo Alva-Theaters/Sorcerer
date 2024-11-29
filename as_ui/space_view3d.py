@@ -154,8 +154,6 @@ def draw_object_header(self, context, scene, active_object, node_layout=None):
         row.prop(ao, "float_object_strength", slider = True, text = "Strength:")
         if identity == "Brush":
             row.prop(ao, "is_erasing", text="Erase", toggle=True)
-        else:
-            row.prop(ao, "alva_is_absolute", icon='FCURVE', text="")
 
     if scene.is_democratic and identity != "Brush":
         box = column.box()
@@ -253,13 +251,13 @@ def draw_service_mode(self, context):
     col.prop(scene, "print_osc_audio")
     col.prop(scene, "print_osc")
 
-    # CPVIA
-    col = layout.column(heading="CPVIA")
-    col.prop(scene, "print_cpvia_generator")
+    # CPV
+    col = layout.column(heading="CPV")
+    col.prop(scene, "print_cpv_generator")
     col.prop(scene, "print_find")
-    col.prop(scene, "print_flags")
-    col.prop(scene, "print_harmonizer")
-    col.prop(scene, "print_influencers")
+    col.prop(scene, "print_stop")
+    col.prop(scene, "print_harmonize")
+    col.prop(scene, "print_influence")
     col.prop(scene, "print_map")
     col.prop(scene, "print_mix")
     col.prop(scene, "print_publish")

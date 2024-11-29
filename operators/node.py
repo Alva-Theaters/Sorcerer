@@ -7,8 +7,8 @@ from bpy.types import Operator
 from bpy.props import IntProperty, StringProperty, BoolProperty
 
 from ..as_ui.space_node import draw_node_formatter_footer, draw_node_formatter_group, draw_node_formatter_mixer
-from ..utils.cpvia_utils import simplify_channels_list
-from ..cpvia.find import Find
+from ..utils.cpv_utils import simplify_channels_list
+from ..cpv.find import Find
 from ..utils.osc import OSC
 
 # pyright: reportInvalidTypeForm=false

@@ -2,8 +2,8 @@
 PACKAGE-LEVEL OVERVIEW:
     audio_utils.py --------- Render logic for Sorcerer's 3D audio panner/renderer. 
 
-    cpvia_utils.py --------- Functions directly related to CPVIA often used outside the CPVIA folder. 
-                             CPVIA stands for (channel, parameter, value, influence, argument).
+    cpv_utils.py --------- Functions directly related to CPV often used outside the CPV folder. 
+                             CPV stands for (channel, parameter, value, influence, argument).
 
     event_utils.py --------- Functions used by the event manager, which handles events like start,
                              stop, jump, depsgraph update, etc for lighting and audio needs.
@@ -13,7 +13,7 @@ PACKAGE-LEVEL OVERVIEW:
 
     osc.py ----------------- Functions for sending OSC messages onto the network. Uses socket module.
 
-    properties_utils.py ---- Not to be confused with poperties like IntProperty. This is for
+    rna_utils.py ---- Not to be confused with poperties like IntProperty. This is for
                              tools that live in the Properties space_type, like Cue Switcher and
                              Stage Manager. This confusion is why the folder that registers things
                              onto Scene and Object and the like is called makesrna, not properties.

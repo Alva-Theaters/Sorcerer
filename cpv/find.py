@@ -9,50 +9,6 @@ from ..assets.sli import SLI
 
 
 class Find:
-    def find_my_patch(self, parent, chan, type, desired_property):
-        """
-        [EDIT 6/29/24: This docustring is slightly outdated now after revising the code for 
-        new patch system]
-        
-        Below, "patch" refers to a special setting like an argument or min/max for something
-        like pan/tilt, strobe, gobo things, etc.
-        
-        This function finds the best patch for a given channel. If the controller type is
-        not Fixture or P/T Fixture, then it tries to find an object in the 3D scene that
-        represents that channel. If it finds one, it will return that object's desired
-        property. If the controller type (type) is Fixture or P/T Fixture, then it will
-        use that object's patch. If neither of those 2 options work out, it will give up,
-        surrender, and just use the parent controller's patch. 
-        
-        The goal of this function is to ensure that the user has a way to patch all fixtures
-        and expect that Sorcerer will behave more or less like a full-blown console——that is
-        to say, things like color profiles, mins and maxes, and other things fade away into
-        the background and the user doesn't hardly ever have to worry about it. With this
-        function, if the user patches the min/max, color profiles, and abilities and whatnot
-        for each fixture, then this function will always use that patch for each individual
-        fixture——regardless of what controller is controlling the fixture.
-        
-        At the same time however, if the user doesn't feel like patching beforehand, they
-        can make things happen extremely quickly without ever thinking about patch. That's
-        why we have a local patch built into the UI of each controller.
-        
-        Parameters:
-            parent: the parent controller object, a node, object, or color strip
-            chan: the channel number as defined by the parent's list_group_channels
-            type: the controllertype of parent controller object, can be mixer, group node, stage object, etc.
-            desired_property: the patch property that is being requested, in string form
-            
-        Returns:
-            desired_property: The value of the requested property, aka the patch info
-        """
-        if type not in ["Fixture", "Pan/Tilt Fixture"]:
-            for obj in bpy.data.objects:
-                if obj.object_identities_enum == "Fixture" and obj.list_group_channels[0].chan == chan:
-                    return getattr(obj, desired_property)
-                
-        return getattr(parent, desired_property)
-        
-        
     def find_controller_by_space_type(context, space_type, node_name, node_tree_name):
         '''Used by home, update, and special props operators to find 
             correct active controller, whether node, strip, or object'''
@@ -86,9 +42,13 @@ class Find:
 
         for node in connected_nodes:
             if node.bl_idname == "group_controller_type":
-                group_list.extend(Find.find_channels_list(node, string=True))
+                group_list.extend(Find._find_node_channels_list(node))
             elif node.bl_idname == "mixer_type":
-                group_list.extend(Find.find_channels_list(node, string=True))
+                group_list.extend(Find._find_node_channels_list(node))
+
+    @staticmethod
+    def _find_node_channels_list(node):
+        return [str(channel.chan) for channel in node.list_group_channels]
 
 
     @staticmethod
@@ -165,7 +125,7 @@ class Find:
                 for link in output_socket.links:
                     connected_node = link.to_socket.node
                     if connected_node.bl_idname == "group_controller_type":
-                        setattr(connected_node, attribute_name, new_value)
+                        setattr(connected_node, f"alva_{attribute_name}", new_value + getattr(connected_node, f"alva_{attribute_name}"))
                     elif connected_node.bl_idname == "mixer_type":
                         connected_node.mirror_upstream_group_controllers()
                         

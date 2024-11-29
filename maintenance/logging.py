@@ -18,22 +18,44 @@ line in 3D View. A new panel should appear where you can control what is and is 
 time. Do the same thing to disable Service Mode.
 
 Furthermore, this method doesn't add the completely pointless "LOGGING" prefix to every message,
-so it reduces visual clutter.'''
+so it reduces visual clutter.
+'''
+
+LOGGING_FORMAT_SPEC = """
+Logging for major classes should be in the following format for readability:
+
+    INFLUENCER SESSION: # for more complex chunks
+    SUBTYPE 1. Logging info
+    SUBTYPE 1. More logging info
+    SUBTYPE 1. More logging info
+    SUBTYPE 2. More logging info from maybe a different subclass
+    SUBTYPE 2. More logging info
+
+    HARMONIZER SESSION:  # For less complex chunks
+    Logging info
+    More logging info
+    Even more logging info
+
+    SOME OTHER SESSION:
+    Some more logging info...
+
+Separate chunks of logging with blank lines so dissimilar logging statements don't quish together.
+"""
 
 
-scripts = [
+scripts = [ # These correspond directly to property names registered to scene, drawn in the service mode panel.
     # OSC. Not actually separate scripts like the others.
     "print_osc_lighting",
     "print_osc_video",
     "print_osc_audio",
     "print_osc",
 
-    # CPVIA
-    "print_cpvia_generator",
+    # CPV
+    "print_cpv_generator",
     "print_find",
-    "print_flags",
-    "print_harmonizer",
-    "print_influencers",
+    "print_stop",
+    "print_harmonize",
+    "print_influence",
     "print_map",
     "print_mix",
     "print_publish",

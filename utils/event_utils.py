@@ -122,17 +122,17 @@ class EventUtils:
 
     @staticmethod
     def fire_updaters(updates): 
-        '''Start the logic to create a CPVIA request for the controller's 
+        '''Start the logic to create a CPV request for the controller's 
            changed property.'''
         for controller, property, value in updates:
             setattr(controller, property, getattr(controller, property))
 
     @staticmethod
     def trigger_special_update(obj):
-        properties = ['float_intensity', 'float_vec_color', 'float_zoom', 'float_iris']
+        properties = ['alva_intensity', 'alva_color', 'alva_zoom', 'alva_iris']
         for prop in properties:
             value = getattr(obj, prop)
-            if prop != "float_iris":
+            if prop != "alva_iris":
                 if isinstance(value, int) and value != 0:
                     setattr(obj, prop, value)
                 elif isinstance(value, mathutils.Color) and any(v != 1 for v in value):
