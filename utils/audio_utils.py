@@ -28,11 +28,11 @@ class VolumeRenderer:
         Figure out how much of each sound strip should be in each speaker. 
         
         1. Use matrix to ensure constraints have a say since we want user to be able 
-           to put both speaker rigs and audio objects on follow_paths.
+           to put both speaker rigs themselves AND audio objects on Follow Path constraints.
 
         2. Use the closest vertice as sound_object center if scaling is not uniform since 
            we don't have a better way figure out how close a point is to an iregular mesh.
-           User can subdivide for better experience.
+           User can subdivide the audio object mesh for a smoother experience.
 
         3. Multiply sound_object scale by 5 for better experience if scaling is uniform since
            the default scale of 1 results in too small a fade radius. Fade radius meaning
@@ -64,7 +64,7 @@ class VolumeRenderer:
         scale_factor = self._find_scale_factor(adjustment_multiplier)
         volume = max(distance / scale_factor, 1e-6)
         logarithmic_volume = self._apply_logarithmic_falloff(volume)
-        alva_log('audio', f"distance: {distance}; scale_factor: {scale_factor}, logarithmic_volume: {logarithmic_volume}")
+        alva_log('audio', f"\nAUDIO: distance: {distance}; scale_factor: {scale_factor}, logarithmic_volume: {logarithmic_volume}")
         expanded_volume = self._map_volume(logarithmic_volume)
         self._redraw_ui()
         OSCInterface.publish_volume(self.speaker.int_speaker_number, self.audio_cue, expanded_volume)

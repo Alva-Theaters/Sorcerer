@@ -28,7 +28,7 @@ AUDIO_UTILS.PY:
 
     This code's job is to figure out how much you should hear of a 3D audio object in
     a specific speaker. Unlike any other known spatial audio renderer, this one handles
-    asymnetrically-scaled audio objects. 
+    asymnetrically-scaled audio objects.
 
     Benefits:
     - The best possible artist's experience for spatial audio
@@ -40,6 +40,18 @@ AUDIO_UTILS.PY:
     - Built-in stage lighting control, allowing moving lights to track 3D audio objects
     - 3D audio objects support asymnetric scaling
     - Total freedom of movement between all 3 axes
+
+    Downsides:
+    - Currently, the only way to export the data onto another drive is to make a crap ton 
+      of sound files. 1 sound file for each speaker, for each audio object. So it can 
+      get out of hand quick. This will improve in the future. We are also looking at 
+      the idea of using orb to automate the creation of a crap ton of fade cues on Qlab 
+      so that you're not asking the playback computer to play 100 audio files at once 
+      and so that you don't have to wait for 2 hours for the thing to mixdown every scene.
+      This tech was already pioneered by Daniel Higgot in PanLab. I'm not aware of any
+      patents. Unlikely, since those are very expensive. But I'll probably reach out.
+    - Limited compatibility. Direct compatibility with audio consoles is coming, but 
+      is not here yet.
 
     Use Cases:
     - Technical theatre with Qlab and (ETC Eos or grandMA3)
