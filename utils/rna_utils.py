@@ -22,6 +22,7 @@ def parse_channels(input_string, remove=False):
     "I want odds from 1-10" => [1, 3, 5, 7, 9]
     '''
     try:
+        input_string = replace_words_with_numbers(input_string)
         input_string = input_string.replace("do not want", "not").replace("don't want", "not").replace(".", "").replace("!", "").replace("?", "")
         input_string = input_string.lower()
 
@@ -143,6 +144,52 @@ def parse_mixer_channels(input_string):
     except Exception as e:
         print(f"An error has occured within parse_channels: {e}")
         return None
+    
+def replace_words_with_numbers(input_string):
+    def generate_number_words():
+        """Generate a dictionary mapping number words to their numerical counterparts."""
+        units = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+        teens = [
+            "eleven", "twelve", "thirteen", "fourteen", "fifteen", 
+            "sixteen", "seventeen", "eighteen", "nineteen"
+        ]
+        tens = ["ten", "twenty", "thirty", "forty", "fifty", 
+                "sixty", "seventy", "eighty", "ninety"]
+        
+        number_words = {}
+        
+        # Add units
+        for i, unit in enumerate(units, start=1):
+            number_words[unit] = str(i)
+        
+        # Add teens
+        for i, teen in enumerate(teens, start=11):
+            number_words[teen] = str(i)
+        
+        # Add tens
+        for i, ten in enumerate(tens, start=1):
+            number_words[ten] = str(i * 10)
+        
+        # Add combinations of tens and units (e.g., twenty-one)
+        for i, ten in enumerate(tens[1:], start=2):  # Skip "ten" since it doesn't combine
+            for j, unit in enumerate(units, start=1):
+                number_words[f"{ten}-{unit}"] = str(i * 10 + j) # Handle twenty-one, for example
+                number_words[f"{ten} {unit}"] = str(i * 10 + j) # Handle twenty one, for example
+                number_words[f"{ten}{unit}"] = str(i * 10 + j) # Handle twentyone, for example
+        
+        # Add "hundred"
+        number_words["one hundred"] = "100"
+        
+        return number_words
+
+    # Generate number words dictionary
+    number_words = generate_number_words()
+
+    # Replace words in the input string
+    for word, num in number_words.items():
+        input_string = input_string.replace(word, num)
+
+    return input_string
 
 
 def update_all_controller_channel_lists(context):
