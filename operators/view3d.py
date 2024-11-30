@@ -9,6 +9,7 @@ from bpy.types import Operator
 from ..cpv.find import Find 
 from ..utils.cpv_utils import simplify_channels_list
 from ..utils.osc import OSC
+from ..assets.tooltips import find_tooltip
 
 # pyright: reportInvalidTypeForm=false
 
@@ -203,6 +204,54 @@ class VIEW3D_OT_alva_object_controller(Operator):
         if active_object.type == 'SPEAKER':
             draw_speaker(self, context, active_object, use_split=False)
 
+class VIEW3D_OT_alva_duplicate_object(Operator):
+    bl_idname = "alva_object.duplicate_object"
+    bl_label = find_tooltip("alva_object.duplicate_object")
+    bl_options = {'REGISTER', 'UNDO'}
+
+    Axis: EnumProperty(
+        items=[('X', 'X Axis', 'Move along X axis'),
+               ('Y', 'Y Axis', 'Move along Y axis'),
+               ('Z', 'Z Axis', 'Move along Z axis')],
+        name="Axis",
+        default='X'
+    )
+    Direction: IntProperty(
+        name="Direction",
+        description=find_tooltip("duplicate_direction"),
+        default=1,
+        min=-1,
+        max=1
+    )
+    Quantity: IntProperty(
+        name="Quantity",
+        description=find_tooltip("duplicate_quantity"),
+        default=1,
+        min=1
+    )
+
+    @classmethod
+    def poll(cls, context):
+        return (hasattr(context, "scene") and
+                hasattr(context, "active_object"))
+
+    def execute(self, context):
+        if context.object:
+            axis_map = {'X': (1, 0, 0), 'Y': (0, 1, 0), 'Z': (0, 0, 1)}
+            move_vector = tuple(self.Direction * axis_map[self.Axis][i] for i in range(3))
+
+            for i in range(self.Quantity):
+                bpy.ops.object.duplicate()
+                bpy.ops.transform.translate(value=move_vector)
+                new_obj = context.object
+                if hasattr(new_obj, "list_group_channels") and len(new_obj.list_group_channels) == 1:
+                    new_obj.str_manual_fixture_selection = str(new_obj.list_group_channels[0].chan + 1)
+
+            return {'FINISHED'}
+        else:
+            self.report({'WARNING'}, "No object selected")
+            return {'CANCELLED'}
+
 
 classes = (
     VIEW3D_OT_alva_add_driver,
@@ -213,6 +262,7 @@ classes = (
     VIEW3D_OT_alva_bump_lighting_modifier,
     VIEW3D_OT_alva_summon_movers,
     VIEW3D_OT_alva_object_controller,
+    VIEW3D_OT_alva_duplicate_object
 )
 
 

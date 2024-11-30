@@ -44,6 +44,7 @@ def draw_alva_toolbar(self, context):
         flow.operator("alva_tool.disable_clocks", icon='MOD_TIME', text="Disable Clocks" if region_width >= 200 else "")
 
     elif space_type == 'VIEW_3D' and scene.view_viewport_toolbar:
+        flow.operator("alva_object.duplicate_object", icon='DUPLICATE', text="Duplicate" if region_width >= 200 else "")
         flow.operator("alva_playback.clear_solos", icon='SOLO_OFF', text="Clear Solos" if region_width >= 200 else "")
         flow.operator("alva_tool.ghost_out", icon='GHOST_ENABLED', text="Cue 0" if region_width >= 200 else "")
         flow.operator("alva_tool.displays", icon='MENU_PANEL', text="Displays" if region_width >= 200 else "")

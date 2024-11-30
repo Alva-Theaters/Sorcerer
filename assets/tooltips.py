@@ -221,9 +221,13 @@ english_tooltips = {
     "start_preset": "Universal preset used for various starting activities",
     "end_preset": "Universal preset used for various ending activities",
 
+    # View3D Operators
+    "alva_object.duplicate_object": "Duplicate and Slide",
+    "duplicate_direction": "Direction of movement: 1 for positive, -1 for negative",
+    "duplicate_quantity": "Number of duplicates to create"
 }
 
-spanish_tooltips = { # Translation provided by ChatGPT (GPT-4o) last on 11/29/2024.
+spanish_tooltips = { # Translation provided by ChatGPT (GPT-4o) last on 11/30/2024.
     # Object Only
     "mute": "Silenciar la salida OSC de este objeto",
     "summon_movers": "Texto de línea de comando para enfocar luminarias móviles en el objeto del escenario",
@@ -348,4 +352,10 @@ spanish_tooltips = { # Translation provided by ChatGPT (GPT-4o) last on 11/29/20
     "end_macro": "Macro universal usada para varias actividades finales",
     "start_preset": "Preset universal usado para varias actividades iniciales",
     "end_preset": "Preset universal usado para varias actividades finales",
+
+    # View3D Operators
+    "alva_object.duplicate_object": "Duplicar y deslizar el objeto seleccionado",
+    "duplicate_direction": "Dirección del movimiento: 1 para positivo, -1 para negativo",
+    "duplicate_quantity": "Cantidad de duplicados a crear"
+
 }
