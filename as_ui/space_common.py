@@ -138,7 +138,7 @@ def draw_parameters(self, context, column, box, active_object):
                 sub_two.prop(active_object, "alva_color_restore", text="")
             sub_two = row.column(align=True)
             # Do not allow students/volunteers to mess up the color profile setting.
-            if not context.scene.scene_props.school_mode_enabled:
+            if not context.scene.scene_props.school_mode_enabled and object_type not in ["Influencer", "Brush"]:
                 sub_two.scale_x = 0.8
                 sub_two.prop(active_object, "color_profile_enum", text="", icon='COLOR', icon_only=True)
 
@@ -160,7 +160,7 @@ def draw_parameters(self, context, column, box, active_object):
                 if hasattr(active_object, "object_identities_enum") and object_type == "Influencer":
                     row.prop(active_object, "alva_color_restore", text="")
                 # Do not allow students/volunteers to mess up the color profile setting.
-                if not context.scene.scene_props.school_mode_enabled:
+                if not context.scene.scene_props.school_mode_enabled and object_type not in ["Influencer", "Brush"]:
                     row.prop(active_object, "color_profile_enum", text="", icon='COLOR', icon_only=True)
     
     # SOUND

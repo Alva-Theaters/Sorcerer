@@ -52,7 +52,7 @@ The best software is the software that looks like it's 1/8th baked. If you open 
 
 If you instead open up a software and it's like, "There's nothing here, where are all the parts?", it is either a very simple software that doesn't do much of anything, or it is a very sophisticated software that was designed from first-principles. Quality design tends towards outward simplicity, not towards outward complexity.
 
-Idiot Parts are parts that are there because of some imaginary technical constraint. Almost all the parts are ultimately Idiot Parts. It's just a matter of ho wdifficult they are to delete. If a part is there specifically because another part was designed poorly, it is clearly an Idiot Part. If a part is there because of a fundamentally flawed foundation of thinking, it is much harder to recognize it as an Idiot Part. 
+Idiot Parts are parts that are there because of some imaginary technical constraint. Almost all the parts are ultimately Idiot Parts. It's just a matter of how difficult they are to delete. If a part is there specifically because another part was designed poorly, it is clearly an Idiot Part. If a part is there because of a fundamentally flawed foundation of thinking, it is much harder to recognize it as an Idiot Part. 
 
 Parts that are not Idiot Parts are parts that are directly and inseparably related to the stuff that is trying to do the stuff. In the context of Sorcerer, parts that are not Idiot Parts are parameters like intensity and color. A part in Sorcerer that **is** an Idiot Part is Orb. Orb is an Idiot Part because it is only there because Sorcerer isn't smart enough to do all the tasks that Orb does entirely automatically in the background without ever bothering the user. It could be that smart, but it's not yet. So all of Orb is an Idiot Part. It's dumb because only an Idiot would say we shouldn't try to delete it. That's because it does not directly serve the true purpose of the software; rather, it only serves a fictional, manufactured, technical constraint that doesn't need to exist.
 
@@ -61,7 +61,7 @@ The easiest way to tell if a part is ultimately an Idiot Part or not is to imagi
 
 80/20:
 ------
-A lot of softwares try to design for 100% of use cases. They end up creating a product that is good for everyone but is not great for anyone. Sorcerer is instead designed only for the 80% of use cases. For example, it is limited in the parameter types supported. It doesn't do any of the advanced, neweer effects that all the super fancy lights can do nowadays. That's because adding those controls would make the interface too complicated for 80% of users.
+A lot of softwares try to design for 100% of use cases. They end up creating a product that is good for everyone but is not great for anyone. Sorcerer is instead designed only for the 80% of use cases. For example, it is limited in the parameter types supported. It doesn't do any of the advanced, newer effects that all the super fancy lights can do nowadays. That's because adding those controls would make the interface too complicated for 80% of users.
 
 Sorcerer is designed to be extremely amazing for the 80%. It's okay if it's nightmare fuel for the 20%.
 I would rather make an extraordinary product for 20 people than make a mediocre product for everyone.

@@ -88,7 +88,7 @@ HOW TO USE.
             2. properties— The list above, so controller_ids, object_only, 
                etc. Prefix with bpy.ALVA_CommonProperties.[list name like 
                patch_info] if running from text editor or by importing
-               at the top with "from .[filepath] import [CommonPropeties]" 
+               at the top with "from .[filepath] import [CommonProperties]" 
                method, then just prefix with CommonProperties.
                
             3. register— optional argument that defaults to True. Pass

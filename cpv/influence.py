@@ -151,11 +151,11 @@ class SetGroups:
 class Initialize:
     def __init__(self, influencer):
         self.influencer = influencer
-        self._needs_prefix = self._is_needing_prefix()
-        self._is_erasing = self._is_erasing_brush()
+        self.is_relative = self._is_relative()
+        self.is_erasing = self._is_erasing_brush()
         self._set_argument_prefix()
 
-    def _is_needing_prefix(self):
+    def _is_relative(self):
         influencer = self.influencer
         return (
             influencer.controller_type == "Brush" or
@@ -164,14 +164,11 @@ class Initialize:
 
     def _set_argument_prefix(self):
         influencer = self.influencer
-        if self._needs_prefix:
-            if self._is_erasing:
-                self._property_name = f"lower_{influencer.property_name}"
-            else:
-                self._property_name = f"raise_{influencer.property_name}"
-
+        if self.is_relative:
+            prefix = "lower" if self.is_erasing else "raise"
+            self.property_name = f"{prefix}_{influencer.property_name}"
         else:
-            self._property_name = influencer.property_name
+            self.property_name = influencer.property_name
 
     def _is_erasing_brush(self):
         influencer = self.influencer
@@ -187,7 +184,7 @@ class Initialize:
     def _initiate_channel(self, channel_object):
         channel_number = self._get_initiate_channel_number(channel_object)
         value = self._determine_initiate_value()
-        Publish(self.influencer, channel_number, self._property_name, value).execute()
+        Publish(self.influencer, channel_number, self.property_name, value).execute()
         self._set_memory_item(self.influencer.parameter_property_group, channel_object, value)
 
     def _get_initiate_channel_number(self, channel_object):
@@ -248,11 +245,10 @@ class Maintain:
      '''
     def __init__(self, influencer):
         self.influencer = influencer
-        self._needs_prefix = self._is_needing_prefix()
+        self.is_relative = self._is_relative()
 
-    def _is_needing_prefix(self):
-        influencer = self.influencer
-        return influencer.property_name != "color"
+    def _is_relative(self):
+        return self.influencer.property_name != "color"
 
 
     def execute(self, maintain_channels):
@@ -265,12 +261,12 @@ class Maintain:
         current_value = self._determine_current_value()
         needed_change, is_positive = self._determine_needed_change(stored_value, current_value)
         new_memory_value = self._determine_new_memory_value(current_value)
-        must_proceed = self._should_proceed(abs(needed_change))
+        must_proceed = self._should_proceed(needed_change)
         self._set_argument_prefix(is_positive)
-        alva_log("influence", f"MAINT. Stored Value: {stored_value}\nMAINT. Current Value: {current_value}\nMAINT. Needed Change: {needed_change}\nMAINT. is_positive: {is_positive}\nMAINT. New Memory Value: {new_memory_value}\nMAINT. Property Name: {self._property_name}\nMAINT. Must Proceed: {must_proceed}")
+        alva_log("influence", f"MAINT. Stored Value: {stored_value}\nMAINT. Current Value: {current_value}\nMAINT. Needed Change: {needed_change}\nMAINT. is_positive: {is_positive}\nMAINT. New Memory Value: {new_memory_value}\nMAINT. Property Name: {self.property_name}\nMAINT. Must Proceed: {must_proceed}")
 
         if must_proceed:
-            Publish(self.influencer, channel_number, self._property_name, abs(needed_change)).execute()
+            Publish(self.influencer, channel_number, self.property_name, needed_change).execute()
             self._update_memory_item(memory_item, new_memory_value)
 
     def _get_memory_item(self, channel_object):
@@ -282,17 +278,22 @@ class Maintain:
     def _get_maintain_channel_number(self, channel_object):
         return channel_object.list_group_channels[0].chan
     
-    def _determine_stored_value(self, memory_item): # This needs to handle color too
-        value = memory_item.current_influence
-        return abs(value)
+    def _determine_stored_value(self, memory_item):
+        prop = "current_influence" if self.influencer.property_name != "color" else "current_influence_color"
+        value = (getattr(memory_item, prop))
+        if self.influencer.property_name == "color":
+            return value
+        else:
+            return abs(value)
     
     def _determine_current_value(self):
         return getattr(self.influencer.parent, f"alva_{self.influencer.property_name}")
     
     def _determine_needed_change(self, stored_value, current_value):
-        min_val = min(stored_value, current_value)
-        max_val = max(stored_value, current_value)
-        change = abs(max_val - min_val)
+        if self.influencer.property_name == "color":
+            return current_value, True # The True doesn't matter.
+        
+        change = abs(stored_value - current_value)
         is_positive = True if stored_value < current_value else False
         return change, is_positive
     
@@ -300,17 +301,17 @@ class Maintain:
         return current_value
     
     def _should_proceed(self, needed_change):
-        return round(needed_change, MAINTAIN_ROUNDING_THRESHOLD) != 0
+        if self.influencer.property_name == "color":
+            return True # TODO - This should be smarter.
+        return round(abs(needed_change), MAINTAIN_ROUNDING_THRESHOLD) != 0
     
     def _set_argument_prefix(self, is_positive):
         influencer = self.influencer
-        if self._needs_prefix:
-            if is_positive:
-                self._property_name = f"raise_{influencer.property_name}"
-            else:
-                self._property_name = f"lower_{influencer.property_name}"
+        if self.is_relative:
+            prefix = "raise" if is_positive else "lower"
+            self.property_name = f"{prefix}_{influencer.property_name}"
         else:
-            self._property_name = influencer.property_name
+            self.property_name = influencer.property_name
 
     def _update_memory_item(self, memory_item, new_value):
         collection = self.influencer.parameter_property_group
@@ -382,9 +383,11 @@ class Release:
     def _get_release_channel_number(self, channel_object):
         return channel_object.list_group_channels[0].chan
     
-    def _determine_release_value(self, memory_item): # This needs to handle color too
-        value = memory_item.current_influence
-        return abs(value)
+    def _determine_release_value(self, memory_item):
+        if self.influencer.property_name != "color":
+            return memory_item.current_influence
+        else:
+            return self.influencer.parent.alva_color_restore
 
     def _remove_memory_item(self, memory_item):
         collection = self.influencer.parameter_property_group
