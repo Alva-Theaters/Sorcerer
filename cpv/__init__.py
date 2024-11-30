@@ -65,6 +65,11 @@ being the equivalent of 10's of thousands of universes.
 
 So that's why we can totally afford CPV.
 
+But at the same time, DMX sends all parameters on every packet, even ones that aren't changing. CPV only sends
+change requests. So that difference alone makes CPV actually less expensive than DMX in 80% of cases. That's 
+before you even consider the modern advances in computing speed. But at the same time, when you build a bridge,
+you don't design for the 80th percentile of expected loads.
+
 This folder contains most of the logic for Alva Sorcerer that converts the stuff you do with a controller in the 
 UI to stuff the lighting console can understand. Sorcerer uses the CPV format internally. In the future, 
 Alva Theaters hopes to experiment with using the CPV format externally to replace DMX in-house. 

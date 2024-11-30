@@ -35,6 +35,7 @@ class CPVGenerator:
 
         self.cpv_functions = {
             "Influencer": lambda: find_influencer_cpv(self),
+            "Key": lambda: find_influencer_cpv(self),
             "Brush": lambda: find_influencer_cpv(self),
             "Fixture": lambda: find_normal_cpv(self),
             "Pan/Tilt Fixture": lambda: find_normal_cpv(self),

@@ -159,7 +159,7 @@ class Initialize:
         influencer = self.influencer
         return (
             influencer.controller_type == "Brush" or
-            influencer.controller_type == "Influencer" and influencer.property_name != "color"
+            influencer.controller_type in ["Influencer", "Key"] and influencer.property_name != "color"
         )
 
     def _set_argument_prefix(self):
@@ -344,7 +344,7 @@ class Release:
         influencer = self.influencer
         return (
             influencer.controller_type == "Brush" or
-            influencer.controller_type == "Influencer" and influencer.property_name != "color"
+            influencer.controller_type in ["Influencer", "Key"] and influencer.property_name != "color"
         )
     
     def _set_argument_prefix(self):
@@ -443,6 +443,17 @@ class FindObjectsInside:
 
         kd.balance()
         return kd, object_map
+    
+    def _get_key_vectors(self):
+        return {
+            (0, 0, 0): .75,
+            (10, 0, 0): .75
+        }
+    
+    def _extrapolate_bbox(self):
+        return Vector((min(corner.x for corner in self.bbox_corners),
+                       min(corner.y for corner in self.bbox_corners),
+                       min(corner.z for corner in self.bbox_corners)))
 
 
     def execute(self):
