@@ -306,7 +306,8 @@ class COMMON_OT_alva_apply_patch(Operator):
 
 class COMMON_OT_alva_add_group(Operator):
     bl_idname = "alva_common.add_group"
-    bl_label = "Add a new group"
+    bl_label = "Add"
+    bl_description = "Add a new group"
 
     def execute(self, context):
         scene = context.scene
@@ -318,7 +319,8 @@ class COMMON_OT_alva_add_group(Operator):
 
 class COMMON_OT_alva_remove_group(Operator):
     bl_idname = "alva_common.remove_group"
-    bl_label = "Remove the selected group"
+    bl_label = "Remove"
+    bl_description = "Remove the selected group"
 
     def execute(self, context):
         scene = context.scene

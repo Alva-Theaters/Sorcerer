@@ -101,6 +101,8 @@ HOW TO USE.
 
 '''
 
+# NOTE: We use find_tooltip() because Sorcerer is multi-lingual and because Blender's C++ does weird things with periods."
+
 class CommonProperties:
     controller_ids = [
         ('str_group_id',  StringProperty(default="1")),
@@ -116,19 +118,19 @@ class CommonProperties:
     ]
 
     object_only = [
-        ('mute', BoolProperty(name="Mute OSC", default=False, description="Mute this object's OSC output")),
+        ('mute', BoolProperty(name="Mute OSC", default=False, description=find_tooltip("mute"))),
         ('object_identities_enum', EnumProperty(
             name="Mesh Identity",
-            description="In Sorcerer, meshes can represent and control individual lighting fixtures, microphones, stage objects, brushes, and 3D bitmapping objects. Select what you want your mesh to do here",
+            description="Background only",
             items=AlvaItems.object_identities,
             default=2
         )),
         ('str_call_fixtures_command', StringProperty(
             name="Summon Movers Command",
-            description="Command line text to focus moving fixtures onto stage object",
+            description=find_tooltip("summon_movers"),
             update=CommonUpdaters.call_fixtures_updater
         )),
-        ('is_erasing', BoolProperty(name="Eraser", description="Erase instead of add")),
+        ('is_erasing', BoolProperty(name="Eraser", description=find_tooltip("erase"))),
         ('influencer_list', CollectionProperty(type=VIEW3D_PG_alva_influencer_property_group)),
         ('float_object_strength', FloatProperty(name="Strength", default=1, min=0, max=1, description=find_tooltip("strength"), update=CommonUpdaters.controller_ids_updater)),
         ('alva_is_absolute', BoolProperty(name="Absolute", default=False, description=find_tooltip("absolute"))),
@@ -172,8 +174,8 @@ class CommonProperties:
         # 3D Audio Properties
         ('speaker_list', CollectionProperty(type=VIEW3D_PG_alva_speaker_list)),
         ('falloff_types', EnumProperty(name="Falloff Types", items=AlvaItems.audio_panning_falloff_types, description="Determines the fade curve when an audio object starts leaving or approaching a speaker")),
-        ('int_speaker_number', IntProperty(name="Speaker Number", update=CommonUpdaters.speaker_number_updater, description="Number of speaker in Qlab or on sound mixer. You're seeing this here because you selected a Speaker object, and speaker objects represent real, physical speakers in your theater for the purpose of spatial audio. To pan microphones left or right, you don't use an encoder, you just move the microphone or sound object closer to the left or right inside 3D view", default=0)),
-        ('sound_source_enum', EnumProperty(name="Sound Source", items=AlvaItems.get_sound_sources, description="Select either a sound strip in the sequencer or a microphone in Audio Patch"))
+        ('int_speaker_number', IntProperty(name="Speaker Number", update=CommonUpdaters.speaker_number_updater, description=find_tooltip("speaker_number"), default=0)),
+        ('sound_source_enum', EnumProperty(name="Sound Source", items=AlvaItems.get_sound_sources, description=find_tooltip("sound_source")))
     ]
 
     flash_strip_parameters = [
@@ -222,19 +224,19 @@ class CommonProperties:
         )),
         ('selected_group_enum', EnumProperty(
             name="Selected Group",
-            description="Choose a fixtures to control. Use either the static Lighting Groups or the mesh's location relative to other meshes for a dynamic spatial selection instead (Dynamic)",
+            description=find_tooltip("selected_group_enum"),
             items=AlvaItems.scene_groups,
             update=CommonUpdaters.controller_ids_updater
         )),
         ('selected_profile_enum', EnumProperty(
             name="Profile to Apply",
-            description="Choose a fixture profile to apply to this fixture and any other selected fixtures. To copy settings directly from another light, select the lights you want to copy to, then select the light you wish to copy from, and then select the Dynamic option here",
+            description=find_tooltip("selected_profile_enum"),
             items=AlvaItems.scene_groups,
             update=CommonUpdaters.group_profile_updater
         )),
         ('color_profile_enum', EnumProperty(
             name="Color Profile",
-            description="Choose a color profile for the mesh based on the patch in the lighting console",
+            description=find_tooltip("color_profile_enum"),
             items=AlvaItems.color_profiles,
         )),
         ('alva_solo', BoolProperty(
@@ -244,14 +246,14 @@ class CommonProperties:
         )),
         ('freezing_mode_enum', EnumProperty(
             name="Freezing",
-            description="Choose whether to render on all frames, every other frame, or every third frame",
+            description=find_tooltip("freezing_mode_enum"),
             items=AlvaItems.freezing_modes,
         )),
     ]
 
     common_parameters = [
         ('influence', IntProperty(
-            default=1, description="How many votes this controller gets when there are conflicts", min=1, max=10)),
+            default=1, description="", min=1, max=10)),
         ('alva_intensity', IntProperty(
             name="Intensity",
             default=0,
@@ -294,7 +296,7 @@ class CommonProperties:
             default=0,
             min=0,
             max=100,
-            description=find_tooltip("tilt"),
+            description=find_tooltip("zoom"),
             options={'ANIMATABLE'},
             update=CPVGenerator.zoom_updater
         )),
@@ -387,12 +389,12 @@ class CommonProperties:
         ('strobe_min', IntProperty(
             name="Stobe Min", 
             default=0, 
-            description="Minimum value for strobe"
+            description=find_tooltip("strobe_min")
         )),
         ('strobe_max', IntProperty(
             name="Strobe Max", 
             default=20, 
-            description="Maximum value for strobe"
+            description=find_tooltip("strobe_max")
         )),
         ('alva_white_balance', FloatVectorProperty(
             name="White Balance",
@@ -401,164 +403,163 @@ class CommonProperties:
             default=(1.0, 1.0, 1.0),
             min=0.0,
             max=1.0,
-            description='If the natural white is not truly white, make it be white here and then white on the Blender color picker will actually be white',
+            description=find_tooltip("white_balance"),
         )),
         ('pan_min', IntProperty(
             name="Pan Min", 
             default=-270, 
-            description="Minimum value for pan"
+            description=find_tooltip("pan_min")
         )),
         ('pan_max', IntProperty(
             name="Pan Max", 
             default=270, 
-            description="Maximum value for pan"
+            description=find_tooltip("pan_max")
         )),
         ('tilt_min', IntProperty(
             name="Tilt Min", 
             default=-135, 
-            description="Minimum value for tilt"
+            description=find_tooltip("tilt_min")
         )),
         ('tilt_max', IntProperty(
             name="Tilt Max", 
             default=135, 
-            description="Maximum value for tilt"
+            description=find_tooltip("tilt_max")
         )),
         ('zoom_min', IntProperty(
             name="Zoom Min", 
             default=1, 
-            description="Minimum value for zoom"
+            description=find_tooltip("zoom_min")
         )),
         ('zoom_max', IntProperty(
             name="Zoom Max", 
             default=100, 
-            description="Maximum value for zoom"
+            description=find_tooltip("zoom_max")
         )),
         ('gobo_speed_min', IntProperty(
             name="Gobo Rotation Speed Min", 
             default=-200, 
-            description="Minimum value for speed"
+            description=find_tooltip("speed_min")
         )),
         ('gobo_speed_max', IntProperty(
             name="Gobo Rotation Speed Min", 
             default=200, 
-            description="Maximum value for speed"
+            description=find_tooltip("speed_max")
         ))
     ]
         
     '''IMPORTANT: intensity_is_on MUST default to True for Event Manager to work.'''
     parameter_toggles = [
-        ('influence_is_on', BoolProperty(name="Influence Toggle", default=False, description="Influence is enabled when checked")),
-        ('audio_is_on', BoolProperty(name="Audio Toggle", default=False, description="Audio is enabled when checked")),
-        ('mic_is_linked', BoolProperty(name="Microphone Linking", default=False, description="Microphone volume is linked to Intensity when red")),
-        ('intensity_is_on', BoolProperty(name="Intensity Toggle", default=True, description="Intensity is enabled when checked")),
-        ('pan_tilt_is_on', BoolProperty(name="Pan/Tilt Toggle", default=False, description="Pan/Tilt is enabled when checked")), 
-        ('color_is_on', BoolProperty(name="Color Toggle", default=False, description="Color is enabled when checked")),
-        ('diffusion_is_on', BoolProperty(name="Diffusion Toggle", default=False, description="Diffusion is enabled when checked")),
-        ('strobe_is_on', BoolProperty(name="Strobe Toggle", default=False, description="Strobe is enabled when checked")),
-        ('zoom_is_on', BoolProperty(name="Zoom Toggle", default=False, description="Zoom is enabled when checked")),
-        ('iris_is_on', BoolProperty(name="Iris Toggle", default=False, description="Iris is enabled when checked")),
-        ('edge_is_on', BoolProperty(name="Edge Toggle", default=False, description="Edge is enabled when checked")),
-        ('gobo_is_on', BoolProperty(name="Gobo Toggle", default=False, description="Gobo ID is enabled when checked")),
-        ('prism_is_on', BoolProperty(name="Prism Toggle", default=False, description="Prism is enabled when checked")),
+        ('intensity_is_on', BoolProperty(default=True)),
+        ('audio_is_on', BoolProperty(name="Audio Toggle", default=False, description=find_tooltip("enable_audio"))),
+        ('mic_is_linked', BoolProperty(name="Microphone Linking", default=False, description=find_tooltip("enable_microphone"))),
+        ('pan_tilt_is_on', BoolProperty(name="Pan/Tilt Toggle", default=False, description=find_tooltip("enable_pan_tilt"))), 
+        ('color_is_on', BoolProperty(name="Color Toggle", default=False, description=find_tooltip("enable_color"))),
+        ('diffusion_is_on', BoolProperty(name="Diffusion Toggle", default=False, description=find_tooltip("enable_diffusion"))),
+        ('strobe_is_on', BoolProperty(name="Strobe Toggle", default=False, description=find_tooltip("enable_strobe"))),
+        ('zoom_is_on', BoolProperty(name="Zoom Toggle", default=False, description=find_tooltip("enable_zoom"))),
+        ('iris_is_on', BoolProperty(name="Iris Toggle", default=False, description=find_tooltip("enable_iris"))),
+        ('edge_is_on', BoolProperty(name="Edge Toggle", default=False, description=find_tooltip("enable_edge"))),
+        ('gobo_is_on', BoolProperty(name="Gobo Toggle", default=False, description=find_tooltip("enable_gobo"))),
+        ('prism_is_on', BoolProperty(name="Prism Toggle", default=False, description=find_tooltip("enable_prism"))),
     ]
 
     special_arguments = [
         ('str_enable_strobe_argument', StringProperty(
             name="Enable Strobe Argument", 
             default="# Strobe_Mode 127 Enter", 
-            description="Add # for group ID")),
+            description=find_tooltip("simple_enable_disable_argument"))),
         
         ('str_disable_strobe_argument', StringProperty(
             name="Disable Strobe Argument", 
             default="# Strobe_Mode 76 Enter", 
-            description="Add # for group ID")),
+            description=find_tooltip("simple_enable_disable_argument"))),
         
         ('str_enable_gobo_speed_argument', StringProperty(
             name="Enable Gobo Rotation Argument", 
             default="", 
-            description="Add # for group ID")),
+            description=find_tooltip("simple_enable_disable_argument"))),
             
         ('str_disable_gobo_speed_argument', StringProperty(
             name="Disable Gobo Rotation Argument", 
             default="", 
-            description="Add # for group ID")),
+            description=find_tooltip("simple_enable_disable_argument"))),
             
         ('str_gobo_id_argument', StringProperty(
             name="Select Gobo Argument", 
             default="# Gobo_Select $ Enter", 
-            description="Add # for group ID and $ for value")),
+            description=find_tooltip("gobo_argument"))),
 
         ('str_enable_prism_argument', StringProperty(
             name="Enable Prism Argument", 
             default="# Beam_Fx_Select 02 Enter", 
-            description="Add # for group ID")),
+            description=find_tooltip("simple_enable_disable_argument"))),
             
         ('str_disable_prism_argument', StringProperty(
             name="Disable Prism Argument", 
             default="# Beam_Fx_Select 01 Enter", 
-            description="Add # for group ID")),
+            description=find_tooltip("simple_enable_disable_argument"))),
 
         ('str_gobo_speed_value_argument', StringProperty(
             name="Gobo Speed Value Argument", 
             default="# Gobo_Index/Speed at $ Enter", 
-            description="Add $ for animation data and # for fixture/group ID"))
+            description=find_tooltip("gobo_argument")))
     ]
 
     timecode_executors = [
-        ('str_parent_name', StringProperty(default="")),
+        ('str_parent_name', StringProperty(default="")), # Used by the find_executor algorithm for memory between iterations
          
         ('int_event_list', IntProperty(
             name="Event List", 
             min=0, 
             max=9999, 
             default=0, 
-            description="This should be the number of the event list you have created on the console for this song")),
+            description=find_tooltip("event_list"))),
         
         ('int_cue_list', IntProperty(
             name="Cue List", 
             min=0, max=999, 
             default=0, 
-            description="This should be the number of the event list you have created on the console for this song")),
+            description=find_tooltip("cue_list"))),
         
         ('str_start_cue', StringProperty(
             name="Start Cue", 
             default="1 / 1", 
             update=SequencerUpdaters.timecode_clock_update_safety, 
-            description="Specifies which cue will start (or enable) the timecode clock. Can't be the same as first cue in Blender sequence or that will create loop")),
+            description=find_tooltip("start_cue"))),
         
         ('str_end_cue', StringProperty(
             name="End Cue", 
             default="1 / 2", 
             update=SequencerUpdaters.timecode_clock_update_safety, 
-            description="Specifies which cue will stop (or disable) the timecode clock")),
+            description=find_tooltip("end_cue"))),
         
         ('int_start_macro', IntProperty(
             name="Start Macro", 
             min=0,
             max=99999, 
             default=1, 
-            description="Universal macro used for various starting activities")),
+            description=find_tooltip("start_macro"))),
         
         ('int_end_macro', IntProperty(
             name="End Macro", 
             min=0, 
             max=99999, 
             default=0, 
-            description="Universal macro used for various ending activities")),
+            description=find_tooltip("end_macro"))),
         
         ('int_start_preset', IntProperty(
             name="Start Preset", 
             default=0, 
             min=0, 
             max=9999, 
-            description="Universal preset used for various starting activities")),
+            description=find_tooltip("start_preset"))),
         
         ('int_end_preset', IntProperty(
             name="End Preset", 
             default=0, 
             min=0, 
             max=9999, 
-            description="Universal preset used for various ending activities"))
+            description=find_tooltip("end_preset")))
     ]
 
 
