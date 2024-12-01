@@ -64,11 +64,11 @@ class Items:
 
 
     def console_types(self, context):
-        items = [
-            ('option_eos', "ETC Eos", "Eos-family console type"),
-            ('option_ma3', "grandMA3", "grandMA3 family console type"),
-            ('option_ma2', "grandMA2", "grandMA2 family console type")
-        ]
+        from ..utils.spy_utils import REGISTERED_LIGHTING_CONSOLES
+
+        items = []
+        for cls in REGISTERED_LIGHTING_CONSOLES.values():  # Access each registered class
+            items.append((cls.as_idname, cls.as_label, cls.as_description))
         return items
 
 

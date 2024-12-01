@@ -11,6 +11,7 @@ import mathutils
 from .cpv.find import Find
 from .utils.osc import OSC
 from .utils.event_utils import EventUtils
+from .utils.spy_utils import _SorcererPython
 from .updaters.properties import PropertiesUpdaters
 
 from .utils.audio_utils import render_volume
@@ -30,7 +31,7 @@ from bpy import spy
 '''
 
 
-class SorcererPython:
+class SorcererPython(_SorcererPython):
     def make_eos_macros(macro_range: Tuple[int, int], int_range: Tuple[int, int], string: str):
         '''
         spy function for iterative macro generation on ETC Eos using custom ranges/strings.
@@ -47,13 +48,14 @@ class SorcererPython:
 
         Warning:
             Uses time.sleep, which freezes up Blender while running. Not currently equipped with press ESC to 
-            cancel functionality. Terminate Blender via Operating Systn if you accidentally tell it to make 
+            cancel functionality. Terminate Blender via Operating System if you accidentally tell it to make 
             99,999 macros, which it will gladly do otherwise.
         '''
         SorcererPython.press_lighting_key("live")
         for macro, custom_int in zip(range(macro_range[0] - 1, macro_range[1]), range(int_range[0], int_range[1] + 1)):
             if macro > 100000:
                 print("Error: Macro indexes on ETC Eos only go up to 99,999.")
+                return
 
             SorcererPython.press_lighting_key("learn")
             SorcererPython.press_lighting_key("macro")
@@ -72,6 +74,9 @@ class SorcererPython:
             time.sleep(.2)
             return
         
+
+    #-----------------------------------------------------------------------------------------------------
+    # The code below is just an interface between Text Editor and Sorcerer. This should not contain logic.
 
     # OSC
     def send_osc_lighting(address: str, argument: str) -> None:

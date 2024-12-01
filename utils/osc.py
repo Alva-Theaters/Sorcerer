@@ -67,6 +67,7 @@ class OSC:
 
 
     def send_osc_string(osc_addr, addr, port, string):
+        alva_log("osc", f"\nOSC:\n   -Address: {osc_addr}\n   -String: {string}")
         def pad(data):
             return data + b"\0" * (4 - (len(data) % 4 or 4))
 
@@ -84,7 +85,5 @@ class OSC:
         except Exception:
             import traceback
             traceback.print_exc()
-
-        alva_log("osc", string)
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

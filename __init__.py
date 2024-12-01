@@ -92,9 +92,11 @@ with Blender. Most of Sorcerer is just for lighting, but some is for 3D audio to
 
 - updaters: The updaters for anything that is not a CPV update (direct parameter update). 
 
-- utils: Please do not make a misc_utils.py here. Right now, everything is organized into the 
-    type is utils and there is no "utils.py" that just has anything and everything in it.
-    Let's keep it that way.
+- utils: This is for helper functions that are either used globally throughout the codebase
+    or need to be kept separate from larger logic trees for readability (event_utils.py for
+    example). Please do not make a misc_utils.py here. Right now, everything is organized 
+    into the type of utils and there is no "utils.py" that just has anything and everything 
+    in it. Let's keep it that way.
 
 - event_manager.py: This script is here to define what happens on events like play, stop, 
     scrub, frame change, and translate/transform. This script encompasses 3D audio and lighting,
@@ -168,7 +170,12 @@ def register():
             print(f"Failed to register: {e}")
 
     from .spy import SorcererPython  # Simply importing this makes "from bpy import spy" work in Text Editor
+    register_as_classes()
     bpy.app.timers.register(on_register, first_interval=.01)
+
+def register_as_classes():
+    from .assets.lighting_consoles import register
+    register()
 
 
 def on_register():
@@ -185,3 +192,9 @@ def unregister():
             unregister_func()
         except Exception as e:
             print(f"Failed to unregister: {e}")
+
+    unregister_as_classes()
+
+def unregister_as_classes():
+    from .assets.lighting_consoles import unregister
+    unregister()

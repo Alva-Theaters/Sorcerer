@@ -354,7 +354,7 @@ spanish_tooltips = { # Translation provided by ChatGPT (GPT-4o) last on 11/30/20
     "end_preset": "Preset universal usado para varias actividades finales",
 
     # View3D Operators
-    "alva_object.duplicate_object": "Duplicar y deslizar el objeto seleccionado",
+    "alva_object.duplicate_object": "Duplicar y Deslizar",
     "duplicate_direction": "Dirección del movimiento: 1 para positivo, -1 para negativo",
     "duplicate_quantity": "Cantidad de duplicados a crear"
 

@@ -9,6 +9,7 @@ from ..utils.osc import OSC
 from ..assets.dictionaries import Dictionaries
 from .map import SliderToFixtureMapper
 from .split_color import ColorSplitter
+from ..utils.spy_utils import REGISTERED_LIGHTING_CONSOLES
     
 change_requests = []
 PROPERTIES_TO_MAP = ["strobe", "pan", "tilt", "zoom", "gobo_speed"]
@@ -22,6 +23,10 @@ class Publish:
         self.value = value
         self.patch_controller = self.find_my_patch_controller()
         self.is_harmonized = is_harmonized
+        self._DataClass = self._find_data_class()
+        self._address = self._DataClass.osc_address
+        self._rounding_points = self._DataClass.rounding_points
+        self._format_value_function = self._DataClass.format_value
 
     @property
     def is_bound_to_harmonizer(self):
@@ -33,30 +38,45 @@ class Publish:
                 if obj.object_identities_enum == "Fixture" and obj.list_group_channels[0].chan == self.channel:
                     return obj
         return self.generator.parent
+    
+    @staticmethod
+    def _find_data_class():
+        console_mode = bpy.context.scene.scene_props.console_type_enum
+        try:
+            return REGISTERED_LIGHTING_CONSOLES[console_mode]
+        except KeyError:
+            print(f"Error: The console mode '{console_mode}' is not registered.")
+            return None
 
 
     def execute(self):
         if self.property_name in PROPERTIES_TO_MAP:
             self.value = SliderToFixtureMapper(self).execute()
 
-        if self.property_name == 'color':
+        if self.property_name in ['color', 'raise_color', 'lower_color']:
             self.property_name, self.value = ColorSplitter(self.generator, self).execute()
 
-        argument_template = self._find_my_argument_template()
+        # This needs to go after ColorSplitter because it must see color type
+        # ("RGB" for example) in self.property_name, not just "color."
+        self._argument_template = self._find_argument_template()
 
-        self.send_cpv(argument_template)
+        if self.is_bound_to_harmonizer and not self.is_harmonized:
+            global change_requests
+            change_requests.append((self.generator, self.channel, self.property_name, self.value))
+        else:
+            full_argument, address = self.form_osc()
+            OSC.send_osc_lighting(address, full_argument, user=0)
 
-    def _find_my_argument_template(self):
-        console_mode = bpy.context.scene.scene_props.console_type_enum
-        if console_mode == "option_eos":
-            argument_template = Dictionaries.eos_arguments_dict.get(self.property_name, "Unknown Argument")
-        elif console_mode == 'option_ma3':
-            argument_template = Dictionaries.ma3_arguments_dict.get(self.property_name, "Unknown Argument")
-        elif console_mode == 'option_ma2':
-            argument_template = Dictionaries.ma2_arguments_dict.get(self.property_name, "Unknown Argument")
+    def _find_argument_template(self):
+        if "raise_" not in self.property_name and "lower_" not in self.property_name:
+            argument_template = self._DataClass.absolute.get(self.property_name, "Unknown Argument")
+        elif "raise_" in self.property_name:
+            argument_template = self._DataClass.increase.get(self.property_name, "Unknown Argument")
+        elif "lower_" in self.property_name:
+            argument_template = self._DataClass.decrease.get(self.property_name, "Unknown Argument")
         else:
             SLI.SLI_assert_unreachable()
-            return "Invalid console mode."
+            return "Invalid lighting console."
 
         if self.property_name in ['strobe', 'prism']:
             argument_template = self._apply_special_parameter_syntax(argument_template)
@@ -78,19 +98,10 @@ class Publish:
 
         return argument
 
-    def send_cpv(self, argument_template):
-        if self.is_bound_to_harmonizer and not self.is_harmonized:
-            global change_requests
-            change_requests.append((self.generator, self.channel, self.property_name, self.value))
-        else:
-            address, full_argument = self.form_osc(argument_template)
-            OSC.send_osc_lighting(address, full_argument, user=0)
-
-    def form_osc(self, argument_template):
+    def form_osc(self):
         channel = self.channel
         parameter = self.property_name
         value = self.value
-        address = self._find_osc_address()
 
         color_profiles = {
             # Absolute Arguments
@@ -124,61 +135,27 @@ class Publish:
         if parameter not in color_profiles:
             channel = self.format_channel(channel)
             value = self.format_value(value)
-            address = address.replace("#", channel).replace("$", value)
-            argument = argument_template.replace("#", channel).replace("$", value)
+            address = self._address.replace("#", channel).replace("$", value)
+            argument = self._argument_template.replace("#", channel).replace("$", value)
         else:
             formatted_values = [self.format_value(val) for val in value]
 
             channel = self.format_channel(channel)
-            argument = argument_template.replace("#", channel)
+            address = self._address
+            argument = self._argument_template.replace("#", channel)
             
             for i, formatted_value in enumerate(formatted_values):
                 argument = argument.replace(color_profiles[parameter][i], str(formatted_value))
 
-        return address, argument
-    
-    def _find_osc_address(self):
-        console_mode = bpy.context.scene.scene_props.console_type_enum
-        if console_mode == "option_eos":
-            return "/eos/newcmd"
-        elif console_mode == 'option_ma3':
-            return "/cmd"
-        elif console_mode == 'option_ma2':
-            return "/cmd"
-        else:
-            SLI.SLI_assert_unreachable()
-            return "/eos/newcmd"
+        return argument, address
     
     def format_channel(self, channel):
         return str(channel)
     
     def format_value(self, value):
-        rounding = {
-            "option_eos": 0,
-            "option_grandMA2": 2,
-            "option_grandMA3": 2
-        }
-        console_type = bpy.context.scene.scene_props.console_type_enum
-        value = round(value, rounding[console_type])
-        if console_type == 'option_eos':
-            value = self.add_zero_prefix_for_eos(value)
-        else:
-            value = str(value)
+        value = round(value, self._rounding_points)
+        value = self._format_value_function(value)
         return value
-    
-    def add_zero_prefix_for_eos(self, value):
-        '''We have to do this stuff because Eos interprets "1" as 10, "2" as 20, etc.'''
-        if -10 < value < 10:
-            return f"{'-0' if value < 0 else '0'}{abs(value)}"
-        return str(value)
-
-    def find_objects():
-        relevant_objects = []
-        for obj in bpy.data.objects:
-            if obj.object_identities_enum == "Fixture":
-                relevant_objects.append(obj)
-                pass
-        return relevant_objects
 
 
 def clear_requests():
