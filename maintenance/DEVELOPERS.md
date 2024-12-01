@@ -1,9 +1,30 @@
 Development
 =============
 
+Intro:
+-----------
+Within the context of Blender add-ons, this codebase is comparable in size to Hard-ops, Animation Nodes, and MTree. However, this add-on does not serve existing Blender workflows. Alva Sorcerer has nothing to do with computer graphics; we're using Blender because it's a free and open-source node engine, video editor, 3D view, graph editor, Python API, and more all rolled into one mature platform.
+
+Basically, what we're trying to do is animate the controls of a performance venue (like a concert hall) using Blender. 
+
+**Lighting:** Sorcerer remote-controls existing lighting consoles like ETC Eos family theatrical lighting consoles and touring consoles like grandMA3. We want Blender to remote-control them because Blender is way better at creating pre-made sequences than they are. 
+
+Existing consoles are all built on the foundation of one of those old DMX-512 fader boards that are the size of a loaf of bread. A grandMA3 consoles is that, just a few thousand times more advanced, powerful, useful, fancy, and sophisticated. But all those high-end consoles all start with that same foundation.
+
+Alva Sorcerer says instead of starting with one of those crappy old DMX-512 fader boards, start with Blender. Blender is your foundation. Only focus on pre-made sequences. Busking is no longer an engineering constraint. Now you're suddenly free to control lights in some exotic, bizarre, outside the box ways. When you see what you can do here and then look back at the lighting console by itself, you ask, "How on earth does nobody else have this stuff?" It's because they're starting with a fader board. We're starting with friggin Blender.
+
+**Audio:** Sorcerer creates 3D audio content for Qlab. It also remote-controls Qlab for real-time monitoring. It's kind of like Dolby Atmos, but for live sound systems. We want Blender doing this because it lets you put all your creative control under one roof in a visually inspiring way.
+
+In the case of Dolby Atmos, you have to have half a dozen softwares open at once to get anything done. Each sound object is just a sphere on the screen with a text label. The rest of the screen is blank. To make audio objects move, you need to make fade cues, so it's not easy to get precise moves. Often, the thing controlling this is in one software and the thing controlling that is in an entirely different software. 
+
+In the case of Sorcerer, creative control of lighting, video, and audio is all in the same software. If a sound object represents a horse, it can be a horse. If a helicopter is flying over the white house, you can add a model of the white house and of a helicopter, make the helicopter fly over the white house, and set the helicopter as the audio object. If you want to move an observer through a rainforest, set up all the rainforest and animate the speaker rig through the rainforest. If you want this audio object to be bigger, just scale it up. If you want an audio object that isn't a sphere, you can make it whatever shape you want. The 3D sound panner will factor in its irregular shape. If you want a moving light to track a 3D audio object, it's so easy you may do it by accident. 
+
+That's the only rational way to design 3D audio. Not these blank dots in a blank cube.
+
+
 Logging/Service Mode:
 ---------------------
-Logging in Sorcerer is controlled through the UI. You type “service mode” into the command line in 3D view, it adds a Service Mode panel, and you can toggle the built-in logging print statements for specific debugging needs there. Repeat the activation procedure to disable Service Mode.
+Logging in Sorcerer is controlled through the UI. You type “service mode” into the command line in 3D view, it adds a Service Mode panel, and you can toggle the built-in logging print statements for specific debugging needs there. Repeat the activation procedure to disable Service Mode. NOTE: Currently, if you're in grandMA3 console mode, you have to go into ETC Eos console mode to get to that command line (it's hidden because the primary feature isn't compatible with MA yet). Console-specific hiding will become far less dumb in the near future. 
 
 
 Testing/Limp Mode:
