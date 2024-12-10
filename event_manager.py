@@ -296,7 +296,7 @@ class EventManager:
             return
         
         for strip in scene.sequence_editor.sequences_all:
-            if strip.type == 'SOUND' and strip.selected_stage_object != None:
+            if strip.type == 'SOUND' and not strip.selected_stage_object:
                 sound_object = bpy.data.objects[strip.selected_stage_object.name]
 
                 for speaker_list in sound_object.speaker_list:
@@ -496,9 +496,12 @@ class EventManager:
     '''Playback STOP handler'''
     #-------------------------------------------------------------------------------------------------------------------------------------------
     def end_timecode_session(self, scene):
+        CMD_ADDRESS = "/eos/newcmd"
+        INTERNAL_DISABLE = "Event $ / Internal Disable Enter"
+        PAUSE_SOUND = "/cue/$/pause"
+        
         '''DOCUMENTATION CODE C3'''
         scene.scene_props.is_playing = False
-        scene = bpy.context.scene
         
         # Go house up.
         if scene.house_up_on_stop:
@@ -514,10 +517,10 @@ class EventManager:
                 
             if relevant_lighting_clock_object:
                 clock = relevant_lighting_clock_object.int_event_list
-                OSC.send_osc_lighting("/eos/newcmd", f"Event {clock} / Internal Disable Enter", user=0)
+                OSC.send_osc_lighting(CMD_ADDRESS, INTERNAL_DISABLE.replace("$", clock), user=0)
 
                 if hasattr(relevant_sound_strip, "int_sound_cue"):
-                    OSC.send_osc_audio(f"/cue/{relevant_sound_strip.int_sound_cue}/pause", "")
+                    OSC.send_osc_audio(PAUSE_SOUND.replace("$", relevant_sound_strip.int_sound_cue), "")
 
         '''C3:3'''
         self.start_mapping = None
@@ -560,7 +563,7 @@ class EventManager:
         clear_requests()
 
 
-event_manager_instance = EventManager()  # Must use () here for binding
+event_manager_instance = EventManager()
 
 
 @persistent
