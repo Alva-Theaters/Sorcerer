@@ -160,9 +160,9 @@ class Items:
             ('Fixture', "Fixture", "This controls a single lighting fixture.", 'OUTLINER_OB_LIGHT', 0),
             ('Pan/Tilt Fixture', "Pan/Tilt", "Select this only if you intend to use Blender's pan/tilt gimbals or constraints.", 'ORIENTATION_GIMBAL', 1),
             ('Influencer', "Influencer", "This is a bit like 3D bitmapping. Fixtures inside this object will inherit this object's parameters. Changes are reverted when the object leaves.", 'CUBE', 2),
-            ('Key', "Key", "Create 3-dimensional gradients with influencers that can interact with each other.", 'CUBE', 2),
-            ('Brush', "Brush", "Move this object over fixtures for a paint brush effect. Changes persist when the object leaves.", 'BRUSH_DATA', 3),
-            ('Stage Object', "Stage Object", "Select the lights on a specific stage object by selecting the stage object, not a light-board group.", 'HOME', 4)
+            ('Key', "Key", "Create 3-dimensional gradients with influencers that can interact with each other.", 'CUBE', 3),
+            ('Brush', "Brush", "Move this object over fixtures for a paint brush effect. Changes persist when the object leaves.", 'BRUSH_DATA', 4),
+            ('Stage Object', "Stage Object", "Select the lights on a specific stage object by selecting the stage object, not a light-board group.", 'HOME', 5)
         ]
         
         return items

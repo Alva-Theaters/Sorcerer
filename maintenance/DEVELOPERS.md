@@ -9,9 +9,9 @@ Basically, what we're trying to do is animate the controls of a performance venu
 
 **Lighting:** Sorcerer remote-controls existing lighting consoles like ETC Eos family theatrical lighting consoles and touring consoles like grandMA3. We want Blender to remote-control them because Blender is way better at creating pre-made sequences than they are. 
 
-Existing consoles are all built on the foundation of one of those old DMX-512 fader boards that are the size of a loaf of bread. A grandMA3 consoles is that, just a few thousand times more advanced, powerful, useful, fancy, and sophisticated. But all those high-end consoles all start with that same foundation.
+Existing consoles are all built on the foundation of one of those old DMX-512 fader boards that are the size of a loaf of bread. A grandMA3 console is that, just a few thousand times more advanced, powerful, useful, fancy, and sophisticated. But all those high-end consoles start with that same foundation.
 
-Alva Sorcerer says instead of starting with one of those crappy old DMX-512 fader boards, start with Blender. Blender is your foundation. Only focus on pre-made sequences. Busking is no longer an engineering constraint. Now you're suddenly free to control lights in some exotic, bizarre, outside the box ways. When you see what you can do here and then look back at the lighting console by itself, you ask, "How on earth does nobody else have this stuff?" It's because they're starting with a fader board. We're starting with friggin Blender.
+Alva Sorcerer says instead of starting with one of those crappy old DMX-512 fader boards, start with Blender. Blender is your foundation. Only focus on pre-made sequences. Busking is no longer an engineering constraint. Now, you're suddenly free to control lights in some exotic, bizarre, outside the box ways. When you see what you can do here and then look back at the lighting console by itself, you ask, "How on earth does nobody else have this stuff?" It's because they're starting with a fader board. We're starting with friggin Blender.
 
 **Audio:** Sorcerer creates 3D audio content for Qlab. It also remote-controls Qlab for real-time monitoring. It's kind of like Dolby Atmos, but for live sound systems. We want Blender doing this because it lets you put all your creative control under one roof in a visually inspiring way.
 
@@ -121,7 +121,7 @@ Within the file system, Sorcerer calls properties, the things we register to the
 
 Some of Sorcerer's properties need to be registered the same way to many different things (scene, nodes, objects, sequencer strips, etc). Those properties are found in the rna_common.py file. Review that script to learn how that system works: it's kind of like the menu at a restaurant. It uses a dictionary data structure to store the property registration data so that you can register dozens of properties to a new bpy type with a simple, single-line function call. 
 
-Currently, some of the tooltips use a special find_tooltip function. In the future, all tooltips will be stored in a single file in a dictionary. That way, we can find inconsistencies, typos, and style variations quickly. This will also make translations signficicantly easier in the future. 
+Currently, some of the tooltips use a special find_tooltip function. In the future, all tooltips will be stored in a single file in a dictionary. That way, we can find inconsistencies, typos, and style variations quickly. This will also make translations significantly easier in the future. 
 
 The format_tooltip function is there to correct problems related to Blender's C++ code that sometimes adds the period to the end and sometimes doesn't. In Blender 4.3, Blender is modifying this behavior, but at this time the final behavior has not been set in stone. 
 

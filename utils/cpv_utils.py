@@ -49,25 +49,26 @@ def find_parent(object):
 
 
 def find_controller_type(parent, property_name):
-    is_pan_tilt_node = property_name in ['pan_graph', 'tilt_graph']
-        
-    if hasattr(parent, "type"):
-        if parent.type == 'MESH' and hasattr(parent, "object_identities_enum"):
-            if is_pan_tilt_node:
-                return "Pan/Tilt"
-            return parent.object_identities_enum
-        
-        elif parent.type == 'COLOR':
-            return "strip"
-        
-        elif parent.type == 'CUSTOM': # Nodes
-            controller_types = {
-            'group_controller_type': "group",
-            'mixer_type': "mixer",
-            }
-            return controller_types.get(parent.bl_idname, None)
-    else:
+    if not hasattr(parent, "type"):
         SLI.SLI_assert_unreachable()
+
+    if parent.type == 'MESH' and hasattr(parent, "object_identities_enum"):
+        if property_name in ['pan_graph', 'tilt_graph']:
+            return "Pan/Tilt"
+        return parent.object_identities_enum
+    
+    elif parent.type == 'COLOR':
+        return "strip"
+    
+    elif parent.type == 'CUSTOM': # Nodes
+        controller_types = {
+        'group_controller_type': "group",
+        'mixer_type': "mixer",
+        }
+        return controller_types.get(parent.bl_idname, None)
+    
+    SLI.SLI_assert_unreachable()
+        
 
 
 def color_object_to_tuple_and_scale_up(v):

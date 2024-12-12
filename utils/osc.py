@@ -12,7 +12,7 @@ from ..maintenance.logging import alva_log
 class OSC:
     def correct_argument_because_etc_is_weird(argument):
         '''Required for influencers to work properly'''
-        return argument.replace(" at - 00 ", " at + 00 ")
+        return argument.replace(" at - 00", " at + 00")
         
 
     def send_osc(address, argument):

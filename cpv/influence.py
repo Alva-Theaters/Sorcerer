@@ -5,13 +5,22 @@
 import bpy
 from mathutils import Vector, kdtree
 import time
+import math
 
 from .publish import Publish
 from ..maintenance.logging import alva_log
 
 PARAMETER_NOT_FOUND_DEFAULT = 'alva_intensity'
 WHITE_COLOR = (1, 1, 1)
-MAINTAIN_ROUNDING_THRESHOLD = 1  # Number of places to round
+MAINTAIN_ROUNDING_THRESHOLD = 3  # Number of places to round
+INFLUENCE_RADIUS_MULTIPLIER = 2
+LIGHT_SENSITIVITY_MULTIPLIER = 2
+
+# ANSI escape codes for colors
+RED = "\033[31m"
+GREEN = "\033[32m"
+BLUE = "\033[34m"
+RESET = "\033[0m"
 
 
 def find_influencer_cpv(generator):
@@ -68,11 +77,11 @@ class Influence:
 
     def execute(self):
         start = time.time()
-        new_channels, maintain_channels, release_channels = SetGroups(self).execute()
-        Initialize(self).execute(new_channels)
-        Maintain(self).execute(maintain_channels)
+        alva_log("influence", f"\n{RED}INFLUENCER SESSION:{RESET}")
+        new_channels, maintain_channels, release_channels, values, new_channels_values = SetGroups(self).execute()
+        Initialize(self).execute(new_channels, new_channels_values)
+        Maintain(self).execute(maintain_channels, values)
         Release(self).execute(release_channels)
-        alva_log("influence", "")
         alva_log('time', f"TIME: find_influencer_cpv took {time.time() - start} seconds")
 
 
@@ -113,39 +122,69 @@ class SetGroups:
         self.is_maintaining = self._is_maintaining_channels()
 
     def _is_maintaining_channels(self):
-        return self.influencer.controller_type == "Influencer"
-    
-    
+        return self.influencer.controller_type in ["Influencer", "Key"]
+
+
     def execute(self):
         start = time.time()
-        _current_channels = self._find_current_channels()
+        _current_channels, values = self._find_current_channels()
+        _stored_channels = [chan.channel_object for chan in self.influencer.parameter_property_group]
+
         alva_log('time', f"TIME: find_influencer_current_channels took {time.time() - start} seconds")
-        _stored_channels = self._find_stored_channels()
+        alva_log("influence", f"{RED}SetGroups._execute | Current channels: {[obj.name for obj in _current_channels]}\nSetGroups._execute | Stored Channels: {[obj.name for obj in _stored_channels]}")
 
-        alva_log("influence", f"INFLUENCER SESSION:\nSET. Current channels: {_current_channels}\nSET. Stored Channels: {_stored_channels}")
+        new_channels = [chan for chan in _current_channels if chan not in _stored_channels]
+        release_channels = [chan for chan in _stored_channels if chan not in _current_channels]
+        maintain_channels = [chan for chan in _current_channels if chan in _stored_channels] if self.is_maintaining else []
 
-        new_channels = self._calculate_new_channels(_current_channels, _stored_channels)
-        release_channels = self._calculate_release_channels(_stored_channels, _current_channels)
-        maintain_channels = self._calculate_maintain_channels(_current_channels, new_channels, release_channels)
+        # Align values with new_channels
+        new_channels_values = [values[_current_channels.index(chan)] for chan in new_channels]
 
-        alva_log("influence", f"GROUPS. Must Initialize: {new_channels}\nSET. Must Maintain: {maintain_channels}\nSET. Must Release: {release_channels}")
+        alva_log("influence", f"SetGroups._execute | Must Initialize: {[obj.name for obj in new_channels]}\n"
+                            f"SetGroups._execute | Must Maintain: {[obj.name for obj in maintain_channels]}\n"
+                            f"SetGroups._execute | Must Release: {[obj.name for obj in release_channels]}{RESET}")
 
-        return new_channels, maintain_channels, release_channels
-
+        return new_channels, maintain_channels, release_channels, values, new_channels_values
+        
     def _find_current_channels(self):
-        return FindObjectsInside(self.influencer.parent).execute()
+        if self.influencer.controller_type != "Key":
+            self._trigger_object_id_updaters()
+            channel_objects = FindObjectsInside(self.influencer.parent).execute()
+            return list(channel_objects), []
+        else:
+            light_objects, influencers, strengths = FindInfluenceField(self.influencer.parent).execute()
+            harmonized_channels, harmonized_values = self._harmonize_influence_field(light_objects, influencers, strengths)
+            return list(harmonized_channels), list(harmonized_values)
+        
+    def _trigger_object_id_updaters(self):
+        # This just needs to run the str_manual_fixture_selection updater on all linked (within same collection) influencers
+        return None
+        
+    def _harmonize_influence_field(self, light_objects, influencers, strengths):
+        harmonized_channels = []
+        harmonized_values = []
 
-    def _find_stored_channels(self):
-        return {chan.channel_object for chan in list(self.influencer.parameter_property_group)}
+        light_influence_map = {}
 
-    def _calculate_new_channels(self, current_channels, stored_channels):
-        return current_channels - stored_channels
+        # Aggregate influences per light
+        for light, influencer, strength in zip(light_objects, influencers, strengths):
+            if light not in light_influence_map:
+                light_influence_map[light] = []
+            light_influence_map[light].append((influencer, strength))
 
-    def _calculate_release_channels(self, stored_channels, current_channels):
-        return stored_channels - current_channels
+        # Blend influences for each light
+        for light, influence_data in light_influence_map.items():
+            print(f"Light is {light.name} and influence_data is {influence_data}")
+            blended_value = sum(
+                data[1] * getattr(data[0], f"alva_{self.influencer.property_name}", 0)
+                for data in influence_data
+            )
+            harmonized_channels.append(light)
+            harmonized_values.append(blended_value)
 
-    def _calculate_maintain_channels(self, current_channels, new_channels, release_channels):
-        return current_channels - (release_channels | new_channels) if self.is_maintaining else frozenset()
+        alva_log("influence", f"{GREEN}SetGroups._harmonize_influence_field | Harmonized channels: {[chan.name for chan in harmonized_channels]}\nSetGroups._harmonize_influence_field | Harmonized values: {[round(value, 2) for value in harmonized_values]}")
+
+        return harmonized_channels, harmonized_values
 
 
 class Initialize:
@@ -178,20 +217,24 @@ class Initialize:
         )
 
 
-    def execute(self, new_channels):
-        list(map(self._initiate_channel, new_channels))
+    def execute(self, new_channels, values):
+        if values: # 3D gradient mode
+            list(map(self._initiate_channel, new_channels, values))
+        else:
+            list(map(self._initiate_channel, new_channels))
 
-    def _initiate_channel(self, channel_object):
+    def _initiate_channel(self, channel_object, value=None):
         channel_number = self._get_initiate_channel_number(channel_object)
-        value = self._determine_initiate_value()
+        value = self._determine_initiate_value(value)
         Publish(self.influencer, channel_number, self.property_name, value).execute()
         self._set_memory_item(self.influencer.parameter_property_group, channel_object, value)
+        alva_log("influence", f"{BLUE}Initialize._initiate_channel | Channel {channel_number} | Value: {round(value, 2)}, Property name: {self.property_name}")
 
     def _get_initiate_channel_number(self, channel_object):
         return channel_object.list_group_channels[0].chan
 
-    def _determine_initiate_value(self):
-        return getattr(self.influencer.parent, f"alva_{self.influencer.property_name}")
+    def _determine_initiate_value(self, input_value=None):
+        return input_value if input_value else getattr(self.influencer.parent, f"alva_{self.influencer.property_name}")
 
     def _set_memory_item(self, collection, channel_object, value):
         new_channel = collection.add()
@@ -251,19 +294,22 @@ class Maintain:
         return self.influencer.property_name != "color"
 
 
-    def execute(self, maintain_channels):
-        list(map(self._maintain_channel, maintain_channels))
+    def execute(self, maintain_channels, values):
+        if values:
+            list(map(self._maintain_channel, maintain_channels, values))
+        else:
+            list(map(self._maintain_channel, maintain_channels))
 
-    def _maintain_channel(self, channel_object):
+    def _maintain_channel(self, channel_object, value=None):
         channel_number = self._get_maintain_channel_number(channel_object)
         memory_item = self._get_memory_item(channel_object)
         stored_value = self._determine_stored_value(memory_item)
-        current_value = self._determine_current_value()
+        current_value = self._determine_current_value(value)
         needed_change, is_positive = self._determine_needed_change(stored_value, current_value)
         new_memory_value = self._determine_new_memory_value(current_value)
         must_proceed = self._should_proceed(needed_change)
         self._set_argument_prefix(is_positive)
-        alva_log("influence", f"MAINT. Stored Value: {stored_value}\nMAINT. Current Value: {current_value}\nMAINT. Needed Change: {needed_change}\nMAINT. is_positive: {is_positive}\nMAINT. New Memory Value: {new_memory_value}\nMAINT. Property Name: {self.property_name}\nMAINT. Must Proceed: {must_proceed}")
+        alva_log("influence", f"{BLUE}Maintain._maintain_channel | Channel {channel_number} | (Stored value: {round(stored_value, 2)}, Current value: {round(current_value, 2)}, Needed change: {round(needed_change, 2)}, is_positive: {GREEN if is_positive else RED}{is_positive}{BLUE}, New memory value: {round(new_memory_value, 2)}, Property name: {self.property_name}, Must proceed: {GREEN if must_proceed else RED}{must_proceed}{RESET})")
 
         if must_proceed:
             Publish(self.influencer, channel_number, self.property_name, needed_change).execute()
@@ -286,8 +332,8 @@ class Maintain:
         else:
             return abs(value)
     
-    def _determine_current_value(self):
-        return getattr(self.influencer.parent, f"alva_{self.influencer.property_name}")
+    def _determine_current_value(self, input_value=None):
+        return input_value if input_value else getattr(self.influencer.parent, f"alva_{self.influencer.property_name}")
     
     def _determine_needed_change(self, stored_value, current_value):
         if self.influencer.property_name == "color":
@@ -303,7 +349,7 @@ class Maintain:
     def _should_proceed(self, needed_change):
         if self.influencer.property_name == "color":
             return True # TODO - This should be smarter.
-        return round(abs(needed_change), MAINTAIN_ROUNDING_THRESHOLD) != 0
+        return not math.isclose(needed_change, 0, rel_tol=1e-5, abs_tol=1e-5)
     
     def _set_argument_prefix(self, is_positive):
         influencer = self.influencer
@@ -492,6 +538,58 @@ class FindObjectsInside:
             for i in range(3)
         )
     
+
+class FindInfluenceField:  
+    def __init__(self, parent):
+        self.parent = parent  # The influencer object (3D mesh) whose field we're evaluating.
+        self.influencers = self._find_all_relevant_influencers()
+        alva_log("influence", f"{BLUE}FindInfluencerField.__init__ | Relevant influencers: {[obj.name for obj in self.influencers]}")
+
+    def execute(self):
+        light_objects = []
+        influencers = []
+        strengths = []
+
+        # Iterate over all lights in the scene
+        for light in self._find_all_lights_in_scene():
+            for influencer in self.influencers:
+                strength = self._calculate_strength(light, influencer)
+                if strength > 0:  # Only include if within the range of influence
+                    light_objects.append(light)
+                    influencers.append(influencer)
+                    strengths.append(strength)
+
+        return light_objects, influencers, strengths
+
+    def _find_all_relevant_influencers(self):
+        # Return all "Key" influencer meshes in the same Blender collection
+        return [
+            obj for obj in self.parent.users_collection[0].objects
+            if obj.object_identities_enum == "Key"
+        ]
+
+    def _find_all_lights_in_scene(self):
+        #Return all light objects in the scene
+        lights = [
+            obj for obj in bpy.data.objects
+            if obj.object_identities_enum == "Fixture" and obj.users > 0
+        ]
+        alva_log("influence", f"FindInfluencerField._find_all_lights_in_scene | Lights: {[obj.name for obj in lights]}")
+        return lights
+
+    def _calculate_strength(self, light, influencer):
+        # Strength depends on proximity and scale
+        distance = (light.location - influencer.location).length
+        influence_radius = sum(influencer.scale) * INFLUENCE_RADIUS_MULTIPLIER  # Average scale defines the radius
+        light_sensitivity = sum(light.scale) * LIGHT_SENSITIVITY_MULTIPLIER
+
+        alva_log("influence", f"FindInfluencerField._calculate_strength | {light.name} | Distance: {round(distance, 2)}, Influence radius: {round(influence_radius, 2)}, Light sensitivity: {round(light_sensitivity, 2)}")
+
+        if distance > influence_radius:
+            return 0  # Out of range
+        
+        return max(0, (1 - (distance / influence_radius)) * light_sensitivity)
+
 
 '''
 DOCUMENTATION CODE A1:

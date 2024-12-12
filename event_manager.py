@@ -320,7 +320,7 @@ class EventManager:
             if not isinstance(obj, bpy.types.Object):
                 continue
 
-            if obj.object_identities_enum not in ["Influencer", "Brush"]:
+            if obj.object_identities_enum not in ["Influencer", "Brush", "Key"]:
                 continue
 
             if update.is_updated_transform:
@@ -386,7 +386,7 @@ class EventManager:
         Utils.check_and_trigger_drivers(objects_with_drivers)
 
         '''A1:3.2'''
-        dynamic_objects = {obj for obj in scene.objects if obj.animation_data and (obj.object_identities_enum in ["Influencer", "Brush"] or obj.int_alva_sem != 0)}
+        dynamic_objects = {obj for obj in scene.objects if obj.animation_data and (obj.object_identities_enum in ["Influencer", "Brush", "Key"] or obj.int_alva_sem != 0)}
         for obj in dynamic_objects:
             Utils.trigger_special_update(obj)
             if obj.int_alva_sem != 0:

@@ -47,7 +47,7 @@ pcoll.load("effect_fourteen", os.path.join(icons_dir, "effect_fourteen.png"), 'I
 filter_color_strips = partial(filter, bpy.types.ColorSequence.__instancecheck__)
 
 
-def draw_alva_sequencer_view(self, layout):
+def draw_alva_sequencer_view_menu(self, layout):
     if bpy.context.scene.scene_props.console_type_enum == 'option_eos':
         pcoll = preview_collections["main"]
         orb = pcoll["orb"]
@@ -77,7 +77,7 @@ def draw_alva_sequencer_add_menu(self, layout):
         layout.operator("alva_seq.add", text="Trigger", icon='SETTINGS').Option = "Option_trigger"
 
 
-def draw_alva_sequencer_strip(self, context):
+def draw_alva_sequencer_strip_menu(self, context):
     if context.scene.scene_props.console_type_enum == 'option_eos':
         pcoll = preview_collections["main"]
         orb = pcoll["orb"]
@@ -94,7 +94,7 @@ def draw_alva_sequencer_strip(self, context):
         layout.prop(context.scene, "cue_builder_id_offset", text="Index Offset", toggle=True)
 
 
-def draw_alva_sequencer_cmd_line(self, context):
+def draw_alva_sequencer_cmd_line_display(self, context):
     if (hasattr(context.scene, "scene_props") and
         context.scene.scene_props.view_sequencer_command_line):
         layout = self.layout
@@ -105,9 +105,15 @@ def draw_alva_sequencer_cmd_line(self, context):
         layout.label(text=scene.command_line_label)
 
 
-def draw_strip_media(self, context, scene, bake_panel=True):
+def draw_strip_media(self, context, scene):
+    '''
+    This is drawn on the side panel and on the M key popup.
+    
+    This UI is highly context-specific.
+    '''
     layout = self.layout
     scene = context.scene
+    box = None
 
     if not context.scene.scene_props.console_type_enum == 'option_eos':
         return
@@ -115,77 +121,45 @@ def draw_strip_media(self, context, scene, bake_panel=True):
     if not hasattr(scene, "sequence_editor") and scene.sequence_editor:
         draw_intro_header(self, context, None, scene, None)
 
-    # Check if the sequence editor and active strip exist
-    elif hasattr(scene, "sequence_editor") and scene.sequence_editor:
-        sequence_editor = scene.sequence_editor
-        if hasattr(sequence_editor, "active_strip") and sequence_editor.active_strip:
-            active_strip = sequence_editor.active_strip
-            alva_context, console_context = determine_sequencer_contexts(sequence_editor, active_strip)
-        else:
-            alva_context = "none_relevant"
-            console_context = "none"
-            
-        column = layout.column(align=True)
-
-        if alva_context == "incompatible_types":
-            box = draw_incompatible_types(self, context, column, scene, active_strip)
+    if not hasattr(scene, "sequence_editor") or not scene.sequence_editor:
+        return
     
-        elif alva_context == "only_sound":
-            box = draw_only_sound(self, context, column, active_strip)
-            
-        elif alva_context == "one_video_one_audio":
-            box = draw_one_audio_one_video(self, context, column, scene, active_strip)
-                
-        elif alva_context == "none_relevant":
-            box = draw_none_relevant(self, context, sequence_editor, column, scene)
-
-        elif alva_context == "only_color":
-            box = draw_color_header(self, context, column, scene, active_strip, console_context)
-            
-            if console_context == "macro":
-                draw_strip_macro(self, context, column, box, active_strip)
-            
-            elif console_context == "cue":
-                draw_strip_cue(self, context, column, box, active_strip)
-                if scene.cue_builder_toggle:
-                    draw_cue_builder(self, context, box, scene, active_strip)
-
-            elif console_context == "flash":  
-                row = box.row()
-                #row.prop(active_strip, "flash_type_enum", expand=0, text="Method")
-                
-                if active_strip.flash_type_enum != 'option_use_controllers':
-                    draw_strip_flash_manual(self, context, box, active_strip)
-                else: draw_strip_flash_controllers(self, context, box, active_strip)
-                
-                draw_strip_flash_footer(self, context, box, active_strip)
-                
-            elif console_context == "animation":
-                draw_text_or_group_input(self, context, box, active_strip, object=False)
-                draw_parameters_mini(self, context, box, active_strip, use_slider=True, expand=True, text=False)
-                box.separator()
-                draw_play_bar(self, context, box)
-                draw_footer_toggles(self, context, column, active_strip)
-
-            elif console_context == "offset":
-                draw_strip_offset(self, context, column, box, active_strip)
-                        
-            elif console_context == "trigger":
-                draw_strip_trigger(self, context, column, box, active_strip)
+    sequence_editor = scene.sequence_editor
+    if hasattr(sequence_editor, "active_strip") and sequence_editor.active_strip:
+        active_strip = sequence_editor.active_strip
+        alva_context, console_context = determine_sequencer_contexts(sequence_editor, active_strip)
+    else:
+        alva_context = "none_relevant"
+        console_context = "none"
         
-        else:
-            draw_add_buttons_row(self, context, column, scene, active_strip)
-            column.separator()
-            box = draw_text_insert(self, context, column, text="No active color strip.")
-            return box    
-                        
-        if not scene.bake_panel_toggle and alva_context == "only_color" and console_context != "animation":
-            box.separator()
+    column = layout.column(align=True)
+
+    if alva_context == "incompatible_types":
+        box = draw_incompatible_types(self, context, column, scene, active_strip)
+
+    elif alva_context == "only_sound":
+        box = draw_only_sound(self, context, column, active_strip)
         
-        if alva_context == "only_color":
-            draw_strip_footer(self, context, column)
-        else:
-            draw_strip_footer(self, context, box)
+    elif alva_context == "one_video_one_audio":
+        box = draw_one_audio_one_video(self, context, column, scene, active_strip)
+            
+    elif alva_context == "none_relevant":
+        box = draw_none_relevant(self, context, sequence_editor, column, scene)
+
+    elif alva_context == "only_color":
+        draw_only_color(self, context, column, scene, active_strip, console_context)
+    
+    else:
+        draw_add_buttons_row(self, context, column, scene, active_strip)
+        column.separator()
+        box = draw_text_insert(self, context, column, text="No active color strip.")
+        return box    
+                    
+    if not scene.bake_panel_toggle and alva_context == "only_color" and console_context != "animation" and box:
+        box.separator()
+    
+    formatter = column if alva_context == "only_color" else box
+    draw_strip_footer(self, context, formatter)
         
 
 def draw_add_buttons_row(self, context, column, scene, active_strip, lighting_icons=False, console_context=None):
@@ -196,7 +170,7 @@ def draw_add_buttons_row(self, context, column, scene, active_strip, lighting_ic
     row.operator("alva_seq.add", text="", icon='IPO_BEZIER').Option = "option_animation"
     #row.operator("alva_seq.add", text="", icon='UV_SYNC_SELECT').Option = "option_offset"
     row.operator("alva_seq.add", text="", icon='SETTINGS').Option = "Option_trigger"
-    
+
 
 def draw_text_insert(self, context, column, text):
     column.separator()
@@ -210,14 +184,11 @@ def draw_text_insert(self, context, column, text):
 Not refactoring the following 4 functions to make it easy to add
 extra functionality for those contexts later.
 '''
-
-
 def draw_intro_header(self, context, column, scene, active_strip):
     draw_add_buttons_row(self, context, column, scene, active_strip)
     column.separator()
-    box = draw_text_insert(self, context, column, text="Welcome to ..")
+    box = draw_text_insert(self, context, column, text="Welcome to Alva Sorcerer!") 
     return box
-    
 
 
 def draw_incompatible_types(self, context, column, scene, active_strip):
@@ -266,6 +237,41 @@ def draw_only_sound(self, context, column, active_strip):
     row = box.row()
     row.operator("alva_seq.analyze_song", icon='SHADERFX')
     return box
+
+
+def draw_only_color(self, context, column, scene, active_strip, console_context):
+    box = draw_color_header(self, context, column, scene, active_strip, console_context)
+    
+    if console_context == "macro":
+        draw_strip_macro(self, context, column, box, active_strip)
+    
+    elif console_context == "cue":
+        draw_strip_cue(self, context, column, box, active_strip)
+        if scene.cue_builder_toggle:
+            draw_cue_builder(self, context, box, scene, active_strip)
+
+    elif console_context == "flash":  
+        row = box.row()
+        #row.prop(active_strip, "flash_type_enum", expand=0, text="Method") Doesn't work yet
+        
+        if active_strip.flash_type_enum != 'option_use_controllers':
+            draw_strip_flash_manual(self, context, box, active_strip)
+        else: draw_strip_flash_controllers(self, context, box, active_strip)
+        
+        draw_strip_flash_footer(self, context, box, active_strip)
+        
+    elif console_context == "animation":
+        draw_text_or_group_input(self, context, box, active_strip, object=False)
+        draw_parameters_mini(self, context, box, active_strip, use_slider=True, expand=True, text=False)
+        box.separator()
+        draw_play_bar(self, context, box)
+        draw_footer_toggles(self, context, column, active_strip)
+
+    elif console_context == "offset":
+        draw_strip_offset(self, context, column, box, active_strip)
+                
+    elif console_context == "trigger":
+        draw_strip_trigger(self, context, column, box, active_strip)
 
 
 def draw_color_header(self, context, column, scene, active_strip, console_context):
@@ -322,8 +328,8 @@ def draw_strip_cue(self, context, column, box, active_strip):
     row.prop(active_strip, "eos_cue_number", text="Cue #")
     row.operator("alva_tool.ghost_out", text="", icon='GHOST_ENABLED')
     if context.scene.cue_builder_toggle:
-        row.operator("my.update_builder", text="", icon='FILE_REFRESH')
-    row.operator("my.record_cue", text="", icon='REC')
+        row.operator("alva_seq.update_builder", text="", icon='FILE_REFRESH')
+    row.operator("alva_seq.record_cue", text="", icon='REC')
     row.operator("alva_orb.generate_cue", icon_value=orb.icon_id)
     row = box.row(align=True)
     row.scale_y = 2
@@ -352,7 +358,7 @@ def draw_builder_row(box, ops_list, id, active_strip, label, alert_flag, is_colo
     alert_ids = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
     row = box.row(align=True)
-    row.operator(f"my.{id}_groups", text="", icon='PREFERENCES')
+    row.operator(f"alva_seq.{id}_groups", text="", icon='PREFERENCES')
     row.prop(active_strip, f"{id}_light", text=label, slider=True)
     row.alert = alert_flag
     row_icons = color_icons if is_color else event_icons
@@ -387,27 +393,27 @@ def draw_cue_builder(self, context, box, scene, active_strip):
     effect_thirteen = pcoll["effect_thirteen"]
     effect_fourteen = pcoll["effect_fourteen"]
 
-    key_ops = ["my.focus_one", "my.focus_two", "my.focus_three", "my.focus_four", "my.focus_five", "my.focus_six", "my.focus_seven", "my.focus_eight", "my.focus_nine"]
+    key_ops = ["alva_seq.focus_one", "alva_seq.focus_two", "alva_seq.focus_three", "alva_seq.focus_four", "alva_seq.focus_five", "alva_seq.focus_six", "alva_seq.focus_seven", "alva_seq.focus_eight", "alva_seq.focus_nine"]
 
-    rim_ops = ["my.focus_rim_one", "my.focus_rim_two", "my.focus_rim_three", "my.focus_rim_four", "my.focus_rim_five", "my.focus_rim_six", "my.focus_rim_seven", "my.focus_rim_eight", "my.focus_rim_nine"]
+    rim_ops = ["alva_seq.focus_rim_one", "alva_seq.focus_rim_two", "alva_seq.focus_rim_three", "alva_seq.focus_rim_four", "alva_seq.focus_rim_five", "alva_seq.focus_rim_six", "alva_seq.focus_rim_seven", "alva_seq.focus_rim_eight", "alva_seq.focus_rim_nine"]
 
-    fill_ops = ["my.focus_fill_one", "my.focus_fill_two", "my.focus_fill_three", "my.focus_fill_four", "my.focus_fill_five", "my.focus_fill_six", "my.focus_fill_seven", "my.focus_fill_eight", "my.focus_fill_nine"]
+    fill_ops = ["alva_seq.focus_fill_one", "alva_seq.focus_fill_two", "alva_seq.focus_fill_three", "alva_seq.focus_fill_four", "alva_seq.focus_fill_five", "alva_seq.focus_fill_six", "alva_seq.focus_fill_seven", "alva_seq.focus_fill_eight", "alva_seq.focus_fill_nine"]
 
-    cyc_ops = ["my.focus_cyc_one", "my.focus_cyc_two", "my.focus_cyc_three", "my.focus_cyc_four",
-                "my.focus_cyc_five", "my.focus_cyc_six", "my.focus_cyc_seven", "my.focus_cyc_eight", "my.focus_texture_nine"]
+    cyc_ops = ["alva_seq.focus_cyc_one", "alva_seq.focus_cyc_two", "alva_seq.focus_cyc_three", "alva_seq.focus_cyc_four",
+                "alva_seq.focus_cyc_five", "alva_seq.focus_cyc_six", "alva_seq.focus_cyc_seven", "alva_seq.focus_cyc_eight", "alva_seq.focus_texture_nine"]
     
-    band_ops = ["my.focus_band_one", "my.focus_band_two", "my.focus_band_three", "my.focus_band_four",
-                "my.focus_band_five", "my.focus_band_six", "my.focus_band_seven", "my.focus_band_eight", "my.focus_texture_nine"]
+    band_ops = ["alva_seq.focus_band_one", "alva_seq.focus_band_two", "alva_seq.focus_band_three", "alva_seq.focus_band_four",
+                "alva_seq.focus_band_five", "alva_seq.focus_band_six", "alva_seq.focus_band_seven", "alva_seq.focus_band_eight", "alva_seq.focus_texture_nine"]
     
-    accent_ops = ["my.focus_accent_one", "my.focus_accent_two", "my.focus_accent_three", "my.focus_accent_four",
-                "my.focus_accent_five", "my.focus_accent_six", "my.focus_accent_seven", "my.focus_accent_eight", "my.focus_texture_nine"]
+    accent_ops = ["alva_seq.focus_accent_one", "alva_seq.focus_accent_two", "alva_seq.focus_accent_three", "alva_seq.focus_accent_four",
+                "alva_seq.focus_accent_five", "alva_seq.focus_accent_six", "alva_seq.focus_accent_seven", "alva_seq.focus_accent_eight", "alva_seq.focus_texture_nine"]
     
-    texture_ops = ["my.focus_texture_one", "my.focus_texture_two", "my.focus_texture_three", "my.focus_texture_four",
-                "my.focus_texture_five", "my.focus_texture_six", "my.focus_texture_seven", "my.focus_texture_eight", "my.focus_texture_nine"]
+    texture_ops = ["alva_seq.focus_texture_one", "alva_seq.focus_texture_two", "alva_seq.focus_texture_three", "alva_seq.focus_texture_four",
+                "alva_seq.focus_texture_five", "alva_seq.focus_texture_six", "alva_seq.focus_texture_seven", "alva_seq.focus_texture_eight", "alva_seq.focus_texture_nine"]
     
     effect_ids = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"]
 
-    fx_ops = ["my.focus_energy_one", "my.focus_energy_two", "my.focus_energy_three", "my.focus_energy_four", "my.focus_energy_five", "my.focus_energy_six", "my.focus_energy_seven", "my.focus_energy_eight", "my.focus_energy_nine", "my.focus_energy_ten", "my.focus_energy_eleven", "my.focus_energy_twelve", "my.focus_energy_thirteen", "my.focus_energy_fourteen"]
+    fx_ops = ["alva_seq.focus_energy_one", "alva_seq.focus_energy_two", "alva_seq.focus_energy_three", "alva_seq.focus_energy_four", "alva_seq.focus_energy_five", "alva_seq.focus_energy_six", "alva_seq.focus_energy_seven", "alva_seq.focus_energy_eight", "alva_seq.focus_energy_nine", "alva_seq.focus_energy_ten", "alva_seq.focus_energy_eleven", "alva_seq.focus_energy_twelve", "alva_seq.focus_energy_thirteen", "alva_seq.focus_energy_fourteen"]
 
     fx_icons = [effect_one.icon_id, effect_two.icon_id, effect_three.icon_id, effect_four.icon_id, effect_five.icon_id, effect_six.icon_id, effect_seven.icon_id, effect_eight.icon_id, effect_nine.icon_id, effect_ten.icon_id, effect_eleven.icon_id, effect_twelve.icon_id, effect_thirteen.icon_id, effect_fourteen.icon_id]
 
@@ -419,7 +425,7 @@ def draw_cue_builder(self, context, box, scene, active_strip):
     # Background row
     if scene.using_gels_for_cyc:
         row = box.row(align=True)
-        row.operator("my.gel_one_groups", text="", icon='PREFERENCES')
+        row.operator("alva_seq.gel_one_groups", text="", icon='PREFERENCES')
         row.prop(active_strip, "background_light_one", text="Cyc 1", slider=True)
         row.prop(active_strip, "background_light_two", text="Cyc 2", slider=True)
         row.prop(active_strip, "background_light_three", text="Cyc 3", slider=True)
@@ -436,14 +442,14 @@ def draw_cue_builder(self, context, box, scene, active_strip):
 
     # Energy Intensity row
     row = box.row(align=True)
-    row.operator("my.energy_groups", text="", icon='PREFERENCES')
+    row.operator("alva_seq.energy_groups", text="", icon='PREFERENCES')
     row.prop(active_strip, "energy_light", text="Effect", slider=True)
     row.prop(active_strip, "energy_speed", text="Speed", slider=True)
     row.prop(active_strip, "energy_scale", text="Scale", slider=True)
 
     # Effects row
     row = box.row(align=True)
-    row.operator("my.stop_effect", text="", icon='CANCEL')
+    row.operator("alva_seq.stop_effect", text="", icon='CANCEL')
     for effect_id, operator, icon in zip(effect_ids, fx_ops, fx_icons):
         row.alert = active_strip.cue_builder_effect_id == effect_id
         row.operator(operator, text="", icon_value=icon)

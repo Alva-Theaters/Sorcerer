@@ -80,7 +80,7 @@ class COMMON_OT_alva_copy_patch(Operator):
     def execute(self, context):
         all_properties = [
             "pan_min", "pan_max", "tilt_min", "tilt_max", "zoom_min", "zoom_max", 
-            "gobo_speed_min", "gobo_speed_max", "influence_is_on", "intensity_is_on", 
+            "gobo_speed_min", "gobo_speed_max", "intensity_is_on",
             "pan_tilt_is_on", "color_is_on", "diffusion_is_on", "strobe_is_on", 
             "zoom_is_on", "iris_is_on", "edge_is_on", "gobo_is_on", "prism_is_on", 
             "str_enable_strobe_argument", "str_disable_strobe_argument", 

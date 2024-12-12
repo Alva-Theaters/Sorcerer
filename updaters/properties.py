@@ -93,7 +93,7 @@ class PropertiesUpdaters:
     def find_velocity(current_value, last_value, time_elapsed):
         '''My job is to figure out how fast the slider is moving'''
         if time_elapsed == 0:
-            return 0  # Prevent division by zero
+            return 0
         return (current_value - last_value) / time_elapsed
 
 

@@ -5,7 +5,7 @@
 
 REGISTERED_LIGHTING_CONSOLES = {}
 
-class _SorcererPython:
+class SpyDataStructure:
     class types:
         class LightingConsole:
             rounding_points = 0
@@ -20,7 +20,7 @@ class _SorcererPython:
         
     class utils:
         def as_register_class(cls):
-            is_valid_console = _SorcererPython.utils._validate_lighting_console(cls)
+            is_valid_console = SpyDataStructure.utils._validate_lighting_console(cls)
             if is_valid_console:
                 REGISTERED_LIGHTING_CONSOLES[cls.as_idname] = cls
         

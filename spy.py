@@ -11,7 +11,7 @@ import mathutils
 from .cpv.find import Find
 from .utils.osc import OSC
 from .utils.event_utils import EventUtils
-from .utils.spy_utils import _SorcererPython
+from .utils.spy_utils import SpyDataStructure
 from .updaters.properties import PropertiesUpdaters
 
 from .utils.audio_utils import render_volume
@@ -21,9 +21,9 @@ from .utils.sequencer_utils import duplicate_active_strip_to_selected, find_avai
 from .utils.sequencer_utils import analyze_song, AnalysisResult
 
 '''
-This script, spy, is a sort of API here to make it easier for casual users
+This script, spy, is a wrapper here to make it easier for casual users
 to interact with Sorcerer functions programmatically. Inspired by Blender's 
-bpy API. End users shall access this API from built-in text editor through:
+bpy API. End users shall access this wrapper from built-in text editor through:
 
 import bpy
 from bpy import spy
@@ -31,7 +31,7 @@ from bpy import spy
 '''
 
 
-class SorcererPython(_SorcererPython):
+class SorcererPython(SpyDataStructure):
     def make_eos_macros(macro_range: Tuple[int, int], int_range: Tuple[int, int], string: str):
         '''
         spy function for iterative macro generation on ETC Eos using custom ranges/strings.
@@ -76,7 +76,7 @@ class SorcererPython(_SorcererPython):
         
 
     #-----------------------------------------------------------------------------------------------------
-    # The code below is just an interface between Text Editor and Sorcerer. This should not contain logic.
+    # The code below is just a wrapper between Text Editor and Sorcerer. This should not contain logic.
 
     # OSC
     def send_osc_lighting(address: str, argument: str) -> None:

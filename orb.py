@@ -14,28 +14,42 @@ from .utils.osc import OSC
 from .assets.sli import SLI
 
 
-'''
-This script's job is to automate repetitive, boring tasks on lighting consoles.
-We use this tool because "creating macros" != "art".
+WHAT_DOES_THIS_DO = """
+All this code is for operators. This code is so far removed from the actual operator classes
+because there are about a dozen different operators using this logic and they all have to 
+use the same generator system so that the user can escape early out of the operation with the
+ESC key. So the bpy.types.Operator classes have essentially no code in their execute() function,
+they inherit the generator class, and the generator class calls functions from this script.
+This script then contains the majority of the higher level logic for each button.
 
-This is the ONLY place to check lighting console type inside operators.
+So if you're trying to debug or extend the step-by-step behavior of an Orb button, you will
+probably be working here. If you are adding an Orb operator, you will need to hook it up
+in the operators folder first. Then you will add its unique runtime logic. If you are working
+on something that impacts all orb operators, you will be working primarily in the operators  
+folder, not here."""
 
-This whole script really needs to be rewritten. Ideally there is a single
-orb.py that is very readable and there is a orb folder with separated scripts
-for Eos and MA. orb_utilities.py would also be moved to that folder. But doing
-this would require extensive testing to ensure no bugs were introduced. 
 
-Ideal New Structure:
-   - Change find_executor function so it accepts multiple strings in same call
-   - initiate_orb function name is vague, delete altogether if possible
-   - Use global orb_start, orb_finish, orb_cancel functions at the operator level, not here
-   - Refactor the console_mode check so it is not repeated
-'''
+ORDER_OF_OPERATIONS = """
+1. Orb operator class calls the generator class to initiate the generator, so user can ESC early.
+   This happens in the operators folder under orb.py, not here at the main level orb.py.
+2. Generator/Modal class finds some of the properties needed, then calls one of the primary
+   functions here.
+3. One of the primary functions here, initiate_orb(), make_qmeo(), or patch_group(), will then
+   find any more properties needed and will likely call many more helper functions to complete
+   the tasks."""
+
+
+# TODO:
+# This entire system will be heavily refactored soon so that the higher level logic is exposed in 
+# the bpy.types.Operator class, where it should be. Doing this without losing the benefits of the
+# modal will be tricky. It will also need to retain its ability to switch between console types.
 
 
 class Orb:
     @staticmethod
-    def initiate_orb(self, context, strip='sound', enable=True):
+    def initiate_orb(self, context, strip='sound', enable=True): 
+        # strip tells us what type of orb button it is.
+        # enable tells us whether the button enables something on the console or disables something
         scene = context.scene
         console_mode = scene.scene_props.console_type_enum
         if hasattr(scene.sequence_editor, "active_strip") and scene.sequence_editor.active_strip is not None:
@@ -59,7 +73,7 @@ class Orb:
                 SLI.SLI_assert_unreachable()
 
         elif strip == 'macro':
-            Updaters.macro_update(active_strip, context)
+            Updaters.macro_update(active_strip, context) # Ensure the textual input has been parsed
             macro_number = find_executor(scene, active_strip, 'start_macro')
             text = active_strip.start_frame_macro_text
             is_final = not scene.strip_end_macros

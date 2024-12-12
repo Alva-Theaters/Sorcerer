@@ -548,7 +548,7 @@ class SEQUENCER_OT_alva_strip_media(Operator):
     
     def draw(self, context):
         scene = context.scene
-        draw_strip_media(self, context, scene, bake_panel=False)
+        draw_strip_media(self, context, scene)
     
 
 class SEQUENCER_OT_alva_mute(Operator):

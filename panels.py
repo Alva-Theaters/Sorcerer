@@ -83,9 +83,9 @@ from .as_ui.space_sequencer import (
     draw_strip_video,
     draw_strip_media, 
     draw_alva_sequencer_add_menu, 
-    draw_alva_sequencer_cmd_line,
-    draw_alva_sequencer_view,
-    draw_alva_sequencer_strip
+    draw_alva_sequencer_cmd_line_display,
+    draw_alva_sequencer_view_menu,
+    draw_alva_sequencer_strip_menu
 )
 from .as_ui.space_node import (
     draw_node_formatter, 
@@ -478,10 +478,10 @@ def register():
     TIME_PT_playback.prepend(draw_alva_time_playback)
     TIME_MT_view.append(draw_alva_time_view)
 
-    SEQUENCER_MT_view.append(draw_alva_sequencer_view)
+    SEQUENCER_MT_view.append(draw_alva_sequencer_view_menu)
     SEQUENCER_MT_add.append(draw_alva_sequencer_add_menu)
-    SEQUENCER_MT_strip.append(draw_alva_sequencer_strip)
-    SEQUENCER_HT_header.append(draw_alva_sequencer_cmd_line)
+    SEQUENCER_MT_strip.append(draw_alva_sequencer_strip_menu)
+    SEQUENCER_HT_header.append(draw_alva_sequencer_cmd_line_display)
 
     NODE_MT_add.append(draw_alva_node_menu)
     NODE_HT_header.append(draw_node_header)
@@ -520,10 +520,10 @@ def unregister():
     TIME_PT_playback.remove(draw_alva_time_playback)
     TIME_MT_view.remove(draw_alva_time_view)
 
-    SEQUENCER_MT_view.remove(draw_alva_sequencer_view)
+    SEQUENCER_MT_view.remove(draw_alva_sequencer_view_menu)
     SEQUENCER_MT_add.remove(draw_alva_sequencer_add_menu)
-    SEQUENCER_MT_strip.remove(draw_alva_sequencer_strip)
-    SEQUENCER_HT_header.remove(draw_alva_sequencer_cmd_line)
+    SEQUENCER_MT_strip.remove(draw_alva_sequencer_strip_menu)
+    SEQUENCER_HT_header.remove(draw_alva_sequencer_cmd_line_display)
 
     NODE_MT_add.remove(draw_alva_node_menu)
     NODE_HT_header.remove(draw_node_header)
