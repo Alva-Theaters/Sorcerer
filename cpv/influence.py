@@ -138,7 +138,10 @@ class SetGroups:
         maintain_channels = [chan for chan in _current_channels if chan in _stored_channels] if self.is_maintaining else []
 
         # Align values with new_channels
-        new_channels_values = [values[_current_channels.index(chan)] for chan in new_channels]
+        if self.influencer.controller_type == "Key":
+            new_channels_values = [values[_current_channels.index(chan)] for chan in new_channels]
+        else: 
+            new_channels_values = None
 
         alva_log("influence", f"SetGroups._execute | Must Initialize: {[obj.name for obj in new_channels]}\n"
                             f"SetGroups._execute | Must Maintain: {[obj.name for obj in maintain_channels]}\n"
