@@ -125,7 +125,7 @@ class Find:
                 for link in output_socket.links:
                     connected_node = link.to_socket.node
                     if connected_node.bl_idname == "group_controller_type":
-                        setattr(connected_node, f"alva_{attribute_name}", new_value + getattr(connected_node, f"alva_{attribute_name}"))
+                        setattr(connected_node, f"alva_{attribute_name}", getattr(connected_node, f"alva_{attribute_name}"))
                     elif connected_node.bl_idname == "mixer_type":
                         connected_node.mirror_upstream_group_controllers()
                         
