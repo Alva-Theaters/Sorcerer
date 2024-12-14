@@ -137,7 +137,13 @@ def unregister_sockets():
 #-------------------------------------------------------------------------------------------------------------------------------------------
 '''Nodes'''
 #------------------------------------------------------------------------------------------------------------------------------------------- 
-class NODE_NT_group_controller(Node):
+class NodeBase:
+    @classmethod
+    def poll(cls, ntree):
+        return ntree.bl_idname == 'ShaderNodeTree'
+    
+
+class NODE_NT_group_controller(NodeBase, Node):
     bl_idname = 'group_controller_type'
     bl_label = 'Group Controller'
     bl_icon = 'STICKY_UVS_LOC'
@@ -168,7 +174,7 @@ class NODE_NT_group_controller(Node):
             draw_footer_toggles(self, context, column, self, box=False)
 
 
-class NODE_NT_mixer(Node):
+class NODE_NT_mixer(NodeBase, Node):
     bl_idname = 'mixer_type'
     bl_label = 'Mixer'
     bl_icon = 'OPTIONS'
@@ -242,7 +248,7 @@ class NODE_NT_mixer(Node):
         draw_node_mixer(self, context, layout)
         
         
-class NODE_NT_pan_tilt(Node):
+class NODE_NT_pan_tilt(NodeBase, Node):
     bl_idname = 'pan_tilt_type'
     bl_label = 'FOH Pan/Tilt'
     bl_icon = 'ORIENTATION_GIMBAL'
@@ -259,7 +265,7 @@ class NODE_NT_pan_tilt(Node):
         draw_pan_tilt_node(self, context, layout)
         
         
-class NODE_NT_global(Node):
+class NODE_NT_global(NodeBase, Node):
     bl_idname = 'global_type'
     bl_label = 'Group Parameters'
     bl_icon = 'WORLD_DATA'
@@ -282,7 +288,7 @@ class NODE_NT_global(Node):
         draw_global_node(self, context, layout)
              
 
-class NODE_NT_motor(Node):
+class NODE_NT_motor(NodeBase, Node):
     bl_idname = 'motor_type'
     bl_label = 'Motor'
     bl_icon = 'ANTIALIASED'
@@ -323,7 +329,7 @@ class NODE_NT_motor(Node):
         draw_motor_node(self, context, layout)
 
             
-class NODE_NT_console_buttons(Node):
+class NODE_NT_console_buttons(NodeBase, Node):
     bl_idname = 'console_buttons_type'
     bl_label = 'Direct Selects'
     bl_icon = 'DESKTOP'
@@ -359,7 +365,7 @@ class NODE_NT_console_buttons(Node):
         draw_console_node(self, context, layout)
         
         
-class NODE_NT_alva_presets(Node):
+class NODE_NT_alva_presets(NodeBase, Node):
     bl_idname = 'presets_type'
     bl_label = 'Color Grid'
     bl_icon = 'NONE'
@@ -384,7 +390,7 @@ class NODE_NT_alva_presets(Node):
         return
 
 
-class NODE_NT_settings(Node):
+class NODE_NT_settings(NodeBase, Node):
     bl_idname = 'settings_type'
     bl_label = 'Settings'
     bl_icon = 'PREFERENCES'
