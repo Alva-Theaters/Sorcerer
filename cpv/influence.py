@@ -16,7 +16,7 @@ MAINTAIN_ROUNDING_THRESHOLD = 3  # Number of places to round
 INFLUENCE_RADIUS_MULTIPLIER = 2
 LIGHT_SENSITIVITY_MULTIPLIER = 2
 
-DEBUG = True  # Reduces CPU load. Always set to False before committing/PRing.
+DEBUG = False  # Reduces CPU load. Always set to False before committing/PRing.
 
 # ANSI escape codes for colors
 RED = "\033[31m"
