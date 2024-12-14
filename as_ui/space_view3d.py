@@ -149,10 +149,10 @@ def draw_object_header(self, context, scene, active_object, node_layout=None):
             row = box.row()
             row.prop(ao, "sound_source_enum", text="", icon='SOUND')
         
-    if identity in ["Brush", "Influencer"]:
+    if identity in ["Brush", "Influencer", "Key"]:
         row = box.row(align=True)
         row.prop(ao, "float_object_strength", slider = True, text = "Strength:")
-        if identity == "Brush":
+        if identity in ["Brush", "Key"]:
             row.prop(ao, "is_erasing", text="Erase", toggle=True)
 
     if scene.is_democratic and identity != "Brush":

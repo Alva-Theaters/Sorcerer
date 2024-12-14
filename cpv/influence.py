@@ -16,7 +16,7 @@ MAINTAIN_ROUNDING_THRESHOLD = 3  # Number of places to round
 INFLUENCE_RADIUS_MULTIPLIER = 2
 LIGHT_SENSITIVITY_MULTIPLIER = 2
 
-DEBUG = False  # Reduces CPU load. Always set to False before committing/PRing.
+DEBUG = True  # Reduces CPU load. Always set to False before committing/PRing.
 
 # ANSI escape codes for colors
 RED = "\033[31m"
@@ -79,7 +79,7 @@ class Influence:
 
     def execute(self):
         start = time.time()
-        if DEBUG: alva_log("influence", f"\n{RED}INFLUENCER SESSION:{RESET}")
+        if DEBUG: alva_log("influence", f"\n{RED}INFLUENCER SESSION({self.controller_type}):{RESET}")
         new_channels, maintain_channels, release_channels, values, new_channels_values = SetGroups(self).execute()
         Initialize(self).execute(new_channels, new_channels_values)
         Maintain(self).execute(maintain_channels, values)
@@ -158,6 +158,7 @@ class SetGroups:
             return list(channel_objects), []
         else:
             light_objects, influencers, strengths = FindInfluenceField(self.influencer.parent).execute()
+            if DEBUG: alva_log("influence", f"SetGroups._find_current_channels | lights, influencers, strengths: {light_objects, influencers, strengths}")
             harmonized_channels, harmonized_values = self._harmonize_influence_field(light_objects, influencers, strengths)
             return list(harmonized_channels), list(harmonized_values)
         
@@ -334,7 +335,7 @@ class Maintain:
         if self.influencer.property_name == "color":
             return value
         else:
-            return abs(value)
+            return value
     
     def _determine_current_value(self, input_value=None):
         return input_value if input_value else getattr(self.influencer.parent, f"alva_{self.influencer.property_name}")
@@ -558,7 +559,7 @@ class FindInfluenceField:
         for light in self._find_all_lights_in_scene():
             for influencer in self.influencers:
                 strength = self._calculate_strength(light, influencer)
-                if strength > 0:  # Only include if within the range of influence
+                if abs(strength) > 0:  # Only include if within the range of influence
                     light_objects.append(light)
                     influencers.append(influencer)
                     strengths.append(strength)
@@ -587,12 +588,17 @@ class FindInfluenceField:
         influence_radius = sum(influencer.scale) * INFLUENCE_RADIUS_MULTIPLIER  # Average scale defines the radius
         light_sensitivity = sum(light.scale) * LIGHT_SENSITIVITY_MULTIPLIER
 
-        if DEBUG: alva_log("influence", f"FindInfluencerField._calculate_strength | {light.name} | Distance: {round(distance, 2)}, Influence radius: {round(influence_radius, 2)}, Light sensitivity: {round(light_sensitivity, 2)}")
-
         if distance > influence_radius:
             return 0  # Out of range
         
-        return max(0, (1 - (distance / influence_radius)) * light_sensitivity)
+        strength = max(0, (1 - (distance / influence_radius)) * light_sensitivity)
+
+        if influencer.is_erasing:
+            strength *= -1
+
+        if DEBUG: alva_log("influence", f"FindInfluencerField._calculate_strength | {light.name} | Distance: {round(distance, 2)}, Influence radius: {round(influence_radius, 2)}, Light sensitivity: {round(light_sensitivity, 2)}, Strength: {round(strength, 2)}")
+
+        return strength
 
 
 '''
