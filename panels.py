@@ -81,7 +81,7 @@ from .as_ui.space_time import (
 from .as_ui.space_sequencer import (
     draw_strip_sound_object,
     draw_strip_video,
-    draw_strip_media, 
+    draw_strip_media,
     draw_alva_sequencer_add_menu, 
     draw_alva_sequencer_cmd_line_display,
     draw_alva_sequencer_view_menu,
@@ -189,6 +189,27 @@ class VIEW3D_PT_alva_service_mode(Panel, View3D_Panel):
 
     def draw(self, context):
         draw_service_mode(self, context)
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------------
+'''PROPERTIES Panels'''
+#-------------------------------------------------------------------------------------------------------------------------------------------                  
+class Graph_Panel:
+    bl_space_type = 'GRAPH_EDITOR'
+    bl_region_type = 'UI'
+    bl_category = 'Alva Sorcerer'
+
+    @classmethod
+    def poll(cls, context):
+        return hasattr(context, "scene")
+
+
+class GRAPH_PT_alva_graph_controllers(Panel, Graph_Panel):
+    '''Access to scene-level Sorcerer patch for lighting'''
+    bl_label = "Make Controllers"
+
+    def draw(self, context):
+        draw_fixture_groups(self, context, pull_fixtures=False)
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -346,7 +367,7 @@ class NODE_PT_alva_fixture_groups(Panel, NodePanel):
     bl_label = "Make Groups"
 
     def draw(self, context):
-        draw_fixture_groups(self, context)
+        draw_fixture_groups(self, context, pull_fixtures=False)
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -430,6 +451,8 @@ panels = [
     VIEW3D_PT_alva_fixture_groups,
     VIEW3D_PT_alva_fixture_generator,
     VIEW3D_PT_alva_service_mode,
+
+    GRAPH_PT_alva_graph_controllers,
 
     SCENE_PT_alva_cue_switcher,
     SCENE_PT_alva_stage_manager,

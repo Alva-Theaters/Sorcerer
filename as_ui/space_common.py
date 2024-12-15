@@ -406,7 +406,7 @@ def draw_play_bar(self, context, layout):
     row.label(text="")
 
 
-def draw_fixture_groups(self, context):
+def draw_fixture_groups(self, context, pull_fixtures=True):
     layout = self.layout
     scene = context.scene
 
@@ -456,7 +456,9 @@ def draw_fixture_groups(self, context):
     if has_channels:
         row.prop(item, "highlight_or_remove_enum", expand=True, text="")
     row.prop(scene.scene_props, "add_channel_ids", text="")
-    row.operator("alva_object.pull_selection", text="", icon='VIEW3D')
+
+    if pull_fixtures:
+        row.operator("alva_object.pull_selection", text="", icon='VIEW3D')
 
 
 def draw_generate_fixtures(self, context):
