@@ -67,7 +67,7 @@ class NODE_ST_flash_out(NodeSocket):
         layout.label(text=text)
 
     def draw_color(self, context, node):
-        return (1, 1, 0, 1) 
+        return (1, 1, 0, 1)
     
     
 class NODE_ST_flash_up(NodeSocket):
@@ -141,7 +141,7 @@ class NodeBase:
     @classmethod
     def poll(cls, ntree):
         return ntree.bl_idname == 'ShaderNodeTree'
-    
+
 
 class NODE_NT_group_controller(NodeBase, Node):
     bl_idname = 'group_controller_type'

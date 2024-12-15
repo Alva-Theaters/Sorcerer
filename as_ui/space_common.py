@@ -337,6 +337,9 @@ def draw_volume_monitor(self, context, sequence_editor):
 
 def draw_parameters_mini(self, context, layout, active_object, use_slider=False, expand=True, text=True):
     ao = active_object
+    scene = context.scene.scene_props
+
+    omit_end = not scene.is_parameter_bar_expanded and not expand
 
     layout.use_property_split = expand
     layout.use_property_decorate = expand
@@ -345,7 +348,7 @@ def draw_parameters_mini(self, context, layout, active_object, use_slider=False,
         element = layout
     else:
         row = layout.row(align=True)
-        row.scale_x = .7
+        row.scale_x = 1 if omit_end else .7
         element = row
 
     if text:
@@ -353,26 +356,31 @@ def draw_parameters_mini(self, context, layout, active_object, use_slider=False,
         
     if ao.intensity_is_on:
         element.prop(ao, "alva_intensity", slider=use_slider)
-    if ao.strobe_is_on:
+    if ao.strobe_is_on and not omit_end:
         element.prop(ao, "alva_strobe", slider=use_slider)
     if ao.color_is_on:
         element.prop(ao, "alva_color", slider=use_slider, text="Color" if expand else "")
     if ao.pan_tilt_is_on:
-        if not (context.scene.scene_props.school_mode_enabled and context.scene.scene_props.restrict_pan_tilt):
+        if not (scene.school_mode_enabled and scene.restrict_pan_tilt):
             element.prop(ao, "alva_pan", slider=use_slider)
             element.prop(ao, "alva_tilt", slider=use_slider)
     if ao.zoom_is_on:
         element.prop(ao, "alva_zoom", slider=use_slider)
-    if ao.iris_is_on:
-        element.prop(ao, "alva_iris", slider=use_slider)
-    if ao.edge_is_on:
-        element.prop(ao, "alva_edge", slider=use_slider)
-    if ao.diffusion_is_on:
-        element.prop(ao, "alva_diffusion", slider=use_slider)
-    if ao.gobo_is_on:
-        element.prop(ao, "alva_gobo", slider=use_slider)
-        element.prop(ao, "alva_gobo_speed", slider=use_slider)
-        element.prop(ao, "alva_prism", slider=use_slider)
+
+    if not omit_end:
+        if ao.iris_is_on:
+            element.prop(ao, "alva_iris", slider=use_slider)
+        if ao.edge_is_on:
+            element.prop(ao, "alva_edge", slider=use_slider)
+        if ao.diffusion_is_on:
+            element.prop(ao, "alva_diffusion", slider=use_slider)
+        if ao.gobo_is_on:
+            element.prop(ao, "alva_gobo", slider=use_slider)
+            element.prop(ao, "alva_gobo_speed", slider=use_slider)
+            element.prop(ao, "alva_prism", slider=use_slider)
+
+    if not expand:
+        layout.prop(scene, "is_parameter_bar_expanded", icon='FORWARD', text="")
 
 
 def draw_play_bar(self, context, layout):

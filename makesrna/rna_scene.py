@@ -12,7 +12,7 @@ from ..utils.rna_utils import register_properties
 from .rna_common import CommonProperties 
 from ..assets.items import Items as AlvaItems 
 from .property_groups import LightingModifier, COMMON_PG_alva_maintenance_errors
-from ..assets.tooltips import format_tooltip
+from ..assets.tooltips import format_tooltip, find_tooltip
 
 # pyright: reportInvalidTypeForm=false
 
@@ -28,6 +28,8 @@ class SceneProperties(PropertyGroup):
     str_osc_ip_address: StringProperty(default="192.168.1.1", description="This should be the IP address of the console. This must set for anything to work. Press the About key on the console to find the console's IP address. Console must be on same local network", update=CommonUpdaters.network_settings_updater) 
     int_osc_port: IntProperty(min=0, max=65535, description="On the console, Displays > Setup > System Settings > Show Control > OSC > (enable OSC RX and make the port number there on the left match the one in this field in Alva. OSC TX = transmit and OSC RX = receive. We want receive", default=8000, update=CommonUpdaters.network_settings_updater) 
     string_osc_receive_port: IntProperty(min=0, max=65535) 
+
+    is_parameter_bar_expanded: BoolProperty(name="Expand Parameters", description=find_tooltip("is_parameter_bar_expanded"), default=False)
     
     str_record_cue: StringProperty(default="Record Cue # Time $ Enter Enter", description="Write command line syntax for recording cue # with duration $. # and $ are filled in by Orb as cue number and duration, respectively") 
     str_create_all_events: StringProperty(default="Event 1 / 1 Thru # Enter", description="Write command line syntax to initialize all events. Orb will replace # with the final event number based on the sequencer's end frame") 

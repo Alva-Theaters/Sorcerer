@@ -224,10 +224,13 @@ english_tooltips = {
     # View3D Operators
     "alva_object.duplicate_object": "Duplicate and Slide",
     "duplicate_direction": "Direction of movement: 1 for positive, -1 for negative",
-    "duplicate_quantity": "Number of duplicates to create"
+    "duplicate_quantity": "Number of duplicates to create",
+
+    # Scene Properties
+    "is_parameter_bar_expanded": "Expand toolbar to see more parameters"
 }
 
-spanish_tooltips = { # Translation provided by ChatGPT (GPT-4o) last on 11/30/2024.
+spanish_tooltips = { # Translation provided by ChatGPT (GPT-4o) last on 12/15/2024.
     # Object Only
     "mute": "Silenciar la salida OSC de este objeto",
     "summon_movers": "Texto de línea de comando para enfocar luminarias móviles en el objeto del escenario",
@@ -356,6 +359,9 @@ spanish_tooltips = { # Translation provided by ChatGPT (GPT-4o) last on 11/30/20
     # View3D Operators
     "alva_object.duplicate_object": "Duplicar y Deslizar",
     "duplicate_direction": "Dirección del movimiento: 1 para positivo, -1 para negativo",
-    "duplicate_quantity": "Cantidad de duplicados a crear"
+    "duplicate_quantity": "Cantidad de duplicados a crear",
+
+    # Scene Properties
+    "is_parameter_bar_expanded": "Expande la barra de herramientas para ver más parámetros."
 
 }
