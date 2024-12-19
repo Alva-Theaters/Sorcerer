@@ -10,7 +10,7 @@ from ..assets.items import Items as AlvaItems
 from ..updaters.node import NodeUpdaters
 from ..utils.rna_utils import register_properties
 from ..makesrna.property_groups import MixerParameters, CustomButtonPropertyGroup
-from ..cpv.find import Find
+from ..cpv.find import FindConnectedNodes
 from ..assets.tooltips import format_tooltip
 
 from ..as_ui.space_common import draw_text_or_group_input, draw_parameters, draw_footer_toggles
@@ -220,7 +220,7 @@ class NODE_NT_mixer(NodeBase, Node):
             self.parameters.add()
 
     def mirror_upstream_group_controllers(self):
-        connected_nodes = Find.find_connected_nodes(self.inputs[0])
+        connected_nodes = FindConnectedNodes(self.inputs[0], is_input=True).execute()
         choices = self.parameters
         mode = self.parameters_enum
         attribute_mapping = {

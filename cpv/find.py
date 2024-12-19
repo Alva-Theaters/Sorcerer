@@ -4,7 +4,6 @@
 
 import bpy
 
-from ..assets.dictionaries import Dictionaries 
 from ..assets.sli import SLI
 
 
@@ -17,13 +16,13 @@ class Find:
                 return Find.find_node_by_tree(node_name, node_tree_name)
             else:
                 SLI.SLI_assert_unreachable()
-        
+
         elif space_type == 'SEQUENCE_EDITOR':
             return context.scene.sequence_editor.active_strip
-        
+
         elif space_type == 'VIEW_3D':
             return context.active_object
-        
+
         else:
             print(f"Invalid space_type: {space_type}")
             SLI.SLI_assert_unreachable()
@@ -35,7 +34,7 @@ class Find:
     @staticmethod
     def find_channels_from_node_links(input_socket, group_list, update_nodes, is_input=True):
         '''Finds the channels inside just one socket'''
-        connected_nodes = Find.find_connected_nodes(input_socket, is_input)
+        connected_nodes = FindConnectedNodes(input_socket, is_input).execute()
 
         if update_nodes:
             update_nodes(connected_nodes)
@@ -49,40 +48,6 @@ class Find:
     @staticmethod
     def _find_node_channels_list(node):
         return [str(channel.chan) for channel in node.list_group_channels]
-
-
-    @staticmethod
-    def find_connected_nodes(socket, is_input=True):
-        '''Returns list of nodes connected to socket, including those connected 
-            to input sockets of found nodes.'''
-        connected_nodes = []
-
-        def add_connected_nodes(current_socket):
-            if is_input:
-                links = current_socket.links
-                from_socket_attr = 'from_socket'
-                to_socket_attr = 'to_socket'
-            else:
-                links = current_socket.links
-                from_socket_attr = 'to_socket'
-                to_socket_attr = 'from_socket'
-
-            for link in links:
-                connected_node = getattr(link, from_socket_attr).node
-                if connected_node not in connected_nodes:
-                    connected_nodes.append(connected_node)
-                    # Recursively find nodes connected to the current node's sockets
-                    for next_socket in connected_node.inputs if is_input else connected_node.outputs:
-                        add_connected_nodes(next_socket)
-                    if connected_node.bl_idname == 'ShaderNodeGroup':
-                        group_node_tree = connected_node.node_tree
-                        for node in group_node_tree.nodes:
-                            if node.type == 'GROUP_OUTPUT':
-                                for inner_socket in node.inputs if is_input else node.outputs:
-                                    add_connected_nodes(inner_socket)
-
-        add_connected_nodes(socket)
-        return connected_nodes
 
 
     @staticmethod    
@@ -122,12 +87,11 @@ class Find:
         """Receives a bpy object and returns nothing"""
         for output_socket in parent.outputs:
             if output_socket.bl_idname == 'LightingOutputType':
-                for link in output_socket.links:
-                    connected_node = link.to_socket.node
-                    if connected_node.bl_idname == "group_controller_type":
-                        setattr(connected_node, f"alva_{attribute_name}", getattr(parent, f"alva_{attribute_name}"))
-                    elif connected_node.bl_idname == "mixer_type":
-                        connected_node.mirror_upstream_group_controllers()
+                connected_nodes = FindConnectedNodes(output_socket, is_input=False).execute()
+                for connected_node in connected_nodes:
+                    setattr(connected_node, f"alva_{attribute_name}", getattr(parent, f"alva_{attribute_name}"))
+            elif connected_node.bl_idname == "mixer_type":
+                connected_node.mirror_upstream_group_controllers()
                         
         
     #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -180,3 +144,71 @@ class Find:
             for node in node_tree.nodes:
                 nodes.append(node)
         return nodes
+    
+
+class FindConnectedNodes:
+    def __init__(self, original_socket, is_input):
+        self.original_socket = original_socket
+        self.socket_attr = 'from_socket' if is_input else 'to_socket'
+        self.LINKABLE_NODE_TYPES = ['group_controller_type', 'mixer_type']
+        self.is_input = is_input
+        self.connected_nodes = []
+
+    def execute(self):
+        self.socket_to_links(self.original_socket)
+        return self.connected_nodes
+
+    def socket_to_links(self, socket, socket_index=None):
+        if not socket.links:
+            return 
+        
+        for i, link in enumerate(socket.links):
+            node = self.node_from_link(link)
+
+            if node:
+                self.connected_nodes.append(node)
+                self.process_downstream_socket_recursive(node)
+
+    def node_from_link(self, link):
+        connected_socket = getattr(link, self.socket_attr)
+        connected_node = connected_socket.node
+
+        if not self.validate_node(connected_node):
+            if connected_node.bl_idname == 'ShaderNodeGroup':
+                socket_list = connected_node.outputs if self.is_input else connected_node.inputs
+                socket_index = self.find_socket_index(connected_socket, socket_list)
+                self.process_group_node(connected_node, socket_index)
+                return
+        
+        return connected_node
+    
+    def find_socket_index(self, target_socket, sockets_list):
+        """Find the index of the target socket in its node's inputs or outputs."""
+        for i, socket in enumerate(sockets_list):
+            if socket == target_socket:
+                return i
+        raise ValueError(f"Socket {target_socket.name} not found in node {target_socket.node.name}")
+        
+    def validate_node(self, node):
+        if node in self.connected_nodes:
+            return False
+        
+        if str(node.bl_idname) not in self.LINKABLE_NODE_TYPES:
+            return False
+        
+        return True
+    
+    def process_downstream_socket_recursive(self, node, node_group=False):
+        for next_socket in node.inputs if self.is_input else node.outputs:
+            self.socket_to_links(next_socket)
+
+    def process_group_node(self, group_node, socket_index):
+        group_node_tree = group_node.node_tree
+        group_input_node = next((n for n in group_node_tree.nodes if n.type == 'GROUP_INPUT'), None)
+
+        if not group_input_node:
+            return
+        
+        internal_sockets = group_input_node.inputs if self.is_input else group_input_node.outputs
+        internal_socket = internal_sockets[socket_index]
+        self.socket_to_links(internal_socket)
