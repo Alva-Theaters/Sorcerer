@@ -3,8 +3,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import bpy
+import time
 
 from ..assets.sli import SLI
+from ..maintenance.logging import alva_log
 
 
 class Find:
@@ -155,7 +157,9 @@ class FindConnectedNodes:
         self.connected_nodes = []
 
     def execute(self):
+        start_time = time.time()
         self.socket_to_links(self.original_socket)
+        alva_log('time', f"TIME: FindConnectedNodes took {time.time() - start_time} seconds\n")
         return self.connected_nodes
 
     def socket_to_links(self, socket, socket_index=None):
