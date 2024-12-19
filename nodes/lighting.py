@@ -204,16 +204,7 @@ class NODE_NT_mixer(NodeBase, Node):
         items=AlvaItems.mixer_parameters,
         default=1,
         update=NodeUpdaters.update_node_name
-    )  
-    node_tree_pointer: PointerProperty(
-        name="Node Tree Pointer",
-        type=NodeTree,
-        description="Pointer to the node tree"
-    )  
-    node_name: StringProperty(
-        name="Node Name",
-        description="Name of the node"
-    ) 
+    )
 
     def add_three_choices(self):
         for _ in range(DEFAULT_QUANTITY_MIXER):

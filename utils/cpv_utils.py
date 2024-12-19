@@ -22,7 +22,7 @@ def find_parent(object):
 
     node = None
     try:
-        node = Find.find_node_by_tree(object.node_name, object.node_tree_pointer, pointer=True)
+        node = Find.find_node_by_tree(object.node_name, object.node_tree_name)
     except:
         pass
     
@@ -37,7 +37,7 @@ def find_parent(object):
             
     # Try again
     try:
-        node = Find.find_node_by_tree(object.node_name, object.node_tree_pointer, pointer=True)
+        node = Find.find_node_by_tree(object.node_name, object.node_tree_name)
     except:
         pass
     

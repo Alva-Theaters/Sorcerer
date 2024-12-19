@@ -188,11 +188,11 @@ class NodeUpdaters:
         if not self.name.startswith("MixerNode_"):
             self.name = "MixerNode_" + self.name
             
-        self.node_tree_pointer = self.id_data
+        self.node_tree_name = self.id_data.name
         self.node_name = self.name
 
         for param in self.parameters:
-            param.node_tree_pointer = self.id_data
+            param.node_tree_name = self.id_data.name
             param.node_name = self.name
 
 

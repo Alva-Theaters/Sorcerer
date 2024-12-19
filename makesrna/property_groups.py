@@ -226,10 +226,9 @@ class CustomButtonPropertyGroup(PropertyGroup):
 
 
 class MixerParameters(PropertyGroup):
-    node_tree_pointer: PointerProperty(
-        name="Node Tree Pointer",
-        type=bpy.types.NodeTree,
-        description="Pointer to the node tree"
+    node_tree_name: StringProperty(
+        name="Node Tree Name",
+        description="Name of the node tree"
     ) 
     node_name: StringProperty(
         name="Node Name",

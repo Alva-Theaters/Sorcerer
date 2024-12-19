@@ -149,7 +149,7 @@ class NODE_OT_alva_mixer_add_choice(Operator):
         node = context.node
         choice = node.parameters.add()
         node.active_modifier_index = len(node.parameters) - 1
-        choice.node_tree_pointer = node.id_data
+        choice.node_tree_name = node.id_data.name
         choice.node_name = node.name
         return {'FINISHED'}
     

@@ -53,7 +53,7 @@ class Find:
 
 
     @staticmethod    
-    def find_node_by_tree(node_name, node_tree_name, pointer=False):
+    def find_node_by_tree(node_name, node_tree_name):
         '''Finds the node by the node name and by the node tree name. Used
             mostly for operators drawn on nodes that need to operate on the
             node. Because Blender isn't smart enough to let us pass the node 
@@ -63,10 +63,7 @@ class Find:
             a pointer property to the actual id, not just the name. We have
             to do this because bpy.types.Operator can store string props, but
             not PointerProperty the way bpy.types.Node can.'''
-        if not pointer:
-            node_tree = bpy.data.node_groups.get(node_tree_name)
-        else:
-            node_tree = node_tree_name
+        node_tree = bpy.data.node_groups.get(node_tree_name)
             
         if not node_tree:
             for world in bpy.data.worlds:
