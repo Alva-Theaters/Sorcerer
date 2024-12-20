@@ -88,9 +88,10 @@ class Find:
             if output_socket.bl_idname == 'LightingOutputType':
                 connected_nodes = FindConnectedNodes(output_socket, is_input=False).execute()
                 for connected_node in connected_nodes:
-                    setattr(connected_node, f"alva_{attribute_name}", getattr(parent, f"alva_{attribute_name}"))
-            elif connected_node.bl_idname == "mixer_type":
-                connected_node.mirror_upstream_group_controllers()
+                    if connected_node.bl_idname == "group_controller_type":
+                        setattr(connected_node, f"alva_{attribute_name}", getattr(parent, f"alva_{attribute_name}"))
+                    elif connected_node.bl_idname == "mixer_type":
+                        connected_node.mirror_upstream_group_controllers()
                         
         
     #-------------------------------------------------------------------------------------------------------------------------------------------

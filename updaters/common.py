@@ -52,7 +52,7 @@ class CommonUpdaters:
             if self.float_object_strength != 1:
                 new_type = "Brush"
 
-        if new_type == "Influencer" and self.users_collection:
+        if new_type == "Influencer" and hasattr(self, 'users_collection') and self.users_collection:
             for collection in self.users_collection:
                 if collection.name == "Collection":
                     continue
