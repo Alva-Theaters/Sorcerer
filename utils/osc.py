@@ -10,7 +10,13 @@ import time
 from ..maintenance.logging import alva_log
 
 DEBUG = False
-TCP_TIMEOUT = .1
+
+ETC_EOS_TCP_PORT = 3032
+TCP_TIMEOUT = 5 # Not sure why this has to be 5, but setting it to 1 or below seems to break Eos. Extremely fickle on ETC's end.
+SLIP_END = b'\xC0'
+SLIP_ESC = b'\xDB'
+SLIP_ESC_END = b'\xDC'
+SLIP_ESC_ESC = b'\xDD'
 
 
 class OSC:
@@ -93,11 +99,26 @@ class OSC:
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 
+    def slip_encode(data):
+        """Encodes data using SLIP (RFC1055) with a double END character."""
+        encoded = bytearray()
+        for byte in data:
+            if byte == 0xC0:  # END byte
+                encoded.extend(SLIP_ESC + SLIP_ESC_END)
+            elif byte == 0xDB:  # ESC byte
+                encoded.extend(SLIP_ESC + SLIP_ESC_ESC)
+            else:
+                encoded.append(byte)
+
+        # Add the SLIP END character to mark the end of the packet
+        encoded.extend(SLIP_END + SLIP_END)
+        return bytes(encoded)
+
+
     def send_tcp(osc_addr, addr, string):
         if DEBUG: alva_log("osc", f"\nOSC:\n   -Address: {osc_addr}\n   -String: {string}")
 
         def pad(data):
-            # Pad to a multiple of 4 bytes
             return data + b"\0" * (4 - (len(data) % 4 or 4))
 
         if not osc_addr.startswith("/"):
@@ -105,22 +126,27 @@ class OSC:
 
         osc_addr = osc_addr.encode() + b"\0"
         string = string.encode() + b"\0"
-        tag = ",s".encode()  # Type tag for a single string argument
+        port = ETC_EOS_TCP_PORT
+        tag = ",s".encode()
 
         message = b"".join(map(pad, (osc_addr, tag, string)))
 
+        # Add a 4-byte size prefix to the message for TCP-based OSC
         message_with_size = struct.pack(">I", len(message)) + message
-
-        port = 3032 # Per ETC, for lighting only
 
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-                sock.settimeout(TCP_TIMEOUT)  # Set a timeout of 5 seconds
+                sock.settimeout(TCP_TIMEOUT)
                 if DEBUG: alva_log("osc", f"   Connecting to {addr}:{port}")
-                sock.connect((addr, port))  # Establish connection
+                sock.connect((addr, port))
                 if DEBUG: alva_log("osc", "   Connection successful. Sending message...")
-                sock.sendall(message_with_size)  # Send the message with the size prefix
+                sock.sendall(message_with_size)
                 if DEBUG: alva_log("osc", "   Message sent successfully.")
+
+                # Explicitly handle server disconnection
+                if DEBUG: alva_log("osc", "   Disconnecting from server.")
+                response = sock.recv(1024)
+                if DEBUG: alva_log("osc", f"   Server response: {response}")
 
         except socket.timeout:
             if DEBUG: alva_log("osc", "   Error: Connection or send operation timed out.")
