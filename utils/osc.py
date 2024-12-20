@@ -9,7 +9,7 @@ import time
 
 from ..maintenance.logging import alva_log
 
-DEBUG = False
+DEBUG = True
 
 ETC_EOS_TCP_PORT = 3032
 TCP_TIMEOUT = 5 # Not sure why this has to be 5, but setting it to 1 or below seems to break Eos. Extremely fickle on ETC's end.

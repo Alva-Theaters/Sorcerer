@@ -72,8 +72,14 @@ class SorcererPython(SpyDataStructure):
             SorcererPython.press_lighting_key("enter")
             SorcererPython.press_lighting_key("learn")
             time.sleep(.2)
-            return
         
+    @staticmethod
+    def explain_make_eos_macros():
+        print("make_eos_macros(macro_range: Tuple[int, int], int_range: Tuple[int, int], string: str):")
+        print("   macro_range: The numbers of the macros to create, in (1, 10) form, for example, for macros 1, 2, 3, etc.")
+        print("   int_range:   The substitution numbers to use in the string, in same (1, 10) tuple form.")
+        print("   string:      The text of the macros to create. * will be replaced by the int_range numbers.\n")
+
 
     #-----------------------------------------------------------------------------------------------------
     # The code below is just a wrapper between Text Editor and Sorcerer. This should not contain logic.
@@ -201,3 +207,5 @@ class SorcererPython(SpyDataStructure):
 
 # Allow direct, easy access from text editor.
 bpy.spy = SorcererPython
+
+SorcererPython.make_eos_macros.explain = SorcererPython.explain_make_eos_macros
