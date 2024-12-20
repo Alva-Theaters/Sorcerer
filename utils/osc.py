@@ -4,9 +4,13 @@
 
 import bpy 
 import socket
+import struct
 import time
 
 from ..maintenance.logging import alva_log
+
+DEBUG = False
+TCP_TIMEOUT = .1
 
 
 class OSC:
@@ -15,21 +19,14 @@ class OSC:
         return argument.replace(" at - 00", " at + 00")
         
 
-    def send_osc(address, argument):
-        scene = bpy.context.scene.scene_props
-        ip_address = scene.str_osc_ip_address
-        port = scene.int_osc_port
-        OSC.send_osc_string(address, ip_address, port, argument)
-        
-        
-    def send_osc_lighting(address, argument, user=1):
+    def send_osc_lighting(address, argument, user=1, tcp=False):
         argument = OSC.correct_argument_because_etc_is_weird(argument)
         address = address.replace("/eos", f"/eos/user/{user}")
         scene = bpy.context.scene.scene_props
         ip_address = scene.str_osc_ip_address
         port = scene.int_osc_port
-        alva_log("osc_lighting", argument)
-        OSC.send_osc_string(address, ip_address, port, argument)
+        if DEBUG: alva_log("osc_lighting", argument)
+        OSC.send_osc_string(address, ip_address, port, argument, tcp=tcp)
 
 
     def press_lighting_key(key):
@@ -52,7 +49,7 @@ class OSC:
         scene = bpy.context.scene.scene_props
         ip_address = scene.str_video_ip_address
         port = scene.int_video_port
-        alva_log("osc_video", f"Address: {address} | Argument: {argument}")
+        if DEBUG: alva_log("osc_video", f"Address: {address} | Argument: {argument}")
         OSC.send_osc_string(address, ip_address, port, argument)
         
         
@@ -62,12 +59,19 @@ class OSC:
         scene = bpy.context.scene
         ip_address = scene.str_audio_ip_address
         port = scene.int_audio_port
-        alva_log("osc_audio", f"Address: {address} | Argument: {argument}")
+        if DEBUG: alva_log("osc_audio", f"Address: {address} | Argument: {argument}")
         OSC.send_osc_string(address, ip_address, port, argument)
 
 
-    def send_osc_string(osc_addr, addr, port, string):
-        alva_log("osc", f"\nOSC:\n   -Address: {osc_addr}\n   -String: {string}")
+    def send_osc_string(osc_addr, addr, port, string, tcp=False):
+        if tcp:
+            OSC.send_tcp(osc_addr, addr, string)
+        else:
+            OSC.send_udp(osc_addr, addr, port, string)
+
+
+    def send_udp(osc_addr, addr, port, string):
+        if DEBUG: alva_log("osc", f"\nOSC:\n   -Address: {osc_addr}\n   -String: {string}")
         def pad(data):
             return data + b"\0" * (4 - (len(data) % 4 or 4))
 
@@ -87,3 +91,42 @@ class OSC:
             traceback.print_exc()
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+
+    def send_tcp(osc_addr, addr, string):
+        if DEBUG: alva_log("osc", f"\nOSC:\n   -Address: {osc_addr}\n   -String: {string}")
+
+        def pad(data):
+            # Pad to a multiple of 4 bytes
+            return data + b"\0" * (4 - (len(data) % 4 or 4))
+
+        if not osc_addr.startswith("/"):
+            osc_addr = "/" + osc_addr
+
+        osc_addr = osc_addr.encode() + b"\0"
+        string = string.encode() + b"\0"
+        tag = ",s".encode()  # Type tag for a single string argument
+
+        message = b"".join(map(pad, (osc_addr, tag, string)))
+
+        message_with_size = struct.pack(">I", len(message)) + message
+
+        port = 3032 # Per ETC, for lighting only
+
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                sock.settimeout(TCP_TIMEOUT)  # Set a timeout of 5 seconds
+                if DEBUG: alva_log("osc", f"   Connecting to {addr}:{port}")
+                sock.connect((addr, port))  # Establish connection
+                if DEBUG: alva_log("osc", "   Connection successful. Sending message...")
+                sock.sendall(message_with_size)  # Send the message with the size prefix
+                if DEBUG: alva_log("osc", "   Message sent successfully.")
+
+        except socket.timeout:
+            if DEBUG: alva_log("osc", "   Error: Connection or send operation timed out.")
+        except ConnectionRefusedError:
+            if DEBUG: alva_log("osc", f"   Error: Connection refused by {addr}:{port}.")
+        except Exception as e:
+            if DEBUG: alva_log("osc", f"   Error occurred: {e}")
+            import traceback
+            traceback.print_exc()
