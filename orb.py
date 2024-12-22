@@ -38,9 +38,9 @@ def invoke_orb(Operator, context, bl_idname):
     active_item = sequencer_strip_or_scene(context.scene)
     Console = get_lighting_console_instance(context.scene)
 
-    yield from Console.prepare_console_for_orb_operation()
+    yield from Console.prepare_console_for_automation()
     yield from complete_operator_specific_automation(context, active_item, Operator, Console, bl_idname)
-    yield from Console.restore_console_to_normal_following_orb_operation()
+    yield from Console.restore_console_to_normal_following_automation()
 
 
 def sequencer_strip_or_scene(scene):
@@ -77,7 +77,7 @@ def complete_operator_specific_automation(context, active_item, Operator, Consol
         'alva_orb.macro_strip': lambda: MacroStrip(context, active_item).execute(Console),
         'alva_orb.flash_strip': lambda: FlashStrip(context, active_item).execute(Console),
         'alva_orb.offset_strip': lambda: OffsetStrip(context, active_item).execute(Console),
-
+        'alva_orb.strips_sync': lambda: StripsSync(context).execute(Console)
     }
 
     executor = executors.get(bl_idname)
@@ -228,18 +228,56 @@ class TextStrips:
         return {'FINISHED'}
 
             
-            
-#     def render_strips(self, context, event):
-#         console_mode = context.scene.scene_props.console_type_enum
-        
-#         if console_mode == 'option_eos':
-#             return Orb.Eos.render_strips(self, context, event)
-#         elif console_mode == 'option_ma3':
-#             self.report({'INFO'}, "Button not supported for grandMA3 yet.")
-#         elif console_mode == 'option_ma2':
-#             self.report({'INFO'}, "Button not supported for grandMA2 yet.")
-#         else:
-#             SLI.SLI_assert_unreachable()
+class StripsSync:
+    BATCH_LIMIT = 50
+
+    def __init__(self, context):
+        from .utils.event_utils import EventUtils
+        self.event_object, sound_strip = EventUtils.find_relevant_clock_objects(context.scene)
+        self.event_list = self.event_object.int_event_list
+        self.scene = context.scene
+
+        self.all_maps = [
+            (StripMapping.get_start_macro_map(self.scene), "Macro"),
+            (StripMapping.get_end_macro_map(self.scene), "Macro"),
+            (StripMapping.get_start_flash_macro_map(self.scene), "Macro"),
+            (StripMapping.get_end_flash_macro_map(self.scene), "Macro"),
+            (StripMapping.get_cue_map(self.scene), "Cue"),
+            (StripMapping.get_offset_map(self.scene), "Macro")
+        ]
+
+        self.event_strings = self.strips_to_events()
+
+    def strips_to_event_strings(self):
+        fps = EventUtils.get_frame_rate(self.scene)
+
+        event_strings = []
+        i = 1
+        for event_map, event_type in self.all_maps:
+            for frame in event_map:
+                actions = event_map[frame]
+                for label, index in actions:
+                    timecode = EventUtils.frame_to_timecode(frame, fps)
+                    event_strings.append(f"Event {self.event_list} / {i} Time {timecode} Show_Control_Action {event_type} {index} Enter")
+                    i += 1
+        return event_strings
+
+
+    def execute(self, Console):
+        Console.key("blind")
+        Console.cmd(f"Delete Event {self.event_list} / Enter Enter")
+        Console.cmd(f"Event {self.event_list} / Enter Enter")
+        yield from self.batch_send_event_strings()
+        bpy.ops.screen.animation_play()
+    
+    def batch_send_event_strings(self, Console):
+        for i in range(0, len(self.event_strings), 50):
+            yield self.send_event_string(i, Console), "Sending event command"
+
+    def send_event_string(self, i, Console):
+        batch = self.event_strings[i:i+self.BATCH_LIMIT]
+        argument = ", ".join(batch)
+        Console.cmd(argument)
 
         
 #     class Eos:
@@ -579,61 +617,7 @@ class TextStrips:
 #         '''Render Strips'''
 #         #-------------------------------------------------------------------------------------------------------------------------------------------
 #         @staticmethod
-#         def render_strips(self, context, event):
-#             Orb.Eos.record_snapshot(context.scene)
-#             Orb.Eos.save_console_file(context.scene)
 
-#             all_maps = [
-#                 (StripMapping.get_start_macro_map(context.scene), "Macro"),
-#                 (StripMapping.get_end_macro_map(context.scene), "Macro"),
-#                 (StripMapping.get_start_flash_macro_map(context.scene), "Macro"),
-#                 (StripMapping.get_end_flash_macro_map(context.scene), "Macro"),
-#                 (StripMapping.get_cue_map(context.scene), "Cue"),
-#                 (StripMapping.get_offset_map(context.scene), "Macro")
-#             ]
-            
-#             commands = []
-#             from .utils.event_utils import EventUtils
-#             event_object, sound_strip = EventUtils.find_relevant_clock_objects(context.scene)
-#             if event_object == None:
-#                 return {'CANCELLED'}
-            
-#             event_list = event_object.int_event_list
-
-#             i = 1
-#             for action_map, description in all_maps:
-#                 for frame in action_map:
-#                     actions = action_map[frame]
-#                     for label, index in actions:
-#                         fps = EventUtils.get_frame_rate(context.scene)
-#                         timecode = EventUtils.frame_to_timecode(frame, fps)
-#                         argument = f"Event {event_list} / {i} Time {timecode} Show_Control_Action {description} {index} Enter"
-#                         commands.append(argument)
-#                         i += 1
-                        
-#             OSC.send_osc_lighting("/eos/key/blind", "1")
-#             OSC.send_osc_lighting("/eos/key/blind", "0")
-            
-#             #time.sleep(.5)
-            
-#             OSC.send_osc_lighting("/eos/newcmd", f"Delete Event {event_list} / Enter Enter")
-#             #time.sleep(.3)
-#             OSC.send_osc_lighting("/eos/newcmd", f"Event {event_list} / Enter Enter")
-            
-#             for i in range(0, len(commands), 50):
-#                 batch = commands[i:i+50]
-#                 argument = ", ".join(batch)
-#                 OSC.send_osc_lighting("/eos/newcmd", argument)
-#                 time.sleep(.5)
-
-#             OSC.send_osc_lighting("/eos/key/live", "1")
-#             OSC.send_osc_lighting("/eos/key/live", "0")
-#             snapshot = str(context.scene.orb_finish_snapshot)
-#             OSC.send_osc_lighting("/eos/newcmd", f"Snapshot {snapshot} Enter")
-            
-#             Orb.Eos.restore_snapshot(context.scene)
-#             bpy.ops.screen.animation_play()
-#             return {'FINISHED'}
         
 
 #         #-------------------------------------------------------------------------------------------------------------------------------------------
