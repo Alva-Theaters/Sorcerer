@@ -16,18 +16,22 @@ from .assets.sli import SLI
 
 
 WHAT_DOES_THIS_DO = """
-All this code is for operators. This code is so far removed from the actual operator classes
-because there are about a dozen different operators using this logic and they all have to 
-use the same generator system so that the user can escape early out of the operation with the
-ESC key. So the bpy.types.Operator classes have essentially no code in their execute() function,
-they inherit the generator class, and the generator class calls functions from this script.
-This script then contains the majority of the higher level logic for each button.
+This code is for a set of operators identified in the UI with a purple orb icon.
 
-So if you're trying to debug or extend the step-by-step behavior of an Orb button, you will
-probably be working here. If you are adding an Orb operator, you will need to hook it up
-in the operators folder first. Then you will add its unique runtime logic. If you are working
-on something that impacts all orb operators, you will be working primarily in the operators  
-folder, not here."""
+These operators are responsible for automating repetitive tasks on the lighting console.
+
+For example, 
+    - Creating qmeos
+    - Creating macros needed for Sorcerer-to-console synchronization
+    - Programming channel-specific cue-timings (discreet timing) on the console's cues
+
+This uses "yield"/generator because we want the user to be able to escape prematurely with the 
+ESC key.
+
+The generator is set up within a mix-in class in the operators/orb.py file. That is where the 
+bpy.types.Operator classes are, as well. We use multiple operators instead of just one to
+make the tooltips and other properties simple to change between instances of the operator.
+"""
 
 
 def invoke_orb(Operator, context, bl_idname):
@@ -35,7 +39,7 @@ def invoke_orb(Operator, context, bl_idname):
     Console = get_lighting_console_instance(context.scene)
 
     yield from Console.prepare_console_for_orb_operation()
-    yield from complete_operator_specific_logic(context, active_item, Operator, Console, bl_idname)
+    yield from complete_operator_specific_automation(context, active_item, Operator, Console, bl_idname)
     yield from Console.restore_console_to_normal_following_orb_operation()
 
 
@@ -51,7 +55,7 @@ def get_lighting_console_instance(scene):
     return console(scene)  # Create instance.
 
 
-def complete_operator_specific_logic(context, active_item, Operator, Console, bl_idname):
+def complete_operator_specific_automation(context, active_item, Operator, Console, bl_idname):
     if not active_item:
         return {'CANCELLED'}, "No item found."
     
