@@ -517,7 +517,7 @@ class EventManager:
                 
             if relevant_lighting_clock_object:
                 clock = relevant_lighting_clock_object.int_event_list
-                OSC.send_osc_lighting(CMD_ADDRESS, INTERNAL_DISABLE.replace("$", str(clock), user=0)
+                OSC.send_osc_lighting(CMD_ADDRESS, INTERNAL_DISABLE.replace("$", str(clock), user=0))
 
                 if hasattr(relevant_sound_strip, "int_sound_cue"):
                     OSC.send_osc_audio(PAUSE_SOUND.replace("$", relevant_sound_strip.int_sound_cue), "")
