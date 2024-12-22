@@ -18,6 +18,8 @@ SLIP_ESC = b'\xDB'
 SLIP_ESC_END = b'\xDC'
 SLIP_ESC_ESC = b'\xDD'
 
+buttons_are_tcp = True
+
 
 class OSC:
     def correct_argument_because_etc_is_weird(argument):
@@ -33,20 +35,21 @@ class OSC:
         port = scene.int_osc_port
         if DEBUG: alva_log("osc_lighting", argument)
         OSC.send_osc_string(address, ip_address, port, argument, tcp=tcp)
+        #from bpy import spy
+        #bpy.spy.make_eos_macros((1, 10), (1, 10), "Go_to_Cue * Enter")
 
 
     def press_lighting_key(key):
-        OSC.send_osc_lighting(f"/eos/key/{key}", "1")
-        time.sleep(.3)
-        OSC.send_osc_lighting(f"/eos/key/{key}", "0")
+        OSC.send_osc_lighting(f"/eos/key/{key}", "1", tcp=buttons_are_tcp)
+        OSC.send_osc_lighting(f"/eos/key/{key}", "0", tcp=buttons_are_tcp)
 
 
     def lighting_key_down(key):
-        OSC.send_osc_lighting(f"/eos/key/{key}", "1")
+        OSC.send_osc_lighting(f"/eos/key/{key}", "1", tcp=buttons_are_tcp)
 
 
     def lighting_key_up(key):
-        OSC.send_osc_lighting(f"/eos/key/{key}", "0")
+        OSC.send_osc_lighting(f"/eos/key/{key}", "0", tcp=buttons_are_tcp)
         
         
     def send_osc_video(address, argument):
@@ -147,6 +150,8 @@ class OSC:
                 if DEBUG: alva_log("osc", "   Disconnecting from server.")
                 response = sock.recv(1024)
                 if DEBUG: alva_log("osc", f"   Server response: {response}")
+
+                #time.sleep(3)
 
         except socket.timeout:
             if DEBUG: alva_log("osc", "   Error: Connection or send operation timed out.")

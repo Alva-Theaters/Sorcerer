@@ -6,7 +6,6 @@ import bpy
 
 from ..assets.sli import SLI
 from ..utils.osc import OSC
-from ..assets.dictionaries import Dictionaries
 from .map import SliderToFixtureMapper
 from .split_color import ColorSplitter
 from ..utils.spy_utils import REGISTERED_LIGHTING_CONSOLES
@@ -23,7 +22,7 @@ class Publish:
         self.value = value
         self.patch_controller = self.find_my_patch_controller()
         self.is_harmonized = is_harmonized
-        self._DataClass = self._find_data_class()
+        self._DataClass = self.find_data_class()
         self._address = self._DataClass.osc_address
         self._rounding_points = self._DataClass.rounding_points
         self._format_value_function = self._DataClass.format_value
@@ -40,7 +39,7 @@ class Publish:
         return self.generator.parent
     
     @staticmethod
-    def _find_data_class():
+    def find_data_class():
         console_mode = bpy.context.scene.scene_props.console_type_enum
         try:
             return REGISTERED_LIGHTING_CONSOLES[console_mode]

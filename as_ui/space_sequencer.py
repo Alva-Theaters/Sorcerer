@@ -232,7 +232,7 @@ def draw_only_sound(self, context, column, active_strip):
     row.operator("alva_seq.tc_right_five", text="", icon='FORWARD')
     row.prop(active_strip, "int_event_list", text="Event List #")
     row.operator("alva_seq.clear_tc_clock", icon="CANCEL")
-    row.operator("alva_orb.execute_on_cue", icon_value=orb.icon_id, text="")
+    row.operator("alva_orb.sound_strip", icon_value=orb.icon_id, text="")
 
     row = box.row()
     row.operator("alva_seq.analyze_song", icon='SHADERFX')
@@ -312,7 +312,7 @@ def draw_strip_macro(self, context, column, box, active_strip):
     row.label(text='* = "Sneak Time " + [Strip length]')
     row = box.row(align=True)
     row.prop(active_strip, "start_frame_macro_text_gui")
-    row.operator("alva_orb.generate_start_frame_macro", icon_value=orb.icon_id)
+    row.operator("alva_orb.macro_strip", icon_value=orb.icon_id)
     if context.scene.strip_end_macros:
         row = box.separator()
         row = box.row(align=True)
@@ -330,7 +330,7 @@ def draw_strip_cue(self, context, column, box, active_strip):
     if context.scene.cue_builder_toggle:
         row.operator("alva_seq.update_builder", text="", icon='FILE_REFRESH')
     row.operator("alva_seq.record_cue", text="", icon='REC')
-    row.operator("alva_orb.generate_cue", icon_value=orb.icon_id)
+    row.operator("alva_orb.cue_strip", icon_value=orb.icon_id)
     row = box.row(align=True)
     row.scale_y = 2
     row.scale_x = .6
@@ -519,7 +519,7 @@ def draw_strip_flash_footer(self, context, box, active_strip):
 
     row = box.row(align=True)
     row.prop(active_strip, "flash_bias", text="Bias", slider=True)
-    row.operator("alva_orb.generate_flash_macros", text="", icon_value=orb.icon_id)
+    row.operator("alva_orb.flash_strip", text="", icon_value=orb.icon_id)
 
     row = box.row()
     if active_strip.flash_bias > 0:
@@ -581,7 +581,7 @@ def draw_strip_offset(self, context, column, box, active_strip):
     row = box.row(align=True)
     row.prop(active_strip, 'offset_channels', text="")
     row.prop(active_strip, "use_macro", text="", icon='FILE_TEXT')
-    row.operator("alva_orb.generate_offset_macro", text="", icon_value=orb.icon_id)
+    row.operator("alva_orb.offset_strip", text="", icon_value=orb.icon_id)
     
     box.separator(factor=.01)
 

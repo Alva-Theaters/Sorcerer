@@ -15,6 +15,7 @@ utilized both by the internal source code (as seen here) and by end-users extend
 '''
 
 from bpy import spy
+from ..utils.osc import OSC
 
 
 class CPV_LC_eos(spy.types.LightingConsole):
@@ -96,6 +97,26 @@ class CPV_LC_eos(spy.types.LightingConsole):
         if -10 < value < 10:
             return f"{'-0' if value < 0 else '0'}{abs(value)}"
         return str(value)
+    
+    @staticmethod
+    def save_console_file(scene):
+        if scene.is_console_saving:
+            CPV_LC_eos.key("shift", 1)
+            CPV_LC_eos.key("update")
+            CPV_LC_eos.key("shift", 0)
+    
+    @staticmethod
+    def key(key_string, direction=None):
+        if not direction:
+            OSC.press_lighting_key(key_string)
+        if direction == 1:
+            OSC.lighting_key_down(key_string)
+        else:
+            OSC.lighting_key_up(key_string)
+
+    @staticmethod
+    def cmd(command_string):
+        OSC.send_osc_lighting(CPV_LC_eos.osc_address, command_string)
 
 
 class CPV_LC_grandma_3(spy.types.LightingConsole):

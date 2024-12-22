@@ -268,7 +268,7 @@ def draw_orb(self, context, column):
     split = box.split(factor=.5)
     
     col1 = split.column()
-    col1.prop(scene, "is_armed_turbo", text="Orb skips Shift+Update", slider=True)
+    col1.prop(scene, "is_console_saving", text="Orb skips Shift+Update", slider=True)
     col1.separator()
     col1.prop(scene, "orb_chill_time", text="Wait Time:", slider=False)
 

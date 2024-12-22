@@ -20,7 +20,7 @@ def draw_macro_generator(self, context):
     
     row = col.row(align=True)
     row.prop(active_text, 'text_macro', text="Macro Number:")
-    row.operator("alva_orb.generate_text_macro", icon_value=orb.icon_id)
+    row.operator("alva_orb.text_block_macro", icon_value=orb.icon_id)
 
     col.separator()
 

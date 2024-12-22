@@ -59,19 +59,20 @@ class SorcererPython(SpyDataStructure):
 
             SorcererPython.press_lighting_key("learn")
             SorcererPython.press_lighting_key("macro")
-            time.sleep(.1)
+            #time.sleep(.1)
             for digit in str(macro+1):
                 SorcererPython.press_lighting_key(f"{digit}")
-                time.sleep(.1)
+                #time.sleep(.1)
             SorcererPython.press_lighting_key("enter")
-            time.sleep(.1)
+            SorcererPython.press_lighting_key("enter")
+            #time.sleep(.1)
 
             formatted_string = string.replace("*", str(custom_int))
             SorcererPython.lighting_command(formatted_string)
-            time.sleep(.1)
+            #time.sleep(.1)
             SorcererPython.press_lighting_key("enter")
             SorcererPython.press_lighting_key("learn")
-            time.sleep(.2)
+            #time.sleep(.2)
         
     @staticmethod
     def explain_make_eos_macros():
