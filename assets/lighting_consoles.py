@@ -135,13 +135,54 @@ class CPV_LC_eos(spy.types.LightingConsole):
             self.key("shift", False)
 
 
-    def prepare_console_for_orb_operation(self):
+    def prepare_console_for_automation(self):
         yield self.record_snapshot(), "Saving your screen"
         yield self.save_console_file(), "Saving the console file"
 
 
-    def restore_console_to_normal_following_orb_operation(self):
+    def restore_console_to_normal_following_automation(self):
         yield self.restore_snapshot(), "Restoring your screen"
+
+
+    def record_cue(self, cue_number, cue_duration):
+        self.key("live")
+        self.cmd(f"Cue {str(cue_number)} Time {cue_duration} Enter")
+
+
+    def record_discreet_time(self, Orb, slowed_prop_name):
+        discrete_time = str(getattr(Orb.active_item, slowed_prop_name))
+
+        if discrete_time == "0.0":
+            return
+        
+        param = slowed_prop_name.replace("_slow", "")
+
+        # Importing here for dependency reasons
+        from ..utils.rna_utils import parse_channels
+        from ..utils.cpv_utils import simplify_channels_list
+
+        groups = parse_channels(getattr(Orb.scene, f"{param}_groups"))
+        channels = parse_channels(getattr(Orb.scene, f"{param}_channels"))
+        submasters = parse_channels(getattr(Orb.scene, f"{param}_submasters"))
+
+        if groups:
+            groups_str = simplify_channels_list(groups)
+            argument = f"Group {groups_str} Time {discrete_time.zfill(2)} Enter"
+            self.cmd(argument)
+
+        if channels:
+            channels_str = simplify_channels_list(channels)
+            argument = f"Chan {channels_str} Time {discrete_time.zfill(2)} Enter"
+            self.cmd(argument)
+
+        if submasters:
+            submasters_str = simplify_channels_list(submasters)
+            argument = f"Sub {submasters_str} Time {discrete_time.zfill(2)} Enter"
+            self.cmd(argument)
+
+    def update_cue(self):
+        self.key("update")
+        self.key("enter")
 
 
 class CPV_LC_grandma_3(spy.types.LightingConsole):

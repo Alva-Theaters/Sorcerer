@@ -108,47 +108,14 @@ class CueStrip:
         slowed_properties = ["key_light_slow", "rim_light_slow", "fill_light_slow", "texture_light_slow", "band_light_slow",
                  "accent_light_slow", "energy_light_slow", "cyc_light_slow"]
         
-        Console.key("live")
-        Console.cmd(f"Cue {str(self.cue_number)} Time {self.cue_duration} Enter")
+        Console.record_cue(self.cue_number, self.cue_duration)
 
         for slowed_prop_name in slowed_properties:
-            yield self.record_discreet_time(slowed_prop_name, Console), "Recording property"
+            yield Console.record_discreet_time(self, slowed_prop_name), "Recording property"
 
-        Console.key("update")
-        Console.key("enter")
+        Console.update_cue()
 
         self.active_item.name = f"Cue {str(self.cue_number)}"
-
-    def record_discreet_time(self, slowed_prop_name, Console):
-        discrete_time = str(getattr(self.active_item, slowed_prop_name))
-
-        if discrete_time == "0.0":
-            return
-        
-        param = slowed_prop_name.replace("_slow", "")
-
-        # Importing here for dependency reasons
-        from .utils.rna_utils import parse_channels
-        from .utils.cpv_utils import simplify_channels_list
-
-        groups = parse_channels(getattr(self.scene, f"{param}_groups"))
-        channels = parse_channels(getattr(self.scene, f"{param}_channels"))
-        submasters = parse_channels(getattr(self.scene, f"{param}_submasters"))
-
-        if groups:
-            groups_str = simplify_channels_list(groups)
-            argument = f"Group {groups_str} Time {discrete_time.zfill(2)} Enter"
-            Console.cmd(argument)
-
-        if channels:
-            channels_str = simplify_channels_list(channels)
-            argument = f"Chan {channels_str} Time {discrete_time.zfill(2)} Enter"
-            Console.cmd(argument)
-
-        if submasters:
-            submasters_str = simplify_channels_list(submasters)
-            argument = f"Sub {submasters_str} Time {discrete_time.zfill(2)} Enter"
-            Console.cmd(argument)
 
 
 class SoundStrip:
@@ -246,7 +213,7 @@ class StripsSync:
             (StripMapping.get_offset_map(self.scene), "Macro")
         ]
 
-        self.event_strings = self.strips_to_events()
+        self.event_strings = self.strips_to_event_strings()
 
     def strips_to_event_strings(self):
         fps = EventUtils.get_frame_rate(self.scene)
@@ -267,7 +234,8 @@ class StripsSync:
         Console.key("blind")
         Console.cmd(f"Delete Event {self.event_list} / Enter Enter")
         Console.cmd(f"Event {self.event_list} / Enter Enter")
-        yield from self.batch_send_event_strings()
+        yield from self.batch_send_event_strings(Console)
+        Console.key("live")
         bpy.ops.screen.animation_play()
     
     def batch_send_event_strings(self, Console):
@@ -441,70 +409,49 @@ class StripsSync:
 #             Orb.Eos.send_osc_with_delay("/eos/key/live", "0", 0.1)
 
 
-#         #-------------------------------------------------------------------------------------------------------------------------------------------
-#         '''Macro strips'''
-#         #-------------------------------------------------------------------------------------------------------------------------------------------
-#         @staticmethod
-#         def generate_macro_command(context, macro_number, macro_text, first=False, final=False):
-#             try:
-#                 if first:
-#                     yield Orb.Eos.record_snapshot(context.scene), "Recording snapshot."
-#                     yield Orb.Eos.save_console_file(context.scene), "Orb is running."
+        # #-------------------------------------------------------------------------------------------------------------------------------------------
+        # '''Macro strips'''
+        # #-------------------------------------------------------------------------------------------------------------------------------------------
+        # @staticmethod
+        # def generate_macro_command(context, macro_number, macro_text, first=False, final=False):
+        #     yield Orb.Eos.initiate_macro(), "Initiating macro."
+        #     yield Orb.Eos.type_macro_number(macro_number), "Typing macro number."
+        #     yield Orb.Eos.learn_macro_and_exit(macro_text), "Learning macro and exiting."
+        #     yield Orb.Eos.reset_macro_key(), "Resetting macro key."
 
-#                 yield Orb.Eos.initiate_macro(), "Initiating macro."
-#                 yield Orb.Eos.type_macro_number(macro_number), "Typing macro number."
-#                 yield Orb.Eos.learn_macro_and_exit(macro_text), "Learning macro and exiting."
-#                 yield Orb.Eos.reset_macro_key(), "Resetting macro key."
+        # @staticmethod
+        # def initiate_macro():
+        #     Orb.Eos.send_osc_with_delay("/eos/key/live")
+        #     Orb.Eos.send_osc_with_delay("/eos/key/live", "0", 0.5)
+        #     Orb.Eos.send_osc_with_delay("/eos/key/learn", "Enter", 0.5)
+        #     Orb.Eos.send_osc_with_delay("/eos/key/macro")
 
-#                 if final:
-#                     yield Orb.Eos.restore_snapshot(context.scene), "Restoring snapshot."
-#                     yield None, "Orb complete."
-#             except AttributeError as e:
-#                 logging.error(f"Attribute error in generate_macro_command: {e}")
-#                 yield None, f"Attribute error: {e}"
-#             except ValueError as e:
-#                 logging.error(f"Value error in generate_macro_command: {e}")
-#                 yield None, f"Value error: {e}"
-#             except RuntimeError as e:
-#                 logging.error(f"Runtime error in generate_macro_command: {e}")
-#                 yield None, f"Runtime error: {e}"
-#             except Exception as e:
-#                 logging.error(f"Unexpected error in generate_macro_command: {e}")
-#                 yield None, f"Unexpected error: {e}"
+        # @staticmethod
+        # def type_macro_number(macro_number):
+        #     for digit in str(macro_number):
+        #         Orb.Eos.send_osc_with_delay(f"/eos/key/{digit}", delay=0.2)
+        #     Orb.Eos.send_osc_with_delay("/eos/key/enter", delay=0.1)
+        #     Orb.Eos.send_osc_with_delay("/eos/key/enter")
 
-#         @staticmethod
-#         def initiate_macro():
-#             Orb.Eos.send_osc_with_delay("/eos/key/live")
-#             Orb.Eos.send_osc_with_delay("/eos/key/live", "0", 0.5)
-#             Orb.Eos.send_osc_with_delay("/eos/key/learn", "Enter", 0.5)
-#             Orb.Eos.send_osc_with_delay("/eos/key/macro")
+        # @staticmethod
+        # def learn_macro_and_exit(macro_text):
+        #     Orb.Eos.send_osc_with_delay("/eos/newcmd", macro_text, 0.5)
+        #     Orb.Eos.send_osc_with_delay("/eos/key/learn", "Enter")
+        #     Orb.Eos.send_osc_with_delay("/eos/key/macro", "0")
 
-#         @staticmethod
-#         def type_macro_number(macro_number):
-#             for digit in str(macro_number):
-#                 Orb.Eos.send_osc_with_delay(f"/eos/key/{digit}", delay=0.2)
-#             Orb.Eos.send_osc_with_delay("/eos/key/enter", delay=0.1)
-#             Orb.Eos.send_osc_with_delay("/eos/key/enter")
-
-#         @staticmethod
-#         def learn_macro_and_exit(macro_text):
-#             Orb.Eos.send_osc_with_delay("/eos/newcmd", macro_text, 0.5)
-#             Orb.Eos.send_osc_with_delay("/eos/key/learn", "Enter")
-#             Orb.Eos.send_osc_with_delay("/eos/key/macro", "0")
-
-#         @staticmethod
-#         def calculate_biased_start_length(bias, frame_rate, strip_length_in_frames):
-#             # Normalize bias to a 0-1 scale
-#             normalized_bias = (bias + 49) / 98  # This will give 0 for -49 and 1 for 49
+        # @staticmethod
+        # def calculate_biased_start_length(bias, frame_rate, strip_length_in_frames):
+        #     # Normalize bias to a 0-1 scale
+        #     normalized_bias = (bias + 49) / 98  # This will give 0 for -49 and 1 for 49
             
-#             # Calculate minimum and maximum start_length in seconds
-#             min_start_length = 1 / frame_rate  # 1 frame
-#             max_start_length = (strip_length_in_frames - 1) / frame_rate
+        #     # Calculate minimum and maximum start_length in seconds
+        #     min_start_length = 1 / frame_rate  # 1 frame
+        #     max_start_length = (strip_length_in_frames - 1) / frame_rate
             
-#             # Interpolate between min and max based on normalized bias
-#             biased_start_length = (min_start_length * (1 - normalized_bias)) + (max_start_length * normalized_bias)
+        #     # Interpolate between min and max based on normalized bias
+        #     biased_start_length = (min_start_length * (1 - normalized_bias)) + (max_start_length * normalized_bias)
             
-#             return round(biased_start_length, 1)
+        #     return round(biased_start_length, 1)
             
                 
 #         #-------------------------------------------------------------------------------------------------------------------------------------------

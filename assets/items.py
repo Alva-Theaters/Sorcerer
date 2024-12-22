@@ -67,10 +67,19 @@ class Items:
         from ..utils.spy_utils import REGISTERED_LIGHTING_CONSOLES
 
         items = []
-        for cls in REGISTERED_LIGHTING_CONSOLES.values():  # Access each registered class
+        for cls in REGISTERED_LIGHTING_CONSOLES.values():
             items.append((cls.as_idname, cls.as_label, cls.as_description))
         return items
+    
 
+    def strip_types(self, context):
+        from ..utils.spy_utils import REGISTERED_STRIPS
+
+        items = []
+        for i, cls in enumerate(REGISTERED_STRIPS.values()):
+            items.append((cls.as_idname, "", cls.as_description, cls.as_icon, i))  # no as_label per UI rules
+        return items
+    
 
     def mixer_types(self, context):
         items = [
@@ -344,19 +353,6 @@ class Items:
             ('Group', "Group", "Select or record groups", 'OUTLINER_COLLECTION', 6),
             ('Macro', "Macro", "Trigger or record macros", 'FILE_TEXT', 7)
         ]
-        return items
-    
-    
-    def enum_items(self, context):
-        items = [
-            ('option_macro', "", "Build and fire macros based on strip length", 'FILE_TEXT', 0),
-            ('option_cue', "", "Use strip length to define cue duration", 'PLAY', 1),
-            ('option_flash', "", "Flash intensity up and down with strip length", 'LIGHT_SUN', 2),
-            ('option_animation', "", "Use keyframes, or inverted cues, to control parameters", 'IPO_BEZIER', 3),
-            #('option_offset', "", "Rapidly make offset effects like wipes and chases using parameters or palettes", 'UV_SYNC_SELECT', 4),
-            ('option_trigger', "", "Send discrete trigger at strip's start and/or end frame. Eos does not record this", 'SETTINGS', 5)
-        ]
-
         return items
     
 

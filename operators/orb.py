@@ -137,7 +137,7 @@ class ORB_OT_qmeo_make(ORB_OT_base):
         return super().execute(context)
     
 
-class ORB_OT_strips_sync(Operator):
+class ORB_OT_strips_sync(ORB_OT_base):
     bl_idname = "alva_orb.strips_sync"
     bl_label = "Sync Strips"
     bl_description = "Orb will create timecode events for every Macro, Cue, and Flash strip on the relevant sound strip's event list. Shortcut is Shift+Spacebar"

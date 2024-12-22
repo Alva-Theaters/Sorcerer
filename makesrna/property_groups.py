@@ -170,9 +170,9 @@ class MySettings(PropertyGroup):
     from ..updaters.sequencer import SequencerUpdaters 
 
     motif_type_enum:  EnumProperty(
-        items=AlvaItems.enum_items,
+        items=AlvaItems.strip_types,
         name="Motif Types",
-        description="Choose motif type",
+        description="Choose strip type",
         update=SequencerUpdaters.motif_type_enum_updater,
         default=1
     ) 
