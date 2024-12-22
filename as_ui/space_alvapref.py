@@ -85,9 +85,9 @@ def draw_network(self, context, column):
             box = box = column.box()
             row = box.row()
         row.alert = scene.scene_props.is_democratic
-        row.operator("alva_pref.democratic", text="Democratic", icon='HEART')
+        row.operator("alva_preferences.democratic", text="Democratic", icon='HEART')
         row.alert = scene.scene_props.is_not_democratic
-        row.operator("alva_pref.nondemocratic", text="Non-democratic", icon='ORPHAN_DATA')
+        row.operator("alva_preferences.nondemocratic", text="Non-democratic", icon='ORPHAN_DATA')
         row.alert = 0
     
     # Lighting
@@ -137,7 +137,7 @@ def draw_network(self, context, column):
         row = box.row()
         row.enabled=False
         row.prop(scene.scene_props, "core_drives_enum", text="", icon='DISC')
-        row.operator("alva_pref.save_dtp", icon='FILE_TICK')
+        row.operator("alva_preferences.save_dtp", icon='FILE_TICK')
 
     column.separator()
     column.separator()
@@ -177,7 +177,7 @@ def draw_sequencer(self, context, column):
 
     box = column.box()
     row = box.row()
-    row.operator("alva_pref.context_to_scene", text="", icon='SCENE_DATA')
+    row.operator("alva_preferences.context_to_scene", text="", icon='SCENE_DATA')
     row.label(text=f"Showing properties for {target.name}:")
 
     if is_scene or (has_strip and target.type == 'SOUND'):
