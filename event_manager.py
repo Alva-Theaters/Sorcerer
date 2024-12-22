@@ -516,7 +516,7 @@ class EventManager:
             relevant_lighting_clock_object, relevant_sound_strip = Utils.find_relevant_clock_objects(scene)
                 
             if relevant_lighting_clock_object:
-                clock = relevant_lighting_clock_object.int_event_list
+                clock = str(relevant_lighting_clock_object.int_event_list)
                 OSC.send_osc_lighting(CMD_ADDRESS, INTERNAL_DISABLE.replace("$", clock), user=0)
 
                 if hasattr(relevant_sound_strip, "int_sound_cue"):

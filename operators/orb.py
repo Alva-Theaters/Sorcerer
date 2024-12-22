@@ -49,7 +49,7 @@ class ORB_OT_base(Operator):
                     self.report({'INFO'}, msg)
             except StopIteration:
                 self.report({'INFO'}, "Operation completed")
-                self.cancel(context)
+                #self.cancel(context)
                 return {'FINISHED'}
 
         return {'RUNNING_MODAL'}

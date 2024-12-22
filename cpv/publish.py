@@ -22,7 +22,7 @@ class Publish:
         self.value = value
         self.patch_controller = self.find_my_patch_controller()
         self.is_harmonized = is_harmonized
-        self._DataClass = self.find_data_class()
+        self._DataClass = self.find_installed_lighting_console_data_class()
         self._address = self._DataClass.osc_address
         self._rounding_points = self._DataClass.rounding_points
         self._format_value_function = self._DataClass.format_value
@@ -39,8 +39,10 @@ class Publish:
         return self.generator.parent
     
     @staticmethod
-    def find_data_class():
-        console_mode = bpy.context.scene.scene_props.console_type_enum
+    def find_installed_lighting_console_data_class(console_mode=None):
+        if not console_mode:
+            console_mode = bpy.context.scene.scene_props.console_type_enum
+            
         try:
             return REGISTERED_LIGHTING_CONSOLES[console_mode]
         except KeyError:

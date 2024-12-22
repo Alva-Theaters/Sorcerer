@@ -32,13 +32,11 @@ folder, not here."""
 
 def invoke_orb(Operator, context, bl_idname):
     active_item = sequencer_strip_or_scene(context.scene)
-    Console = get_lighting_console_instance()
+    Console = get_lighting_console_instance(context.scene)
 
-    Console.prepare_console_for_orb_operation()
-    operator_result_type, operator_message = complete_button_specific_logic(context, active_item, Operator, Console, bl_idname)
-    Console.restore_console_to_normal_following_orb_operation()
-
-    return operator_result_type, operator_message
+    yield from Console.prepare_console_for_orb_operation()
+    yield from complete_operator_specific_logic(context, active_item, Operator, Console, bl_idname)
+    yield from Console.restore_console_to_normal_following_orb_operation()
 
 
 def sequencer_strip_or_scene(scene):
@@ -53,7 +51,7 @@ def get_lighting_console_instance(scene):
     return console(scene)  # Create instance.
 
 
-def complete_button_specific_logic(context, active_item, Operator, Console, bl_idname):
+def complete_operator_specific_logic(context, active_item, Operator, Console, bl_idname):
     if not active_item:
         return {'CANCELLED'}, "No item found."
     
@@ -70,11 +68,11 @@ def complete_button_specific_logic(context, active_item, Operator, Console, bl_i
         return {'CANCELLED'}, "No bl_idname found."
     
     executors = {
-        'alva_orb.cue_strip': lambda: CueStrip(context, active_item).execute(Operator, Console),
-        'alva_orb.sound_strip': lambda: SoundStrip(context.scene, active_item).execute(Operator, Console),
-        'alva_orb.macro_strip': lambda: MacroStrip(context, active_item).execute(Operator, Console),
-        'alva_orb.flash_strip': lambda: FlashStrip(context, active_item).execute(Operator, Console),
-        'alva_orb.offset_strip': lambda: OffsetStrip(context, active_item).execute(Operator, Console),
+        'alva_orb.cue_strip': lambda: CueStrip(context, active_item).execute(Console),
+        'alva_orb.sound_strip': lambda: SoundStrip(context.scene, active_item).execute(Console),
+        'alva_orb.macro_strip': lambda: MacroStrip(context, active_item).execute(Console),
+        'alva_orb.flash_strip': lambda: FlashStrip(context, active_item).execute(Console),
+        'alva_orb.offset_strip': lambda: OffsetStrip(context, active_item).execute(Console),
 
     }
 
@@ -82,78 +80,71 @@ def complete_button_specific_logic(context, active_item, Operator, Console, bl_i
     if executor is None:
         return {'CANCELLED'}, f"Invalid bl_idname: {bl_idname}."
     
-    operator_result_type, operator_message = executor()
+    yield from executor()
 
-    return operator_result_type, operator_message
-
-
-CUE = 'cue'
-SOUND = 'sound'
-MACRO = 'macro'
-FLASH = 'flash'
-OFFSET = 'offset'
-TEXT_BLOCK = 'text_block'
-
-    
-def unsupported_console(console_mode, Operator):
-    Operator.report({'ERROR'}, f"{console_mode} is not supported by this button.")
-    return {'CANCELLED'}
+    return {'FINISHED'}, "Orb complete."
             
 
 class CueStrip:
     def __init__(self, context, active_item):
         self.scene = context.scene
         self.active_item = active_item
-        self.frame_rate = EventUtils.get_frame_rate(context.scene)
-        strip_length_in_seconds_total = int(round(active_item.frame_final_duration / self.frame_rate))
-        minutes = strip_length_in_seconds_total // 60
-        seconds = strip_length_in_seconds_total % 60
-        self.cue_duration = "{:02d}:{:02d}".format(minutes, seconds)
+        self.cue_duration = self.find_cue_duration()
         self.cue_number = active_item.eos_cue_number
 
-    def execute(self, Operator, Console):
-        props = ["key_light_slow", "rim_light_slow", "fill_light_slow", "texture_light_slow", "band_light_slow",
+    def find_cue_duration(self):
+        frame_rate = EventUtils.get_frame_rate(self.scene)
+        strip_length_in_seconds_total = int(round(self.active_item.frame_final_duration / frame_rate))
+        minutes = strip_length_in_seconds_total // 60
+        seconds = strip_length_in_seconds_total % 60
+        return "{:02d}:{:02d}".format(minutes, seconds)
+    
+
+    def execute(self, Console):
+        slowed_properties = ["key_light_slow", "rim_light_slow", "fill_light_slow", "texture_light_slow", "band_light_slow",
                  "accent_light_slow", "energy_light_slow", "cyc_light_slow"]
         
         Console.key("live")
         Console.cmd(f"Cue {str(self.cue_number)} Time {self.cue_duration} Enter")
 
-        for prop in props:
-            yield self.process_property(prop, Console), ""
+        for slowed_prop_name in slowed_properties:
+            yield self.record_discreet_time(slowed_prop_name, Console), "Recording property"
 
         Console.key("update")
         Console.key("enter")
 
         self.active_item.name = f"Cue {str(self.cue_number)}"
 
+    def record_discreet_time(self, slowed_prop_name, Console):
+        discrete_time = str(getattr(self.active_item, slowed_prop_name))
 
-    def process_property(self, prop, Console):
-        discrete_time = str(getattr(self.active_item, prop))
-        if discrete_time != "0.0":
-            param = prop.replace("_slow", "")
+        if discrete_time == "0.0":
+            return
+        
+        param = slowed_prop_name.replace("_slow", "")
 
-            # Importing here for dependency reasons
-            from .utils.rna_utils import parse_channels
-            from .utils.cpv_utils import simplify_channels_list
+        # Importing here for dependency reasons
+        from .utils.rna_utils import parse_channels
+        from .utils.cpv_utils import simplify_channels_list
 
-            groups = parse_channels(getattr(self.scene, f"{param}_groups"))
-            channels = parse_channels(getattr(self.scene, f"{param}_channels"))
-            submasters = parse_channels(getattr(self.scene, f"{param}_submasters"))
+        groups = parse_channels(getattr(self.scene, f"{param}_groups"))
+        channels = parse_channels(getattr(self.scene, f"{param}_channels"))
+        submasters = parse_channels(getattr(self.scene, f"{param}_submasters"))
 
-            if groups:
-                groups_str = simplify_channels_list(groups)
-                argument = f"Group {groups_str} Time {discrete_time.zfill(2)} Enter"
-                Console.cmd(argument)
+        if groups:
+            groups_str = simplify_channels_list(groups)
+            argument = f"Group {groups_str} Time {discrete_time.zfill(2)} Enter"
+            Console.cmd(argument)
 
-            if channels:
-                channels_str = simplify_channels_list(channels)
-                argument = f"Chan {channels_str} Time {discrete_time.zfill(2)} Enter"
-                Console.cmd(argument)
+        if channels:
+            channels_str = simplify_channels_list(channels)
+            argument = f"Chan {channels_str} Time {discrete_time.zfill(2)} Enter"
+            Console.cmd(argument)
 
-            if submasters:
-                submasters_str = simplify_channels_list(submasters)
-                argument = f"Sub {submasters_str} Time {discrete_time.zfill(2)} Enter"
-                Console.cmd(argument)
+        if submasters:
+            submasters_str = simplify_channels_list(submasters)
+            argument = f"Sub {submasters_str} Time {discrete_time.zfill(2)} Enter"
+            Console.cmd(argument)
 
 
 class SoundStrip:
@@ -180,7 +171,7 @@ class MacroStrip:
             self.macro_end_number = find_executor(scene, active_item, 'end_macro')
             self.text_end = active_item.end_frame_macro_text
 
-    def execute(self, console_mode, Operator):
+    def execute(self, Console):
         return {'FINISHED'}
 
 
@@ -204,7 +195,7 @@ class FlashStrip:
         # start_macro = find_executor(scene, active_item, 'start_macro')
         # end_macro = find_executor(scene, active_item, 'end_macro')
 
-    def execute(self, console_mode, Operator):
+    def execute(self, Console):
         return {'FINISHED'}
 
 
@@ -218,8 +209,9 @@ class OffsetStrip:
         
         #macro = find_executor(scene, active_item, 'start_macro')
 
-    def execute(self, console_mode, Operator):
+    def execute(self, Console):
         return {'FINISHED'}
+
 
 class TextStrips:
     def __init__(self, context, active_item):
@@ -228,7 +220,7 @@ class TextStrips:
         text_data = active_text.as_string()
         text_data = text_data.splitlines()
 
-    def execute(self, console_mode, Operator):
+    def execute(self, Console):
         return {'FINISHED'}
 
             

@@ -15,6 +15,8 @@ utilized both by the internal source code (as seen here) and by end-users extend
 '''
 
 from bpy import spy
+import time
+
 from ..utils.osc import OSC
 
 
@@ -92,31 +94,54 @@ class CPV_LC_eos(spy.types.LightingConsole):
         "lower_rgbam": "# Red at - $1 Enter, # Green at - $2 Enter, # Blue at - $3 Enter, # Amber at - $4 Enter, # Mint at - $5 Enter"
     }
 
+    def __init__(self, scene):
+        self.scene = scene
+
     def format_value(value):
         '''We have to do this stuff because Eos interprets "1" as 10, "2" as 20, etc.'''
         if -10 < value < 10:
             return f"{'-0' if value < 0 else '0'}{abs(value)}"
         return str(value)
     
-    @staticmethod
-    def save_console_file(scene):
-        if scene.is_console_saving:
-            CPV_LC_eos.key("shift", 1)
-            CPV_LC_eos.key("update")
-            CPV_LC_eos.key("shift", 0)
-    
-    @staticmethod
-    def key(key_string, direction=None):
-        if not direction:
-            OSC.press_lighting_key(key_string)
-        if direction == 1:
-            OSC.lighting_key_down(key_string)
-        else:
-            OSC.lighting_key_up(key_string)
 
-    @staticmethod
-    def cmd(command_string):
-        OSC.send_osc_lighting(CPV_LC_eos.osc_address, command_string)
+    def key(self, key_string, direction=None):
+        if direction is None:
+            OSC.press_lighting_key(key_string)
+        elif direction is False:
+            OSC.lighting_key_up(key_string)
+        elif direction:
+            OSC.lighting_key_down(key_string)
+
+
+    def cmd(self, command_string):
+        OSC.send_osc_lighting(self.osc_address, command_string, tcp=True)
+
+
+    def record_snapshot(self):
+        snapshot = str(self.scene.orb_finish_snapshot)
+        self.cmd(f"Record Snapshot {snapshot} Enter Enter")
+
+
+    def restore_snapshot(self):
+        snapshot = str(self.scene.orb_finish_snapshot)
+        self.cmd(f"Snapshot {snapshot} Enter")
+
+
+    def save_console_file(self):
+        if self.scene.is_console_saving:
+            self.key("shift", True)
+            self.key("update")
+            time.sleep(2)
+            self.key("shift", False)
+
+
+    def prepare_console_for_orb_operation(self):
+        yield self.record_snapshot(), "Saving your screen"
+        yield self.save_console_file(), "Saving the console file"
+
+
+    def restore_console_to_normal_following_orb_operation(self):
+        yield self.restore_snapshot(), "Restoring your screen"
 
 
 class CPV_LC_grandma_3(spy.types.LightingConsole):
