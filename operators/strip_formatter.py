@@ -14,7 +14,7 @@ filter_color_strips = partial(filter, bpy.types.ColorSequence.__instancecheck__)
 
 
 class SEQUENCER_OT_alva_select_similar(Operator):
-    bl_idname = "alva_seq.select_similar"
+    bl_idname = "alva_sequencer.select_similar"
     bl_label = "Select Similar"
     bl_description = "This selects all strips with the same length and color as the active strip"
 
@@ -135,7 +135,7 @@ class SEQUENCER_OT_alva_select_similar(Operator):
 
 
 class SEQUENCER_OT_alva_formatter_select(Operator):
-    bl_idname = "alva_seq.formatter_select"
+    bl_idname = "alva_sequencer.formatter_select"
     bl_label = "Rapid Select"
 
     target: StringProperty() # type: ignore
@@ -157,7 +157,7 @@ class SEQUENCER_OT_alva_formatter_select(Operator):
 
 
 class SEQUENCER_OT_alva_frame_jump(Operator):
-    bl_idname = "alva_seq.frame_jump"
+    bl_idname = "alva_sequencer.frame_jump"
     bl_label = "Jump to Start Frame"
 
     direction: IntProperty() # type: ignore
@@ -173,7 +173,7 @@ class SEQUENCER_OT_alva_frame_jump(Operator):
 
 class SEQUENCER_OT_alva_hotkey_hint(Operator):
     '''Press for hotkey hint'''
-    bl_idname = "alva_seq.hotkey_hint"
+    bl_idname = "alva_sequencer.hotkey_hint"
     bl_label = "Hotkey Hint"
 
     message: StringProperty() # type: ignore
@@ -185,7 +185,7 @@ class SEQUENCER_OT_alva_hotkey_hint(Operator):
   
 class SEQUENCER_OT_alva_copy_strip_attribute(Operator):
     '''Copy this attribute of active strip to selected strips'''
-    bl_idname = "alva_seq.copy_attribute"
+    bl_idname = "alva_sequencer.copy_attribute"
     bl_label = "Copy Attribute"
 
     target: StringProperty() # type: ignore
@@ -216,7 +216,7 @@ class SEQUENCER_OT_alva_copy_strip_attribute(Operator):
 
 
 class SEQUENCER_OT_alva_set_timecode(Operator):
-    bl_idname = "alva_seq.set_timecode"
+    bl_idname = "alva_sequencer.set_timecode"
     bl_label = "Set Timecode"
     bl_description = "Drag all strips uniformly so that active strip's start frame is on frame 1 of the sequencer. Commonly used to synchronize with the console's timecode"
         
@@ -238,7 +238,7 @@ class SEQUENCER_OT_alva_set_timecode(Operator):
     
 
 class SEQUENCER_OT_alva_start_end_mapping(Operator):
-    bl_idname = "alva_seq.start_end_frame_mapping"
+    bl_idname = "alva_sequencer.start_end_frame_mapping"
     bl_label = "Set Range"
     bl_description = "Make sequencer's start and end frame match the selected clip's start and end frame"
         
@@ -251,7 +251,7 @@ class SEQUENCER_OT_alva_start_end_mapping(Operator):
     
 
 class SEQUENCER_OT_alva_sync_video_to_audio(Operator):
-    bl_idname = "alva_seq.sync_video"
+    bl_idname = "alva_sequencer.sync_video"
     bl_label = "Sync Video to Audio Speed"
     bl_description = "Synchronizes start and end frame of a video and also remaps the timing if the frame rate of the sequencer does not match that of the video"
         
