@@ -398,7 +398,7 @@ class SEQUENCER_OT_alva_new_kick(Operator):
             channel = sequence_editor.active_strip.channel if sequence_editor.active_strip else 1
             frame_end = current_frame + 25
             
-            channel = (sequence_editor, current_frame, frame_end, channel)
+            channel = find_available_channel(sequence_editor, current_frame, frame_end, channel)
             
             color_strip = sequence_editor.sequences.new_effect(
                     name="New Strip",

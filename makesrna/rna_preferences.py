@@ -45,7 +45,7 @@ def register():
 
     # Orb
     Scene.is_console_saving = BoolProperty(
-        default=True, name="Orb Skips Shift+Update", description="Arm this to skip the safety step where build buttons save the console file prior to messing with stuff on the console")
+        default=False, name="Orb Saves Console File First", description="Safety step where Orb buttons save the console file prior to messing with stuff on the console")
     Scene.orb_chill_time = FloatProperty(default=.2, name="Wait Time", description="How long Orb waits for Eos to catch up when rendering qmeos frame by frame")
     Scene.orb_finish_snapshot = IntProperty(default=1, min=1, max=9999, description="Snapshot that Orb should set when done")
     Scene.orb_records_snapshot = BoolProperty(default=True, description="Orb will record current screen as its snapshot before doing anything to restore correctly when finished")
