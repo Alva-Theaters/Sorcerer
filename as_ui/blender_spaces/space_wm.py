@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from .utils import get_orb_icon
+from ..utils import get_orb_icon
 
 
 def draw_splash(self, context):

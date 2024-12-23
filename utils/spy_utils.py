@@ -83,6 +83,7 @@ class SpyDataStructure:
                 },
                 SpyDataStructure.types.SequencerStrip: {
                     "as_idname": "an 'as_idname' attribute",
+                    "as_label": "an 'as_label' attribute",
                     "as_description": "an 'as_description' attribute",
                     "as_icon": "an 'as_icon' attribute"
                 },

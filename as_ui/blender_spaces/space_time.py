@@ -4,7 +4,7 @@
 
 import bpy
 
-from .utils import get_orb_icon
+from ..utils import get_orb_icon
 
 
 def draw_alva_time_header(self, context):
@@ -19,7 +19,7 @@ def draw_alva_time_header(self, context):
 
         layout = self.layout
         row = layout.row()
-        from ..panels import TIME_PT_alva_flags
+        from ...panels import TIME_PT_alva_flags
         row.popover(
             panel=TIME_PT_alva_flags.bl_idname,
             text="Render Flags",

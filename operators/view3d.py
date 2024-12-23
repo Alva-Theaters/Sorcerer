@@ -194,12 +194,12 @@ class VIEW3D_OT_alva_object_controller(Operator):
     def draw(self, context):
         active_object = context.active_object
         from ..as_ui.space_common import draw_parameters_mini, draw_play_bar
-        from ..as_ui.space_view3d import draw_speaker
+        from ..as_ui.blender_spaces.space_view3d import draw_speaker
         
         if active_object.type == 'MESH':
-            draw_parameters_mini(self, context, self.layout, active_object, use_slider=True)
+            draw_parameters_mini(context, self.layout, active_object, use_slider=True)
             self.layout.separator()
-            draw_play_bar(self, context, self.layout)
+            draw_play_bar(context, self.layout)
         
         if active_object.type == 'SPEAKER':
             draw_speaker(self, context, active_object, use_split=False)

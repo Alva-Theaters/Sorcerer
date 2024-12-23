@@ -8,14 +8,14 @@ from bpy.props import IntProperty, StringProperty
 import time
 import os
 
-from ..as_ui.space_sequencer import (
-    draw_strip_media,
+from ..as_ui.blender_spaces.space_sequencer import draw_strip_media
+from ..as_ui.strip_formatter import (
     draw_strip_formatter_color, 
     draw_strip_formatter_sound, 
     draw_strip_formatter_video_audio, 
     draw_strip_formatter_generator
 )
-from ..as_ui.utils import determine_sequencer_contexts
+from ..as_ui.utils import determine_sequencer_context
 from ..utils.event_utils import EventUtils
 from ..utils.sequencer_utils import find_available_channel, add_color_strip, analyze_song
 from ..utils.osc import OSC
@@ -511,23 +511,22 @@ class SEQUENCER_OT_alva_format_strip(Operator):
             sequence_editor = scene.sequence_editor
             if hasattr(sequence_editor, "active_strip") and sequence_editor.active_strip:
                 active_strip = sequence_editor.active_strip
-                alva_context, console_context = determine_sequencer_contexts(sequence_editor, active_strip)
+                alva_context = determine_sequencer_context(sequence_editor, active_strip)
             else:
                 alva_context = "none_relevant"
-                console_context = "none"
                 
             column = layout.column(align=True)
             if alva_context == "only_color":
-                draw_strip_formatter_color(self, context, column, scene, sequence_editor, active_strip)
+                draw_strip_formatter_color(context, column, scene, active_strip)
 
             elif alva_context == "only_sound":
-                draw_strip_formatter_sound(self, context, column, active_strip)
+                draw_strip_formatter_sound(column, active_strip)
                 
             elif alva_context == "one_video_one_audio":
-                draw_strip_formatter_video_audio(self, context, column, active_strip, sequence_editor)
+                draw_strip_formatter_video_audio(column, active_strip, sequence_editor)
                 
             else:
-                draw_strip_formatter_generator(self, context, column, scene)
+                draw_strip_formatter_generator(column, scene)
                
                
 class SEQUENCER_OT_alva_strip_media(Operator):

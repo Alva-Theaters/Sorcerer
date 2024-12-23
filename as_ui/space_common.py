@@ -33,7 +33,7 @@ pcoll.load("diffusion_dark", os.path.join(icons_dir, "diffusion_dark.svg"), 'IMA
 pcoll.load("gobo_dark", os.path.join(icons_dir, "gobo_dark.svg"), 'IMAGE')
 
 
-def draw_text_or_group_input(self, context, row_or_box, active_object, object=False):
+def draw_text_or_group_input(context, row_or_box, active_object, object=False):
     space_type, node_tree, node_name, node_tree_name = find_tree_name(context, active_object)
 
     if object:
@@ -70,7 +70,7 @@ def find_audio_type(enum_option):
     return True
         
 
-def draw_parameters(self, context, column, box, active_object):
+def draw_parameters(context, box, active_object):
     pcoll = preview_collections["main"]
     zoom = pcoll["zoom"]
     edge = pcoll["edge"]
@@ -223,7 +223,7 @@ def draw_parameters(self, context, column, box, active_object):
         row.prop(active_object, "alva_prism", slider=True, text="Prism")
 
 
-def draw_footer_toggles(self, context, column, active_object, box=True, vertical=False):
+def draw_footer_toggles(context, column, active_object, box=True, vertical=False):
     pcoll = preview_collections["main"]
 
     zoom = pcoll["zoom"]
@@ -312,6 +312,8 @@ def draw_volume_monitor(self, context, sequence_editor):
     is_nothing = True
 
     if active_strip.selected_stage_object is None:
+        row = box.row()
+        row.label(text="No participating speaker strips found.")
         return
     
     sound_object = bpy.data.objects[active_strip.selected_stage_object.name]
@@ -335,7 +337,7 @@ def draw_volume_monitor(self, context, sequence_editor):
         row = box.row()
         row.label(text="No participating speaker strips found.")
 
-def draw_parameters_mini(self, context, layout, active_object, use_slider=False, expand=True, text=True):
+def draw_parameters_mini(context, layout, active_object, use_slider=False, expand=True, text=True):
     ao = active_object
     scene = context.scene.scene_props
 
@@ -383,7 +385,7 @@ def draw_parameters_mini(self, context, layout, active_object, use_slider=False,
         layout.prop(scene, "is_parameter_bar_expanded", icon='FORWARD', text="")
 
 
-def draw_play_bar(self, context, layout):
+def draw_play_bar(context, layout):
     '''Copy/pasted from /scripts/startup/bl_ui/space_time.py.
         This is here because the normal keymaps don't work for 
         keyframing in the popup window context.

@@ -4,8 +4,8 @@
 
 import bpy
 
-from .space_common import draw_text_or_group_input, draw_parameters_mini
-from .utils import get_orb_icon
+from ..space_common import draw_text_or_group_input, draw_parameters_mini
+from ..utils import get_orb_icon
 
 DISASTER_THRESHOLD = 3
 
@@ -96,7 +96,7 @@ def draw_tool_settings(self, context):
         
         obj = context.active_object
         if obj and obj.type == 'MESH' and context.scene.scene_props.view_parameters_header:
-            draw_parameters_mini(self, context, layout, obj, use_slider=True, expand=False)
+            draw_parameters_mini(context, layout, obj, use_slider=True, expand=False)
                 
 
 def draw_speaker(self, context, active_object, use_split=True):
@@ -139,7 +139,7 @@ def draw_object_header(self, context, scene, active_object, node_layout=None):
     box = column.box()
     row = box.row(align=True)
     #row.prop(ao, "selected_profile_enum", icon_only=True, icon='SHADERFX')
-    draw_text_or_group_input(self, context, row, ao, object=True)
+    draw_text_or_group_input(context, row, ao, object=True)
 
     if identity == "Stage Object":
         row = box.row(align=True)

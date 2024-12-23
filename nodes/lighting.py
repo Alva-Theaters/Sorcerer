@@ -15,7 +15,7 @@ from ..assets.tooltips import format_tooltip
 
 from ..as_ui.space_common import draw_text_or_group_input, draw_parameters, draw_footer_toggles
 from ..as_ui.space_alvapref import draw_settings
-from ..as_ui.space_node import (
+from ..as_ui.blender_spaces.space_node import (
     draw_expanded_color,
     draw_node_mixer, 
     draw_pan_tilt_node, 
@@ -169,9 +169,9 @@ class NODE_NT_group_controller(NodeBase, Node):
         if self.expand_color:
             draw_expanded_color(self, context, layout, row)
         else:
-            draw_text_or_group_input(self, context, row, self, object=False)
-            draw_parameters(self, context, column, column, self)
-            draw_footer_toggles(self, context, column, self, box=False)
+            draw_text_or_group_input(context, row, self, object=False)
+            draw_parameters(context, column, self)
+            draw_footer_toggles(context, column, self, box=False)
 
 
 class NODE_NT_mixer(NodeBase, Node):

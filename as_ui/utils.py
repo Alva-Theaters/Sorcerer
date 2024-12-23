@@ -5,6 +5,9 @@
 import bpy.utils.previews
 import os
 
+from ..utils.spy_utils import REGISTERED_STRIPS
+from ..assets.sli import SLI
+
 preview_collections = {}
 
 
@@ -25,63 +28,53 @@ def unregister_previews():
     preview_collections.clear()
 
 
-def determine_sequencer_contexts(sequence_editor, active_strip):
-    """Determines the alva_context and console_context based on the selected strips in the sequence_editor."""
-    if sequence_editor and active_strip:
-        selected_color_strips = []
-        selected_sound_strips = []
-        selected_video_strips = []
-        selected_strips = []
-        if active_strip:
-            motif_type = active_strip.my_settings.motif_type_enum
-            alva_context = "no_selection"
-            console_context = "no_motif_type"
-        
-        for strip in sequence_editor.sequences:
-            if strip.select or (active_strip and strip == active_strip):
-                selected_strips.append(strip)
-                if strip.type == 'COLOR':
-                    selected_color_strips.append(strip)
-                elif strip.type == 'SOUND':
-                    selected_sound_strips.append(strip)
-                elif strip.type == 'MOVIE':
-                    selected_video_strips.append(strip)
-        
-        if selected_strips:
-            if len(selected_strips) != len(selected_color_strips) and selected_color_strips:
-                alva_context = "incompatible_types"
-            elif selected_sound_strips and not selected_color_strips and len(selected_strips) == 1:
-                alva_context = "only_sound"
-            elif len(selected_sound_strips) == 1 and len(selected_video_strips) == 1 and len(selected_strips) == 2:
-                alva_context = "one_video_one_audio"
-            elif len(selected_sound_strips) == 1 and len(selected_video_strips) == 1 and len(selected_strips) == 3:
-                alva_context = "one_video_one_audio"
-            elif not (selected_color_strips or selected_sound_strips):
-                alva_context = "none_relevant"
-            elif len(selected_strips) == len(selected_color_strips) and selected_color_strips and active_strip.type == 'COLOR':
-                alva_context = "only_color"
-                
-        elif not selected_strips:
-            alva_context = "none_relevant"
-        
-        if alva_context == "only_color":
-            if motif_type == "option_macro":
-                console_context = "macro"
-            elif motif_type == "option_cue":
-                console_context = "cue"
-            elif motif_type == "option_flash":
-                console_context = "flash"
-            elif motif_type == "option_animation":
-                console_context = "animation"
-            elif motif_type == "option_offset":
-                console_context = "offset"
-            elif motif_type == "option_trigger":
-                console_context = "trigger"
-    else:
-        alva_context = "none_relevant"
-        console_context = "none"
+def determine_sequencer_context(sequence_editor, active_strip):
+    """Determines the alva_context based on the selected strips in the sequence_editor."""
+    if not (sequence_editor and active_strip):
+        return "none_relevant"
+    
+    if not active_strip:
+        return "no_selection"
+    
+    all, colors, sounds, videos = count_selected_strips(sequence_editor, active_strip)
+    
+    if len(all) == len(colors) and colors and active_strip.type == 'COLOR':  # Most common first.
+        return "only_color"
+    elif sounds and len(all) == 1:
+        return "only_sound"
+    elif len(sounds) == 1 and len(videos) == 1 and (len(all) == 2 or len(all) == 3):  # Include speed strips.
+        return "one_video_one_audio"
+    elif not (colors or sounds):
+        return "none_relevant"
+    return "incompatible_types"
 
-    return alva_context, console_context
+
+def count_selected_strips(sequence_editor, active_strip):
+    colors = []
+    sounds = []
+    videos = []
+    all = []
+    for strip in sequence_editor.sequences:
+        if strip.select or (active_strip and strip == active_strip):
+            all.append(strip)
+            if strip.type == 'COLOR':
+                colors.append(strip)
+            elif strip.type == 'SOUND':
+                sounds.append(strip)
+            elif strip.type == 'MOVIE':
+                videos.append(strip)
+
+    return all, colors, sounds, videos
+    
+
+def get_strip_class(active_strip):
+    strip_mode = active_strip.my_settings.motif_type_enum
+        
+    try:
+        return REGISTERED_STRIPS[strip_mode]
+    except KeyError:
+        print(f"Error: The strip mode '{strip_mode}' is not registered.")
+        return None
 
 
 def find_group_label(controller):

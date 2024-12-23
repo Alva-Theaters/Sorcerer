@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .space_time import is_qmeo_parent_a_sound_strip
-from .utils import get_orb_icon
+from ..utils import get_orb_icon
 
 orb = get_orb_icon()
 

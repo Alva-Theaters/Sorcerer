@@ -4,7 +4,7 @@
 
 import bpy
 
-from .utils import find_group_label, get_orb_icon
+from ..utils import find_group_label, get_orb_icon
 
 MIXER_CHOICES_VISIBLE = True
 

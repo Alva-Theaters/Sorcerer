@@ -49,14 +49,14 @@ from bpy.types import (
     SEQUENCER_MT_context_menu
     )
 
-from .as_ui.space_topbar import (
+from .as_ui.blender_spaces.space_topbar import (
     draw_alva_topbar, 
     draw_alva_edit, 
     draw_alva_render, 
     draw_alva_window, 
     draw_alva_help
 )
-from .as_ui.space_view3d import (
+from .as_ui.blender_spaces.space_view3d import (
     draw_tool_settings,
     draw_speaker, 
     draw_object_header, 
@@ -72,13 +72,13 @@ from .as_ui.properties_scene import (
     draw_alva_properties_navigation,
     draw_alva_properties_sync
 )
-from .as_ui.space_time import (
+from .as_ui.blender_spaces.space_time import (
     draw_alva_time_header, 
     draw_alva_time_view, 
     draw_alva_time_playback,
     draw_alva_time_flags
 )
-from .as_ui.space_sequencer import (
+from .as_ui.blender_spaces.space_sequencer import (
     draw_strip_sound_object,
     draw_strip_video,
     draw_strip_media,
@@ -87,17 +87,17 @@ from .as_ui.space_sequencer import (
     draw_alva_sequencer_view_menu,
     draw_alva_sequencer_strip_menu
 )
-from .as_ui.space_node import (
+from .as_ui.blender_spaces.space_node import (
     draw_node_formatter, 
     draw_alva_node_menu, 
     draw_node_header, 
     draw_alva_node_view
 )
-from .as_ui.space_graph import draw_graph_header
-from .as_ui.space_text import draw_import_usitt_ascii, draw_macro_generator
-from .as_ui.space_text import draw_text_view
+from .as_ui.blender_spaces.space_graph import draw_graph_header
+from .as_ui.blender_spaces.space_text import draw_import_usitt_ascii, draw_macro_generator
+from .as_ui.blender_spaces.space_text import draw_text_view
 
-from .as_ui.space_tool import draw_alva_toolbar
+from .as_ui.blender_spaces.space_tool import draw_alva_toolbar
 from .as_ui.space_common import (
     draw_generate_fixtures, 
     draw_fixture_groups, 
@@ -105,7 +105,7 @@ from .as_ui.space_common import (
     draw_footer_toggles, 
     draw_volume_monitor
 )
-from .as_ui.space_wm import draw_alva_right_click
+from .as_ui.blender_spaces.space_wm import draw_alva_right_click
              
     
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -137,8 +137,8 @@ class VIEW3D_PT_alva_object_controller(Panel, View3D_Panel):
         
         if active_object.type == 'MESH':
             box, column = draw_object_header(self, context, scene, active_object)
-            draw_parameters(self, context, column, box, active_object)
-            draw_footer_toggles(self, context, column, active_object)
+            draw_parameters(context, box, active_object)
+            draw_footer_toggles(context, column, active_object)
         
         if active_object.type == 'SPEAKER':
             draw_speaker(self, context, active_object)
@@ -315,7 +315,7 @@ class SEQUENCER_PT_alva_Audio(Panel, SequencerPanel):
         sequence_editor = scene.sequence_editor
 
         if active_strip.type == 'SOUND':
-            draw_strip_sound_object(self, context, column, active_strip)
+            draw_strip_sound_object(column, active_strip)
             draw_volume_monitor(self, context, sequence_editor)
 
 

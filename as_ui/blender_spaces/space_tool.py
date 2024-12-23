@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from .utils import get_orb_icon
+from ..utils import get_orb_icon
 
 
 def draw_alva_toolbar(self, context):
@@ -25,7 +25,7 @@ def draw_alva_toolbar(self, context):
         flow.operator("alva_seq.add", icon='LIGHT_SUN', text="Flash" if region_width > 200 else "").Option = "option_flash"
         flow.operator("alva_seq.add", icon='IPO_BEZIER', text="Animation" if region_width > 200 else "").Option = "option_animation"
         #flow.operator("alva_seq.add", icon='UV_SYNC_SELECT', text="Offset" if region_width > 200 else "").Option = "option_offset"
-        flow.operator("alva_seq.add", icon='SETTINGS', text="Trigger" if region_width > 200 else "").Option = "Option_trigger"
+        flow.operator("alva_seq.add", icon='SETTINGS', text="Trigger" if region_width > 200 else "").Option = "option_trigger"
         flow.separator()
         flow.operator("alva_playback.clear_solos", icon='SOLO_OFF', text="Clear Solos" if region_width >= 200 else "")
         flow.operator("alva_orb.strips_sync", icon_value=orb.icon_id, text="Render" if region_width > 200 else "")

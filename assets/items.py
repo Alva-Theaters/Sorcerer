@@ -77,7 +77,7 @@ class Items:
 
         items = []
         for i, cls in enumerate(REGISTERED_STRIPS.values()):
-            items.append((cls.as_idname, "", cls.as_description, cls.as_icon, i))  # no as_label per UI rules
+            items.append((cls.as_idname, "", cls.as_description, cls.as_icon, i))  # as_label is drawn to the right, not with this
         return items
     
 

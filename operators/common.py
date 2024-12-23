@@ -14,7 +14,7 @@ from ..utils.rna_utils import update_all_controller_channel_lists, apply_patch
 from ..updaters.common import CommonUpdaters
 from ..as_ui.space_alvapref import draw_settings 
 from ..cpv.find import Find
-from ..as_ui.space_wm import (
+from ..as_ui.blender_spaces.space_wm import (
     draw_edge_diffusion_settings, 
     draw_gobo_settings, 
     draw_pan_tilt_settings, 
