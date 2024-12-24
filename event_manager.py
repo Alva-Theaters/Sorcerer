@@ -441,7 +441,7 @@ class EventManager:
 
         # Get trigger maps
         '''C1:2'''
-        self.sequencer_strips_mapping = StripMapper(scene).execute()
+        self.sequencer_strips_mapping = StripMapper(scene, streaming=True).execute()  # Only Trigger Strips, or custom ones set to streaming
 
         # Go timecode sync.
         if scene.sync_timecode:

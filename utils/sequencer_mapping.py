@@ -41,7 +41,8 @@ This is how we do it:
 VALID_STRIP_TYPE = 'COLOR'
 
 class StripMapper:
-    def __init__(self, scene):
+    def __init__(self, scene, streaming=False):
+        self.streaming = streaming
         self.mapping = defaultdict(list)
         self.sequences = scene.sequence_editor.sequences
         self.strip_classes = self.find_registered_strip_classes()
@@ -53,6 +54,8 @@ class StripMapper:
 
     def execute(self):
         for StripClass in self.strip_classes:
+            if self.streaming and not StripClass.streaming:
+                continue
             for strip in self.filter_strips(StripClass.as_idname):
                 self.process_a_side_of_the_strip(StripClass, strip, side="start")
                 self.process_a_side_of_the_strip(StripClass, strip, side="end")

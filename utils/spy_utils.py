@@ -49,6 +49,8 @@ class SpyDataStructure:
 
 
         class SequencerStrip:
+            streaming = False
+            
             def draw(self, context):
                 pass
 

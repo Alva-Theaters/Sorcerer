@@ -143,6 +143,8 @@ class SEQUENCER_ST_trigger(spy.types.SequencerStrip):
     as_description = "Send discrete trigger at strip's start and/or end frame. Eos does not record this"
     as_icon = 'SETTINGS'
 
+    streaming = True  # Tell the event manager that this needs to stream live during playback.
+
     def draw(context, column, box, active_strip):
         draw_strip_trigger(context, box, active_strip)
 
