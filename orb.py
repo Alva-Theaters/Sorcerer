@@ -9,7 +9,7 @@ import logging
 from .updaters.sequencer import SequencerUpdaters as Updaters
 from .utils.event_utils import EventUtils
 from .utils.orb_utils import find_addresses, tokenize_macro_line, find_executor
-from .utils.sequencer_mapping import StripMapping
+from .utils.sequencer_mapping import StripMapper
 from .cpv.publish import Publish
 from .utils.osc import OSC
 from .assets.sli import SLI
@@ -76,7 +76,6 @@ def complete_operator_specific_automation(context, active_item, Operator, Consol
         'alva_orb.sound_strip': lambda: SoundStrip(context.scene, active_item).execute(Console),
         'alva_orb.macro_strip': lambda: MacroStrip(context, active_item).execute(Console),
         'alva_orb.flash_strip': lambda: FlashStrip(context, active_item).execute(Console),
-        'alva_orb.offset_strip': lambda: OffsetStrip(context, active_item).execute(Console),
         'alva_orb.strips_sync': lambda: StripsSync(context).execute(Console)
     }
 
@@ -170,20 +169,6 @@ class FlashStrip:
         return {'FINISHED'}
 
 
-class OffsetStrip:
-    def __init__(self, context, active_item):
-        self.scene = context.scene
-        self.macro = 'offset_macro'
-        self.text = StripMapping.get_trigger_offset_start_map(self.scene, active_item=active_item)
-        if active_item.friend_list == "" or active_item.osc_trigger == "":
-            return {'CANCELLED', "Invalid text inputs."}
-        
-        #macro = find_executor(scene, active_item, 'start_macro')
-
-    def execute(self, Console):
-        return {'FINISHED'}
-
-
 class TextStrips:
     def __init__(self, context, active_item):
         macro = context.space_data.text.text_macro
@@ -204,14 +189,7 @@ class StripsSync:
         self.event_list = self.event_object.int_event_list
         self.scene = context.scene
 
-        self.all_maps = [
-            (StripMapping.get_start_macro_map(self.scene), "Macro"),
-            (StripMapping.get_end_macro_map(self.scene), "Macro"),
-            (StripMapping.get_start_flash_macro_map(self.scene), "Macro"),
-            (StripMapping.get_end_flash_macro_map(self.scene), "Macro"),
-            (StripMapping.get_cue_map(self.scene), "Cue"),
-            (StripMapping.get_offset_map(self.scene), "Macro")
-        ]
+        self.all_maps = StripMapper(context.scene).execute()
 
         self.event_strings = self.strips_to_event_strings()
 

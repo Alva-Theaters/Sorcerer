@@ -23,6 +23,7 @@ from ..as_ui.strip_types import (
     draw_strip_flash,
     draw_strip_trigger
 )
+from ..utils.sequencer_utils import BiasCalculator
 
 
 class SEQUENCER_ST_macro(spy.types.SequencerStrip):
@@ -34,6 +35,29 @@ class SEQUENCER_ST_macro(spy.types.SequencerStrip):
     def draw(context, column, box, active_strip):
         draw_strip_macro(context, box, active_strip)
 
+    def poll(value):
+        return value == 0
+
+
+    def get_start_frame(strip):
+        return strip.frame_start
+    
+    def get_start_value(strip):
+        return strip.int_start_macro
+    
+    
+    def get_end_frame(strip):
+        return strip.frame_final_end
+    
+    def get_end_value(strip):
+        return strip.int_end_macro
+    
+
+    def form_osc(value):
+        address = f"/eos/macro/{value}"
+        argument = "fire"
+        return address, argument
+
 
 class SEQUENCER_ST_cue(spy.types.SequencerStrip):
     as_idname = 'option_cue'
@@ -44,6 +68,23 @@ class SEQUENCER_ST_cue(spy.types.SequencerStrip):
     def draw(context, column, box, active_strip):
         draw_strip_cue(context, box, active_strip)
 
+    
+    def poll(value):
+        return value != ""  # strip.eos_cue_number is actually a string, so user can specify cue list
+    
+
+    def get_start_frame(strip):
+        return strip.frame_start
+
+    def get_start_value(strip):
+        return strip.eos_cue_number
+    
+
+    def form_osc(strip, value):
+        address = "/eos/cue"
+        argument = value
+        return address, argument
+    
 
 class SEQUENCER_ST_flash(spy.types.SequencerStrip):
     as_idname = 'option_flash'
@@ -53,6 +94,37 @@ class SEQUENCER_ST_flash(spy.types.SequencerStrip):
 
     def draw(context, column, box, active_strip):
         draw_strip_flash(context,  box, active_strip)
+
+
+    def poll(value):
+        return value == ""
+
+
+    def get_start_frame(strip):
+        return strip.frame_start
+    
+    def get_start_value(strip):
+        return strip.start_flash
+    
+    
+    def get_end_frame(strip):
+        bias = strip.flash_bias
+        strip_length_in_frames = strip.frame_final_duration
+
+        bias_in_frames = BiasCalculator(bias, strip_length_in_frames).execute()
+
+        start_frame = strip.frame_start
+        end_flash_macro_frame = start_frame + bias_in_frames
+        return int(round(end_flash_macro_frame))
+    
+    def get_end_value(strip):
+        return strip.end_flash
+    
+
+    def form_osc(value):
+        address = f"/eos/macro/{value}"
+        argument = "fire"
+        return address, argument
 
 
 class SEQUENCER_ST_animation(spy.types.SequencerStrip):
@@ -73,6 +145,30 @@ class SEQUENCER_ST_trigger(spy.types.SequencerStrip):
 
     def draw(context, column, box, active_strip):
         draw_strip_trigger(context, box, active_strip)
+
+
+    def poll(value):
+        return value != ""
+
+
+    def get_start_frame(strip):
+        return strip.frame_start
+    
+    def get_start_value(strip):
+        return strip.osc_trigger
+    
+    
+    def get_end_frame(strip):
+        return strip.frame_final_end
+    
+    def get_end_value(strip):
+        return strip.osc_trigger_end
+    
+
+    def form_osc(strip, value):
+        address = strip.trigger_prefix
+        argument = value
+        return address, argument
 
 
 strips = [

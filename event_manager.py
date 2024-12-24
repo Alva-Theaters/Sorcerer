@@ -13,7 +13,7 @@ from .maintenance.logging import alva_log
 from .utils.audio_utils import render_volume
 from .utils.event_utils import EventUtils as Utils
 from .utils.osc import OSC
-from .utils.sequencer_mapping import StripMapping
+from .utils.sequencer_mapping import StripMapper
 
 
 stored_channels = set()
@@ -279,9 +279,7 @@ class EventManager:
     def __init__(self):
         self.last_frame = -1
         
-        self.start_mapping = None
-        self.offset_start_mapping = None
-        self.end_mapping = None
+        self.sequencer_strips_mapping = None
         
         self.old_graph = []
         self.controllers = []
@@ -296,7 +294,7 @@ class EventManager:
             return
         
         for strip in scene.sequence_editor.sequences_all:
-            if strip.type == 'SOUND' and strip.selected_stage_object:
+            if strip.type == 'SOUND' and not strip.selected_stage_object:
                 sound_object = bpy.data.objects[strip.selected_stage_object.name]
 
                 for speaker_list in sound_object.speaker_list:
@@ -357,21 +355,9 @@ class EventManager:
         # Trigger-strips.
         '''B1:1-2'''
         frame = scene.frame_current
-        if self.start_mapping and frame in self.start_mapping:
-            for trigger_prefix, osc_trigger in self.start_mapping[frame]:
-                OSC.send_osc_lighting(trigger_prefix, osc_trigger, user=0)
-
-        if self.offset_start_mapping and frame in self.offset_start_mapping:
-            for item in self.offset_start_mapping[frame]:
-                try:
-                    trigger_prefix, osc_trigger = item
-                    OSC.send_osc_lighting(trigger_prefix, osc_trigger, user=0)
-                except ValueError as e:
-                    print(f"Error: {e}")
-
-        if self.end_mapping and frame in self.end_mapping: # Trigger strip end frame.
-            for trigger_prefix, osc_trigger_end in self.end_mapping[frame]:
-                OSC.send_osc_lighting(trigger_prefix, osc_trigger_end, user=0) 
+        if self.sequencer_strips_mapping and frame in self.sequencer_strips_mapping:
+            for osc_address, osc_argument in self.sequencer_strips_mapping[frame]:
+                OSC.send_osc_lighting(osc_address, osc_argument, user=0)
 
 
     def fire_parameter_updaters(self, scene):
@@ -455,9 +441,7 @@ class EventManager:
 
         # Get trigger maps
         '''C1:2'''
-        self.start_mapping = StripMapping.get_trigger_start_map(scene)
-        self.offset_start_mapping = StripMapping.get_trigger_offset_start_map(scene)
-        self.end_mapping = StripMapping.get_trigger_end_map(scene)
+        self.sequencer_strips_mapping = StripMapper(scene).execute()
 
         # Go timecode sync.
         if scene.sync_timecode:
@@ -517,7 +501,7 @@ class EventManager:
                 
             if relevant_lighting_clock_object:
                 clock = str(relevant_lighting_clock_object.int_event_list)
-                OSC.send_osc_lighting(CMD_ADDRESS, INTERNAL_DISABLE.replace("$", clock), user=0)
+                OSC.send_osc_lighting(CMD_ADDRESS, INTERNAL_DISABLE.replace("$", clock, user=0))
 
                 if hasattr(relevant_sound_strip, "int_sound_cue"):
                     OSC.send_osc_audio(PAUSE_SOUND.replace("$", relevant_sound_strip.int_sound_cue), "")

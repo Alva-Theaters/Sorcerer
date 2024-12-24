@@ -14,7 +14,8 @@ class BiasCalculator():
         self.bias = bias
         self.strip_length_in_frames = strip_length_in_frames
         
-    def calculate_flash_strip_bias(self):
+        
+    def execute(self):
         self.bias = self.bias
         self.strip_length_in_frames = self.strip_length_in_frames
 
