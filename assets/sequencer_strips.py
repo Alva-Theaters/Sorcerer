@@ -36,7 +36,7 @@ class SEQUENCER_ST_macro(spy.types.SequencerStrip):
         draw_strip_macro(context, box, active_strip)
 
     def poll(value):
-        return value == 0
+        return value != 0
 
 
     def get_start_frame(strip):
@@ -97,7 +97,7 @@ class SEQUENCER_ST_flash(spy.types.SequencerStrip):
 
 
     def poll(value):
-        return value == ""
+        return value != ""
 
 
     def get_start_frame(strip):
