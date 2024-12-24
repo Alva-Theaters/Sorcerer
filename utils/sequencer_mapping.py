@@ -78,13 +78,29 @@ class StripMapper:
         if StripClass.poll and not StripClass.poll(strip):
             return
 
-        frame = frame_func(strip)
-        value = value_func(strip)
-        data = form_osc_func(strip, value)
+        frames = frame_func(strip)
+        values = value_func(strip)
 
-        if all(data):
-            self.mapping[frame].append(data)
+        frames, values = self.format_frames_and_values(frames, values)
 
+        for frame, value in zip(frames, values):
+            data = form_osc_func(strip, value)
+
+            if all(data):
+                self.mapping[frame].append(data)
+
+    def format_frames_and_values(self, frames, values):
+        if not isinstance(frames, list):
+            frames = [frames]
+        if not isinstance(values, list):
+            values = [values]
+
+        if len(frames) != len(values):
+            min_length = min(len(frames), len(values))
+            frames = frames[:min_length]
+            values = values[:min_length]
+
+        return frames, values
 
 '''
 This stuff is from the old Offset Friends thing from Alva Sequencer. 
