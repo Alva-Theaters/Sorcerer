@@ -110,11 +110,40 @@ class CueStrip:
         Console.record_cue(self.cue_number, self.cue_duration)
 
         for slowed_prop_name in slowed_properties:
-            yield Console.record_discreet_time(self, slowed_prop_name), "Recording property"
+            yield from self.record_discrete_times(self, slowed_prop_name, Console)
 
         Console.update_cue()
 
         self.active_item.name = f"Cue {str(self.cue_number)}"
+
+
+    def record_discrete_times(self, slowed_prop_name, Console):
+        discrete_time = str(getattr(self.active_item, slowed_prop_name))
+
+        if discrete_time == "0.0":
+            return
+        
+        param = slowed_prop_name.replace("_slow", "")
+
+        # Importing here for dependency reasons
+        from .utils.rna_utils import parse_channels
+        from .utils.cpv_utils import simplify_channels_list
+
+        groups = parse_channels(getattr(self.scene, f"{param}_groups"))
+        channels = parse_channels(getattr(self.scene, f"{param}_channels"))
+        submasters = parse_channels(getattr(self.scene, f"{param}_submasters"))
+
+        if groups:
+            members_str = simplify_channels_list(groups)
+            yield Console.record_discrete_time("Group", members_str, discrete_time), "Recording groups"
+
+        if channels:
+            members_str = simplify_channels_list(channels)
+            yield Console.record_discrete_time("Chan", members_str, discrete_time), "Recording channels"
+
+        if submasters:
+            members_str = simplify_channels_list(submasters)
+            yield Console.record_discrete_time("Sub", members_str, discrete_time), "Recording submasters"
 
 
 class SoundStrip:

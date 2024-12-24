@@ -104,6 +104,8 @@ class CPV_LC_eos(spy.types.LightingConsole):
         return str(value)
     
 
+
+    # Common Actions --------------------------------------------------------------------------------------------------
     def key(self, key_string, direction=None):
         if direction is None:
             OSC.press_lighting_key(key_string)
@@ -115,16 +117,6 @@ class CPV_LC_eos(spy.types.LightingConsole):
 
     def cmd(self, command_string):
         OSC.send_osc_lighting(self.osc_address, command_string, tcp=True)
-
-
-    def record_snapshot(self):
-        snapshot = str(self.scene.orb_finish_snapshot)
-        self.cmd(f"Record Snapshot {snapshot} Enter Enter")
-
-
-    def restore_snapshot(self):
-        snapshot = str(self.scene.orb_finish_snapshot)
-        self.cmd(f"Snapshot {snapshot} Enter")
 
 
     def save_console_file(self):
@@ -141,7 +133,7 @@ class CPV_LC_eos(spy.types.LightingConsole):
 
 
     def restore_console_to_normal_following_automation(self):
-        yield self.restore_snapshot(), "Restoring your screen"
+        yield self.restore_snapshot(), "Restoring your screen"  
 
 
     def record_cue(self, cue_number, cue_duration):
@@ -149,36 +141,21 @@ class CPV_LC_eos(spy.types.LightingConsole):
         self.cmd(f"Cue {str(cue_number)} Time {cue_duration} Enter")
 
 
-    def record_discreet_time(self, Orb, slowed_prop_name):
-        discrete_time = str(getattr(Orb.active_item, slowed_prop_name))
+    def record_discreet_time(self, type_id, members_str, discrete_time):
+        argument = f"{type_id} {members_str} Time {discrete_time.zfill(2)} Enter"
+        self.cmd(argument)
 
-        if discrete_time == "0.0":
-            return
-        
-        param = slowed_prop_name.replace("_slow", "")
 
-        # Importing here for dependency reasons
-        from ..utils.rna_utils import parse_channels
-        from ..utils.cpv_utils import simplify_channels_list
+    # Unique Helpers --------------------------------------------------------------------------------------------------
+    def record_snapshot(self):
+        snapshot = str(self.scene.orb_finish_snapshot)
+        self.cmd(f"Record Snapshot {snapshot} Enter Enter")
 
-        groups = parse_channels(getattr(Orb.scene, f"{param}_groups"))
-        channels = parse_channels(getattr(Orb.scene, f"{param}_channels"))
-        submasters = parse_channels(getattr(Orb.scene, f"{param}_submasters"))
 
-        if groups:
-            groups_str = simplify_channels_list(groups)
-            argument = f"Group {groups_str} Time {discrete_time.zfill(2)} Enter"
-            self.cmd(argument)
+    def restore_snapshot(self):
+        snapshot = str(self.scene.orb_finish_snapshot)
+        self.cmd(f"Snapshot {snapshot} Enter")
 
-        if channels:
-            channels_str = simplify_channels_list(channels)
-            argument = f"Chan {channels_str} Time {discrete_time.zfill(2)} Enter"
-            self.cmd(argument)
-
-        if submasters:
-            submasters_str = simplify_channels_list(submasters)
-            argument = f"Sub {submasters_str} Time {discrete_time.zfill(2)} Enter"
-            self.cmd(argument)
 
     def update_cue(self):
         self.key("update")
