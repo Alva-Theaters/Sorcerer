@@ -10,15 +10,30 @@ except:
 
 
 class BiasCalculator():
+    '''
+    Returns bias in frames. Use by adding this class's integer return value to the strip's start frame.
+    
+    Problem: 
+        Flash strips want to make a light on the stage flash up and flash down. It would be pretty boring 
+        if it had to flash up just as fast as it flashes down. 
+
+    Solution:
+        We add a "Bias" property to the flash strip GUI. This number, between -49 and 49, can make the 
+        light flash up super fast and go back down super slow (if a strong negative value) or the opposite
+        (if a strong positive value). If bias is set to 0, it comes up and comes down at equal speed.
+
+    This Code:
+        This code is passed the bias property from the UI and the parent strip's length in frames. It then 
+        converts the bias property to number of frames. Whoever called this code is then responsible for 
+        adding that bias_in_frames value to the start frame to give the frame that the flash down action 
+        should happen on.
+    '''
     def __init__(self, bias, strip_length_in_frames):
         self.bias = bias
         self.strip_length_in_frames = strip_length_in_frames
         
-        
-    def execute(self):
-        self.bias = self.bias
-        self.strip_length_in_frames = self.strip_length_in_frames
 
+    def execute(self):
         if self.bias == 0:
             return self._divide_in_half()
         elif self.bias < 0:

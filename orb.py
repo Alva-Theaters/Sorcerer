@@ -9,6 +9,7 @@ import logging
 from .updaters.sequencer import SequencerUpdaters as Updaters
 from .utils.event_utils import EventUtils
 from .utils.orb_utils import find_addresses, tokenize_macro_line, find_executor
+from .utils.sequencer_utils import BiasCalculator
 from .utils.sequencer_mapping import StripMapper
 from .cpv.publish import Publish
 from .utils.osc import OSC
@@ -186,13 +187,14 @@ class FlashStrip:
         strip_length_in_seconds = strip_length_in_frames / frame_rate
         bias = active_item.flash_bias
 
-        # m1_start_length = Orb.Eos.calculate_biased_start_length(bias, frame_rate, strip_length_in_frames)
-        # m1_text = f"{str(active_item.flash_input_background)} Sneak Time {str(m1_start_length)} Enter "
-        # end_length = round((strip_length_in_seconds - m1_start_length), 1)
-        # m2_text = f"{str(active_item.flash_down_input_background)} Sneak Time {str(end_length)} Enter"
+        bias_in_frames = BiasCalculator(bias, strip_length_in_frames).execute()
+        m1_start_length_in_seconds = bias_in_frames / frame_rate
+        m1_text = f"{str(active_item.flash_input_background)} Sneak Time {str(m1_start_length_in_seconds)} Enter "
+        end_length = round((strip_length_in_seconds - m1_start_length_in_seconds), 1)
+        m2_text = f"{str(active_item.flash_down_input_background)} Sneak Time {str(end_length)} Enter"
 
-        # start_macro = find_executor(scene, active_item, 'start_macro')
-        # end_macro = find_executor(scene, active_item, 'end_macro')
+        start_macro = find_executor(scene, active_item, 'start_macro')
+        end_macro = find_executor(scene, active_item, 'end_macro')
 
     def execute(self, Console):
         return {'FINISHED'}
