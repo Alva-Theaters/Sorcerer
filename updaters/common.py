@@ -218,10 +218,10 @@ class CommonUpdaters:
         if scene.string_highlight_memory != "":
             OSC.send_osc_lighting("/eos/newcmd", f"Chan {scene.string_highlight_memory} Out")
         
-        # Clear scene selection so we can leave only the correct objects selected
-        bpy.ops.object.select_all(action='DESELECT')
-        
         if scene.highlight_mode:
+            # Clear scene selection so we can leave only the correct objects selected
+            bpy.ops.object.select_all(action='DESELECT')
+            
             relevant_channels = [channel.chan for channel in item.channels_list]
             relevant_objects = []
             for obj in bpy.data.objects:

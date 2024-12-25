@@ -49,8 +49,8 @@ class SpyDataStructure:
 
 
         class SequencerStrip:
-            streaming = False
-            
+            streaming = False  # Seems better than using a hasattr in the mapping function
+
             def draw(self, context):
                 pass
 

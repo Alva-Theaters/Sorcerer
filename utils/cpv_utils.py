@@ -138,6 +138,8 @@ def home_alva_controller(controller):
 
 def simplify_channels_list(channels):
     #[1, 2, 3, 10, 11, 15, 16, 17, 18] -> "1 Thru 3 + 10 Thru 11 + 15 Thru 18"
+    if not channels:
+        return ""
     channels.sort()
     combined_channels = []
     start = channels[0]
