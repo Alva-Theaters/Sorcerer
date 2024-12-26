@@ -356,7 +356,7 @@ class EventManager:
         '''B1:1-2'''
         frame = scene.frame_current
         if self.sequencer_strips_mapping and frame in self.sequencer_strips_mapping:
-            for osc_address, osc_argument, event_type in self.sequencer_strips_mapping[frame]:
+            for osc_address, osc_argument in self.sequencer_strips_mapping[frame]:
                 OSC.send_osc_lighting(osc_address, osc_argument, user=0)
 
 
