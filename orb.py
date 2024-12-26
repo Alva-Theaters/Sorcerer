@@ -161,17 +161,23 @@ class SoundStrip:
 
 class MacroStrip:
     def __init__(self, context, active_item):
-        scene = context.scene
+        self.scene = context.scene
         Updaters.macro_update(active_item, context) # Ensure the textual input has been parsed
-        self.macro_number = find_executor(scene, active_item, 'start_macro')
-        self.text = active_item.start_frame_macro_text
-        self.is_final = not scene.strip_end_macros
 
-        if scene.strip_end_macros:
-            self.macro_end_number = find_executor(scene, active_item, 'end_macro')
-            self.text_end = active_item.end_frame_macro_text
+        self.start_macro_number = find_executor(self.scene, active_item, 'start_macro')
+        self.start_macro_text = active_item.start_frame_macro_text
+
+        if self.scene.strip_end_macros:
+            self.end_macro_number = find_executor(self.scene, active_item, 'end_macro')
+            self.end_macro_text = active_item.end_frame_macro_text
 
     def execute(self, Console):
+        if self.start_macro_text != "" and self.start_macro_number != 0:
+            yield from Console.make_macro(self.start_macro_number, self.start_macro_text)
+
+        if self.scene.strip_end_macros and self.end_macro_text != "" and self.end_macro_number != 0:
+            yield from Console.make_macro(self.end_macro_number, self.end_macro_text)
+            
         return {'FINISHED'}
 
 

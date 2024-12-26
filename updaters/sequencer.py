@@ -39,26 +39,28 @@ class SequencerUpdaters:
                 return
                 
         
-    def update_macro_command(command, duration):
-        '''
-        This replaces * with "Sneak Time [time]" and adds in the underscores where needed.
-        
-        Arguments: command: string; duration: string
-        Returns: command: string
-        '''
-        if '*' in command:
-            command = command.replace('*', 'Sneak Time ' + str(duration))
+    def replace_asterisk_with_sneak_time(macro_text, duration):
+        if '*' in macro_text:
+            macro_text = macro_text.replace('*', 'Sneak Time ' + str(duration))
 
+        return macro_text
+
+
+    def format_macro_text(macro_text):
         commands_to_replace = Dictionaries.commands_to_replace
 
         for cmd in commands_to_replace:
-            if cmd in command:
-                command = command.replace(cmd, cmd.replace(' ', '_'))
+            if cmd in macro_text:
+                macro_text = macro_text.replace(cmd, cmd.replace(' ', '_'))
 
-        if not command.strip().endswith('Enter'):
-            command += ' Enter'
+        '''Courtesy fix in case user accidentally added * in bottom where it is nonsensical.
+           We don't need to check is_start because if it was the top, it would have been replaced already.'''
+        macro_text = macro_text.replace("*", "Time")
 
-        return command          
+        if not macro_text.strip().lower().endswith('enter') and not macro_text.strip().lower().endswith('out'):
+            macro_text += ' Enter'
+
+        return macro_text         
                    
             
     def universal_macro_update(self, context, is_start):
@@ -82,12 +84,15 @@ class SequencerUpdaters:
         seconds = strip_length_in_seconds_total % 60
         duration = "{:02d}:{:04.1f}".format(minutes, seconds)  
         
-        formatted_command = SequencerUpdaters.update_macro_command(macro_text, duration)
-        
         if is_start:
-            self.start_frame_macro_text = formatted_command
+            macro_text = SequencerUpdaters.replace_asterisk_with_sneak_time(macro_text, duration)
+
+        macro_text = SequencerUpdaters.format_macro_text(macro_text)
+        print(f"Macro text: {macro_text}\nis_start: {is_start}\n\n")
+        if is_start:
+            self.start_frame_macro_text = macro_text
         else:
-            self.end_frame_macro_text = formatted_command
+            self.end_frame_macro_text = macro_text
 
 
     def macro_update(self, context):
