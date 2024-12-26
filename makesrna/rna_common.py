@@ -560,25 +560,34 @@ class CommonProperties:
 
 
 def register():
-    # Object, excluding flash_strip_parameters
-    register_properties(Object, CommonProperties.controller_ids)
-    register_properties(Object, CommonProperties.object_only)  # Unique
-    register_properties(Object, CommonProperties.common_header)
-    register_properties(Object, CommonProperties.common_parameters)
-    register_properties(Object, CommonProperties.common_parameters_extended)
-    register_properties(Object, CommonProperties.mins_maxes)
-    register_properties(Object, CommonProperties.parameter_toggles)
-    register_properties(Object, CommonProperties.special_arguments)
+    register_properties(
+        Object, 
+        *[
+            CommonProperties.controller_ids,
+            CommonProperties.object_only,  # Unique
+            CommonProperties.common_header,
+            CommonProperties.common_parameters,
+            CommonProperties.common_parameters_extended,
+            CommonProperties.mins_maxes,
+            CommonProperties.parameter_toggles,
+            CommonProperties.special_arguments
+        ]
+    )
 
     # ColorSequence, excluding object_only
-    register_properties(ColorSequence, CommonProperties.controller_ids)
-    register_properties(ColorSequence, CommonProperties.common_header)
-    register_properties(ColorSequence, CommonProperties.common_parameters)
-    register_properties(ColorSequence, CommonProperties.common_parameters_extended)
-    register_properties(ColorSequence, CommonProperties.mins_maxes)
-    register_properties(ColorSequence, CommonProperties.parameter_toggles)
-    register_properties(ColorSequence, CommonProperties.special_arguments)
-    register_properties(ColorSequence, CommonProperties.flash_strip_parameters)  # Unique
+    register_properties(
+        ColorSequence, 
+        *[
+            CommonProperties.controller_ids,
+            CommonProperties.common_header,
+            CommonProperties.common_parameters,
+            CommonProperties.common_parameters_extended,
+            CommonProperties.mins_maxes,
+            CommonProperties.parameter_toggles,
+            CommonProperties.special_arguments,
+            CommonProperties.flash_strip_parameters  # Unique
+        ]
+    )
 
     # Sequence
     register_properties(Sequence, CommonProperties.timecode_executors)
@@ -588,25 +597,38 @@ def register():
 
 
 def unregister():
-    # Object, excluding flash_strip_parameters
-    register_properties(Object, CommonProperties.controller_ids, register=False)
-    register_properties(Object, CommonProperties.object_only, register=False)  # Unique
-    register_properties(Object, CommonProperties.common_header, register=False)
-    register_properties(Object, CommonProperties.common_parameters, register=False)
-    register_properties(Object, CommonProperties.common_parameters_extended, register=False)
-    register_properties(Object, CommonProperties.mins_maxes, register=False)
-    register_properties(Object, CommonProperties.parameter_toggles, register=False)
-    register_properties(Object, CommonProperties.special_arguments, register=False)
+    register_properties(
+        Object, 
+        *[
+            CommonProperties.object_only,
+
+            CommonProperties.controller_ids,
+            CommonProperties.common_header,
+            CommonProperties.common_parameters,
+            CommonProperties.common_parameters_extended,
+            CommonProperties.mins_maxes,
+            CommonProperties.parameter_toggles,
+            CommonProperties.special_arguments
+        ],
+        register=False
+    )
 
     # ColorSequence, excluding object_only
-    register_properties(ColorSequence, CommonProperties.controller_ids, register=False)
-    register_properties(ColorSequence, CommonProperties.common_header, register=False)
-    register_properties(ColorSequence, CommonProperties.common_parameters, register=False)
-    register_properties(ColorSequence, CommonProperties.common_parameters_extended, register=False)
-    register_properties(ColorSequence, CommonProperties.mins_maxes, register=False)
-    register_properties(ColorSequence, CommonProperties.parameter_toggles, register=False)
-    register_properties(ColorSequence, CommonProperties.special_arguments, register=False)
-    register_properties(ColorSequence, CommonProperties.flash_strip_parameters, register=False)  # Unique
+    register_properties(
+        ColorSequence, 
+        *[
+            CommonProperties.controller_ids,
+            CommonProperties.common_header,
+            CommonProperties.common_parameters,
+            CommonProperties.common_parameters_extended,
+            CommonProperties.mins_maxes,
+            CommonProperties.parameter_toggles,
+            CommonProperties.special_arguments,
+
+            CommonProperties.flash_strip_parameters
+        ],
+        register=False
+    )
 
     # Sequence
     register_properties(Sequence, CommonProperties.timecode_executors, register=False)

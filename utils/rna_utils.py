@@ -5,13 +5,14 @@
 import re
 
 
-def register_properties(cls, properties, register=True):
-    if register:
-        for prop_name, prop_value in properties:
-            setattr(cls, prop_name, prop_value)
-    else:
-        for prop_name, _ in reversed(properties):
-            delattr(cls, prop_name)
+def register_properties(cls, *properties, register=True):
+    for property_list in properties:
+        if register:
+            for prop_name, prop_value in property_list:
+                setattr(cls, prop_name, prop_value)
+        else:
+            for prop_name, _ in reversed(property_list):
+                delattr(cls, prop_name)
 
 
 def parse_channels(input_string, remove=False):
