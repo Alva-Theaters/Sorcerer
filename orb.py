@@ -188,16 +188,18 @@ class FlashStrip:
         bias = active_item.flash_bias
 
         bias_in_frames = BiasCalculator(bias, strip_length_in_frames).execute()
-        m1_start_length_in_seconds = bias_in_frames / frame_rate
-        m1_text = f"{str(active_item.flash_input_background)} Sneak Time {str(m1_start_length_in_seconds)} Enter "
+        m1_start_length_in_seconds = round((bias_in_frames / frame_rate), 2)
+        self.start_macro_text = f"{str(active_item.flash_input_background)} Sneak Time {str(m1_start_length_in_seconds)} Enter "
         end_length = round((strip_length_in_seconds - m1_start_length_in_seconds), 1)
-        m2_text = f"{str(active_item.flash_down_input_background)} Sneak Time {str(end_length)} Enter"
+        self.end_macro_text = f"{str(active_item.flash_down_input_background)} Sneak Time {str(end_length)} Enter"
 
-        start_macro = find_executor(scene, active_item, 'start_macro')
-        end_macro = find_executor(scene, active_item, 'end_macro')
+        self.start_macro_number = find_executor(scene, active_item, 'start_macro')
+        self.end_macro_number = find_executor(scene, active_item, 'end_macro')
+
 
     def execute(self, Console):
-        return {'FINISHED'}
+        yield from Console.make_macro(self.start_macro_number, self.start_macro_text)
+        yield from Console.make_macro(self.end_macro_number, self.end_macro_text)
 
 
 class TextStrips:
@@ -220,23 +222,20 @@ class StripsSync:
         self.event_list = self.event_object.int_event_list
         self.scene = context.scene
 
-        self.all_maps = StripMapper(context.scene).execute()
+        self.event_map = StripMapper(context.scene, orb=True).execute()
 
         self.event_strings = self.strips_to_event_strings()
 
     def strips_to_event_strings(self):
         fps = EventUtils.get_frame_rate(self.scene)
-
+        
         event_strings = []
-        i = 1
-        for event_map, event_type in self.all_maps:
-            for frame in event_map:
-                actions = event_map[frame]
-                for label, index in actions:
-                    timecode = EventUtils.frame_to_timecode(frame, fps)
-                    event_strings.append(f"Event {self.event_list} / {i} Time {timecode} Show_Control_Action {event_type} {index} Enter")
-                    i += 1
+        for i, (frame, events) in enumerate(self.event_map.items(), start=1):
+            for event_type, value in events:  # Iterate over the list of tuples
+                timecode = EventUtils.frame_to_timecode(int(frame), fps)  # Convert frame to int if needed
+                event_strings.append(f"Event {self.event_list} / {i} Time {timecode} Show_Control_Action {event_type} {value} Enter")
         return event_strings
+
 
 
     def execute(self, Console):

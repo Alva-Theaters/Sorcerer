@@ -41,8 +41,11 @@ This is how we do it:
 VALID_STRIP_TYPE = 'COLOR'
 
 class StripMapper:
-    def __init__(self, scene, streaming=False):
-        self.streaming = streaming
+    ''''Returns {frame: (address, argument)} if passed event_manager or {frame: (event_type, value)} if passed orb.
+        Will return blank dict if passed both a truthy event_manager and truthy orb, since that call is nonsensical.'''
+    def __init__(self, scene, event_manager=False, orb=False):
+        self.event_manager = event_manager
+        self.orb = orb
         self.mapping = defaultdict(list)
         self.sequences = scene.sequence_editor.sequences
         self.strip_classes = self.find_registered_strip_classes()
@@ -53,15 +56,24 @@ class StripMapper:
 
 
     def execute(self):
+        if self.orb and self.event_manager:
+            return self.mapping  # Early return for nonsensical call
+        
         for StripClass in self.strip_classes:
-            if self.streaming and not StripClass.streaming:
+            if not self.is_in_options(StripClass):
                 continue
+
             for strip in self.filter_strips(StripClass.as_idname):
                 self.process_a_side_of_the_strip(StripClass, strip, side="start")
                 self.process_a_side_of_the_strip(StripClass, strip, side="end")
 
-        print(f"Mapping: {dict(self.mapping)}")
         return dict(self.mapping)
+    
+    def is_in_options(self, StripClass):
+        class_options = getattr(StripClass, 'options', [])
+
+        return ((self.event_manager and 'EVENT_MANAGER' in class_options) or
+                (self.orb and 'ORB' in class_options))
 
     def filter_strips(self, strip_type):
         return [strip for strip in self.sequences if strip.type == VALID_STRIP_TYPE and strip.my_settings.motif_type_enum == strip_type and not strip.mute]
@@ -85,12 +97,17 @@ class StripMapper:
         values = value_func(strip)
 
         frames, values = self.format_frames_and_values(frames, values)
+        event_type = getattr(StripClass, 'event_type', None)
 
         for frame, value in zip(frames, values):
-            data = form_osc_func(strip, value)
+            if self.orb and event_type and value:
+                self.mapping[frame].append((event_type, value))
+            
+            elif self.event_manager:
+                address, argument = form_osc_func(strip, value)  # Returns (addres, argument) tuple
 
-            if all(data):
-                self.mapping[frame].append(data)
+                if all([address, argument]):
+                    self.mapping[frame].append((address, argument))  
 
     def format_frames_and_values(self, frames, values):
         if not isinstance(frames, list):
@@ -104,6 +121,7 @@ class StripMapper:
             values = values[:min_length]
 
         return frames, values
+
 
 '''
 This stuff is from the old Offset Friends thing from Alva Sequencer. 

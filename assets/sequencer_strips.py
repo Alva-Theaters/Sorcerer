@@ -32,6 +32,9 @@ class SEQUENCER_ST_macro(spy.types.SequencerStrip):
     as_description = "Build and fire macros based on strip length"
     as_icon = 'FILE_TEXT'
 
+    event_type = 'macro'
+    options = {'ORB'}
+
     def draw(context, column, box, active_strip):
         draw_strip_macro(context, box, active_strip)
 
@@ -53,7 +56,7 @@ class SEQUENCER_ST_macro(spy.types.SequencerStrip):
         return strip.int_end_macro
     
 
-    def form_osc(value):
+    def form_osc(strip, value):
         address = f"/eos/macro/{value}"
         argument = "fire"
         return address, argument
@@ -64,6 +67,9 @@ class SEQUENCER_ST_cue(spy.types.SequencerStrip):
     as_label = "Cue Strip"
     as_description = "Use strip length to define cue duration"
     as_icon = 'PLAY'
+
+    event_type = 'cue'
+    options = {'ORB'}
 
     def draw(context, column, box, active_strip):
         draw_strip_cue(context, box, active_strip)
@@ -92,6 +98,9 @@ class SEQUENCER_ST_flash(spy.types.SequencerStrip):
     as_description = "Flash intensity up and down with strip length"
     as_icon = 'LIGHT_SUN'
 
+    event_type = 'macro'
+    options = {'ORB'}
+
     def draw(context, column, box, active_strip):
         draw_strip_flash(context,  box, active_strip)
 
@@ -104,7 +113,7 @@ class SEQUENCER_ST_flash(spy.types.SequencerStrip):
         return strip.frame_start
     
     def get_start_value(strip):
-        return strip.start_flash
+        return strip.int_start_macro
     
     
     def get_end_frame(strip):
@@ -118,10 +127,10 @@ class SEQUENCER_ST_flash(spy.types.SequencerStrip):
         return int(round(end_flash_macro_frame))
     
     def get_end_value(strip):
-        return strip.end_flash
+        return strip.int_end_macro
     
 
-    def form_osc(value):
+    def form_osc(strip, value):
         address = f"/eos/macro/{value}"
         argument = "fire"
         return address, argument
@@ -143,7 +152,7 @@ class SEQUENCER_ST_trigger(spy.types.SequencerStrip):
     as_description = "Send discrete trigger at strip's start and/or end frame. Eos does not record this"
     as_icon = 'SETTINGS'
 
-    streaming = True  # Tell the event manager that this needs to stream live during playback.
+    options = {'EVENT_MANAGER'}
 
     def draw(context, column, box, active_strip):
         draw_strip_trigger(context, box, active_strip)

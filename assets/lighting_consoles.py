@@ -106,13 +106,19 @@ class CPV_LC_eos(spy.types.LightingConsole):
 
 
     # Common Actions --------------------------------------------------------------------------------------------------
-    def key(self, key_string, direction=None):
+    def key(self, key_strings, direction=None):
+        if not isinstance(key_strings, list):
+            key_strings = [key_strings]
+
         if direction is None:
-            OSC.press_lighting_key(key_string)
+            for key_string in key_strings:
+                OSC.press_lighting_key(key_string)
         elif direction is False:
-            OSC.lighting_key_up(key_string)
+            for key_string in key_strings:
+                OSC.lighting_key_up(key_string)
         elif direction:
-            OSC.lighting_key_down(key_string)
+            for key_string in key_strings:
+                OSC.lighting_key_down(key_string)
 
 
     def cmd(self, command_string):
@@ -146,6 +152,14 @@ class CPV_LC_eos(spy.types.LightingConsole):
         self.cmd(argument)
 
 
+    def make_macro(self, macro_number, macro_text):
+        yield self.learn_macro(), "Initiating macro."
+        yield self.type_macro_number(macro_number), "Typing macro number."
+        yield self.record_macro_text(macro_text), "Learning macro and exiting."
+        yield self.exit_learn(), "Exiting learn mode"
+        yield self.reset_macro_key(), "Resetting macro key"
+
+
     # Unique Helpers --------------------------------------------------------------------------------------------------
     def record_snapshot(self):
         snapshot = str(self.scene.orb_finish_snapshot)
@@ -158,8 +172,29 @@ class CPV_LC_eos(spy.types.LightingConsole):
 
 
     def update_cue(self):
-        self.key("update")
-        self.key("enter")
+        self.key(["update", "enter"])
+
+
+    def learn_macro(self):
+        self.key(["live", "learn", "macro"])
+
+
+    def type_macro_number(self, macro_number):
+        for digit in str(macro_number):
+            self.key(digit)
+        self.key(["enter", "enter"])
+
+
+    def record_macro_text(self, macro_text):
+        self.cmd(macro_text)
+
+
+    def exit_learn(self):
+        self.key("learn")
+
+
+    def reset_macro_key(self):
+        self.key("macro", direction=False)
 
 
 class CPV_LC_grandma_3(spy.types.LightingConsole):

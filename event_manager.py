@@ -356,7 +356,7 @@ class EventManager:
         '''B1:1-2'''
         frame = scene.frame_current
         if self.sequencer_strips_mapping and frame in self.sequencer_strips_mapping:
-            for osc_address, osc_argument in self.sequencer_strips_mapping[frame]:
+            for osc_address, osc_argument, event_type in self.sequencer_strips_mapping[frame]:
                 OSC.send_osc_lighting(osc_address, osc_argument, user=0)
 
 
@@ -441,7 +441,7 @@ class EventManager:
 
         # Get trigger maps
         '''C1:2'''
-        self.sequencer_strips_mapping = StripMapper(scene, streaming=True).execute()  # Only Trigger Strips, or custom ones set to streaming
+        self.sequencer_strips_mapping = StripMapper(scene, event_manager=True).execute()  # Only Trigger Strips, or custom ones set to streaming
 
         # Go timecode sync.
         if scene.sync_timecode:
@@ -501,7 +501,7 @@ class EventManager:
                 
             if relevant_lighting_clock_object:
                 clock = str(relevant_lighting_clock_object.int_event_list)
-                OSC.send_osc_lighting(CMD_ADDRESS, INTERNAL_DISABLE.replace("$", clock, user=0))
+                OSC.send_osc_lighting(CMD_ADDRESS, INTERNAL_DISABLE.replace("$", clock), user=0)
 
                 if hasattr(relevant_sound_strip, "int_sound_cue"):
                     OSC.send_osc_audio(PAUSE_SOUND.replace("$", relevant_sound_strip.int_sound_cue), "")
