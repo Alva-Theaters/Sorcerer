@@ -24,7 +24,7 @@ These operators are responsible for automating repetitive tasks on the lighting 
 For example, 
     - Creating qmeos
     - Creating macros needed for Sorcerer-to-console synchronization
-    - Programming channel-specific cue-timings (discreet timing) on the console's cues
+    - Programming channel-specific cue-timings (discrete timing) on the console's cues
 
 This uses "yield"/generator because we want the user to be able to escape prematurely with the 
 ESC key.
@@ -111,7 +111,7 @@ class CueStrip:
         Console.record_cue(self.cue_number, self.cue_duration)
 
         for slowed_prop_name in slowed_properties:
-            yield from self.record_discrete_times(self, slowed_prop_name, Console)
+            yield from self.record_discrete_times(slowed_prop_name, Console)
 
         Console.update_cue()
 

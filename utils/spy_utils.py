@@ -40,8 +40,8 @@ class SpyDataStructure:
                 print("Recording a cue.")
 
 
-            def record_discreet_time(self, Orb, slowed_prop_name):
-                print("Recording discreet time.")
+            def record_discrete_time(self, Orb, slowed_prop_name):
+                print("Recording discrete time.")
 
 
             def update_cue(self):

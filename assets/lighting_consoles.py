@@ -147,7 +147,7 @@ class CPV_LC_eos(spy.types.LightingConsole):
         self.cmd(f"Cue {str(cue_number)} Time {cue_duration} Enter")
 
 
-    def record_discreet_time(self, type_id, members_str, discrete_time):
+    def record_discrete_time(self, type_id, members_str, discrete_time):
         argument = f"{type_id} {members_str} Time {discrete_time.zfill(2)} Enter"
         self.cmd(argument)
 
