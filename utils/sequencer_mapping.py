@@ -110,9 +110,9 @@ class StripMapper:
                     self.mapping[frame].append((address, argument))  
 
     def format_frames_and_values(self, frames, values):
-        if not isinstance(frames, list):
+        if not isinstance(frames, tuple):
             frames = [frames]
-        if not isinstance(values, list):
+        if not isinstance(values, tuple):
             values = [values]
 
         if len(frames) != len(values):

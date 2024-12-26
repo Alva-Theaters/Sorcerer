@@ -66,9 +66,13 @@ class SpyDataStructure:
                 return
             
             if cls_id == SpyDataStructure.types.LightingConsole:
+                if cls.as_idname in REGISTERED_LIGHTING_CONSOLES:
+                    del REGISTERED_LIGHTING_CONSOLES[cls.as_idname]
                 REGISTERED_LIGHTING_CONSOLES[cls.as_idname] = cls
 
             elif cls_id == SpyDataStructure.types.SequencerStrip:
+                if cls.as_idname in REGISTERED_STRIPS:
+                    del REGISTERED_STRIPS[cls.as_idname]
                 REGISTERED_STRIPS[cls.as_idname] = cls
         
         @staticmethod

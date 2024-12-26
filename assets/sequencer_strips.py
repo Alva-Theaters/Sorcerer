@@ -60,7 +60,7 @@ class SEQUENCER_ST_macro(spy.types.SequencerStrip):
         address = f"/eos/macro/{value}"
         argument = "fire"
         return address, argument
-
+    
 
 class SEQUENCER_ST_cue(spy.types.SequencerStrip):
     as_idname = 'option_cue'
