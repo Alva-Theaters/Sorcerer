@@ -69,19 +69,7 @@ def complete_operator_specific_automation(context, active_item, Operator, Consol
     if not as_orb_id:
         return {'CANCELLED'}, "No as_orb_id found."
     
-    StripClass = get_strip_class(as_orb_id)
-
-    if not StripClass:
-        executors = {
-            'timeline': lambda: timeline_wrapper(context, active_item, Console),
-            'sequencer': lambda: sequencer_wrapper(context, active_item, Console),
-            'viewport': lambda: viewport_wrapper(context, active_item, Console)
-        }
-
-        executor = executors.get(as_orb_id)
-
-    else:
-        executor = StripClass.orb
+    executor = get_executor(as_orb_id, context, active_item, Console)
 
     if executor is None:
         return {'CANCELLED'}, f"Invalid as_orb_id: {as_orb_id}."
@@ -89,6 +77,21 @@ def complete_operator_specific_automation(context, active_item, Operator, Consol
     yield from executor(context, active_item, Console)
 
     return {'FINISHED'}, "Orb complete."
+
+
+def get_executor(as_orb_id, context, active_item, Console):
+    StripClass = get_strip_class(as_orb_id)
+    if not StripClass:
+        local_executors = {
+            'timeline': lambda: timeline_wrapper(context, active_item, Console),
+            'sequencer': lambda: sequencer_wrapper(context, active_item, Console),
+            'viewport': lambda: viewport_wrapper(context, active_item, Console)
+        }
+
+        return local_executors.get(as_orb_id)
+
+    elif hasattr(StripClass, 'orb'):
+        return StripClass.orb
 
 
 def timeline_wrapper(context, active_item, Console):
