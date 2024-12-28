@@ -73,11 +73,11 @@ def complete_operator_specific_automation(context, active_item, Operator, Consol
         return {'CANCELLED'}, "No bl_idname found."
     
     executors = {
-        'alva_orb.cue_strip': lambda: CueStrip(context, active_item).execute(Console),
-        'alva_orb.sound_strip': lambda: SoundStrip(context.scene, active_item).execute(Console),
-        'alva_orb.macro_strip': lambda: MacroStrip(context, active_item).execute(Console),
-        'alva_orb.flash_strip': lambda: FlashStrip(context, active_item).execute(Console),
-        'alva_orb.strips_sync': lambda: StripsSync(context).execute(Console)
+        'cue': lambda: CueStrip(context, active_item).execute(Console),
+        'sound': lambda: SoundStrip(context.scene, active_item).execute(Console),
+        'macro': lambda: MacroStrip(context, active_item).execute(Console),
+        'flash': lambda: FlashStrip(context, active_item).execute(Console),
+        'sequencer': lambda: SequencerSync(context).execute(Console)
     }
 
     executor = executors.get(bl_idname)
@@ -177,7 +177,7 @@ class MacroStrip:
 
         if self.scene.strip_end_macros and self.end_macro_text != "" and self.end_macro_number != 0:
             yield from Console.make_macro(self.end_macro_number, self.end_macro_text)
-            
+
         return {'FINISHED'}
 
 
@@ -219,7 +219,7 @@ class TextStrips:
         return {'FINISHED'}
 
             
-class StripsSync:
+class SequencerSync:
     BATCH_LIMIT = 50
 
     def __init__(self, context):

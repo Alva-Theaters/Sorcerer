@@ -59,7 +59,7 @@ def draw_strip_macro(context, box, active_strip):
     row.label(text='* = "Sneak Time " + [Strip length]')
     row = box.row(align=True)
     row.prop(active_strip, "start_frame_macro_text_gui")
-    row.operator("alva_orb.macro_strip", icon_value=orb.icon_id)
+    row.operator("alva_orb.orb", icon_value=orb.icon_id).as_id = 'macro'
     if context.scene.strip_end_macros:
         row = box.separator()
         row = box.row(align=True)
@@ -82,7 +82,7 @@ def draw_strip_cue_top(context, box, active_strip):
     if context.scene.cue_builder_toggle:
         row.operator("alva_seq.update_builder", text="", icon='FILE_REFRESH')
     row.operator("alva_seq.record_cue", text="", icon='REC')
-    row.operator("alva_orb.cue_strip", icon_value=orb.icon_id)
+    row.operator("alva_orb.orb", icon_value=orb.icon_id).as_id = 'cue'
     row = box.row(align=True)
     row.scale_y = 2
     row.scale_x = .6
@@ -282,7 +282,7 @@ def draw_strip_flash_footer(context, box, active_strip):
 
     row = box.row(align=True)
     row.prop(active_strip, "flash_bias", text="Bias", slider=True)
-    row.operator("alva_orb.flash_strip", text="", icon_value=orb.icon_id)
+    row.operator("alva_orb.orb", text="", icon_value=orb.icon_id).as_id = 'flash'
 
     row = box.row()
     if active_strip.flash_bias > 0:
@@ -352,6 +352,6 @@ def draw_strip_offset(context, box, active_strip):
     row = box.row(align=True)
     row.prop(active_strip, 'offset_channels', text="")
     row.prop(active_strip, "use_macro", text="", icon='FILE_TEXT')
-    row.operator("alva_orb.offset_strip", text="", icon_value=orb.icon_id)
+    row.operator("alva_orb.orb", text="", icon_value=orb.icon_id).as_id = 'offset'
     
     box.separator(factor=.01)
