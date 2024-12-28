@@ -121,7 +121,7 @@ import os
 
 sys.path.append(os.path.dirname(__file__))
 
-DEBUG = True
+DEBUG = False
 
 # START SEQUENCE - for scripts with their own register sections at the end.
 MODULES = { # Order matters for dependency reasons!!!
