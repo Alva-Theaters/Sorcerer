@@ -24,6 +24,9 @@ from ..as_ui.strip_types import (
     draw_strip_trigger
 )
 from ..utils.sequencer_utils import BiasCalculator
+from ..orb import MacroStrip, CueStrip, FlashStrip
+
+#generator = spy.generator
 
 
 class SEQUENCER_ST_macro(spy.types.SequencerStrip):
@@ -35,7 +38,7 @@ class SEQUENCER_ST_macro(spy.types.SequencerStrip):
     event_type = 'macro'
     options = {'ORB'}
 
-    def draw(context, column, box, active_strip):
+    def draw(self, context, column, box, active_strip):
         draw_strip_macro(context, box, active_strip)
 
     def poll(value):
@@ -61,6 +64,9 @@ class SEQUENCER_ST_macro(spy.types.SequencerStrip):
         argument = "fire"
         return address, argument
     
+    def orb(context, active_item, Console):
+        yield from MacroStrip(context, active_item).execute(Console)
+    
 
 class SEQUENCER_ST_cue(spy.types.SequencerStrip):
     as_idname = 'option_cue'
@@ -71,7 +77,7 @@ class SEQUENCER_ST_cue(spy.types.SequencerStrip):
     event_type = 'cue'
     options = {'ORB'}
 
-    def draw(context, column, box, active_strip):
+    def draw(self, context, column, box, active_strip):
         draw_strip_cue(context, box, active_strip)
 
     
@@ -91,6 +97,9 @@ class SEQUENCER_ST_cue(spy.types.SequencerStrip):
         argument = value
         return address, argument
     
+    def orb(context, active_item, Console):
+        yield from CueStrip(context, active_item).execute(Console)
+    
 
 class SEQUENCER_ST_flash(spy.types.SequencerStrip):
     as_idname = 'option_flash'
@@ -101,7 +110,7 @@ class SEQUENCER_ST_flash(spy.types.SequencerStrip):
     event_type = 'macro'
     options = {'ORB'}
 
-    def draw(context, column, box, active_strip):
+    def draw(self, context, column, box, active_strip):
         draw_strip_flash(context,  box, active_strip)
 
 
@@ -134,6 +143,10 @@ class SEQUENCER_ST_flash(spy.types.SequencerStrip):
         address = f"/eos/macro/{value}"
         argument = "fire"
         return address, argument
+    
+
+    def orb(context, active_item, Console):
+        yield from FlashStrip(context, active_item).execute(Console)
 
 
 class SEQUENCER_ST_animation(spy.types.SequencerStrip):
@@ -142,7 +155,7 @@ class SEQUENCER_ST_animation(spy.types.SequencerStrip):
     as_description = "Use keyframes, or inverted cues, to control parameters"
     as_icon = 'IPO_BEZIER'
 
-    def draw(context, column, box, active_strip):
+    def draw(self, context, column, box, active_strip):
         draw_strip_animation(context, column, box, active_strip)
 
 
@@ -154,7 +167,7 @@ class SEQUENCER_ST_trigger(spy.types.SequencerStrip):
 
     options = {'EVENT_MANAGER'}
 
-    def draw(context, column, box, active_strip):
+    def draw(self, context, column, box, active_strip):
         draw_strip_trigger(context, box, active_strip)
 
 

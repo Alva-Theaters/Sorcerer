@@ -39,7 +39,7 @@ def draw_alva_render(self, context):
         is_sound = is_qmeo_parent_a_sound_strip(context)
         
         layout = self.layout
-        layout.operator("alva_orb.orb", text="Render Qmeo", icon_value=orb.icon_id).as_id = 'timeline'
+        layout.operator("alva_orb.orb", text="Render Qmeo", icon_value=orb.icon_id).as_orb_id = 'timeline'
 
 
 def draw_alva_window(self, context):

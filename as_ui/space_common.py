@@ -496,4 +496,4 @@ def draw_generate_fixtures(self, context):
     pcoll = preview_collections["main"]
     orb = pcoll["orb"]
     
-    layout.operator("alva_orb.orb", text="Generate Fixtures", icon_value=orb.icon_id).as_id = 'patch'
+    layout.operator("alva_orb.orb", text="Generate Fixtures", icon_value=orb.icon_id).as_orb_id = 'patch'

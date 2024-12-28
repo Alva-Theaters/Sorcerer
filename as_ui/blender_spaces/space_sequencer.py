@@ -178,7 +178,7 @@ def draw_only_sound(column, active_strip):
     row.operator("alva_seq.tc_right_five", text="", icon='FORWARD')
     row.prop(active_strip, "int_event_list", text="Event List #")
     row.operator("alva_seq.clear_tc_clock", icon="CANCEL")
-    row.operator("alva_orb.orb", icon_value=orb.icon_id, text="").as_id = 'sound'
+    row.operator("alva_orb.orb", icon_value=orb.icon_id, text="").as_orb_id = 'sound'
 
     row = box.row()
     row.operator("alva_seq.analyze_song", icon='SHADERFX')
@@ -191,7 +191,10 @@ def draw_one_audio_one_video(column):
     return box
 
 def draw_only_color(column, context, active_strip):
-    Strip = get_strip_class(active_strip)
+    as_orb_id = active_strip.my_settings.motif_type_enum
+    Strip = get_strip_class(as_orb_id)
+    if not Strip:
+        return box
     
     box = column.box()
     row = box.row(align=True)
@@ -200,7 +203,7 @@ def draw_only_color(column, context, active_strip):
     row.label(text=f"  {Strip.as_label}")
     box = column.box()
 
-    Strip.draw(context, column, box, active_strip)
+    Strip().draw(context, column, box, active_strip)
     return box
 
 

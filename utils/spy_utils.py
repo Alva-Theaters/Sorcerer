@@ -53,10 +53,6 @@ class SpyDataStructure:
 
             def draw(self, context):
                 pass
-
-
-            def orb(self, context):
-                pass
         
         
     class utils:

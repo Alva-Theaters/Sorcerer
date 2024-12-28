@@ -19,7 +19,7 @@ keymap_data = {
         "space_type": "SEQUENCE_EDITOR",
         "items": [
             ({"idname": "alva_seq.command_line", "key": 'C', "value": 'PRESS'}, None),
-            ({"idname": "alva_orb.orb", "key": 'SPACE', "value": 'PRESS', "shift": True}, {'as_id': 'sequencer'}),
+            ({"idname": "alva_orb.orb", "key": 'SPACE', "value": 'PRESS', "shift": True}, {'as_orb_id': 'sequencer'}),
             ({"idname": "alva_tool.ghost_out", "key": 'G', "value": 'PRESS', "shift": True}, None),
             ({"idname": "alva_seq.scale_strips", "key": 'S', "value": 'PRESS'}, None),
             ({"idname": "alva_seq.extrude_strips", "key": 'E', "value": 'PRESS'}, None),

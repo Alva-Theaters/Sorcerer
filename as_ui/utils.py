@@ -67,13 +67,10 @@ def count_selected_strips(sequence_editor, active_strip):
     return all, colors, sounds, videos
     
 
-def get_strip_class(active_strip):
-    strip_mode = active_strip.my_settings.motif_type_enum
-        
+def get_strip_class(as_orb_id):
     try:
-        return REGISTERED_STRIPS[strip_mode]
+        return REGISTERED_STRIPS[as_orb_id]
     except KeyError:
-        print(f"Error: The strip mode '{strip_mode}' is not registered.")
         return None
 
 

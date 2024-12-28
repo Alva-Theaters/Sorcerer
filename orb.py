@@ -9,6 +9,7 @@ import logging
 from .updaters.sequencer import SequencerUpdaters as Updaters
 from .utils.event_utils import EventUtils
 from .utils.orb_utils import find_addresses, tokenize_macro_line, find_executor
+from .as_ui.utils import get_strip_class
 from .utils.sequencer_utils import BiasCalculator
 from .utils.sequencer_mapping import StripMapper
 from .cpv.publish import Publish
@@ -28,19 +29,15 @@ For example,
 
 This uses "yield"/generator because we want the user to be able to escape prematurely with the 
 ESC key.
-
-The generator is set up within a mix-in class in the operators/orb.py file. That is where the 
-bpy.types.Operator classes are, as well. We use multiple operators instead of just one to
-make the tooltips and other properties simple to change between instances of the operator.
 """
 
 
-def invoke_orb(Operator, context, bl_idname):
+def invoke_orb(Operator, context, as_orb_id):
     active_item = sequencer_strip_or_scene(context.scene)
     Console = get_lighting_console_instance(context.scene)
 
     yield from Console.prepare_console_for_automation()
-    yield from complete_operator_specific_automation(context, active_item, Operator, Console, bl_idname)
+    yield from complete_operator_specific_automation(context, active_item, Operator, Console, as_orb_id)
     yield from Console.restore_console_to_normal_following_automation()
 
 
@@ -56,7 +53,7 @@ def get_lighting_console_instance(scene):
     return console(scene)  # Create instance.
 
 
-def complete_operator_specific_automation(context, active_item, Operator, Console, bl_idname):
+def complete_operator_specific_automation(context, active_item, Operator, Console, as_orb_id):
     if not active_item:
         return {'CANCELLED'}, "No item found."
     
@@ -69,24 +66,39 @@ def complete_operator_specific_automation(context, active_item, Operator, Consol
     if not Console:
         return {'CANCELLED'}, "Invalid lighting console selected."
     
-    if not bl_idname:
-        return {'CANCELLED'}, "No bl_idname found."
+    if not as_orb_id:
+        return {'CANCELLED'}, "No as_orb_id found."
     
-    executors = {
-        'cue': lambda: CueStrip(context, active_item).execute(Console),
-        'sound': lambda: SoundStrip(context.scene, active_item).execute(Console),
-        'macro': lambda: MacroStrip(context, active_item).execute(Console),
-        'flash': lambda: FlashStrip(context, active_item).execute(Console),
-        'sequencer': lambda: SequencerSync(context).execute(Console)
-    }
+    StripClass = get_strip_class(as_orb_id)
 
-    executor = executors.get(bl_idname)
+    if not StripClass:
+        executors = {
+            'timeline': lambda: timeline_wrapper(context, active_item, Console),
+            'sequencer': lambda: sequencer_wrapper(context, active_item, Console),
+            'viewport': lambda: viewport_wrapper(context, active_item, Console)
+        }
+
+        executor = executors.get(as_orb_id)
+
+    else:
+        executor = StripClass.orb
+
     if executor is None:
-        return {'CANCELLED'}, f"Invalid bl_idname: {bl_idname}."
+        return {'CANCELLED'}, f"Invalid as_orb_id: {as_orb_id}."
     
-    yield from executor()
+    yield from executor(context, active_item, Console)
 
     return {'FINISHED'}, "Orb complete."
+
+
+def timeline_wrapper(context, active_item, Console):
+    return lambda: TimelineSync(context, active_item).execute(Console)
+
+def sequencer_wrapper(context, active_item, Console):
+    return lambda: SequencerSync(context, active_item).execute(Console)
+
+def viewport_wrapper(context, active_item, Console):
+    return lambda: ViewportSync(context, active_item).execute(Console)
             
 
 class CueStrip:
@@ -260,6 +272,22 @@ class SequencerSync:
         batch = self.event_strings[i:i+self.BATCH_LIMIT]
         argument = ", ".join(batch)
         Console.cmd(argument)
+
+
+class TimelineSync():
+    def __init__():
+        pass
+
+    def execute():
+        pass
+
+
+class ViewportSync():
+    def __init__():
+        pass
+
+    def execute():
+        pass
 
         
 #     class Eos:

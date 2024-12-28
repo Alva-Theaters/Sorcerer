@@ -19,6 +19,7 @@ from .utils.cpv_utils import color_object_to_tuple_and_scale_up, update_alva_con
 from .utils.rna_utils import parse_channels, parse_mixer_channels
 from .utils.sequencer_utils import duplicate_active_strip_to_selected, find_available_channel, add_color_strip
 from .utils.sequencer_utils import analyze_song, AnalysisResult
+from .as_ui.utils import get_orb_icon
 
 '''
 This script, spy, is a wrapper here to make it easier for casual users
@@ -121,6 +122,9 @@ class SorcererPython(SpyDataStructure):
 
         
     # General Utilities
+    def get_orb_icon():
+        return get_orb_icon()
+    
     def get_frame_rate(scene: bpy.types.Scene) -> float:
         '''ALWAYS use this, NOT scene.render.fps. Must divide 
         render.fps by render.base and round for true fps, done 

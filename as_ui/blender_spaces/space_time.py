@@ -47,7 +47,7 @@ def draw_alva_time_header(self, context):
             row.prop(target, "int_start_macro", text="Macro")
 
         row = layout.row()
-        row.operator("alva_orb.orb", text="", icon_value=orb.icon_id).as_id = 'timeline'
+        row.operator("alva_orb.orb", text="", icon_value=orb.icon_id).as_orb_id = 'timeline'
 
 
 def is_qmeo_parent_a_sound_strip(context):

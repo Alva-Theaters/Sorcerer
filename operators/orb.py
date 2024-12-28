@@ -15,9 +15,9 @@ class ORB_OT_sync(Operator):
     bl_idname = "alva_orb.orb"
     bl_label = ""
     bl_description = "Sync Sorcerer data onto the console"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = {'UNDO'}
 
-    as_id: StringProperty() # type: ignore
+    as_orb_id: StringProperty() # type: ignore
     cancel_key = 'ESC'
 
     def execute(self, context):
@@ -30,7 +30,7 @@ class ORB_OT_sync(Operator):
         return {'RUNNING_MODAL'}
     
     def orb(self, context):
-        yield from invoke_orb(self, context, self.as_id)
+        yield from invoke_orb(self, context, self.as_orb_id)
 
     def modal(self, context, event):
         if event.type == self.cancel_key and event.value == 'PRESS':

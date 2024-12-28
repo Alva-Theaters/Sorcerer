@@ -29,7 +29,7 @@ class SEQUENCER_ST_custom_strip(spy.types.SequencerStrip):  # Not quite bpy, but
 
 
     # UI ----------------------------------------------------------------------------------------------------------------------------------
-    def draw(context, column, box, active_strip):  # This will draw in the middle of the color strip panel when the custom icon is selected.
+    def draw(self, context, column, box, active_strip):  # This will draw in the middle of the color strip panel when the custom icon is selected.
         row = box.row()  # Use box to make normal rows without adding lines.
         row.label(text="Macro numbers:")
 
@@ -48,6 +48,11 @@ class SEQUENCER_ST_custom_strip(spy.types.SequencerStrip):  # Not quite bpy, but
         row.label(text="Make middle message fire in the middle of the strip!")
 
         row.separator()
+        
+        box = column.box()
+        row = box.row()
+        orb = spy.get_orb_icon()
+        row.operator('alva_orb.orb', text="Fire Orb", icon_value=orb.icon_id).as_orb_id = self.as_idname
 
 
     # Mapping -----------------------------------------------------------------------------------------------------------------------------
@@ -88,8 +93,10 @@ class SEQUENCER_ST_custom_strip(spy.types.SequencerStrip):  # Not quite bpy, but
         return address, argument
     
 
-    # Orb ----------------------------------------------------------------------------------------------------------------------------------
-    'Coming soon!'
+    def orb(context, active_strip, Console):
+        start_macro_number = 7
+        start_macro_text = "Go_to_Cue 7 Enter"
+        yield from Console.make_macro(start_macro_number, start_macro_text)
 
 
 def register():
