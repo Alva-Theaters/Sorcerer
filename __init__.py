@@ -121,31 +121,33 @@ import os
 
 sys.path.append(os.path.dirname(__file__))
 
+DEBUG = True
+
 # START SEQUENCE - for scripts with their own register sections at the end.
 MODULES = { # Order matters for dependency reasons!!!
-    'strip_formatter': 'operators.strip_formatter',
-    'ui_lists': 'as_ui.ui_lists',
-    'property_groups': 'makesrna.property_groups',
-    'lighting': 'nodes.lighting',
-    'audio': 'nodes.audio',
-    'node': 'operators.node',
-    'properties': 'operators.properties',
-    'view3d': 'operators.view3d',
-    'text': 'operators.text',
-    'cue_builder': 'operators.cue_builder',
-    'sequencer': 'operators.sequencer',
-    'orb': 'operators.orb',
-    'common': 'operators.common',
-    'preferences': 'operators.preferences',
-    'rna_text': 'makesrna.rna_text',
-    'rna_preferences': 'makesrna.rna_preferences',
-    'rna_sequencer': 'makesrna.rna_sequencer',
-    'rna_scene': 'makesrna.rna_scene',
-    'rna_common': 'makesrna.rna_common',
-    'panels': 'panels',
-    'menus': 'as_ui.menus',
-    'event_manager': 'event_manager',
-    'keymap': 'operators.keymap',
+    'strip_formatter': 'operators.strip_formatter',  # 1
+    'ui_lists': 'as_ui.ui_lists',  # 2
+    'property_groups': 'makesrna.property_groups',  # 3
+    'lighting': 'nodes.lighting',  # 4
+    'audio': 'nodes.audio',  # 5
+    'node': 'operators.node',  # 6
+    'properties': 'operators.properties',  # 7
+    'view3d': 'operators.view3d',  # 8
+    'text': 'operators.text',  # 9
+    'cue_builder': 'operators.cue_builder',  # 10
+    'sequencer': 'operators.sequencer',  # 11
+    'orb': 'operators.orb',  # 12
+    'common': 'operators.common',  # 13
+    'preferences': 'operators.preferences',  # 14
+    'rna_text': 'makesrna.rna_text',  # 15
+    'rna_preferences': 'makesrna.rna_preferences',  # 16
+    'rna_sequencer': 'makesrna.rna_sequencer',  # 17
+    'rna_scene': 'makesrna.rna_scene',  # 18
+    'rna_common': 'makesrna.rna_common',  # 19
+    'panels': 'panels',  # 20
+    'menus': 'as_ui.menus',  # 21
+    'event_manager': 'event_manager',  # 22
+    'keymap': 'operators.keymap',  # 23
 }
 
 
@@ -163,7 +165,8 @@ for module_name, module_path in MODULES.items():
 
 
 def register():
-    for register_func in REGISTER_FUNCS:
+    for i, register_func in enumerate(REGISTER_FUNCS, start=1):
+        if DEBUG: print(f"Trying to register {i}")
         try:
             register_func()
         except Exception as e:
