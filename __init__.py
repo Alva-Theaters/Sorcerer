@@ -174,10 +174,10 @@ def register():
     bpy.app.timers.register(on_register, first_interval=.01)
 
 def register_as_classes():
-    from .assets.lighting_consoles import register as register_lighting_consoles
+    from .extendables.lighting_consoles import register as register_lighting_consoles
     register_lighting_consoles()
 
-    from .assets.sequencer_strips import register as register_strips
+    from .extendables.sequencer_strips import register as register_strips
     register_strips()
 
 
@@ -199,8 +199,8 @@ def unregister():
     unregister_as_classes()
 
 def unregister_as_classes():
-    from .assets.lighting_consoles import unregister as unregister_lighting_consoles
+    from .extendables.lighting_consoles import unregister as unregister_lighting_consoles
     unregister_lighting_consoles()
 
-    from .assets.sequencer_strips import unregister as unregister_strips
+    from .extendables.sequencer_strips import unregister as unregister_strips
     unregister_strips()
