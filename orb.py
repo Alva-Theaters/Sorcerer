@@ -83,9 +83,10 @@ def get_executor(as_orb_id, context, active_item, Console):
     StripClass = get_strip_class(as_orb_id)
     if not StripClass:
         local_executors = {
-            'timeline': lambda: timeline_wrapper(context, active_item, Console),
-            'sequencer': lambda: sequencer_wrapper(context, active_item, Console),
-            'viewport': lambda: viewport_wrapper(context, active_item, Console)
+            'sound': lambda ctx, item, con: SoundStrip(ctx, item).execute(con),
+            'timeline': lambda ctx, item, con: TimelineSync(ctx, item).execute(con),
+            'sequencer': lambda ctx, item, con: SequencerSync(ctx, item).execute(con),
+            'viewport': lambda ctx, item, con: ViewportSync(ctx, item).execute(con)
         }
 
         return local_executors.get(as_orb_id)
@@ -93,6 +94,9 @@ def get_executor(as_orb_id, context, active_item, Console):
     elif hasattr(StripClass, 'orb'):
         return StripClass.orb
 
+
+def sound_wrapper(context, active_item, Console):
+    return lambda: SoundStrip(context, active_item).execute(Console)
 
 def timeline_wrapper(context, active_item, Console):
     return lambda: TimelineSync(context, active_item).execute(Console)
@@ -163,14 +167,20 @@ class CueStrip:
 
 
 class SoundStrip:
-    def __init__(self, scene, active_item):
+    def __init__(self, context, active_item):
+        scene = context.scene
         self.event_list = find_executor(scene, active_item, 'event_list')
         self.start_macro = find_executor(scene, active_item, 'start_macro')
         self.end_macro = find_executor(scene, active_item, 'end_macro')
         self.start_cue = active_item.str_start_cue
         self.end_cue = active_item.str_start_cue
 
-    def execute(self, console_mode, Operator):
+    def execute(self, Console):
+        yield from Console.record_timecode_macro(self.start_macro, self.event_list, desired_state='enable')
+        yield from Console.record_timecode_macro(self.end_macro, self.event_list, desired_state='disable')
+        yield from Console.link_cue_to_macro(self.start_cue, self.start_macro)
+        yield from Console.link_cue_to_macro(self.end_cue, self.end_macro)
+        
         return {'FINISHED'}
     
 
@@ -294,27 +304,6 @@ class ViewportSync():
 
         
 #     class Eos:
-#         @staticmethod
-#         def send_osc_with_delay(command, value="1", delay=0.5):
-#             OSC.send_osc_lighting(command, value)
-#             #time.sleep(delay)
-
-#         @staticmethod
-#         def save_console_file(scene):
-#             if not scene.is_console_saving:
-#                 Orb.Eos.send_osc_with_delay("/eos/key/shift")
-#                 Orb.Eos.send_osc_with_delay("/eos/key/update")
-#                 Orb.Eos.send_osc_with_delay("/eos/key/shift", "0", 2)
-
-#         @staticmethod
-#         def record_snapshot(scene):
-#             snapshot = str(scene.orb_finish_snapshot)
-#             Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Record Snapshot {snapshot} Enter Enter", 0.5)
-
-#         @staticmethod
-#         def restore_snapshot(scene):
-#             snapshot = str(scene.orb_finish_snapshot)
-#             Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Snapshot {snapshot} Enter", 0.5)
       
 #         @staticmethod
 #         def delete_recreate_macro_enter_edit(macro_number, live=True):
@@ -334,8 +323,14 @@ class ViewportSync():
 #         @staticmethod
 #         def manipulate_show_control(scene, event_list, start_macro, end_macro, start_cue, end_cue, timecode=None, execute_on_cues=True):
 #             try:
-#                 yield Orb.Eos.record_snapshot(scene), "Recording snapshot."
-#                 yield Orb.Eos.save_console_file(scene), "Orb is running."
+                # So we need macro, event_list, timecode,
+                # Then again
+                # Then cue, macro
+                # Then again
+                # Then reset macro key
+
+                # def record_timecode_macro(self, macro, event_list, timecode)
+                # def link_cue_to_macro(cue, macro)
 
 #                 yield Orb.Eos.delete_recreate_macro_enter_edit(start_macro), "Creating blank macro."
 #                 yield Orb.Eos.type_event_list_number(event_list), "Typing event list number."
@@ -344,31 +339,11 @@ class ViewportSync():
 #                 yield Orb.Eos.type_event_list_number(event_list), "Typing event list number again."
 #                 yield Orb.Eos.internal_enable_or_disable_foreground("enable"), "Setting to foreground mode."
 
-#                 yield Orb.Eos.delete_recreate_macro_enter_edit(end_macro, live=False), "Creating blank macro."
-#                 yield Orb.Eos.type_event_list_number(event_list), "Typing event list number."
-#                 yield Orb.Eos.type_internal_time(), "Internal Time"
-#                 yield Orb.Eos.enter_timecode_or_just_enter(None), "Typing timecode for sync."
-#                 yield Orb.Eos.type_event_list_number(event_list), "Typing event list number again."
-#                 yield Orb.Eos.internal_enable_or_disable_foreground("disable"), "Setting to foreground mode."
-
 #                 yield Orb.Eos.live_and_execute_on_cue(start_cue, start_macro, execute_on_cues), "Setting start cue executor"
 #                 yield Orb.Eos.live_and_execute_on_cue(end_cue, end_macro, execute_on_cues), "Setting end cue executor"
 
 #                 yield Orb.Eos.reset_macro_key(), "Resetting macro key."
 #                 yield Orb.Eos.restore_snapshot(scene), "Restoring your screen setup."
-
-#             except AttributeError as e:
-#                 logging.error(f"Attribute error in manipulate_show_control: {e}")
-#                 yield None, f"Attribute error: {e}"
-#             except ValueError as e:
-#                 logging.error(f"Value error in manipulate_show_control: {e}")
-#                 yield None, f"Value error: {e}"
-#             except RuntimeError as e:
-#                 logging.error(f"Runtime error in manipulate_show_control: {e}")
-#                 yield None, f"Runtime error: {e}"
-#             except Exception as e:
-#                 logging.error(f"Unexpected error in manipulate_show_control: {e}")
-#                 yield None, f"Unexpected error: {e}"
             
             
 #         @staticmethod
@@ -411,9 +386,6 @@ class ViewportSync():
 #             if execute_on_cues:
 #                 Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Cue {str(cue_number)} Execute Macro {str(macro_number)} Enter Enter")
 
-#         @staticmethod
-#         def reset_macro_key():
-#             Orb.Eos.send_osc_with_delay("/eos/key/macro", "0", delay=.2)
 
 
 #         #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -452,51 +424,6 @@ class ViewportSync():
 #             Orb.Eos.send_osc_with_delay("/eos/softkey/6", "1", 0.1)  # "Done" softkey
 #             Orb.Eos.send_osc_with_delay("/eos/key/live", "1", 0.1)
 #             Orb.Eos.send_osc_with_delay("/eos/key/live", "0", 0.1)
-
-
-        # #-------------------------------------------------------------------------------------------------------------------------------------------
-        # '''Macro strips'''
-        # #-------------------------------------------------------------------------------------------------------------------------------------------
-        # @staticmethod
-        # def generate_macro_command(context, macro_number, macro_text, first=False, final=False):
-        #     yield Orb.Eos.initiate_macro(), "Initiating macro."
-        #     yield Orb.Eos.type_macro_number(macro_number), "Typing macro number."
-        #     yield Orb.Eos.learn_macro_and_exit(macro_text), "Learning macro and exiting."
-        #     yield Orb.Eos.reset_macro_key(), "Resetting macro key."
-
-        # @staticmethod
-        # def initiate_macro():
-        #     Orb.Eos.send_osc_with_delay("/eos/key/live")
-        #     Orb.Eos.send_osc_with_delay("/eos/key/live", "0", 0.5)
-        #     Orb.Eos.send_osc_with_delay("/eos/key/learn", "Enter", 0.5)
-        #     Orb.Eos.send_osc_with_delay("/eos/key/macro")
-
-        # @staticmethod
-        # def type_macro_number(macro_number):
-        #     for digit in str(macro_number):
-        #         Orb.Eos.send_osc_with_delay(f"/eos/key/{digit}", delay=0.2)
-        #     Orb.Eos.send_osc_with_delay("/eos/key/enter", delay=0.1)
-        #     Orb.Eos.send_osc_with_delay("/eos/key/enter")
-
-        # @staticmethod
-        # def learn_macro_and_exit(macro_text):
-        #     Orb.Eos.send_osc_with_delay("/eos/newcmd", macro_text, 0.5)
-        #     Orb.Eos.send_osc_with_delay("/eos/key/learn", "Enter")
-        #     Orb.Eos.send_osc_with_delay("/eos/key/macro", "0")
-
-        # @staticmethod
-        # def calculate_biased_start_length(bias, frame_rate, strip_length_in_frames):
-        #     # Normalize bias to a 0-1 scale
-        #     normalized_bias = (bias + 49) / 98  # This will give 0 for -49 and 1 for 49
-            
-        #     # Calculate minimum and maximum start_length in seconds
-        #     min_start_length = 1 / frame_rate  # 1 frame
-        #     max_start_length = (strip_length_in_frames - 1) / frame_rate
-            
-        #     # Interpolate between min and max based on normalized bias
-        #     biased_start_length = (min_start_length * (1 - normalized_bias)) + (max_start_length * normalized_bias)
-            
-        #     return round(biased_start_length, 1)
             
                 
 #         #-------------------------------------------------------------------------------------------------------------------------------------------

@@ -106,19 +106,28 @@ class CPV_LC_eos(spy.types.LightingConsole):
 
 
     # Common Actions --------------------------------------------------------------------------------------------------
-    def key(self, key_strings, direction=None):
+    def key(self, key_strings, direction=None, enter=False):
         if not isinstance(key_strings, list):
             key_strings = [key_strings]
 
-        if direction is None:
+        if enter:
             for key_string in key_strings:
-                OSC.press_lighting_key(key_string)
-        elif direction is False:
-            for key_string in key_strings:
-                OSC.lighting_key_up(key_string)
-        elif direction:
-            for key_string in key_strings:
-                OSC.lighting_key_down(key_string)
+                time.sleep(.1)
+                OSC.send_osc_lighting(f"/eos/key/{key_string}", "1")
+                OSC.send_osc_lighting(f"/eos/key/{key_string}", "1")
+                time.sleep(.1)
+                return
+
+        direction_to_normal_key = {
+            None: lambda: OSC.press_lighting_key(key_string),
+            False: lambda: OSC.lighting_key_up(key_string),
+            True: lambda: OSC.lighting_key_down(key_string)
+        }
+
+        func = direction_to_normal_key[direction]
+
+        for key_string in key_strings:
+            func()
 
 
     def cmd(self, command_string):
@@ -160,6 +169,21 @@ class CPV_LC_eos(spy.types.LightingConsole):
         yield self.reset_macro_key(), "Resetting macro key"
 
 
+    def record_timecode_macro(self, macro, event_list, timecode=None, desired_state='enable'):
+        yield self.delete_recreate_macro(macro), "Creating blank macro."
+        yield self.enter_edit_mode(), "Entering edit mode"
+        yield self.type_event_list_number(event_list), "Typing event list number."
+        yield self.type_slash_internal_time(), "Internal Time"
+        yield self.type_timecode_or_just_enter(timecode), "Typing timecode for sync."
+        yield self.type_event_list_number(event_list), "Typing event list number again."
+        yield self.internal_enable_disable_then_foreground(desired_state), "Setting to foreground mode."
+        yield self.enter_live_mode(desired_state), "Entering live mode"
+        
+
+    def link_cue_to_macro(self, cue, macro):
+        yield self.execute_on_cue(cue, macro), "Setting start cue executor"
+
+
     # Unique Helpers --------------------------------------------------------------------------------------------------
     def record_snapshot(self):
         snapshot = str(self.scene.orb_finish_snapshot)
@@ -195,6 +219,51 @@ class CPV_LC_eos(spy.types.LightingConsole):
 
     def reset_macro_key(self):
         self.key("macro", direction=False)
+
+
+    def delete_recreate_macro(self, macro_number):
+        self.key("macro", enter=True)
+        self.cmd(f"Delete {str(macro_number)} Enter Enter")
+        self.cmd(f"{str(macro_number)} Enter")
+
+    
+    def enter_edit_mode(self):
+        OSC.send_osc_lighting("/eos/softkey/6", "1", tcp=True)  # Edit" softkey
+        OSC.send_osc_lighting("/eos/softkey/6", "0", tcp=True)  # Edit" softkey
+
+
+    def type_event_list_number(self, event_list_number):
+        self.key("event")
+        for digit in str(event_list_number):
+            self.key(digit)
+
+
+    def type_slash_internal_time(self):
+        self.key(["\\", "internal", "time"])
+
+
+    def type_timecode_or_just_enter(self, timecode):
+        if timecode:
+            for digit in timecode:
+                self.key(digit)
+            time.sleep(0.5)
+        self.key("enter")     
+
+
+    def internal_enable_disable_then_foreground(self, desired_state):
+        self.key(["\\", "internal", desired_state, "enter", "select"])
+        OSC.send_osc_lighting("/eos/softkey/3", "1", tcp=True)  # "Foreground Mode" softkey
+        OSC.send_osc_lighting("/eos/softkey/3", "1", tcp=True)  # "Foreground Mode" softkey
+        self.key("enter")
+
+
+    def enter_live_mode(self, desired_state):
+        if desired_state == 'disable':
+            self.key("live")
+
+
+    def execute_on_cue(self, cue_number, macro_number):
+        self.cmd(f"Cue {str(cue_number)} Execute Macro {str(macro_number)} Enter Enter")
 
 
 class CPV_LC_grandma_3(spy.types.LightingConsole):
