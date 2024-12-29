@@ -253,7 +253,7 @@ class CPV_LC_eos(spy.types.LightingConsole):
     def internal_enable_disable_then_foreground(self, desired_state):
         self.key(["\\", "internal", desired_state, "enter", "select"])
         OSC.send_osc_lighting("/eos/softkey/3", "1", tcp=True)  # "Foreground Mode" softkey
-        OSC.send_osc_lighting("/eos/softkey/3", "1", tcp=True)  # "Foreground Mode" softkey
+        OSC.send_osc_lighting("/eos/softkey/3", "0", tcp=True)  # "Foreground Mode" softkey
         self.key("enter")
 
 
