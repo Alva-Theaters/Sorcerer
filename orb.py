@@ -193,10 +193,10 @@ class MacroStrip:
 
     def execute(self, Console):
         if self.start_macro_text != "" and self.start_macro_number != 0:
-            yield from Console.make_macro(self.start_macro_number, self.start_macro_text)
+            yield from Console.record_one_line_macro(self.start_macro_number, self.start_macro_text)
 
         if self.scene.strip_end_macros and self.end_macro_text != "" and self.end_macro_number != 0:
-            yield from Console.make_macro(self.end_macro_number, self.end_macro_text)
+            yield from Console.record_one_line_macro(self.end_macro_number, self.end_macro_text)
 
         return {'FINISHED'}
 
@@ -224,8 +224,8 @@ class FlashStrip:
 
 
     def execute(self, Console):
-        yield from Console.make_macro(self.start_macro_number, self.start_macro_text)
-        yield from Console.make_macro(self.end_macro_number, self.end_macro_text)
+        yield from Console.record_one_line_macro(self.start_macro_number, self.start_macro_text)
+        yield from Console.record_one_line_macro(self.end_macro_number, self.end_macro_text)
 
 
 class TextStrips:

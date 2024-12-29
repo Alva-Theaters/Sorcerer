@@ -147,7 +147,7 @@ class CPV_LC_custom_console(spy.types.LightingConsole):  # CPV is Sorcerer's fad
         self.cmd(argument)
 
 
-    def make_macro(self, macro_number, macro_text):
+    def record_one_line_macro(self, macro_number, macro_text):
         yield self.learn_macro(), "Initiating macro."  # These would be helper function 
         yield self.type_macro_number(macro_number), "Typing macro number."
         # And so on...

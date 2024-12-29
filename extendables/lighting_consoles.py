@@ -161,7 +161,7 @@ class CPV_LC_eos(spy.types.LightingConsole):
         self.cmd(argument)
 
 
-    def make_macro(self, macro_number, macro_text):
+    def record_one_line_macro(self, macro_number, macro_text):
         yield self.learn_macro(), "Initiating macro."
         yield self.type_macro_number(macro_number), "Typing macro number."
         yield self.record_macro_text(macro_text), "Learning macro and exiting."

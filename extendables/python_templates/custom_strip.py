@@ -102,7 +102,7 @@ class SEQUENCER_ST_custom_strip(spy.types.SequencerStrip):  # Not quite bpy, but
     def orb(context, active_strip, Console):
         start_macro_number = 7
         start_macro_text = "Go_to_Cue 7 Enter"
-        yield from Console.make_macro(start_macro_number, start_macro_text)
+        yield from Console.record_one_line_macro(start_macro_number, start_macro_text)
 
 
 def register():
