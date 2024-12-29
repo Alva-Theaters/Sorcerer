@@ -172,12 +172,7 @@ def draw_only_sound(column, active_strip):
     box = column.box()  
 
     row = box.row(align=True)
-    row.operator("alva_seq.tc_left_five", text="", icon='BACK')
-    row.operator("alva_seq.tc_left_one", text="", icon='TRIA_LEFT')
-    row.operator("alva_seq.tc_right_one", text="", icon='TRIA_RIGHT')
-    row.operator("alva_seq.tc_right_five", text="", icon='FORWARD')
-    row.prop(active_strip, "int_event_list", text="Event List #")
-    row.operator("alva_seq.clear_tc_clock", icon="CANCEL")
+    row.prop(active_strip, "int_start_macro", text="Start Macro #")
     row.operator("alva_orb.orb", icon_value=orb.icon_id, text="").as_orb_id = 'sound'
 
     row = box.row()

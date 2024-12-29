@@ -172,15 +172,10 @@ class SoundStrip:
         self.event_list = find_executor(scene, active_item, 'event_list')
         self.start_macro = find_executor(scene, active_item, 'start_macro')
         self.end_macro = find_executor(scene, active_item, 'end_macro')
-        self.start_cue = active_item.str_start_cue
-        self.end_cue = active_item.str_start_cue
 
     def execute(self, Console):
         yield from Console.record_timecode_macro(self.start_macro, self.event_list, desired_state='enable')
         yield from Console.record_timecode_macro(self.end_macro, self.event_list, desired_state='disable')
-        yield from Console.link_cue_to_macro(self.start_cue, self.start_macro)
-        yield from Console.link_cue_to_macro(self.end_cue, self.end_macro)
-        
         return {'FINISHED'}
     
 

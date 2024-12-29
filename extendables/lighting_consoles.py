@@ -178,10 +178,6 @@ class CPV_LC_eos(spy.types.LightingConsole):
         yield self.type_event_list_number(event_list), "Typing event list number again."
         yield self.internal_enable_disable_then_foreground(desired_state), "Setting to foreground mode."
         yield self.enter_live_mode(desired_state), "Entering live mode"
-        
-
-    def link_cue_to_macro(self, cue, macro):
-        yield self.execute_on_cue(cue, macro), "Setting start cue executor"
 
 
     # Unique Helpers --------------------------------------------------------------------------------------------------
@@ -260,10 +256,6 @@ class CPV_LC_eos(spy.types.LightingConsole):
     def enter_live_mode(self, desired_state):
         if desired_state == 'disable':
             self.key("live")
-
-
-    def execute_on_cue(self, cue_number, macro_number):
-        self.cmd(f"Cue {str(cue_number)} Execute Macro {str(macro_number)} Enter Enter")
 
 
 class CPV_LC_grandma_3(spy.types.LightingConsole):
