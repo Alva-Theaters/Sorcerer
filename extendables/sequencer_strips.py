@@ -2,18 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-'''
-To make your own custom Sorcerer sequencer strip type:
-
-    1. Copy/paste the code below directly into Blender's text editor.
-    2. Modify it as needed.
-    3. Run it.
-    4. Select your new strip type in the M menu that pops up when you have  color strip selected.
-
-The strip types below are built into Sorcerer. Similar to Blender's bpy, Sorcerer's spy is
-utilized both by the internal source code (as seen here) and by end-users extending the application.
-'''
-
 from bpy import spy
 
 from ..as_ui.strip_types import (
@@ -26,7 +14,17 @@ from ..as_ui.strip_types import (
 from ..utils.sequencer_utils import BiasCalculator
 from ..orb import MacroStrip, CueStrip, FlashStrip
 
-#generator = spy.generator
+'''
+To make your own custom Sorcerer sequencer strip type:
+
+    1. Copy/paste the code below directly into Blender's text editor.
+    2. Modify it as needed.
+    3. Run it.
+    4. Select your new strip type in the M menu that pops up when you have  color strip selected.
+
+The strip types below are built into Sorcerer. Similar to Blender's bpy, Sorcerer's spy is
+utilized both by the internal source code (as seen here) and by end-users extending the application.
+'''
 
 
 class SEQUENCER_ST_macro(spy.types.SequencerStrip):

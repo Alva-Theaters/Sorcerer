@@ -1,19 +1,25 @@
+# SPDX-FileCopyrightText: 2024 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 import bpy
 from bpy import spy
 #from spy.types import SequencerStrip will not work here.
 
 
 '''
-Use custom strips to make Blender's sequence editor color strips send custom OSC with Python when they come up in the sequencer during playback.
+Use custom strips to make Blender's sequence editor color strips send custom OSC with Python when they come up in the sequencer 
+during playback.
 
-This can of course be done from scratch through bpy directly, but Sorcerer's spy provides event handling, mapping, UI foundation, OSC settings, 
-Orb automation, and other features that would take much longer to develop from scratch.
+This can of course be done from scratch through bpy directly, but Sorcerer's spy provides event handling, mapping, UI foundation, 
+OSC settings, Orb automation, and other features that would take much longer to develop from scratch.
 
 Custom strip types appear as a new option on the M popup menu for color strips alongside Macro, Cue, Flash, Animation, and Trigger.
 
-They can be set to stream their OSC messages live during playback, or they can use the built-in Orb operator that syncs sequencer events
-directly to the lighting console's internal timecode system. This only works however if you also have an orb button that converts what the 
-strip does to something that can be expressed as an event list event. In ETC Eos, everything has to be either a cue or a macro to be an event.
+They can be set to stream their OSC messages live during playback, or they can use the built-in Orb operator that syncs sequencer 
+events directly to the lighting console's internal timecode system. This only works however if you also have an orb button that 
+converts what the strip does to something that can be expressed as an event list event. In ETC Eos, everything has to be either a 
+cue or a macro to be an event.
 
 You can write a custom Orb operator class that automatically converts what your strips do to macros if needed.'''
 
@@ -29,7 +35,7 @@ class SEQUENCER_ST_custom_strip(spy.types.SequencerStrip):  # Not quite bpy, but
 
 
     # UI ----------------------------------------------------------------------------------------------------------------------------------
-    def draw(self, context, column, box, active_strip):  # This will draw in the middle of the color strip panel when the custom icon is selected.
+    def draw(self, context, column, box, active_strip):  # This will draw in the middle of the color strip panel.
         row = box.row()  # Use box to make normal rows without adding lines.
         row.label(text="Macro numbers:")
 
@@ -61,7 +67,7 @@ class SEQUENCER_ST_custom_strip(spy.types.SequencerStrip):  # Not quite bpy, but
 
 
     # These next four can return multiple values, not just 1.
-    def get_start_frame(strip):  # This tells the mapping function what time the first event should happen in reference to the strip's location.
+    def get_start_frame(strip):  # Tells the mapping function what time the first event should happen in reference to the strip's location.
         start = strip.frame_start
 
         # Calculate the middle of the strip...

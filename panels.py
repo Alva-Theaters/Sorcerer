@@ -44,6 +44,7 @@ from bpy.types import (
 
     TEXT_HT_header,
     TEXT_MT_view, 
+    TEXT_MT_templates,
 
     VIEW3D_MT_object_context_menu,
     SEQUENCER_MT_context_menu
@@ -106,6 +107,7 @@ from .as_ui.space_common import (
     draw_volume_monitor
 )
 from .as_ui.blender_spaces.space_wm import draw_alva_right_click
+from .as_ui.menus import draw_text_templates_menu
              
     
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -514,6 +516,7 @@ def register():
 
     TEXT_HT_header.append(draw_tool_settings)
     TEXT_MT_view.append(draw_text_view)
+    TEXT_MT_templates.prepend(draw_text_templates_menu)
 
     WM_MT_button_context.append(draw_alva_right_click)
     VIEW3D_MT_object_context_menu.append(draw_alva_right_click)
@@ -556,6 +559,7 @@ def unregister():
 
     TEXT_HT_header.remove(draw_tool_settings)
     TEXT_MT_view.remove(draw_text_view)
+    TEXT_MT_templates.remove(draw_text_templates_menu)
 
     WM_MT_button_context.remove(draw_alva_right_click)
     VIEW3D_MT_object_context_menu.remove(draw_alva_right_click)

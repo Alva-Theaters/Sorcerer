@@ -2,22 +2,22 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-'''
-To make your own custom lighting console:
-
-    1. Copy/paste the code below directly into Blender's text editor.
-    2. Modify it as needed.
-    3. Run it.
-    4. Select your new lighting console in Alva Sorcerer preferences under Network.
-
-The lighting consoles below are built into Sorcerer. Similar to Blender's bpy, Sorcerer's spy is
-utilized both by the internal source code (as seen here) and by end-users extending the application.
-'''
-
 from bpy import spy
 import time
 
 from ..utils.osc import OSC
+
+'''
+To make your own custom Sorcerer sequencer strip type:
+
+    1. Copy/paste the code below directly into Blender's text editor.
+    2. Modify it as needed.
+    3. Run it.
+    4. Select your new strip type in the M menu that pops up when you have  color strip selected.
+
+The strip types below are built into Sorcerer. Similar to Blender's bpy, Sorcerer's spy is
+utilized both by the internal source code (as seen here) and by end-users extending the application.
+'''
 
 
 class CPV_LC_eos(spy.types.LightingConsole):

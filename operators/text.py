@@ -6,8 +6,11 @@ import bpy
 from bpy.props import StringProperty
 from bpy.types import Operator
 import math
+import os
 
 from ..assets.dictionaries import Dictionaries
+
+LICENSE_HEADER_NUM_LINES = 4
 
 
 class TEXT_OT_alva_populate_macros(Operator):
@@ -395,9 +398,48 @@ class TEXT_OT_alva_send_text_to_3d(Operator):
         return {'FINISHED'}
     
 
+class TEXT_OT_alva_template_add(Operator):
+    bl_idname = 'alva_text.template_add'
+    bl_label = "Template"
+
+    template_type: StringProperty() # type: ignore
+
+    def execute(self, context):
+        if self.template_type == 'lighting_console':
+            text_block_name = "lighting_console.py"
+            file_path = os.path.join(os.path.dirname(__file__), '..', 'extendables', 'python_templates', 'lighting_console.py')
+        elif self.template_type == 'strip':
+            text_block_name = "custom_strip.py"
+            file_path = os.path.join(os.path.dirname(__file__), '..', 'extendables', 'python_templates', 'custom_strip.py')
+        else:
+            self.report({'ERROR'}, "Unknown template type")
+            return {'CANCELLED'}
+
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                lines = file.readlines()[LICENSE_HEADER_NUM_LINES:]
+                content = ''.join(lines)
+        except FileNotFoundError:
+            self.report({'ERROR'}, f"File {file_path} not found")
+            return {'CANCELLED'}
+        except Exception as e:
+            self.report({'ERROR'}, f"Error reading {file_path}: {str(e)}")
+            return {'CANCELLED'}
+
+        new_text_block = bpy.data.texts.new(name=text_block_name)
+        new_text_block.from_string(content)
+        context.space_data.text = new_text_block
+        context.area.tag_redraw()
+        bpy.ops.text.move(type='FILE_TOP')
+        bpy.ops.text.move(type='LINE_BEGIN')
+
+        return {'FINISHED'}
+    
+
 operator_classes = [
     TEXT_OT_alva_populate_macros,
     TEXT_OT_alva_send_text_to_3d,
+    TEXT_OT_alva_template_add
 ]
 
 

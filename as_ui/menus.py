@@ -78,11 +78,29 @@ class NODE_MT_alva_outputs_audio_nodes(Menu):
         layout.operator("node.add_dante_outputs_node", text="Dante Outputs Node", icon='BACK')
 
 
+class TEXT_MT_alva_python_templates(Menu):
+    bl_idname = 'TEXT_MT_alva_python_templates'
+    bl_label = "Alva Sorcerer"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator('alva_text.template_add', text="Lighting Console").template_type = 'lighting_console'
+        layout.operator('alva_text.template_add', text="Sequencer Strip").template_type = 'strip'
+
+
+
+def draw_text_templates_menu(self, context):
+    layout = self.layout
+    layout.menu('TEXT_MT_alva_python_templates')
+    
+
+
 menus = [
     NODE_MT_alva_lighting_nodes,
     NODE_MT_alva_general_audio_nodes,
     NODE_MT_alva_inputs_audio_nodes,
-    NODE_MT_alva_outputs_audio_nodes
+    NODE_MT_alva_outputs_audio_nodes,
+    TEXT_MT_alva_python_templates
 ]
 
 
