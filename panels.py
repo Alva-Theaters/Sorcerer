@@ -113,7 +113,7 @@ from .as_ui.menus import draw_text_templates_menu
 #-------------------------------------------------------------------------------------------------------------------------------------------
 '''VIEW3D Panels'''
 #-------------------------------------------------------------------------------------------------------------------------------------------                             
-class View3D_Panel:
+class View3DPanel:
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'Alva Sorcerer'
@@ -123,7 +123,7 @@ class View3D_Panel:
         return hasattr(context, "scene")
     
 
-class VIEW3D_PT_alva_object_controller(Panel, View3D_Panel):
+class VIEW3D_PT_alva_object_controller(Panel, View3DPanel):
     '''Main controller for object parameters in 3D view'''
     bl_label = "Control Specific Lights"
 
@@ -146,7 +146,7 @@ class VIEW3D_PT_alva_object_controller(Panel, View3D_Panel):
             draw_speaker(self, context, active_object)
         
         
-class VIEW3D_PT_alva_lighting_modifiers(Panel, View3D_Panel):
+class VIEW3D_PT_alva_lighting_modifiers(Panel, View3DPanel):
     '''Modifiers for changing all lights as one'''
     bl_label = "Modify All Lights at Once"
 
@@ -158,7 +158,7 @@ class VIEW3D_PT_alva_lighting_modifiers(Panel, View3D_Panel):
         draw_lighting_modifiers(self, context)
         
         
-class VIEW3D_PT_alva_fixture_groups(Panel, View3D_Panel):
+class VIEW3D_PT_alva_fixture_groups(Panel, View3DPanel):
     '''Access to scene-level Sorcerer patch for lighting'''
     bl_label = "Make Groups"
 
@@ -166,7 +166,7 @@ class VIEW3D_PT_alva_fixture_groups(Panel, View3D_Panel):
         draw_fixture_groups(self, context)
             
             
-class VIEW3D_PT_alva_fixture_generator(Panel, View3D_Panel):
+class VIEW3D_PT_alva_fixture_generator(Panel, View3DPanel):
     """Automation tools for rapidly creating lighting fixtures"""
     bl_label = "Patch Console Remotely"
 
@@ -181,7 +181,7 @@ class VIEW3D_PT_alva_fixture_generator(Panel, View3D_Panel):
         draw_generate_fixtures(self, context)
 
 
-class VIEW3D_PT_alva_service_mode(Panel, View3D_Panel):
+class VIEW3D_PT_alva_service_mode(Panel, View3DPanel):
     """Access debug print settings"""
     bl_label = "Service Mode"
 
@@ -196,7 +196,7 @@ class VIEW3D_PT_alva_service_mode(Panel, View3D_Panel):
 #-------------------------------------------------------------------------------------------------------------------------------------------
 '''PROPERTIES Panels'''
 #-------------------------------------------------------------------------------------------------------------------------------------------                  
-class Graph_Panel:
+class GraphPanel:
     bl_space_type = 'GRAPH_EDITOR'
     bl_region_type = 'UI'
     bl_category = 'Alva Sorcerer'
@@ -206,7 +206,7 @@ class Graph_Panel:
         return hasattr(context, "scene")
 
 
-class GRAPH_PT_alva_graph_controllers(Panel, Graph_Panel):
+class GRAPH_PT_alva_graph_controllers(Panel, GraphPanel):
     '''Access to scene-level Sorcerer patch for lighting'''
     bl_label = "Make Controllers"
 
