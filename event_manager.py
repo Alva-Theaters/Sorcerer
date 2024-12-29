@@ -294,7 +294,7 @@ class EventManager:
             return
         
         for strip in scene.sequence_editor.sequences_all:
-            if strip.type == 'SOUND' and not strip.selected_stage_object:
+            if strip.type == 'SOUND' and strip.selected_stage_object:
                 sound_object = bpy.data.objects[strip.selected_stage_object.name]
 
                 for speaker_list in sound_object.speaker_list:
