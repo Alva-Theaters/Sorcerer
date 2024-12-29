@@ -134,7 +134,7 @@ class VIEW3D_PT_alva_object_controller(Panel, View3D_Panel):
                 context.active_object is not None)
 
     def draw(self, context):
-        scene = bpy.context.scene.scene_props
+        scene = context.scene.scene_props
         active_object = context.active_object
         
         if active_object.type == 'MESH':
