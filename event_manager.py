@@ -497,14 +497,14 @@ class EventManager:
         # End timecode.    
         if scene.sync_timecode:
             '''C3:2'''
-            relevant_lighting_clock_object, relevant_sound_strip = Utils.find_relevant_clock_objects(scene)
+            clock, strip = Utils.find_relevant_clock_objects(scene)
                 
-            if relevant_lighting_clock_object:
-                clock = str(relevant_lighting_clock_object.int_event_list)
+            if clock:
+                clock = str(clock.int_event_list)
                 OSC.send_osc_lighting(CMD_ADDRESS, INTERNAL_DISABLE.replace("$", clock), user=0)
 
-                if hasattr(relevant_sound_strip, "int_sound_cue"):
-                    OSC.send_osc_audio(PAUSE_SOUND.replace("$", relevant_sound_strip.int_sound_cue), "")
+                if hasattr(strip, "int_sound_cue") and hasattr(strip, 'selected_stage_object') and strip.selected_stage_object:
+                    OSC.send_osc_audio(PAUSE_SOUND.replace("$", strip.int_sound_cue), "")
 
         '''C3:3'''
         self.start_mapping = None
