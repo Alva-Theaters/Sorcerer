@@ -6,6 +6,7 @@ from bpy import spy
 import time
 
 from ..utils.osc import OSC
+from ..utils.orb_utils import tokenize_macro_line
 
 '''
 To make your own custom Sorcerer sequencer strip type:
@@ -169,6 +170,7 @@ class CPV_LC_eos(spy.types.LightingConsole):
 
     def record_timecode_macro(self, macro, event_list, timecode=None, desired_state='enable'):
         yield self.delete_recreate_macro(macro), "Creating blank macro."
+        yield self.reset_macro_key(), "Resetting macro key"
         yield self.enter_edit_mode(), "Entering edit mode"
         yield self.type_event_list_number(event_list), "Typing event list number."
         yield self.type_slash_internal_time(), "Internal Time"
@@ -176,6 +178,14 @@ class CPV_LC_eos(spy.types.LightingConsole):
         yield self.type_event_list_number(event_list), "Typing event list number again."
         yield self.internal_enable_disable_then_foreground(desired_state), "Setting to foreground mode."
         yield self.enter_live_mode(desired_state), "Entering live mode"
+
+
+    def record_multiline_macro(self, macro, macro_text):
+        yield self.delete_recreate_macro(macro), "Creating blank macro"
+        yield self.reset_macro_key(), "Resetting macro key"
+        yield self.enter_edit_mode(), "Entering edit mode"
+        yield self.type_tokens(macro_text), "Typing the lines"
+        yield self.type_done(), "Typing done"
 
 
     # Unique Helpers --------------------------------------------------------------------------------------------------
@@ -254,6 +264,17 @@ class CPV_LC_eos(spy.types.LightingConsole):
     def enter_live_mode(self, desired_state):
         if desired_state == 'disable':
             self.key("live")
+
+
+    def type_tokens(self, text_data):
+        for line in text_data:
+            tokens = tokenize_macro_line(line)
+            for address, argument in tokens:
+                OSC.send_osc_lighting(address, argument)
+
+
+    def type_done(self):
+        OSC.send_osc_lighting("/eos/softkey/6", "1", tcp=True)  # "Done" softkey
 
 
 class CPV_LC_grandma_3(spy.types.LightingConsole):

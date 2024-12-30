@@ -82,6 +82,7 @@ def get_executor(as_orb_id, context, active_item, Console):
     if not StripClass:
         local_executors = {
             'sound': lambda ctx, item, con: SoundStrip(ctx, item).execute(con),
+            'text': lambda ctx, item, con: TextSync(ctx, item).execute(con),
             'timeline': lambda ctx, item, con: TimelineSync(ctx, item).execute(con),
             'sequencer': lambda ctx, item, con: SequencerSync(ctx, item).execute(con),
             'viewport': lambda ctx, item, con: ViewportSync(ctx, item).execute(con)
@@ -175,7 +176,7 @@ class SoundStrip:
     def execute(self, Console):
         yield from Console.record_timecode_macro(self.start_macro, self.event_list, desired_state='enable')
         yield from Console.record_timecode_macro(self.end_macro, self.event_list, desired_state='disable')
-        return {'FINISHED'}
+        yield Console.reset_macro_key(), "Resetting macro key."
     
 
 class MacroStrip:
@@ -227,15 +228,15 @@ class FlashStrip:
         yield from Console.record_one_line_macro(self.end_macro_number, self.end_macro_text)
 
 
-class TextStrips:
+class TextSync:
     def __init__(self, context, active_item):
-        macro = context.space_data.text.text_macro
+        self.macro = context.space_data.text.text_macro
         active_text = context.space_data.text
         text_data = active_text.as_string()
-        text_data = text_data.splitlines()
+        self.text_data = text_data.splitlines()
 
     def execute(self, Console):
-        return {'FINISHED'}
+        yield from Console.record_multiline_macro(self.macro, self.text_data)
 
             
 class SequencerSync:
