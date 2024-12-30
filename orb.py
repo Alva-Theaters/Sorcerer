@@ -174,8 +174,8 @@ class SoundStrip:
 
 
     def execute(self, Console):
-        yield from Console.record_timecode_macro(self.start_macro, self.event_list, desired_state='enable')
-        yield from Console.record_timecode_macro(self.end_macro, self.event_list, desired_state='disable')
+        yield from Console.record_timecode_macro(self.start_macro, self.event_list, state='enable')
+        yield from Console.record_timecode_macro(self.end_macro, self.event_list, state='disable')
         yield Console.reset_macro_key(), "Resetting macro key."
     
 
@@ -233,10 +233,17 @@ class TextSync:
         self.macro = context.space_data.text.text_macro
         active_text = context.space_data.text
         text_data = active_text.as_string()
-        self.text_data = text_data.splitlines()
+        text_data = text_data.splitlines()
+
+        all_tokens = []
+        for line in text_data:
+            tokens = tokenize_macro_line(line)
+            for token in tokens:
+                all_tokens.append(token)
+        self.tokens = all_tokens
 
     def execute(self, Console):
-        yield from Console.record_multiline_macro(self.macro, self.text_data)
+        yield from Console.record_multiline_macro(self.macro, self.tokens)
 
             
 class SequencerSync:
@@ -295,29 +302,6 @@ class ViewportSync():
 
     def execute():
         pass
-
-
-#         #-------------------------------------------------------------------------------------------------------------------------------------------
-#         '''Text editor macros'''
-#         #-------------------------------------------------------------------------------------------------------------------------------------------
-#         @staticmethod
-#         def generate_multiline_macro(self, context, scene, macro, text_data):
-#             try:
-#                 yield Orb.Eos.delete_recreate_macro_enter_edit(macro), "Creating blank macro."
-#                 yield Orb.Eos.reset_macro_key(), "Resetting macro key."
-#                 yield Orb.Eos.type_tokens(text_data), "Typing macro contents"
-            
-#         @staticmethod
-#         def type_tokens(text_data):
-#             for line in text_data:
-#                 tokens = tokenize_macro_line(line)
-#                 for address, argument in tokens:
-#                     Orb.Eos.send_osc_with_delay(address, argument, .2)
-#                     time.sleep(.1)
-
-#             Orb.Eos.send_osc_with_delay("/eos/softkey/6", "1", 0.1)  # "Done" softkey
-#             Orb.Eos.send_osc_with_delay("/eos/key/live", "1", 0.1)
-#             Orb.Eos.send_osc_with_delay("/eos/key/live", "0", 0.1)
             
                 
 #         #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -426,12 +410,6 @@ class ViewportSync():
 #             Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Event {event_list} / {str(final_frame)} Time {str(timecode)} Show_Control_Action Macro {str(end_macro)} Enter")
 
 
-#         #-------------------------------------------------------------------------------------------------------------------------------------------
-#         '''Render Strips'''
-#         #-------------------------------------------------------------------------------------------------------------------------------------------
-#         @staticmethod
-
-        
 
 #         #-------------------------------------------------------------------------------------------------------------------------------------------
 #         '''Patch Group'''

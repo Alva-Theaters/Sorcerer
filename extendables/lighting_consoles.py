@@ -111,26 +111,46 @@ class CPV_LC_eos(spy.types.LightingConsole):
         if not isinstance(key_strings, list):
             key_strings = [key_strings]
 
-        if enter:
-            for key_string in key_strings:
-                OSC.send_osc_lighting(f"/eos/key/{key_string}", "1", tcp=True)
-                OSC.send_osc_lighting(f"/eos/key/{key_string}", "1", tcp=True)
-                return
-
-        direction_to_normal_key = {
-            None: lambda: OSC.press_lighting_key(key_string),
-            False: lambda: OSC.lighting_key_up(key_string),
-            True: lambda: OSC.lighting_key_down(key_string)
-        }
-
-        func = direction_to_normal_key[direction]
-
         for key_string in key_strings:
-            func()
+            OSC.press_lighting_key(key_string)
+
+    
+    def key_up(self, key_string):
+        OSC.send_osc_lighting(f"/eos/key/{key_string}", "0", tcp=True)
+
+
+    def key_down(self, key_string):
+        OSC.send_osc_lighting(f"/eos/key/{key_string}", "1", tcp=True)
+
+
+    def enter(self, key_string):
+        OSC.send_osc_lighting(f"/eos/key/{key_string}", "1", tcp=True)
+        OSC.send_osc_lighting(f"/eos/key/{key_string}", "1", tcp=True)
+
+
+    def softkey(self, key_string):
+        OSC.send_osc_lighting(f"/eos/softkey/{key_string}", "1", tcp=True)
+        OSC.send_osc_lighting(f"/eos/softkey/{key_string}", "0", tcp=True)
+
+
+    def softkey_up(self, key_string):
+        OSC.send_osc_lighting(f"/eos/softkey/{key_string}", "0", tcp=True)
+
+
+    def softkey_down(self, key_string):
+        OSC.send_osc_lighting(f"/eos/softkey/{key_string}", "1", tcp=True)
 
 
     def cmd(self, command_string):
         OSC.send_osc_lighting(self.osc_address, command_string, tcp=True)
+
+
+    def raw(self, pairs):
+        if not isinstance(pairs, list):
+            pairs = [pairs]
+
+        for (address, argument) in pairs:
+            OSC.send_osc_lighting(address, argument, tcp=True)
 
 
     def save_console_file(self):
@@ -146,49 +166,6 @@ class CPV_LC_eos(spy.types.LightingConsole):
         yield self.save_console_file(), "Saving the console file"
 
 
-    def restore_console_to_normal_following_automation(self):
-        yield self.restore_snapshot(), "Restoring your screen"  
-
-
-    def record_cue(self, cue_number, cue_duration):
-        self.key("live")
-        self.cmd(f"Cue {str(cue_number)} Time {cue_duration} Enter")
-
-
-    def record_discrete_time(self, type_id, members_str, discrete_time):
-        argument = f"{type_id} {members_str} Time {discrete_time.zfill(2)} Enter"
-        self.cmd(argument)
-
-
-    def record_one_line_macro(self, macro_number, macro_text):
-        yield self.learn_macro(), "Initiating macro."
-        yield self.type_macro_number(macro_number), "Typing macro number."
-        yield self.record_macro_text(macro_text), "Learning macro and exiting."
-        yield self.exit_learn(), "Exiting learn mode"
-        yield self.reset_macro_key(), "Resetting macro key"
-
-
-    def record_timecode_macro(self, macro, event_list, timecode=None, desired_state='enable'):
-        yield self.delete_recreate_macro(macro), "Creating blank macro."
-        yield self.reset_macro_key(), "Resetting macro key"
-        yield self.enter_edit_mode(), "Entering edit mode"
-        yield self.type_event_list_number(event_list), "Typing event list number."
-        yield self.type_slash_internal_time(), "Internal Time"
-        yield self.type_timecode_or_just_enter(timecode), "Typing timecode for sync."
-        yield self.type_event_list_number(event_list), "Typing event list number again."
-        yield self.internal_enable_disable_then_foreground(desired_state), "Setting to foreground mode."
-        yield self.enter_live_mode(desired_state), "Entering live mode"
-
-
-    def record_multiline_macro(self, macro, macro_text):
-        yield self.delete_recreate_macro(macro), "Creating blank macro"
-        yield self.reset_macro_key(), "Resetting macro key"
-        yield self.enter_edit_mode(), "Entering edit mode"
-        yield self.type_tokens(macro_text), "Typing the lines"
-        yield self.type_done(), "Typing done"
-
-
-    # Unique Helpers --------------------------------------------------------------------------------------------------
     def record_snapshot(self):
         snapshot = str(self.scene.orb_finish_snapshot)
         self.cmd(f"Record Snapshot {snapshot} Enter Enter")
@@ -199,82 +176,71 @@ class CPV_LC_eos(spy.types.LightingConsole):
         self.cmd(f"Snapshot {snapshot} Enter")
 
 
+    def restore_console_to_normal_following_automation(self):
+        yield self.restore_snapshot(), "Restoring your screen"  
+
+
+    def record_cue(self, cue_number, cue_duration):
+        self.key("live")
+        self.cmd(f"Cue {str(cue_number)} Time {cue_duration} Enter")
+
+    def record_discrete_time(self, type_id, members_str, discrete_time):
+        argument = f"{type_id} {members_str} Time {discrete_time.zfill(2)} Enter"
+        self.cmd(argument)
+
     def update_cue(self):
         self.key(["update", "enter"])
 
 
-    def learn_macro(self):
-        self.key(["live", "learn", "macro"])
+    def record_one_line_macro(self, macro_number, macro_text):
+        logic = [
+            ('key',     ["live", "learn", "macro"],    "Initiating macro"     ),
+            ('key',     list(str(macro_number)),       "Typing macro number"  ),
+            ('key',     ["enter", "enter"],            "Typing Enter"         ),
+            ('cmd',     macro_text,                    "Learning the macro"   ),
+            ('key',     "learn",                       "Stopping learn mode"  ),
+            ('key_up',  "macro",                       "Resetting macro key"  )
+        ]
+        yield from self.execute_logic(logic)
 
 
-    def type_macro_number(self, macro_number):
-        for digit in str(macro_number):
-            self.key(digit)
-        self.key(["enter", "enter"])
+    def record_multiline_macro(self, macro, tokens):
+        logic = [
+            ('enter',         "macro",                                     "Entering macro mode"  ),
+            ('cmd',           f"Delete Macro {str(macro)} Enter Enter",    "Deleting macro"       ),
+            ('cmd',           f"{str(macro)} Enter",                       "Recreating macro"     ),
+            ('key_up',        "macro",                                     "Resetting macro key"  ),
+            ('softkey',       "6",                                         "Edit softkey"         ),
+            ('raw',           tokens,                                      "Typing macro lines"   ),
+            ('softkey_down',  "6",                                         "Typing done"          ),
+            ('key',           "live",                                      "Typing live"          )
+        ]
+        yield from self.execute_logic(logic)
 
 
-    def record_macro_text(self, macro_text):
-        self.cmd(macro_text)
+    def record_timecode_macro(self, macro, event_list, state='enable'):
+        logic = [
+            ('enter',    "macro",                                        "Entering macro mode"  ),
+            ('cmd',      f"Delete Macro {str(macro)} Enter Enter",       "Deleting macro"       ),
+            ('cmd',      f"{str(macro)} Enter",                          "Recreating macro"     ),
+            ('key_up',   "macro",                                        "Resetting macro key"  ),
+            ('softkey',  "6",                                            "Edit softkey"         ),
+            ('key',      "event",                                        "Typing event"         ),
+            ('key',      list(str(event_list)),                          "Typing number"        ),
+            ('key',      ["\\", "internal", "time", "enter"],            "Typing internal time" ),
+            ('key',      "event",                                        "Typing event"         ),
+            ('key',      list(str(event_list)),                          "Typing number"        ),
+            ('key',      ["\\", "internal", state, "enter", "select"],   "Typing internal time" ),
+            ('softkey',  "3",                                            "Setting to foreground"),
+            ('key',      "live",                                         "Typing live"          )
+        ]
+        yield from self.execute_logic(logic)
 
 
-    def exit_learn(self):
-        self.key("learn")
-
-
-    def reset_macro_key(self):
-        self.key("macro", direction=False)
-
-
-    def delete_recreate_macro(self, macro_number):
-        self.key("macro", enter=True)
-        self.cmd(f"Delete Macro {str(macro_number)} Enter Enter")
-        self.cmd(f"{str(macro_number)} Enter")
-
-    
-    def enter_edit_mode(self):
-        OSC.send_osc_lighting("/eos/softkey/6", "1", tcp=True)  # Edit" softkey
-        OSC.send_osc_lighting("/eos/softkey/6", "0", tcp=True)  # Edit" softkey
-
-
-    def type_event_list_number(self, event_list_number):
-        self.key("event")
-        for digit in str(event_list_number):
-            self.key(digit)
-
-
-    def type_slash_internal_time(self):
-        self.key(["\\", "internal", "time"])
-
-
-    def type_timecode_or_just_enter(self, timecode):
-        if timecode:
-            for digit in timecode:
-                self.key(digit)
-            time.sleep(0.5)
-        self.key("enter")     
-
-
-    def internal_enable_disable_then_foreground(self, desired_state):
-        self.key(["\\", "internal", desired_state, "enter", "select"])
-        OSC.send_osc_lighting("/eos/softkey/3", "1", tcp=True)  # "Foreground Mode" softkey
-        OSC.send_osc_lighting("/eos/softkey/3", "0", tcp=True)  # "Foreground Mode" softkey
-        self.key("enter")
-
-
-    def enter_live_mode(self, desired_state):
-        if desired_state == 'disable':
-            self.key("live")
-
-
-    def type_tokens(self, text_data):
-        for line in text_data:
-            tokens = tokenize_macro_line(line)
-            for address, argument in tokens:
-                OSC.send_osc_lighting(address, argument)
-
-
-    def type_done(self):
-        OSC.send_osc_lighting("/eos/softkey/6", "1", tcp=True)  # "Done" softkey
+    def execute_logic(self, logic):
+        for funcname, item_list, report in logic:
+            method = getattr(self, funcname)
+            yield method(item_list), report
 
 
 class CPV_LC_grandma_3(spy.types.LightingConsole):
