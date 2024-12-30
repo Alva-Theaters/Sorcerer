@@ -1,12 +1,3 @@
-*.py[cod]        # compiled Python files (.pyc, .pyd, .pyo, etc.)
-__pycache__/     # Python cache directories
-
-*.c
-*.so
-*.pyd
-*.dll
-*.o
-*.html
-
+.pyc     
+__pycache__/  
 .DS_Store
-Thumbs.db
