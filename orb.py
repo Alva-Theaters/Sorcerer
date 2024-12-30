@@ -173,6 +173,7 @@ class SoundStrip:
         self.start_macro = find_executor(scene, active_item, 'start_macro')
         self.end_macro = find_executor(scene, active_item, 'end_macro')
 
+
     def execute(self, Console):
         yield from Console.record_timecode_macro(self.start_macro, self.event_list, desired_state='enable')
         yield from Console.record_timecode_macro(self.end_macro, self.event_list, desired_state='disable')
@@ -242,7 +243,7 @@ class TextStrips:
 class SequencerSync:
     BATCH_LIMIT = 50
 
-    def __init__(self, context):
+    def __init__(self, context, active_item):
         from .utils.event_utils import EventUtils
         self.event_object, sound_strip = EventUtils.find_relevant_clock_objects(context.scene)
         self.event_list = self.event_object.int_event_list
@@ -261,7 +262,6 @@ class SequencerSync:
                 timecode = EventUtils.frame_to_timecode(int(frame), fps)  # Convert frame to int if needed
                 event_strings.append(f"Event {self.event_list} / {i} Time {timecode} Show_Control_Action {event_type} {value} Enter")
         return event_strings
-
 
 
     def execute(self, Console):

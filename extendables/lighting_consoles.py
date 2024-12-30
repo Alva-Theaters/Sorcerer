@@ -112,10 +112,8 @@ class CPV_LC_eos(spy.types.LightingConsole):
 
         if enter:
             for key_string in key_strings:
-                time.sleep(.1)
-                OSC.send_osc_lighting(f"/eos/key/{key_string}", "1")
-                OSC.send_osc_lighting(f"/eos/key/{key_string}", "1")
-                time.sleep(.1)
+                OSC.send_osc_lighting(f"/eos/key/{key_string}", "1", tcp=True)
+                OSC.send_osc_lighting(f"/eos/key/{key_string}", "1", tcp=True)
                 return
 
         direction_to_normal_key = {
@@ -219,7 +217,7 @@ class CPV_LC_eos(spy.types.LightingConsole):
 
     def delete_recreate_macro(self, macro_number):
         self.key("macro", enter=True)
-        self.cmd(f"Delete {str(macro_number)} Enter Enter")
+        self.cmd(f"Delete Macro {str(macro_number)} Enter Enter")
         self.cmd(f"{str(macro_number)} Enter")
 
     
