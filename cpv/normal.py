@@ -16,8 +16,8 @@ class NormalCPV:
         self.controller_type = generator.controller_type   
 
     def execute(self):
-        self._strip_graph_suffix()
         value = self._find_value()
+        self._strip_graph_suffix()  # Must go after _find_value()
         
         if self.parent.type == 'CUSTOM':  # CUSTOM because that means node
             Find().trigger_downstream_nodes(self.parent, self.property_name, value)
@@ -27,8 +27,11 @@ class NormalCPV:
     
     def _strip_graph_suffix(self):
         if self.property_name in ['pan_graph', 'tilt_graph']:
-            return self.property_name.replace("_graph", "")
-        return self.property_name
+            self.property_name = self.property_name.replace("_graph", "")
     
     def _find_value(self):
-        return getattr(self.parent, f"alva_{self.property_name}")
+        if not self.property_name in ['pan_graph', 'tilt_graph']:
+            prefix = "alva_"
+        else:
+            prefix = ""
+        return getattr(self.parent, f"{prefix}{self.property_name}")

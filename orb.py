@@ -13,8 +13,6 @@ from .as_ui.utils import get_strip_class
 from .utils.sequencer_utils import BiasCalculator
 from .utils.sequencer_mapping import StripMapper
 from .cpv.publish import Publish
-from .utils.osc import OSC
-from .assets.sli import SLI
 
 
 WHAT_DOES_THIS_DO = """
@@ -297,91 +295,6 @@ class ViewportSync():
     def execute():
         pass
 
-        
-#     class Eos:
-      
-#         @staticmethod
-#         def delete_recreate_macro_enter_edit(macro_number, live=True):
-#             if live:
-#                 Orb.Eos.send_osc_with_delay("/eos/key/live")
-#                 Orb.Eos.send_osc_with_delay("/eos/key/live", "0", 0.5)
-#             Orb.Eos.send_osc_with_delay("/eos/key/macro", "11 Enter", 0)
-#             Orb.Eos.send_osc_with_delay("/eos/key/macro", "11 Enter", 0.5)
-#             Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Delete {str(macro_number)} Enter Enter", 0.5)
-#             Orb.Eos.send_osc_with_delay("/eos/newcmd", f"{str(macro_number)} Enter", 0.5)
-#             Orb.Eos.send_osc_with_delay("/eos/softkey/6", "1", 0.1)  # Edit" softkey
-
-
-#         #-------------------------------------------------------------------------------------------------------------------------------------------
-#         '''Show control'''
-#         #-------------------------------------------------------------------------------------------------------------------------------------------
-#         @staticmethod
-#         def manipulate_show_control(scene, event_list, start_macro, end_macro, start_cue, end_cue, timecode=None, execute_on_cues=True):
-#             try:
-                # So we need macro, event_list, timecode,
-                # Then again
-                # Then cue, macro
-                # Then again
-                # Then reset macro key
-
-                # def record_timecode_macro(self, macro, event_list, timecode)
-                # def link_cue_to_macro(cue, macro)
-
-#                 yield Orb.Eos.delete_recreate_macro_enter_edit(start_macro), "Creating blank macro."
-#                 yield Orb.Eos.type_event_list_number(event_list), "Typing event list number."
-#                 yield Orb.Eos.type_internal_time(), "Internal Time"
-#                 yield Orb.Eos.enter_timecode_or_just_enter(timecode), "Typing timecode for sync."
-#                 yield Orb.Eos.type_event_list_number(event_list), "Typing event list number again."
-#                 yield Orb.Eos.internal_enable_or_disable_foreground("enable"), "Setting to foreground mode."
-
-#                 yield Orb.Eos.live_and_execute_on_cue(start_cue, start_macro, execute_on_cues), "Setting start cue executor"
-#                 yield Orb.Eos.live_and_execute_on_cue(end_cue, end_macro, execute_on_cues), "Setting end cue executor"
-
-#                 yield Orb.Eos.reset_macro_key(), "Resetting macro key."
-#                 yield Orb.Eos.restore_snapshot(scene), "Restoring your screen setup."
-            
-            
-#         @staticmethod
-#         def type_event_list_number(event_list_number):
-#             Orb.Eos.send_osc_with_delay("/eos/key/event", delay=.2)
-            
-#             for digit in str(event_list_number):
-#                 Orb.Eos.send_osc_with_delay(f"/eos/key/{digit}", delay=.2)
-                
-#         @staticmethod    
-#         def type_internal_time():
-#             Orb.Eos.send_osc_with_delay("/eos/key/\\", delay=.2)
-#             Orb.Eos.send_osc_with_delay("/eos/key/internal", delay=.2)
-#             Orb.Eos.send_osc_with_delay("/eos/key/time", delay=.2)
-            
-#         @staticmethod
-#         def enter_timecode_or_just_enter(timecode, is_delayed=False):
-#             if timecode:
-#                 '''When animation-strip-start, make the macro start clock 
-#                 at correct time per Blender's timeline'''  
-#                 for digit in timecode:
-#                     Orb.Eos.send_osc_with_delay(f"/eos/key/{digit}", delay=0.2)
-#                 time.sleep(0.5)
-#             Orb.Eos.send_osc_with_delay("/eos/key/enter")
-
-#         @staticmethod
-#         def internal_enable_or_disable_foreground(desired_state):
-#             Orb.Eos.send_osc_with_delay("/eos/key/\\", delay=.2)
-#             Orb.Eos.send_osc_with_delay("/eos/key/internal", delay=.2)
-#             Orb.Eos.send_osc_with_delay(f"/eos/key/{desired_state}", delay=.2)
-#             Orb.Eos.send_osc_with_delay("/eos/key/enter", delay=.2)
-#             Orb.Eos.send_osc_with_delay("/eos/key/select", delay=.2)
-#             Orb.Eos.send_osc_with_delay("/eos/softkey/3", delay=.2)  # "Foreground Mode" softkey
-#             Orb.Eos.send_osc_with_delay("/eos/key/enter", delay=.2)
-
-#         @staticmethod
-#         def live_and_execute_on_cue(cue_number, macro_number, execute_on_cues, live=True):
-#             if live:
-#                 Orb.Eos.send_osc_with_delay("/eos/key/live", delay=.2)
-#             if execute_on_cues:
-#                 Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Cue {str(cue_number)} Execute Macro {str(macro_number)} Enter Enter")
-
-
 
 #         #-------------------------------------------------------------------------------------------------------------------------------------------
 #         '''Text editor macros'''
@@ -389,24 +302,9 @@ class ViewportSync():
 #         @staticmethod
 #         def generate_multiline_macro(self, context, scene, macro, text_data):
 #             try:
-#                 yield Orb.Eos.record_snapshot(scene), "Recording snapshot."
-#                 yield Orb.Eos.save_console_file(scene), "Orb is running."
 #                 yield Orb.Eos.delete_recreate_macro_enter_edit(macro), "Creating blank macro."
 #                 yield Orb.Eos.reset_macro_key(), "Resetting macro key."
 #                 yield Orb.Eos.type_tokens(text_data), "Typing macro contents"
-#                 yield Orb.Eos.restore_snapshot(scene), "Restoring your screen setup."
-#             except AttributeError as e:
-#                 logging.error(f"Attribute error in generate_multiline_macro: {e}")
-#                 yield None, f"Attribute error: {e}"
-#             except ValueError as e:
-#                 logging.error(f"Value error in generate_multiline_macro: {e}")
-#                 yield None, f"Value error: {e}"
-#             except RuntimeError as e:
-#                 logging.error(f"Runtime error in generate_multiline_macro: {e}")
-#                 yield None, f"Runtime error: {e}"
-#             except Exception as e:
-#                 logging.error(f"Unexpected error in generate_multiline_macro: {e}")
-#                 yield None, f"Unexpected error: {e}"
             
 #         @staticmethod
 #         def type_tokens(text_data):
