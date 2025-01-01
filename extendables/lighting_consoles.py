@@ -2,19 +2,23 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from bpy import spy
+import time
+
+from ..utils.osc import OSC
+from ..utils.orb_utils import tokenize_macro_line
+
 '''
-To make your own custom lighting console:
+To make your own custom Sorcerer sequencer strip type:
 
     1. Copy/paste the code below directly into Blender's text editor.
     2. Modify it as needed.
     3. Run it.
-    4. Select your new lighting console in Alva Sorcerer preferences under Network.
+    4. Select your new strip type in the M menu that pops up when you have  color strip selected.
 
-The lighting consoles below are built into Sorcerer. Similar to Blender's bpy, Sorcerer's spy is
+The strip types below are built into Sorcerer. Similar to Blender's bpy, Sorcerer's spy is
 utilized both by the internal source code (as seen here) and by end-users extending the application.
 '''
-
-from bpy import spy
 
 
 class CPV_LC_eos(spy.types.LightingConsole):
@@ -91,11 +95,183 @@ class CPV_LC_eos(spy.types.LightingConsole):
         "lower_rgbam": "# Red at - $1 Enter, # Green at - $2 Enter, # Blue at - $3 Enter, # Amber at - $4 Enter, # Mint at - $5 Enter"
     }
 
+    def __init__(self, scene):
+        self.scene = scene
+
     def format_value(value):
         '''We have to do this stuff because Eos interprets "1" as 10, "2" as 20, etc.'''
         if -10 < value < 10:
             return f"{'-0' if value < 0 else '0'}{abs(value)}"
         return str(value)
+    
+
+
+    # Common Actions --------------------------------------------------------------------------------------------------
+    def key(self, key_strings):
+        if not isinstance(key_strings, list):
+            key_strings = [key_strings]
+
+        for key_string in key_strings:
+            OSC.press_lighting_key(key_string)
+
+    
+    def key_up(self, key_string):
+        OSC.send_osc_lighting(f"/eos/key/{key_string}", "0", tcp=True)
+
+
+    def key_down(self, key_string):
+        OSC.send_osc_lighting(f"/eos/key/{key_string}", "1", tcp=True)
+
+
+    def enter(self, key_string):
+        OSC.send_osc_lighting(f"/eos/key/{key_string}", "1", tcp=True)
+        OSC.send_osc_lighting(f"/eos/key/{key_string}", "1", tcp=True)
+
+
+    def softkey(self, key_string):
+        OSC.send_osc_lighting(f"/eos/softkey/{key_string}", "1", tcp=True)
+        OSC.send_osc_lighting(f"/eos/softkey/{key_string}", "0", tcp=True)
+
+
+    def softkey_up(self, key_string):
+        OSC.send_osc_lighting(f"/eos/softkey/{key_string}", "0", tcp=True)
+
+
+    def softkey_down(self, key_string):
+        OSC.send_osc_lighting(f"/eos/softkey/{key_string}", "1", tcp=True)
+
+
+    def cmd(self, command_string):
+        OSC.send_osc_lighting(self.osc_address, command_string, tcp=True)
+
+
+    def raw(self, pairs):
+        if not isinstance(pairs, list):
+            pairs = [pairs]
+
+        for (address, argument) in pairs:
+            OSC.send_osc_lighting(address, argument, tcp=True)
+
+
+    def save_console_file(self):
+        if self.scene.is_console_saving:
+            self.key("shift", True)
+            self.key("update")
+            time.sleep(2)
+            self.key("shift", False)
+
+
+    def prepare_console_for_automation(self):
+        yield self.record_snapshot(), "Saving your screen"
+        yield self.save_console_file(), "Saving the console file"
+
+
+    def record_snapshot(self):
+        snapshot = str(self.scene.orb_finish_snapshot)
+        self.cmd(f"Record Snapshot {snapshot} Enter Enter")
+
+
+    def restore_snapshot(self):
+        snapshot = str(self.scene.orb_finish_snapshot)
+        self.cmd(f"Snapshot {snapshot} Enter")
+
+
+    def restore_console_to_normal_following_automation(self):
+        yield self.restore_snapshot(), "Restoring your screen"  
+
+
+    def record_cue(self, cue_number, cue_duration):
+        self.key("live")
+        self.cmd(f"Cue {str(cue_number)} Time {cue_duration} Enter")
+
+    def record_discrete_time(self, type_id, members_str, discrete_time):
+        argument = f"{type_id} {members_str} Time {discrete_time.zfill(2)} Enter"
+        self.cmd(argument)
+
+    def update_cue(self):
+        self.key(["update", "enter"])
+
+
+    def delete_cue_list(self, cue_list):
+        self.cmd(f"Delete Cue {cue_list} / Enter Enter")
+
+    def reset_cue_list(self):
+        self.cmd("Cue 1 / Enter")
+
+    def final_event_stop_clock(self, event_list, final_frame, timecode, end_macro):
+        self.cmd(f"Event {event_list} / {str(final_frame)} Time {str(timecode)} Show_Control_Action Macro {str(end_macro)} Enter")
+
+
+    def make_record_qmeo_cue_argument(self, cue_list, current_frame_number, cue_duration):
+        return f"Record Cue {str(cue_list)} / {str(current_frame_number)} Time {str(cue_duration)} Enter Enter"
+    
+    def make_record_qmeo_event_argument(self, event_list, frame, timecode):
+        return f"Event {event_list} / {str(frame)} Time {str(timecode)} Show_Control_Action Cue {str(frame)} Enter"
+
+    def send_frame(self, argument_one, argument_two):
+        self.cmd(argument_one)
+        self.cmd(argument_two)
+
+
+    def record_one_line_macro(self, macro_number, macro_text):
+        logic = [
+            ('key',     ["live", "learn", "macro"],    "Initiating macro"     ),
+            ('key',     list(str(macro_number)),       "Typing macro number"  ),
+            ('key',     ["enter", "enter"],            "Typing Enter"         ),
+            ('cmd',     macro_text,                    "Learning the macro"   ),
+            ('key',     "learn",                       "Stopping learn mode"  ),
+            ('key_up',  "macro",                       "Resetting macro key"  )
+        ]
+        yield from self.execute_logic(logic)
+
+
+    def record_multiline_macro(self, macro, tokens):
+        logic = [
+            ('enter',         "macro",                                     "Entering macro mode"  ),
+            ('cmd',           f"Delete Macro {str(macro)} Enter Enter",    "Deleting macro"       ),
+            ('cmd',           f"{str(macro)} Enter",                       "Recreating macro"     ),
+            ('key_up',        "macro",                                     "Resetting macro key"  ),
+            ('softkey',       "6",                                         "Edit softkey"         ),
+            ('raw',           tokens,                                      "Typing macro lines"   ),
+            ('softkey_down',  "6",                                         "Typing done"          ),
+            ('key',           "live",                                      "Typing live"          )
+        ]
+        yield from self.execute_logic(logic)
+
+
+    def record_timecode_macro(self, macro, event_list, state='enable'):
+        logic = [
+            ('enter',    "macro",                                        "Entering macro mode"  ),
+            ('cmd',      f"Delete Macro {str(macro)} Enter Enter",       "Deleting macro"       ),
+            ('cmd',      f"{str(macro)} Enter",                          "Recreating macro"     ),
+            ('key_up',   "macro",                                        "Resetting macro key"  ),
+            ('softkey',  "6",                                            "Edit softkey"         ),
+            ('key',      "event",                                        "Typing event"         ),
+            ('key',      list(str(event_list)),                          "Typing number"        ),
+            ('key',      ["\\", "internal", "time", "enter"],            "Typing internal time" ),
+            ('key',      "event",                                        "Typing event"         ),
+            ('key',      list(str(event_list)),                          "Typing number"        ),
+            ('key',      ["\\", "internal", state, "enter", "select"],   "Typing internal time" ),
+            ('softkey',  "3",                                            "Setting to foreground"),
+            ('key',      "live",                                         "Typing live"          )
+        ]
+        yield from self.execute_logic(logic)
+
+
+    def delete_recreate_event_list(self, event_list, end_frame, fps):
+        logic = [
+            ('cmd',    f"Delete Event {event_list} / Enter Enter",                        "Deleting List"),
+            ('cmd',    f"Event {str(event_list)} / 1 Thru {str(end_frame - 1)} Enter",    "Recreating"),
+            ('cmd',    f"Event {event_list} / Frame_Rate {int(fps)} Enter",               "Setting FPS"),
+            ('key',    "live",                                                            "Going to live")
+        ]
+        yield from self.execute_logic(logic)
+
+
+    def execute_logic(self, logic):
+        for funcname, item_list, report in logic:
+            method = getattr(self, funcname)
+            yield method(item_list), report
 
 
 class CPV_LC_grandma_3(spy.types.LightingConsole):

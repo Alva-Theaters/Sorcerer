@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from .utils import get_orb_icon
+from ..utils import get_orb_icon
 
 
 def draw_text_view(self, context):
@@ -20,7 +20,7 @@ def draw_macro_generator(self, context):
     
     row = col.row(align=True)
     row.prop(active_text, 'text_macro', text="Macro Number:")
-    row.operator("alva_orb.generate_text_macro", icon_value=orb.icon_id)
+    row.operator("alva_orb.orb", icon_value=orb.icon_id).as_orb_id = 'text'
 
     col.separator()
 
