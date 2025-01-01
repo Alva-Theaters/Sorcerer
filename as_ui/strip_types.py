@@ -80,8 +80,8 @@ def draw_strip_cue_top(context, box, active_strip):
     row.prop(active_strip, "eos_cue_number", text="Cue #")
     row.operator("alva_tool.ghost_out", text="", icon='GHOST_ENABLED')
     if context.scene.cue_builder_toggle:
-        row.operator("alva_seq.update_builder", text="", icon='FILE_REFRESH')
-    row.operator("alva_seq.record_cue", text="", icon='REC')
+        row.operator("alva_sequencer.update_builder", text="", icon='FILE_REFRESH')
+    row.operator("alva_sequencer.record_cue", text="", icon='REC')
     row.operator("alva_orb.orb", icon_value=orb.icon_id).as_orb_id = 'option_cue'
     row = box.row(align=True)
     row.scale_y = 2
@@ -110,7 +110,7 @@ def draw_builder_row(box, ops_list, id, active_strip, label, alert_flag, is_colo
     alert_ids = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
     row = box.row(align=True)
-    row.operator(f"alva_seq.{id}_groups", text="", icon='PREFERENCES')
+    row.operator(f"alva_sequencer.{id}_groups", text="", icon='PREFERENCES')
     row.prop(active_strip, f"{id}_light", text=label, slider=True)
     row.alert = alert_flag
     row_icons = color_icons if is_color else event_icons
@@ -145,27 +145,27 @@ def draw_cue_builder(context, box, active_strip):
     effect_thirteen = pcoll["effect_thirteen"]
     effect_fourteen = pcoll["effect_fourteen"]
 
-    key_ops = ["alva_seq.focus_one", "alva_seq.focus_two", "alva_seq.focus_three", "alva_seq.focus_four", "alva_seq.focus_five", "alva_seq.focus_six", "alva_seq.focus_seven", "alva_seq.focus_eight", "alva_seq.focus_nine"]
+    key_ops = ["alva_sequencer.focus_one", "alva_sequencer.focus_two", "alva_sequencer.focus_three", "alva_sequencer.focus_four", "alva_sequencer.focus_five", "alva_sequencer.focus_six", "alva_sequencer.focus_seven", "alva_sequencer.focus_eight", "alva_sequencer.focus_nine"]
 
-    rim_ops = ["alva_seq.focus_rim_one", "alva_seq.focus_rim_two", "alva_seq.focus_rim_three", "alva_seq.focus_rim_four", "alva_seq.focus_rim_five", "alva_seq.focus_rim_six", "alva_seq.focus_rim_seven", "alva_seq.focus_rim_eight", "alva_seq.focus_rim_nine"]
+    rim_ops = ["alva_sequencer.focus_rim_one", "alva_sequencer.focus_rim_two", "alva_sequencer.focus_rim_three", "alva_sequencer.focus_rim_four", "alva_sequencer.focus_rim_five", "alva_sequencer.focus_rim_six", "alva_sequencer.focus_rim_seven", "alva_sequencer.focus_rim_eight", "alva_sequencer.focus_rim_nine"]
 
-    fill_ops = ["alva_seq.focus_fill_one", "alva_seq.focus_fill_two", "alva_seq.focus_fill_three", "alva_seq.focus_fill_four", "alva_seq.focus_fill_five", "alva_seq.focus_fill_six", "alva_seq.focus_fill_seven", "alva_seq.focus_fill_eight", "alva_seq.focus_fill_nine"]
+    fill_ops = ["alva_sequencer.focus_fill_one", "alva_sequencer.focus_fill_two", "alva_sequencer.focus_fill_three", "alva_sequencer.focus_fill_four", "alva_sequencer.focus_fill_five", "alva_sequencer.focus_fill_six", "alva_sequencer.focus_fill_seven", "alva_sequencer.focus_fill_eight", "alva_sequencer.focus_fill_nine"]
 
-    cyc_ops = ["alva_seq.focus_cyc_one", "alva_seq.focus_cyc_two", "alva_seq.focus_cyc_three", "alva_seq.focus_cyc_four",
-                "alva_seq.focus_cyc_five", "alva_seq.focus_cyc_six", "alva_seq.focus_cyc_seven", "alva_seq.focus_cyc_eight", "alva_seq.focus_texture_nine"]
+    cyc_ops = ["alva_sequencer.focus_cyc_one", "alva_sequencer.focus_cyc_two", "alva_sequencer.focus_cyc_three", "alva_sequencer.focus_cyc_four",
+                "alva_sequencer.focus_cyc_five", "alva_sequencer.focus_cyc_six", "alva_sequencer.focus_cyc_seven", "alva_sequencer.focus_cyc_eight", "alva_sequencer.focus_texture_nine"]
     
-    band_ops = ["alva_seq.focus_band_one", "alva_seq.focus_band_two", "alva_seq.focus_band_three", "alva_seq.focus_band_four",
-                "alva_seq.focus_band_five", "alva_seq.focus_band_six", "alva_seq.focus_band_seven", "alva_seq.focus_band_eight", "alva_seq.focus_texture_nine"]
+    band_ops = ["alva_sequencer.focus_band_one", "alva_sequencer.focus_band_two", "alva_sequencer.focus_band_three", "alva_sequencer.focus_band_four",
+                "alva_sequencer.focus_band_five", "alva_sequencer.focus_band_six", "alva_sequencer.focus_band_seven", "alva_sequencer.focus_band_eight", "alva_sequencer.focus_texture_nine"]
     
-    accent_ops = ["alva_seq.focus_accent_one", "alva_seq.focus_accent_two", "alva_seq.focus_accent_three", "alva_seq.focus_accent_four",
-                "alva_seq.focus_accent_five", "alva_seq.focus_accent_six", "alva_seq.focus_accent_seven", "alva_seq.focus_accent_eight", "alva_seq.focus_texture_nine"]
+    accent_ops = ["alva_sequencer.focus_accent_one", "alva_sequencer.focus_accent_two", "alva_sequencer.focus_accent_three", "alva_sequencer.focus_accent_four",
+                "alva_sequencer.focus_accent_five", "alva_sequencer.focus_accent_six", "alva_sequencer.focus_accent_seven", "alva_sequencer.focus_accent_eight", "alva_sequencer.focus_texture_nine"]
     
-    texture_ops = ["alva_seq.focus_texture_one", "alva_seq.focus_texture_two", "alva_seq.focus_texture_three", "alva_seq.focus_texture_four",
-                "alva_seq.focus_texture_five", "alva_seq.focus_texture_six", "alva_seq.focus_texture_seven", "alva_seq.focus_texture_eight", "alva_seq.focus_texture_nine"]
+    texture_ops = ["alva_sequencer.focus_texture_one", "alva_sequencer.focus_texture_two", "alva_sequencer.focus_texture_three", "alva_sequencer.focus_texture_four",
+                "alva_sequencer.focus_texture_five", "alva_sequencer.focus_texture_six", "alva_sequencer.focus_texture_seven", "alva_sequencer.focus_texture_eight", "alva_sequencer.focus_texture_nine"]
     
     effect_ids = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"]
 
-    fx_ops = ["alva_seq.focus_energy_one", "alva_seq.focus_energy_two", "alva_seq.focus_energy_three", "alva_seq.focus_energy_four", "alva_seq.focus_energy_five", "alva_seq.focus_energy_six", "alva_seq.focus_energy_seven", "alva_seq.focus_energy_eight", "alva_seq.focus_energy_nine", "alva_seq.focus_energy_ten", "alva_seq.focus_energy_eleven", "alva_seq.focus_energy_twelve", "alva_seq.focus_energy_thirteen", "alva_seq.focus_energy_fourteen"]
+    fx_ops = ["alva_sequencer.focus_energy_one", "alva_sequencer.focus_energy_two", "alva_sequencer.focus_energy_three", "alva_sequencer.focus_energy_four", "alva_sequencer.focus_energy_five", "alva_sequencer.focus_energy_six", "alva_sequencer.focus_energy_seven", "alva_sequencer.focus_energy_eight", "alva_sequencer.focus_energy_nine", "alva_sequencer.focus_energy_ten", "alva_sequencer.focus_energy_eleven", "alva_sequencer.focus_energy_twelve", "alva_sequencer.focus_energy_thirteen", "alva_sequencer.focus_energy_fourteen"]
 
     fx_icons = [effect_one.icon_id, effect_two.icon_id, effect_three.icon_id, effect_four.icon_id, effect_five.icon_id, effect_six.icon_id, effect_seven.icon_id, effect_eight.icon_id, effect_nine.icon_id, effect_ten.icon_id, effect_eleven.icon_id, effect_twelve.icon_id, effect_thirteen.icon_id, effect_fourteen.icon_id]
 
@@ -177,7 +177,7 @@ def draw_cue_builder(context, box, active_strip):
     # Background row
     if context.scene.using_gels_for_cyc:
         row = box.row(align=True)
-        row.operator("alva_seq.gel_one_groups", text="", icon='PREFERENCES')
+        row.operator("alva_sequencer.gel_one_groups", text="", icon='PREFERENCES')
         row.prop(active_strip, "background_light_one", text="Cyc 1", slider=True)
         row.prop(active_strip, "background_light_two", text="Cyc 2", slider=True)
         row.prop(active_strip, "background_light_three", text="Cyc 3", slider=True)
@@ -194,14 +194,14 @@ def draw_cue_builder(context, box, active_strip):
 
     # Energy Intensity row
     row = box.row(align=True)
-    row.operator("alva_seq.energy_groups", text="", icon='PREFERENCES')
+    row.operator("alva_sequencer.energy_groups", text="", icon='PREFERENCES')
     row.prop(active_strip, "energy_light", text="Effect", slider=True)
     row.prop(active_strip, "energy_speed", text="Speed", slider=True)
     row.prop(active_strip, "energy_scale", text="Scale", slider=True)
 
     # Effects row
     row = box.row(align=True)
-    row.operator("alva_seq.stop_effect", text="", icon='CANCEL')
+    row.operator("alva_sequencer.stop_effect", text="", icon='CANCEL')
     for effect_id, operator, icon in zip(effect_ids, fx_ops, fx_icons):
         row.alert = active_strip.cue_builder_effect_id == effect_id
         row.operator(operator, text="", icon_value=icon)
@@ -227,7 +227,7 @@ def draw_strip_flash_manual(context, box, active_strip):
     row = box.row(align=True)
     row.enabled = is_manual_enabled
     row.prop(active_strip, "flash_input", text="")
-    row.operator("alva_seq.flash_copy_down", text="", icon='DOWNARROW_HLT')
+    row.operator("alva_sequencer.flash_copy_down", text="", icon='DOWNARROW_HLT')
     
     row = box.row()
     row = box.label(text=f"Flash Down: {active_strip.flash_down_input_background}")

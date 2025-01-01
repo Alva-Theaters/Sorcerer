@@ -18,24 +18,24 @@ keymap_data = {
     "Sequencer": {
         "space_type": "SEQUENCE_EDITOR",
         "items": [
-            ({"idname": "alva_seq.command_line", "key": 'C', "value": 'PRESS'}, None),
+            ({"idname": "alva_sequencer.command_line", "key": 'C', "value": 'PRESS'}, None),
             ({"idname": "alva_orb.orb", "key": 'SPACE', "value": 'PRESS', "shift": True}, {'as_orb_id': 'sequencer'}),
             ({"idname": "alva_tool.ghost_out", "key": 'G', "value": 'PRESS', "shift": True}, None),
-            ({"idname": "alva_seq.scale_strips", "key": 'S', "value": 'PRESS'}, None),
-            ({"idname": "alva_seq.extrude_strips", "key": 'E', "value": 'PRESS'}, None),
-            ({"idname": "alva_seq.duplicate_pattern", "key": 'E', "value": 'PRESS', "shift": True}, None),
+            ({"idname": "alva_sequencer.scale_strips", "key": 'S', "value": 'PRESS'}, None),
+            ({"idname": "alva_sequencer.extrude_strips", "key": 'E', "value": 'PRESS'}, None),
+            ({"idname": "alva_sequencer.duplicate_pattern", "key": 'E', "value": 'PRESS', "shift": True}, None),
             ({"idname": 'alva_common.deselect_all', "key": 'D', "value": 'PRESS'}, None),
-            ({"idname": 'alva_seq.add_color', "key": 'Z', "value": 'RELEASE'}, None),
-            ({"idname": 'alva_seq.add_color_kick', "key": 'Z', "value": 'PRESS'}, None),
-            ({"idname": 'alva_seq.add_color_pointer', "key": 'Z', "value": 'PRESS', "shift": True}, None),
-            ({"idname": 'alva_seq.bump_vertical', "key": 'U', "value": 'PRESS'}, {"direction": 1}),
-            ({"idname": 'alva_seq.bump_vertical', "key": 'U', "value": 'PRESS', "shift": True}, {"direction": -1}),
-            ({"idname": 'alva_seq.bump_horizontal', "key": 'L', "value": 'PRESS'}, {"direction": -1}),
-            ({"idname": 'alva_seq.bump_horizontal', "key": 'R', "value": 'PRESS'}, {"direction": 1}),
-            ({"idname": 'alva_seq.bump_horizontal', "key": 'L', "value": 'PRESS', "shift": True}, {"direction": -5}),
-            ({"idname": 'alva_seq.bump_horizontal', "key": 'R', "value": 'PRESS', "shift": True}, {"direction": 5}),
-            ({"idname": "alva_seq.properties", "key": 'M', "value": 'PRESS'}, None),
-            ({"idname": "alva_seq.formatter", "key": 'F', "value": 'PRESS'}, None)
+            ({"idname": 'alva_sequencer.add_color', "key": 'Z', "value": 'RELEASE'}, None),
+            ({"idname": 'alva_sequencer.add_color_kick', "key": 'Z', "value": 'PRESS'}, None),
+            ({"idname": 'alva_sequencer.add_color_pointer', "key": 'Z', "value": 'PRESS', "shift": True}, None),
+            ({"idname": 'alva_sequencer.bump_vertical', "key": 'U', "value": 'PRESS'}, {"direction": 1}),
+            ({"idname": 'alva_sequencer.bump_vertical', "key": 'U', "value": 'PRESS', "shift": True}, {"direction": -1}),
+            ({"idname": 'alva_sequencer.bump_horizontal', "key": 'L', "value": 'PRESS'}, {"direction": -1}),
+            ({"idname": 'alva_sequencer.bump_horizontal', "key": 'R', "value": 'PRESS'}, {"direction": 1}),
+            ({"idname": 'alva_sequencer.bump_horizontal', "key": 'L', "value": 'PRESS', "shift": True}, {"direction": -5}),
+            ({"idname": 'alva_sequencer.bump_horizontal', "key": 'R', "value": 'PRESS', "shift": True}, {"direction": 5}),
+            ({"idname": "alva_sequencer.properties", "key": 'M', "value": 'PRESS'}, None),
+            ({"idname": "alva_sequencer.formatter", "key": 'F', "value": 'PRESS'}, None)
         ]
     },
     "Node Editor": {
@@ -91,7 +91,7 @@ def register_keymaps():
                     for prop, val in special_params.items():
                         setattr(kmi.properties, prop, val)
                 
-                if keymap_name == "Sequencer" and item["idname"] in ["alva_seq.properties", "alva_seq.formatter"]:
+                if keymap_name == "Sequencer" and item["idname"] in ["alva_sequencer.properties", "alva_sequencer.formatter"]:
                     addon_keymaps.append((keymap, kmi))
                 elif keymap_name == "Node Editor" and item["idname"] == "alva_node.formatter":
                     custom_node_editor_keymaps.append((keymap, kmi))

@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from ..utils import get_orb_icon
+from .utils import get_orb_icon
 
 
 def draw_alva_toolbar(self, context):
@@ -25,10 +25,10 @@ def draw_alva_toolbar(self, context):
         flow.operator("alva_sequencer.add", icon='LIGHT_SUN', text="Flash" if region_width > 200 else "").Option = "option_flash"
         flow.operator("alva_sequencer.add", icon='IPO_BEZIER', text="Animation" if region_width > 200 else "").Option = "option_animation"
         #flow.operator("alva_sequencer.add", icon='UV_SYNC_SELECT', text="Offset" if region_width > 200 else "").Option = "option_offset"
-        flow.operator("alva_sequencer.add", icon='SETTINGS', text="Trigger" if region_width > 200 else "").Option = "option_trigger"
+        flow.operator("alva_sequencer.add", icon='SETTINGS', text="Trigger" if region_width > 200 else "").Option = "Option_trigger"
         flow.separator()
         flow.operator("alva_playback.clear_solos", icon='SOLO_OFF', text="Clear Solos" if region_width >= 200 else "")
-        flow.operator("alva_orb.orb", icon_value=orb.icon_id, text="Render" if region_width > 200 else "").as_orb_id = 'sequencer'
+        flow.operator("alva_orb.strips_sync", icon_value=orb.icon_id, text="Render" if region_width > 200 else "")
         flow.operator("alva_sequencer.duplicate", icon='ADD', text="Add Strip" if region_width > 200 else "", emboss=True)
         flow.operator("alva_tool.ghost_out", icon='GHOST_ENABLED', text="Cue 0" if region_width > 200 else "")
         flow.operator("alva_tool.displays", icon='MENU_PANEL', text="Displays" if region_width > 200 else "")

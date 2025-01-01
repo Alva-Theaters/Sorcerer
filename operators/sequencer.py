@@ -60,7 +60,7 @@ color_codes = [
 # Hotkeys and Popups
 class SEQUENCER_OT_alva_scale_strips(Operator):  # TODO Scale type not the most helpful.
     """Scale the length of a single strip or the offsets between multiple selected strips in the VSE"""
-    bl_idname = "alva_seq.scale_strips"
+    bl_idname = "alva_sequencer.scale_strips"
     bl_label = "Scale VSE Strips"
     bl_options = {'UNDO'}
 
@@ -140,7 +140,7 @@ class SEQUENCER_OT_alva_scale_strips(Operator):  # TODO Scale type not the most 
     
 class SEQUENCER_OT_alva_extrude_strips(Operator):  # TODO New strips must inherit properties.
     '''Extrude patterns of strips like meshes.'''
-    bl_idname = "alva_seq.extrude_strips"
+    bl_idname = "alva_sequencer.extrude_strips"
     bl_label = "Extrude VSE Strips"
     bl_options = {'UNDO'}
     
@@ -281,7 +281,7 @@ class SEQUENCER_OT_alva_extrude_strips(Operator):  # TODO New strips must inheri
             
 class SEQUENCER_OT_alva_duplicate_pattern(Operator):
     """Duplicate Selected Pattern"""
-    bl_idname = "alva_seq.duplicate_pattern"
+    bl_idname = "alva_sequencer.duplicate_pattern"
     bl_label = "Duplicate Pattern"
     bl_options = {'UNDO'}
 
@@ -340,7 +340,7 @@ snare_state = "snare_complete"
     
 class SEQUENCER_OT_alva_new_strip(Operator):
     '''Add color strip on release of Z, when Release is enabled.'''
-    bl_idname = 'alva_seq.add_color'
+    bl_idname = 'alva_sequencer.add_color'
     bl_label = "New Color Strip"
     bl_options = {'UNDO'}
 
@@ -383,7 +383,7 @@ class SEQUENCER_OT_alva_new_strip(Operator):
  
 class SEQUENCER_OT_alva_new_kick(Operator):
     '''Add color strip on down press of Z key.'''
-    bl_idname = 'alva_seq.add_color_kick'
+    bl_idname = 'alva_sequencer.add_color_kick'
     bl_label = "New Color Strip"
     bl_options = {'UNDO'}
 
@@ -422,7 +422,7 @@ class SEQUENCER_OT_alva_new_kick(Operator):
     
 class SEQUENCER_OT_alva_new_pointer(Operator):
     '''Add color strip on down press of Z key.'''
-    bl_idname = 'alva_seq.add_color_pointer'
+    bl_idname = 'alva_sequencer.add_color_pointer'
     bl_label = "New Color Strip"
     bl_options = {'UNDO'}
 
@@ -458,7 +458,7 @@ class SEQUENCER_OT_alva_new_pointer(Operator):
 
     
 class SEQUENCER_OT_alva_bump_horizontal(Operator):
-    bl_idname = "alva_seq.bump_horizontal"
+    bl_idname = "alva_sequencer.bump_horizontal"
     bl_label = ""
     bl_description = "Bump Horizontally"
     bl_options = {'UNDO'}
@@ -473,7 +473,7 @@ class SEQUENCER_OT_alva_bump_horizontal(Operator):
     
 
 class SEQUENCER_OT_alva_bump_vertical(Operator):
-    bl_idname = "alva_seq.bump_vertical"
+    bl_idname = "alva_sequencer.bump_vertical"
     bl_label = ""
     bl_description = "Bump Vertically"
     bl_options = {'UNDO'}
@@ -489,7 +489,7 @@ class SEQUENCER_OT_alva_bump_vertical(Operator):
 
 class SEQUENCER_OT_alva_format_strip(Operator):
     '''Pop-up menu for strip formatter, mostly for managing many strips at once'''
-    bl_idname = "alva_seq.formatter"
+    bl_idname = "alva_sequencer.formatter"
     bl_label = "Strip Formatter"
     
     @classmethod
@@ -531,7 +531,7 @@ class SEQUENCER_OT_alva_format_strip(Operator):
                
 class SEQUENCER_OT_alva_strip_media(Operator):
     '''Popup that shows the Lighting panel GUI'''
-    bl_idname = "alva_seq.properties"
+    bl_idname = "alva_sequencer.properties"
     bl_label = "Strip Media"
     
     @classmethod
@@ -551,7 +551,7 @@ class SEQUENCER_OT_alva_strip_media(Operator):
     
 
 class SEQUENCER_OT_alva_mute(Operator):
-    bl_idname = "alva_seq.mute"
+    bl_idname = "alva_sequencer.mute"
     bl_label = ""   
     bl_description = "This mutes the selected strip(s). Muted strips will not contribute to OSC messaging to the console. You can also do this with H to mute and Alt-H to unmute, or command + H to unmute on Mac"
     bl_options = {'UNDO'}
@@ -572,7 +572,7 @@ def bump_timecode(context, time):
     OSC.send_osc_lighting("/eos/newcmd", f"Event {str(event_list)} / 1 Thru 1000000 Time + {str(time)} Enter")
 
 class SEQUENCER_OT_alva_tc_left_five(Operator):
-    bl_idname = "alva_seq.tc_left_five"
+    bl_idname = "alva_sequencer.tc_left_five"
     bl_label = "5"
     bl_description = "They're too late. Bump console's event list events back 5 frames. The event list this is applied to is determined by the Event List field above. This only works for ETC Eos"
 
@@ -581,7 +581,7 @@ class SEQUENCER_OT_alva_tc_left_five(Operator):
         return {'FINISHED'}    
     
 class SEQUENCER_OT_alva_tc_left_one(Operator):
-    bl_idname = "alva_seq.tc_left_one"
+    bl_idname = "alva_sequencer.tc_left_one"
     bl_label = "1"
     bl_description = "They're a smidge late. Bump console's event list events back 1 frame. The event list this is applied to is determined by the Event List field above. This only works for ETC Eos"
     
@@ -590,7 +590,7 @@ class SEQUENCER_OT_alva_tc_left_one(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_alva_tc_right_one(Operator):
-    bl_idname = "alva_seq.tc_right_one"
+    bl_idname = "alva_sequencer.tc_right_one"
     bl_label = "1"
     bl_description = "They're a smidge early. Bump console's event list events forward 1 frame. The event list this is applied to is determined by the Event List field above. This only works for ETC Eos"
     
@@ -599,7 +599,7 @@ class SEQUENCER_OT_alva_tc_right_one(Operator):
         return {'FINISHED'}
 
 class SEQUENCER_OT_alva_tc_right_five(Operator):
-    bl_idname = "alva_seq.tc_right_five"
+    bl_idname = "alva_sequencer.tc_right_five"
     bl_label = "5"
     bl_description = "They're too early. Bump console's event list events forward 5 frames. The event list this is applied to is determined by the Event List field above. This only works for ETC Eos"
     
@@ -609,7 +609,7 @@ class SEQUENCER_OT_alva_tc_right_five(Operator):
     
     
 class SEQUENCER_OT_alva_select_channel(Operator):
-    bl_idname = "alva_seq.select_channel"
+    bl_idname = "alva_sequencer.select_channel"
     bl_label = "Select Channel"
     bl_description = "Select all strips on channel above. Pressing 1-9 selects channels 1-9, pressing 0 selects channel 10, and holding shift gets you to channel 20. Press D to deselect all and A to toggle selection of all. B for box select"
     bl_options = {'UNDO'}
@@ -649,7 +649,7 @@ hotkeys_popups = [
     
 
 class SEQUENCER_OT_alva_fire_start_macro(Operator):
-    bl_idname = "alva_seq.start_macro_fire"
+    bl_idname = "alva_sequencer.start_macro_fire"
     bl_label = ""
     bl_description = "Send a test command"
     
@@ -660,7 +660,7 @@ class SEQUENCER_OT_alva_fire_start_macro(Operator):
     
     
 class SEQUENCER_OT_alva_fire_end_macro(Operator):
-    bl_idname = "alva_seq.end_macro_fire"
+    bl_idname = "alva_sequencer.end_macro_fire"
     bl_label = ""
     bl_description = "Send a test command"
     
@@ -671,7 +671,7 @@ class SEQUENCER_OT_alva_fire_end_macro(Operator):
     
 
 class SEQUENCER_OT_alva_flash_copy_down(Operator):
-    bl_idname = "alva_seq.flash_copy_down"
+    bl_idname = "alva_sequencer.flash_copy_down"
     bl_label = ""
     bl_description = "Paste this text down below"
     bl_options = {'UNDO'}
@@ -692,7 +692,7 @@ macro_operators = [
 
 
 class SEQUENCER_OT_alva_analyze_song(Operator):
-    bl_idname = "alva_seq.analyze_song"
+    bl_idname = "alva_sequencer.analyze_song"
     bl_label = "Analyze Song (AI)"
     bl_description = "Use AI to automatically generate strips"
     bl_options = {'UNDO'}
@@ -740,7 +740,7 @@ class SEQUENCER_OT_alva_analyze_song(Operator):
         
         
 class SEQUENCER_OT_alva_add_offset(Operator):
-    bl_idname = "alva_seq.offset"
+    bl_idname = "alva_sequencer.offset"
     bl_label = "Offset"
     bl_description = "Offset selected strips by the BPM to the left"
     bl_options = {'UNDO'}
@@ -768,7 +768,7 @@ class SEQUENCER_OT_alva_add_offset(Operator):
 
 
 class SEQUENCER_OT_alva_generate_strips(Operator):
-    bl_idname = "alva_seq.generate_on_song"
+    bl_idname = "alva_sequencer.generate_on_song"
     bl_label = "Generate Strips On-Beat"
     bl_description = "Generate color-coded strips on each beat as specified above"
     bl_options = {'UNDO'}
@@ -815,7 +815,7 @@ class SEQUENCER_OT_alva_generate_strips(Operator):
 
 
 class SEQUENCER_OT_alva_add_color_strip(Operator):
-    bl_idname = "alva_seq.generate"
+    bl_idname = "alva_sequencer.generate"
     bl_label = "Add Strip(s)"
     bl_description = "Generate 1 or more color strips. If multiple, offset them by frames with the Offset by field. Also, press O as in Oscar to add strips even during playback. Go to Settings to enable adding a second strip upon release for kick/snare"
     bl_options = {'UNDO'}
@@ -853,7 +853,7 @@ class SEQUENCER_OT_alva_add_color_strip(Operator):
     
     
 class SEQUENCER_OT_alva_delete_events(Operator):
-    bl_idname = "alva_seq.clear_tc_clock"
+    bl_idname = "alva_sequencer.clear_tc_clock"
     bl_label = ""
     bl_description = "Deletes all timecode events in the event list associated with the timecode clock. Command must be manually confirmed on the console"
 
@@ -873,7 +873,7 @@ class SEQUENCER_OT_alva_delete_events(Operator):
     
 
 class SEQUENCER_OT_alva_command_line(Operator):
-    bl_idname = "alva_seq.command_line"
+    bl_idname = "alva_sequencer.command_line"
     bl_label = "Simple Command Line"
     bl_options = {'UNDO'}
 
@@ -916,7 +916,7 @@ class SEQUENCER_OT_alva_command_line(Operator):
         
         
 class TOOL_OT_alva_duplicate_strip_to_above(Operator):
-    bl_idname = "alva_seq.duplicate"
+    bl_idname = "alva_sequencer.duplicate"
     bl_label = "Add Strip"
     bl_description = "Adds a duplicate strip above current strip"
     bl_options = {'UNDO'}
@@ -949,7 +949,7 @@ class TOOL_OT_alva_duplicate_strip_to_above(Operator):
     
 
 class SEQUENCER_OT_alva_add(Operator):
-    bl_idname = 'alva_seq.add'
+    bl_idname = 'alva_sequencer.add'
     bl_label = "Add"
     bl_description = "Add color strip"
     bl_options = {'UNDO'}
@@ -992,7 +992,7 @@ class SEQUENCER_OT_alva_add(Operator):
     
 
 class SEQUENCER_OT_alva_refresh_audio_object_selection(Operator):
-    bl_idname = "alva_seq.refresh_audio_object_selection"
+    bl_idname = "alva_sequencer.refresh_audio_object_selection"
     bl_label = ""
     bl_description = "Refresh after making changes to speaker routing"
 
@@ -1003,7 +1003,7 @@ class SEQUENCER_OT_alva_refresh_audio_object_selection(Operator):
     
  
 class SEQUENCER_OT_alva_bake_audio(Operator):
-    bl_idname = "alva_seq.export_audio"
+    bl_idname = "alva_sequencer.export_audio"
     bl_label = "May Take > 1 Hour"
     bl_description = "Create separate audio files for external playback, with 3D mixing built into the files. Route each sound file to the correct speaker inside a group cue. WARNING: Can take a very long time to complete"
     bl_options = {'UNDO'}

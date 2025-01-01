@@ -33,12 +33,12 @@ def draw_alva_sequencer_add_menu(self, layout):
         layout = self.layout
         layout.separator()
         layout.label(text="Alva Sorcerer", icon_value=orb.icon_id)
-        layout.operator("alva_seq.add", text="Macro", icon='FILE_TEXT').Option = "option_macro"
-        layout.operator("alva_seq.add", text="Cue", icon='PLAY').Option = "option_cue"
-        layout.operator("alva_seq.add", text="Flash", icon='LIGHT_SUN').Option = "option_flash"
-        layout.operator("alva_seq.add", text="Animation", icon='IPO_BEZIER').Option = "option_animation"
-        #layout.operator("alva_seq.add", text="Offset", icon='UV_SYNC_SELECT').Option = "option_offset"
-        layout.operator("alva_seq.add", text="Trigger", icon='SETTINGS').Option = "option_trigger"
+        layout.operator("alva_sequencer.add", text="Macro", icon='FILE_TEXT').Option = "option_macro"
+        layout.operator("alva_sequencer.add", text="Cue", icon='PLAY').Option = "option_cue"
+        layout.operator("alva_sequencer.add", text="Flash", icon='LIGHT_SUN').Option = "option_flash"
+        layout.operator("alva_sequencer.add", text="Animation", icon='IPO_BEZIER').Option = "option_animation"
+        #layout.operator("alva_sequencer.add", text="Offset", icon='UV_SYNC_SELECT').Option = "option_offset"
+        layout.operator("alva_sequencer.add", text="Trigger", icon='SETTINGS').Option = "option_trigger"
 
 
 def draw_alva_sequencer_strip_menu(self, context):
@@ -125,12 +125,12 @@ def draw_intro_header(self, context, column, scene, active_strip):  # Only drawn
 
 def draw_add_buttons_row(column):
     row = column.row(align=True)
-    row.operator("alva_seq.add", text="", icon='FILE_TEXT').Option = "option_macro"
-    row.operator("alva_seq.add", text="", icon='PLAY').Option = "option_cue"
-    row.operator("alva_seq.add", text="", icon='LIGHT_SUN').Option = "option_flash"
-    row.operator("alva_seq.add", text="", icon='IPO_BEZIER').Option = "option_animation"
-    #row.operator("alva_seq.add", text="", icon='UV_SYNC_SELECT').Option = "option_offset"
-    row.operator("alva_seq.add", text="", icon='SETTINGS').Option = "option_trigger"
+    row.operator("alva_sequencer.add", text="", icon='FILE_TEXT').Option = "option_macro"
+    row.operator("alva_sequencer.add", text="", icon='PLAY').Option = "option_cue"
+    row.operator("alva_sequencer.add", text="", icon='LIGHT_SUN').Option = "option_flash"
+    row.operator("alva_sequencer.add", text="", icon='IPO_BEZIER').Option = "option_animation"
+    #row.operator("alva_sequencer.add", text="", icon='UV_SYNC_SELECT').Option = "option_offset"
+    row.operator("alva_sequencer.add", text="", icon='SETTINGS').Option = "option_trigger"
 
 def draw_text_insert(column, text):
     column.separator()
@@ -163,7 +163,7 @@ def draw_only_sound(column, active_strip):
     orb = get_orb_icon()
 
     row = column.row(align=True)
-    row.operator("alva_seq.mute", icon='HIDE_OFF' if not active_strip.mute else 'HIDE_ON')
+    row.operator("alva_sequencer.mute", icon='HIDE_OFF' if not active_strip.mute else 'HIDE_ON')
     row.prop(active_strip, "name", text="")
 
     column.separator()
@@ -176,7 +176,7 @@ def draw_only_sound(column, active_strip):
     row.operator("alva_orb.orb", icon_value=orb.icon_id, text="").as_orb_id = 'sound'
 
     row = box.row()
-    row.operator("alva_seq.analyze_song", icon='SHADERFX')
+    row.operator("alva_sequencer.analyze_song", icon='SHADERFX')
     return box
 
 def draw_one_audio_one_video(column):  
@@ -205,20 +205,20 @@ def draw_only_color(column, context, active_strip):
 # FOOTER --------------------------------------------------------------------------------------------------
 def draw_strip_footer(column):
     row = column.row(align=True)
-    row.operator("alva_seq.bump_horizontal", text="-5", icon='BACK').direction = -5
-    row.operator("alva_seq.bump_horizontal", text="-1", icon='BACK').direction = -1
-    row.operator("alva_seq.bump_vertical", icon='TRIA_UP').direction = 1
-    row.operator("alva_seq.bump_vertical", icon='TRIA_DOWN').direction = -1
-    row.operator("alva_seq.bump_horizontal", text="1", icon='FORWARD').direction = 1
-    row.operator("alva_seq.bump_horizontal", text="5", icon='FORWARD').direction = 5
+    row.operator("alva_sequencer.bump_horizontal", text="-5", icon='BACK').direction = -5
+    row.operator("alva_sequencer.bump_horizontal", text="-1", icon='BACK').direction = -1
+    row.operator("alva_sequencer.bump_vertical", icon='TRIA_UP').direction = 1
+    row.operator("alva_sequencer.bump_vertical", icon='TRIA_DOWN').direction = -1
+    row.operator("alva_sequencer.bump_horizontal", text="1", icon='FORWARD').direction = 1
+    row.operator("alva_sequencer.bump_horizontal", text="5", icon='FORWARD').direction = 5
     
 
 # Other Strip Types --------------------------------------------------------------------------------------------------
 def draw_strip_sound_object(column, active_strip):
     row = column.row(align=True)
-    row.operator('alva_seq.refresh_audio_object_selection', icon='FILE_REFRESH', text="")
+    row.operator('alva_sequencer.refresh_audio_object_selection', icon='FILE_REFRESH', text="")
     row.prop_search(active_strip, "selected_stage_object", bpy.data, "objects", text="", icon='VIEW3D')
-    row.operator("alva_seq.export_audio", text="", icon='FILE_TICK')
+    row.operator("alva_sequencer.export_audio", text="", icon='FILE_TICK')
     row = column.row()
     row.prop(active_strip, 'int_sound_cue', text="Sound Cue")
     
