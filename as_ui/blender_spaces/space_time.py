@@ -14,39 +14,28 @@ def draw_alva_time_header(self, context):
         hasattr(context.scene, "timecode_expected_lag") and
         context.scene.scene_props.view_alva_time_header and
         context.scene.scene_props.console_type_enum == 'option_eos'):
-        scene = context.scene
-        is_sound = is_qmeo_parent_a_sound_strip(context)
 
+        scene = context.scene
         layout = self.layout
+
+        row = layout.row(align=True)
+        row.scale_x = .75
+        row.operator('anim.start_frame_set', text="S")
+        row.operator('anim.end_frame_set', text="E")
+
         row = layout.row()
         from ...panels import TIME_PT_alva_flags
         row.popover(
             panel=TIME_PT_alva_flags.bl_idname,
-            text="Render Flags",
+            text="",
         )
 
+        row = layout.row(align=True)
         row.prop(scene, "sync_timecode", text="", icon='LINKED' if scene.sync_timecode else 'UNLINKED')
-        row = layout.row()
-        is_strip = False
-        if is_sound:
-            active_strip = context.scene.sequence_editor.active_strip
-            row.label(text="", icon='SOUND')
-            target = active_strip
-            is_strip = True
+        row.scale_x = 0.9
+        row.prop(scene, "int_start_macro", text="Macro")
 
-            row = layout.row(align=True)
-            row.scale_x = 0.5
-            row.prop(target, "str_start_cue", text="")
-            row.prop(target, "str_end_cue", text="")
-        else:
-            row.label(text="", icon='SCENE_DATA')
-            target = scene
-
-            row = layout.row(align=True)
-            row.scale_x = 0.75
-            row.prop(target, "int_start_macro", text="Macro")
-
-        row = layout.row()
+        #row = layout.row()
         row.operator("alva_orb.orb", text="", icon_value=orb.icon_id).as_orb_id = 'timeline'
 
 

@@ -107,7 +107,7 @@ class CPV_LC_eos(spy.types.LightingConsole):
 
 
     # Common Actions --------------------------------------------------------------------------------------------------
-    def key(self, key_strings, direction=None, enter=False):
+    def key(self, key_strings):
         if not isinstance(key_strings, list):
             key_strings = [key_strings]
 
@@ -192,6 +192,27 @@ class CPV_LC_eos(spy.types.LightingConsole):
         self.key(["update", "enter"])
 
 
+    def delete_cue_list(self, cue_list):
+        self.cmd(f"Delete Cue {cue_list} / Enter Enter")
+
+    def reset_cue_list(self):
+        self.cmd("Cue 1 / Enter")
+
+    def final_event_stop_clock(self, event_list, final_frame, timecode, end_macro):
+        self.cmd(f"Event {event_list} / {str(final_frame)} Time {str(timecode)} Show_Control_Action Macro {str(end_macro)} Enter")
+
+
+    def make_record_qmeo_cue_argument(self, cue_list, current_frame_number, cue_duration):
+        return f"Record Cue {str(cue_list)} / {str(current_frame_number)} Time {str(cue_duration)} Enter Enter"
+    
+    def make_record_qmeo_event_argument(self, event_list, frame, timecode):
+        return f"Event {event_list} / {str(frame)} Time {str(timecode)} Show_Control_Action Cue {str(frame)} Enter"
+
+    def send_frame(self, argument_one, argument_two):
+        self.cmd(argument_one)
+        self.cmd(argument_two)
+
+
     def record_one_line_macro(self, macro_number, macro_text):
         logic = [
             ('key',     ["live", "learn", "macro"],    "Initiating macro"     ),
@@ -233,6 +254,16 @@ class CPV_LC_eos(spy.types.LightingConsole):
             ('key',      ["\\", "internal", state, "enter", "select"],   "Typing internal time" ),
             ('softkey',  "3",                                            "Setting to foreground"),
             ('key',      "live",                                         "Typing live"          )
+        ]
+        yield from self.execute_logic(logic)
+
+
+    def delete_recreate_event_list(self, event_list, end_frame, fps):
+        logic = [
+            ('cmd',    f"Delete Event {event_list} / Enter Enter",                        "Deleting List"),
+            ('cmd',    f"Event {str(event_list)} / 1 Thru {str(end_frame - 1)} Enter",    "Recreating"),
+            ('cmd',    f"Event {event_list} / Frame_Rate {int(fps)} Enter",               "Setting FPS"),
+            ('key',    "live",                                                            "Going to live")
         ]
         yield from self.execute_logic(logic)
 

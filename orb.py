@@ -176,7 +176,6 @@ class SoundStrip:
     def execute(self, Console):
         yield from Console.record_timecode_macro(self.start_macro, self.event_list, state='enable')
         yield from Console.record_timecode_macro(self.end_macro, self.event_list, state='disable')
-        yield Console.reset_macro_key(), "Resetting macro key."
     
 
 class MacroStrip:
@@ -277,7 +276,7 @@ class SequencerSync:
         yield from self.batch_send_event_strings(Console)
         Console.key("live")
         bpy.ops.screen.animation_play()
-    
+
     def batch_send_event_strings(self, Console):
         for i in range(0, len(self.event_strings), 50):
             yield self.send_event_string(i, Console), "Sending event command"
@@ -288,12 +287,61 @@ class SequencerSync:
         Console.cmd(argument)
 
 
-class TimelineSync():
-    def __init__():
-        pass
+class TimelineSync:
+    def __init__(self, context, active_item):
+        self.scene = context.scene
+        self.frame_rate = EventUtils.get_frame_rate(context.scene)
+        self.start_frame = context.scene.frame_start
+        self.end_frame = context.scene.frame_end
 
-    def execute():
-        pass
+        self.event_list = find_executor(context.scene, context.scene, 'event_list')
+        self.start_macro = find_executor(context.scene, context.scene, 'start_macro')
+        self.end_macro = find_executor(context.scene, context.scene, 'end_macro')
+        self.cue_list = find_executor(context.scene, context.scene, 'cue_list')
+
+    def execute(self, Console):
+        yield from Console.record_timecode_macro(self.start_macro, self.event_list, state='enable')
+        yield from Console.record_timecode_macro(self.end_macro, self.event_list, state='disable')
+
+        frames = list(range(int(self.start_frame), int(self.end_frame)))
+        cue_duration = round(1 / self.frame_rate, 2)
+
+        yield from Console.delete_recreate_event_list(self.event_list, self.end_frame, self.frame_rate)
+        yield Console.delete_cue_list(self.cue_list), "Recreating cue list"
+
+        wm = bpy.context.window_manager
+        wm.progress_begin(0, 100)
+ 
+        for i, frame in enumerate(frames):
+            yield from self.qmeo_frame(Console, frame, cue_duration, wm, frames, i)
+
+        wm.progress_end()
+        bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
+
+        final_frame = frames[-1]
+        timecode = EventUtils.frame_to_timecode(final_frame) # Ensure this event has a time component even if something above got skipped
+        
+        yield Console.final_event_stop_clock(self.event_list, final_frame, timecode, self.end_macro), "Setting final event to stop clock"
+        yield Console.reset_cue_list(), "Resetting cue list"
+
+    def qmeo_frame(self, Console, frame, cue_duration, wm, frames, i):
+        # Get ready to record cue with the new CPV updates.
+        current_frame_number = self.scene.frame_current
+        argument_one = Console.make_record_qmeo_cue_argument(self.cue_list, current_frame_number, cue_duration)
+
+        # Get ready to record the cue while also binding cue to its event.
+        timecode = EventUtils.frame_to_timecode(frame)
+        argument_two = Console.make_record_qmeo_event_argument(self.event_list, frame, timecode)
+
+        # Update progress bar to keep user in the loop.
+        wm.progress_update(i / len(frames) * 100)
+        
+        # Go ahead and actually send the final command
+        self.scene.frame_set(frame)
+        bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
+        time.sleep(.1)
+        yield Console.send_frame(argument_one, argument_two), "Recording frame"
+        time.sleep(self.scene.orb_chill_time)
 
 
 class ViewportSync():
@@ -303,112 +351,6 @@ class ViewportSync():
     def execute():
         pass
             
-                
-#         #-------------------------------------------------------------------------------------------------------------------------------------------
-#         '''Qmeos'''
-#         #-------------------------------------------------------------------------------------------------------------------------------------------
-#         @staticmethod
-#         def make_qmeo(scene, frame_rate, start_frame, end_frame, is_sound):
-#             if is_sound:
-#                 active_strip = scene.sequence_editor.active_strip
-#                 execute_on_cues = True
-#             else:
-#                 active_strip = scene
-#                 execute_on_cues = False
-
-#             event_list = find_executor(scene, active_strip, 'event_list')
-#             start_macro = find_executor(scene, active_strip, 'start_macro')
-#             end_macro = find_executor(scene, active_strip, 'end_macro')
-#             cue_list = find_executor(scene, active_strip, 'cue_list')
-#             timecode = EventUtils.frame_to_timecode(active_strip.frame_start)
-
-#             active_strip.str_parent_name = active_strip.name # Allow find_executor() to distinguish duplicates
-
-#             if execute_on_cues:
-#                 start_cue = active_strip.str_start_cue
-#                 end_cue = active_strip.str_end_cue
-#             else:
-#                 start_cue, end_cue = None, None
-
-#             yield from Orb.Eos.manipulate_show_control(scene, event_list, start_macro, end_macro, start_cue, end_cue, timecode, execute_on_cues)
-
-#             yield from Orb.Eos.bake_qmeo_generator(scene, event_list, frame_rate, start_frame, end_frame, cue_list, end_macro)
-
-#         @staticmethod
-#         def bake_qmeo_generator(scene, event_list, frame_rate, start_frame, end_frame, cue_list, end_macro):
-#             frames = list(range(int(start_frame), int(end_frame)))
-#             cue_duration = round(1 / frame_rate, 2)
-
-#             if event_list:
-#                 yield Orb.Eos.delete_recreate_event_list(event_list, end_frame, frame_rate), "Recreating event list"
-
-#             if cue_list:
-#                 yield Orb.Eos.delete_cue_list(cue_list), "Recreating cue list"
-
-#             wm = bpy.context.window_manager
-#             wm.progress_begin(0, 100)
-
-#             for i, frame in enumerate(frames):
-#                 Orb.Eos.qmeo_frame(frame, scene, cue_list, event_list, cue_duration, wm, frames, i)
-
-#             wm.progress_end()
-#             bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
-
-#             yield Orb.Eos.final_event_stop_clock(event_list, frames[-1], end_macro), "Setting final event to stop clock"
-#             yield Orb.Eos.reset_cue_list(), "Resetting cue list"
-
-#         @staticmethod
-#         def delete_recreate_event_list(event_list, end_frame, fps):
-#             # Delete event list so we don't have unexpected leftover baggage.
-#             Orb.Eos.send_osc_with_delay("/eos/newcmd/", f"Delete Event {event_list} / Enter Enter", delay=.3)
-
-#             # Recreate the event list from a blank slate.
-#             argument = f"Event {str(event_list)} / 1 Thru {str(end_frame - 1)} Enter"
-#             Orb.Eos.send_osc_with_delay("/eos/newcmd/", argument, delay=.2)
-
-#             # Set the frame rate based on Blender scene.
-#             int_fps = int(fps)
-#             Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Event {event_list} / Frame_Rate {int_fps} Enter", delay=.2)
-
-#             # Go back to live for convenience.
-#             OSC.press_lighting_key("live")
-#             time.sleep(.2)
-
-#         @staticmethod
-#         def delete_cue_list(cue_list):
-#             Orb.Eos.send_osc_with_delay("/eos/newcmd/", f"Delete Cue {cue_list} / Enter Enter", delay=.3)
-
-#         @staticmethod
-#         def qmeo_frame(frame, scene, cue_list, event_list, cue_duration, wm, frames, i):
-#             # Get ready to record cue with the new CPV updates.
-#             current_frame_number = scene.frame_current
-#             argument_one = f"Record Cue {str(cue_list)} / {str(current_frame_number)} Time {str(cue_duration)} Enter Enter"
-
-#             # Get ready to record the cue while also binding cue to its event.
-#             if event_list:
-#                 timecode = EventUtils.frame_to_timecode(frame)
-#                 argument_two = f"Event {event_list} / {str(frame)} Time {str(timecode)} Show_Control_Action Cue {str(frame)} Enter"
-
-#             # Update progress bar to keep user in the loop.
-#             wm.progress_update(i / len(frames) * 100)
-            
-#             # Go ahead and actually send the final command
-#             delay = scene.orb_chill_time
-#             scene.frame_set(frame)
-#             bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
-#             time.sleep(.1)
-#             Orb.Eos.send_osc_with_delay("/eos/newcmd", argument_one, delay=.1)
-#             Orb.Eos.send_osc_with_delay("/eos/newcmd", argument_two, delay)
-
-#         @staticmethod
-#         def reset_cue_list():
-#             Orb.Eos.send_osc_with_delay("/eos/newcmd/", "Cue 1 / Enter")
-
-#         @staticmethod
-#         def final_event_stop_clock(event_list, final_frame, end_macro):
-#             timecode = EventUtils.frame_to_timecode(final_frame) # Ensure this event has a time component even if something above got skipped
-#             Orb.Eos.send_osc_with_delay("/eos/newcmd", f"Event {event_list} / {str(final_frame)} Time {str(timecode)} Show_Control_Action Macro {str(end_macro)} Enter")
-
 
 
 #         #-------------------------------------------------------------------------------------------------------------------------------------------
