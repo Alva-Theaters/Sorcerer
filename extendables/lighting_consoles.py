@@ -177,7 +177,8 @@ class CPV_LC_eos(spy.types.LightingConsole):
 
 
     def restore_console_to_normal_following_automation(self):
-        yield self.restore_snapshot(), "Restoring your screen"  
+        self.key("live")
+        yield self.restore_snapshot(), "Restoring your screen"
 
 
     def record_cue(self, cue_number, cue_duration):
@@ -212,6 +213,21 @@ class CPV_LC_eos(spy.types.LightingConsole):
         self.cmd(argument_one)
         self.cmd(argument_two)
 
+
+    def prepare_patch(self):
+        self.key("blind")
+        self.cmd("Patch Enter")
+
+    def patch_light(self, chan, pos_x, pos_y, pos_z, or_x, or_y, or_z, uni, addr):
+        self.cmd(f"Chan {chan} Position {pos_x} / {pos_y} / {pos_z} Enter, Chan {chan} Orientation {or_x} / {or_y} / {or_z} Enter, Chan {chan} at {str(uni)} / {str(addr)} Enter")
+
+    def select_lights(self, lights):
+        self.cmd(f"Chan {lights} Enter Enter Full Enter")
+
+    def record_group(self, lights, group_number):
+        self.key("live")
+        self.cmd(f"Chan {lights} Record Group {group_number} Enter Enter")
+    
 
     def record_one_line_macro(self, macro_number, macro_text):
         logic = [

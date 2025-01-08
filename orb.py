@@ -4,7 +4,7 @@
 
 import bpy
 import time
-import logging
+from itertools import chain
 
 from .updaters.sequencer import SequencerUpdaters as Updaters
 from .utils.event_utils import EventUtils
@@ -345,193 +345,162 @@ class TimelineSync:
 
 
 class ViewportSync():
-    def __init__():
-        pass
+    def __init__(self, context, active_item):
+        self.context = context
+        self.scene = context.scene
+        self.original_objects = [obj for obj in context.selected_objects]
 
-    def execute():
-        pass
-            
+        self.starting_universe = context.scene.scene_props.int_array_universe
+        self.start_address = context.scene.scene_props.int_array_start_address
+        self.channels_to_add = context.scene.scene_props.int_array_channel_mode
 
 
-#         #-------------------------------------------------------------------------------------------------------------------------------------------
-#         '''Patch Group'''
-#         #-------------------------------------------------------------------------------------------------------------------------------------------
-#         @staticmethod
-#         def patch_group(self, context):
-#             scene = context.scene
-#             address = "/eos/newcmd"
+    def execute(self, Console):
+        self.scene.scene_props.freeze_cpv = True  # Prevent random CPV updates from interfering.
 
-#             # Ensure at least one object is selected.
-#             original_objects = [obj for obj in context.selected_objects]
-#             if not original_objects:
-#                 yield {'CANCELLED'}, "Please select at least one object in the viewport so Orb knows where to patch it on Augment 3D"
-#                 return
-            
-#             yield Orb.Eos.record_snapshot(context.scene), "Orb is running"
-#             yield Orb.Eos.save_console_file(context.scene), "Orb is running"
-            
-#             # Prevent random CPV updates from interfering.
-#             scene.scene_props.freeze_cpv = True
+        if not self.original_objects:
+            yield {'CANCELLED'}, "Please select at least one object in the viewport so Orb knows where to patch it on Augment 3D"
+            return
 
-#             # Setup the patch screen.
-#             OSC.send_osc_lighting("/eos/key/blind", "1")
-#             OSC.send_osc_lighting("/eos/key/blind", "0")
-#             #time.sleep(.3)
-#             OSC.send_osc_lighting("/eos/newcmd", "Patch Enter")
-#             #time.sleep(.3)
+        Console.prepare_patch()
+        yield self.loop_over_parents(Console), "Patching"
 
-#             # Loop over the selected objects.
-#             yield from Orb.Eos.loop_over_parents(self, context, original_objects, scene, address)
-            
-#             # Re-nable CPV.
-#             scene.scene_props.freeze_cpv = False
-
-#             Orb.Eos.restore_snapshot(scene)
-
-#             self.report({'INFO'}, "Orb complete.")
-#             return {'FINISHED'}
+        self.scene.scene_props.freeze_cpv = False  # Re-nable CPV.
         
-#         @staticmethod
-#         def loop_over_parents(self, context, original_objects, scene, address):
-#             for obj in original_objects:
-#                 # Set the active-object.
-#                 bpy.ops.object.select_all(action='DESELECT')
-#                 obj.select_set(True)
-#                 context.view_layer.objects.active = obj
-                
-#                 # Apply all array and curve modifiers on active_object.
-#                 is_group = False
-#                 array_modifiers, curve_modifiers = Orb.Eos.find_modifiers(self, context)
-#                 for array in array_modifiers:
-#                     bpy.ops.object.modifier_apply(modifier=array.name)
-#                     is_group = True
-#                 for curve in curve_modifiers:
-#                     bpy.ops.object.modifier_apply(modifier=curve.name)
-                
-#                 # Separate by loose parts and set transform pivot point to center of mass.
-#                 if context.object.mode != 'OBJECT':
-#                     bpy.ops.object.mode_set(mode='OBJECT')
-#                 bpy.ops.object.editmode_toggle()
-#                 bpy.ops.mesh.separate(type='LOOSE')
-#                 bpy.ops.object.mode_set(mode='OBJECT')
-
-#                 # Create a new collection for the separated objects
-#                 if is_group:
-#                     collection_name = f"{obj.name}_Group"
-#                     new_collection = bpy.data.collections.new(collection_name)
-#                     bpy.context.scene.collection.children.link(new_collection)
-                
-#                 for obj in context.selected_objects:
-#                     if obj.type == 'MESH':
-#                         context.view_layer.objects.active = obj
-#                         bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS')
-                        
-#                         if is_group:
-#                             new_collection.objects.link(obj)
-
-#                             for coll in obj.users_collection:
-#                                 if coll != new_collection:
-#                                     coll.objects.unlink(obj)  # Unlink from the original collections
-
-#                 # Find indexes.
-#                 starting_universe = scene.scene_props.int_array_universe
-#                 start_address = scene.scene_props.int_array_start_address
-#                 channels_to_add = scene.scene_props.int_array_channel_mode
-#                 total_lights = len([chan for chan in bpy.data.objects if chan.select_get()])
-
-#                 # Create list of all valid universe/addresses beforehand since trying to calculate this
-#                 # dynamically is far more error-prone.
-#                 addresses_list = find_addresses(starting_universe, start_address, channels_to_add, total_lights)
+    def loop_over_parents(self, Console):
+        for obj in self.original_objects:
+            self.set_active_object(obj)
+            is_group = self.decide_if_group(obj)
+            self.apply_modifiers()
+            self.separate_by_loose_parts()
+            new_collection = self.create_collection(is_group, obj)
             
-#                 # Loop over the channels within that object, assuming there was an array
-#                 yield Orb.Eos.loop_over_children(self, context, scene, addresses_list, channels_to_add, address, is_group, obj.name), "Patching channels"
+            for obj in self.context.selected_objects:
+                self.origin_and_collection_set(obj, is_group, new_collection)
 
-#                 # Get out of edit mode.
-#                 bpy.ops.object.editmode_toggle()
-#                 bpy.ops.object.editmode_toggle()
-                
-#         @staticmethod
-#         def find_modifiers(self, context):
-#             array_modifiers = []
-#             curve_modifiers = []
+            num_total_lights = len([chan for chan in bpy.data.objects if chan.select_get()])
+            addresses_list = find_addresses(self.starting_universe, self.start_address, self.channels_to_add, num_total_lights)
+        
+            # Loop over the channels within that object, assuming there was an array
+            self.loop_over_children(Console, addresses_list, self.channels_to_add, is_group, obj.name)
 
-#             if context.active_object and context.active_object.modifiers:
-#                 for mod in context.active_object.modifiers:
-#                     if mod.type == 'ARRAY':
-#                         array_modifiers.append(mod)
-#                     elif mod.type == 'CURVE':
-#                         curve_modifiers.append(mod)
+            self.edit_mode_exit()
 
-#             return array_modifiers, curve_modifiers
+    def set_active_object(self, obj):
+        bpy.ops.object.select_all(action='DESELECT')
+        obj.select_set(True)
+        self.context.view_layer.objects.active = obj
 
-#         @staticmethod
-#         def loop_over_children(self, context, scene, addresses_list, channels_to_add, address, is_group, group_name):
-#             relevant_channels = []
+    def decide_if_group(self, obj):
+        array_modifiers = [mod for mod in obj.modifiers if mod.type == 'ARRAY']
+        return len(array_modifiers) > 0
 
-#             # Ensure correct console mode.
-#             OSC.send_osc_lighting("/eos/key/blind", "1")
-#             OSC.send_osc_lighting("/eos/key/blind", "0")
-#             time.sleep(.3)
-#             OSC.send_osc_lighting("/eos/newcmd", "Patch Enter")
-#             time.sleep(.3)
+    def apply_modifiers(self):
+        array_modifiers, curve_modifiers = self.find_modifiers()
+        for modifier in chain(array_modifiers, curve_modifiers):
+            bpy.ops.object.modifier_apply(modifier=modifier.name)
+            
+    def find_modifiers(self):
+        context = self.context
 
-#             for i, chan in enumerate([obj for obj in bpy.data.objects if obj.select_get()]):
-#                 chan_num = scene.scene_props.int_array_start_channel
-#                 current_universe, current_address = addresses_list[i]
+        if not (context.active_object and context.active_object.modifiers):
+            return [], []
+        
+        array_mods = [mod for mod in context.active_object.modifiers if mod.type == 'ARRAY']
+        curve_mods = [mod for mod in context.active_object.modifiers if mod.type == 'CURVE']
 
-#                 position_x, position_y, position_z, orientation_x, orientation_y, orientation_z = EventUtils.get_loc_rot(chan, use_matrix=True)
+        return array_mods, curve_mods
+    
+    def separate_by_loose_parts(self):
+        if self.context.object.mode != 'OBJECT':
+            bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.editmode_toggle()
+        bpy.ops.mesh.separate(type='LOOSE')
+        bpy.ops.object.mode_set(mode='OBJECT')
 
-#                 # Set channel-specific UI fields inside the loop.
-#                 chan.str_manual_fixture_selection = str(chan_num)
-#                 scene.scene_props.int_array_start_channel += 1
-                
-#                 # Patch the channel on the console.
-#                 OSC.send_osc_lighting(address, f"Chan {chan_num} Position {position_x} / {position_y} / {position_z} Enter, Chan {chan_num} Orientation {orientation_x} / {orientation_y} / {orientation_z} Enter, Chan {chan_num} at {str(current_universe)} / {str(current_address)} Enter")
-#                 #time.sleep(.3)
+    def create_collection(self, is_group, obj):
+        if not is_group:
+            return
+        
+        collection_name = f"{obj.name}_Group"
+        new_collection = bpy.data.collections.new(collection_name)
+        bpy.context.scene.collection.children.link(new_collection)
+        return new_collection
 
-#                 # Add this channel to the list.
-#                 channel_number = chan_num
-#                 relevant_channels.append(channel_number)
-                
-#             # Set scene-specific UI fields outside the loop.
-#             scene.scene_props.int_array_start_channel = chan_num + 1
-#             scene.scene_props.int_array_start_address = current_address + channels_to_add
-#             scene.scene_props.int_array_universe = current_universe
-#             scene.scene_props.int_array_group_index += 1
+    def origin_and_collection_set(self, obj, is_group, new_collection):
+        if obj.type != 'MESH':
+            return
 
-#             # Select the new lights on the console for highlight visibility.
-#             argument = "Chan "
-#             if len(relevant_channels) != 0: 
-#                 for light in relevant_channels:
-#                     argument += f"{light} "
-#                 argument += "Enter Enter Full Enter"
-#             OSC.send_osc_lighting(address, argument)
+        self.origin_set_center_mass(obj)
+        
+        if not is_group:
+            return
 
-#             # Record group
-#             if is_group:
-#                 # Add group to console
-#                 group_number = scene.scene_props.int_group_number
-#                 Orb.Eos.record_group(group_number, relevant_channels)
-#                 scene.scene_props.int_group_number += 1
+        new_collection.objects.link(obj)
 
-#                 # Add group to Sorcerer group_data
-#                 new_group = scene.scene_group_data.add()
-#                 new_group.name = group_name
-#                 for channel in relevant_channels:
-#                     new_channel = new_group.channels_list.add()
-#                     new_channel.chan = channel
+        for coll in obj.users_collection:
+            self.original_collection_unlink(coll, obj, new_collection)
 
+    def origin_set_center_mass(self, obj):
+        self.context.view_layer.objects.active = obj
+        bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS')
 
-#         @staticmethod
-#         def record_group(group_number, channels):
-#             if group_number != 0:
-#                 OSC.send_osc_lighting("/eos/key/live", "1")
-#                 OSC.send_osc_lighting("/eos/key/live", "0")
-#                 #time.sleep(.1)
-#                 channels = [str(chan) for chan in channels]
-#                 argument = " + ".join(channels)
-#                 argument = f"Chan {argument} Record Group {group_number} Enter Enter"
-#                 Orb.Eos.send_osc_with_delay("/eos/newcmd", argument)
+    def original_collection_unlink(self, coll, obj, new_collection):
+        if coll != new_collection:
+            coll.objects.unlink(obj)
+
+    def edit_mode_exit(self):
+        bpy.ops.object.editmode_toggle()
+        bpy.ops.object.editmode_toggle()
+
+ 
+    def loop_over_children(self, Console, addresses_list, channels_to_add, is_group, group_name):
+        relevant_channels = []
+
+        Console.prepare_patch()
+
+        for i, chan in enumerate([obj for obj in bpy.data.objects if obj.select_get()]):
+            chan_num = self.scene.scene_props.int_array_start_channel
+            uni, addr = addresses_list[i]
+
+            pos_x, pos_y, pos_z, or_x, or_y, or_z = EventUtils.get_loc_rot(chan, use_matrix=True)
+
+            # Set channel-specific UI fields inside the loop.
+            chan.str_manual_fixture_selection = str(chan_num)
+            self.scene.scene_props.int_array_start_channel += 1
+            
+            Console.patch_light(chan_num, pos_x, pos_y, pos_z, or_x, or_y, or_z, uni, addr)
+
+            # Add this channel to the list.
+            channel_number = chan_num
+            relevant_channels.append(channel_number)
+            
+        # Set scene-specific UI fields outside the loop.
+        self.scene.scene_props.int_array_start_channel = chan_num + 1
+        self.scene.scene_props.int_array_start_address = addr + channels_to_add
+        self.scene.scene_props.int_array_universe = uni
+        self.scene.scene_props.int_array_group_index += 1
+
+        # Select the lights on the console for user's convenience
+        lights = [str(num) for num in relevant_channels]
+        lights = " + ".join(lights)
+        Console.select_lights(lights)
+        
+
+        # Record group
+        if is_group:
+            # Add group to console
+            group_number = self.scene.scene_props.int_group_number
+            if group_number != 0:
+                Console.record_group(lights, group_number)
+                self.scene.scene_props.int_group_number += 1
+
+            # Add group to Sorcerer group_data
+            new_group = self.scene.scene_group_data.add()
+            new_group.name = group_name
+            for channel in relevant_channels:
+                new_channel = new_group.channels_list.add()
+                new_channel.chan = channel
 
 
 def test_orb(): # Return True for fail, False for pass
