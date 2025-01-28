@@ -53,4 +53,4 @@ In Sorcerer, we take the best of both worlds. Here are the guidelines:
 
 - Long, essay-length docstrings at the top are prefered. These should explain the context and the "why". Write these as if to a child.
 - Keep inline comments to a minimum by using clear naming and clear separation of concerns.
-- If a chunk of code is excessively complex and fragile, consider adding *-style documentation codes inline with a key at the top or bottom.
+- If a chunk of code is excessively complex and fragile, consider adding *-style documentation codes inline with a key at the top or bottom. See event_manager.py for an example of this documentation style.

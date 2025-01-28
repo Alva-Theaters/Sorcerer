@@ -6,7 +6,6 @@ from bpy import spy
 import time
 
 from ..utils.osc import OSC
-from ..utils.orb_utils import tokenize_macro_line
 
 '''
 To make your own custom Sorcerer sequencer strip type:

@@ -6,7 +6,6 @@ import bpy.utils.previews
 import os
 
 from ..utils.spy_utils import REGISTERED_STRIPS
-from ..assets.sli import SLI
 
 preview_collections = {}
 

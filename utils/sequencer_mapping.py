@@ -40,6 +40,7 @@ This is how we do it:
 
 VALID_STRIP_TYPE = 'COLOR'
 
+
 class StripMapper:
     ''''Returns {frame: (address, argument)} if passed event_manager or {frame: (event_type, value)} if passed orb.
         Will return blank dict if passed both a truthy event_manager and truthy orb, since that call is nonsensical.'''

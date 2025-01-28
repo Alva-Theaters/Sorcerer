@@ -4,7 +4,6 @@
 
 import bpy
 
-import time
 from typing import Tuple, Union
 import mathutils
 
@@ -28,7 +27,6 @@ bpy API. End users shall access this wrapper from built-in text editor through:
 
 import bpy
 from bpy import spy
-
 '''
 
 

@@ -5,7 +5,7 @@
 import bpy
 
 '''
-Currently choosing not to use conventional logging methods because they seem overly complicated.
+Currently choosing not to use conventional logging methods because they seem overly complicated. (NEWB ALERT!!! lol)
 Doing it this way allows you to choose exactly what you want printed in the Blender UI with the
 simplest possible UI. Don't need to learn anything at all whatsoever about how logging works. 
 This method could not possibly be any simpler. 

@@ -15,9 +15,7 @@ from .utils.event_utils import EventUtils as Utils
 from .utils.osc import OSC
 from .utils.sequencer_mapping import StripMapper
 
-
 stored_channels = set()
-
 
 '''
 __________________________________________________________________________________
@@ -274,6 +272,7 @@ Sequence of events when playback STARTS:
         
         C3:3. And we clear the mapping for trigger strips.
 '''
+
 
 class EventManager:
     def __init__(self):

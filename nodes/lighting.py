@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import bpy
-from bpy.types import NodeSocket, Node, NodeTree
+from bpy.types import NodeSocket, Node
 from bpy.props import *
 
 from ..assets.items import Items as AlvaItems 
