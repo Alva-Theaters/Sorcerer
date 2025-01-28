@@ -1,4 +1,9 @@
+# SPDX-FileCopyrightText: 2025 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 import os
+
 
 def search_for_debug_true(directory):
     for root, _, files in os.walk(directory):

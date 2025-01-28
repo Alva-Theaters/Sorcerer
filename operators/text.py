@@ -65,8 +65,8 @@ class TEXT_OT_alva_send_text_to_3d(Operator):
         return None
 
     def parse_ascii_for_channel_positions(self, ascii_data):
-        channel_positions = []  # List to store channel numbers and their positions.
-        channel_orientations = []  # List to store channel numbers and their orientations.
+        channel_positions = []
+        channel_orientations = []
 
         current_channel = None
         current_position = None
@@ -110,7 +110,6 @@ class TEXT_OT_alva_send_text_to_3d(Operator):
         current_label = ""
         current_channels = []
 
-        # Loop through each line in the ASCII data.
         for line in ascii_data.lines:
             trimmed_line = line.body.strip()
 

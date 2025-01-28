@@ -35,6 +35,7 @@ def check_flags(context, parent, property_name, controller_type):
         if not type_checks[controller_type]:
             alva_log("stop", "STOP: Stopping CPV per type_checks.\n")
             return False
+        
     elif not scene.enable_objects:
         alva_log("stop", "STOP: Stopping CPV per type_checks.\n")
         return False
@@ -48,7 +49,6 @@ def check_flags(context, parent, property_name, controller_type):
         alva_log("stop", "STOP: CPV passes all flags, continuing.\n")
         return True
 
-    # Check parameter-related flags
     param_flags = {
         'strobe': parent.strobe_is_on,
         'color': parent.color_is_on,
@@ -67,7 +67,6 @@ def check_flags(context, parent, property_name, controller_type):
         alva_log("stop", "STOP: Stopping CPV per parameter toggles.\n")
         return False
 
-    # Check for freeze mode
     if scene.in_frame_change:
         frame = round(context.scene.frame_current) # This is technically a float
         freeze_mode = parent.freezing_mode_enum

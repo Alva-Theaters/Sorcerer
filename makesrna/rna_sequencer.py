@@ -8,7 +8,6 @@ from bpy.types import Scene, ColorSequence, SoundSequence, Object
 from ..assets.items import Items as AlvaItems
 from ..assets.tooltips import format_tooltip
 from ..updaters.sequencer import SequencerUpdaters as Updaters
-from ..updaters.common import CommonUpdaters
 from ..utils.sequencer_utils import form_livemap_string
 
 

@@ -6,7 +6,6 @@ import bpy
 from bpy import spy
 #from spy.types import SequencerStrip will not work here.
 
-
 '''
 Use custom strips to make Blender's sequence editor color strips send custom OSC with Python when they come up in the sequencer 
 during playback.

@@ -14,7 +14,6 @@ from .utils.sequencer_utils import BiasCalculator
 from .utils.sequencer_mapping import StripMapper
 from .cpv.publish import Publish
 
-
 WHAT_DOES_THIS_DO = """
 This code is for a set of operators identified in the UI with a purple orb icon.
 
@@ -67,7 +66,7 @@ def complete_operator_specific_automation(context, active_item, Operator, Consol
     if not as_orb_id:
         return {'CANCELLED'}, "No as_orb_id found."
     
-    executor = get_executor(as_orb_id, context, active_item, Console)
+    executor = get_executor(as_orb_id)
 
     if executor is None:
         return {'CANCELLED'}, f"Invalid as_orb_id: {as_orb_id}."
@@ -77,7 +76,7 @@ def complete_operator_specific_automation(context, active_item, Operator, Consol
     return {'FINISHED'}, "Orb complete."
 
 
-def get_executor(as_orb_id, context, active_item, Console):
+def get_executor(as_orb_id):
     StripClass = get_strip_class(as_orb_id)
     if not StripClass:
         local_executors = {

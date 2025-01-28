@@ -1,7 +1,12 @@
+# SPDX-FileCopyrightText: 2025 Alva Theaters
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 import bpy
 from functools import partial
 
 filter_color_strips = partial(filter, bpy.types.ColorSequence.__instancecheck__)
+
 
 def draw_strip_formatter_color(context, column, scene, active_strip):
     row = column.row(align=True)

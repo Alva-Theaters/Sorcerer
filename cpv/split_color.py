@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-
 class ColorSplitter:
     def __init__(self, generator, publisher):
         self.generator = generator

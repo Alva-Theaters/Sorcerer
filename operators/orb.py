@@ -6,7 +6,6 @@ import bpy
 from bpy.types import Operator
 from bpy.props import StringProperty
 
-from ..utils.event_utils import EventUtils
 from ..utils.osc import OSC
 from ..orb import invoke_orb
 
