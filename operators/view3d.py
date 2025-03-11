@@ -196,7 +196,7 @@ class VIEW3D_OT_alva_object_controller(Operator):
         from ..as_ui.space_common import draw_parameters_mini, draw_play_bar
         from ..as_ui.blender_spaces.space_view3d import draw_speaker
         
-        if active_object.type == 'MESH':
+        if active_object.type in ['MESH', 'LIGHT']:
             draw_parameters_mini(context, self.layout, active_object, use_slider=True)
             self.layout.separator()
             draw_play_bar(context, self.layout)

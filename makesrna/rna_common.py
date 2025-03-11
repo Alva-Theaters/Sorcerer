@@ -4,7 +4,7 @@
 
 import bpy
 from bpy.props import StringProperty, CollectionProperty, BoolProperty, EnumProperty, IntProperty, FloatProperty, FloatVectorProperty, PointerProperty
-from bpy.types import Object, ColorSequence, Sequence, Scene
+from bpy.types import Object, ColorSequence, Sequence, Scene, Light
 
 from ..utils.rna_utils import register_properties
 from ..assets.items import Items as AlvaItems 
@@ -574,6 +574,18 @@ def register():
         ]
     )
 
+    register_properties(
+        Light, 
+        *[
+            CommonProperties.controller_ids,
+            CommonProperties.common_header,
+            CommonProperties.common_parameters,
+            CommonProperties.common_parameters_extended,
+            CommonProperties.mins_maxes,
+            CommonProperties.parameter_toggles
+        ]
+    )
+
     # ColorSequence, excluding object_only
     register_properties(
         ColorSequence, 
@@ -609,6 +621,19 @@ def unregister():
             CommonProperties.mins_maxes,
             CommonProperties.parameter_toggles,
             CommonProperties.special_arguments
+        ],
+        register=False
+    )
+
+    register_properties(
+        Light, 
+        *[
+            CommonProperties.controller_ids,
+            CommonProperties.common_header,
+            CommonProperties.common_parameters,
+            CommonProperties.common_parameters_extended,
+            CommonProperties.mins_maxes,
+            CommonProperties.parameter_toggles
         ],
         register=False
     )

@@ -52,7 +52,7 @@ def find_controller_type(parent, property_name):
     if not hasattr(parent, "type"):
         SLI.SLI_assert_unreachable()
 
-    if parent.type == 'MESH' and hasattr(parent, "object_identities_enum"):
+    if parent.type in ['MESH', 'LIGHT'] and hasattr(parent, "object_identities_enum"):
         if property_name in ['pan_graph', 'tilt_graph']:
             return "Pan/Tilt"
         return parent.object_identities_enum

@@ -95,7 +95,7 @@ def draw_tool_settings(self, context):
             return
         
         obj = context.active_object
-        if obj and obj.type == 'MESH' and context.scene.scene_props.view_parameters_header:
+        if obj and obj.type in ['MESH', 'LIGHT'] and context.scene.scene_props.view_parameters_header:
             draw_parameters_mini(context, layout, obj, use_slider=True, expand=False)
                 
 
@@ -149,10 +149,10 @@ def draw_object_header(self, context, scene, active_object, node_layout=None):
             row = box.row()
             row.prop(ao, "sound_source_enum", text="", icon='SOUND')
         
-    if identity in ["Brush", "Influencer", "Key"]:
+    if identity in ["Brush", "Influencer"] and active_object.type != 'LIGHT':
         row = box.row(align=True)
         row.prop(ao, "float_object_strength", slider = True, text = "Strength:")
-        if identity in ["Brush", "Key"]:
+        if identity in ["Brush"]:
             row.prop(ao, "is_erasing", text="Erase", toggle=True)
 
     if scene.is_democratic and identity != "Brush":
