@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import bpy
+import traceback
 try:
     import allin1 # type: ignore
 except:
@@ -153,9 +154,12 @@ class AnalysisResult:
 
 def analyze_song(self, filepath):
     try:
-        return allin1.analyze(filepath)
-    except:
-        print("allin1 not found or failed. Returning hardcoded dummy class.")
+        return allin1.analyze(filepath, keep_byproducts=True)
+    except Exception as e:
+        print("An error occurred in allin1.analyze()!")
+        print(traceback.format_exc())
+        print(f"Error Type: {type(e).__name__}, Message: {e}")
+        print("Allin1 not found or failed. Returning hardcoded dummy class.")
 
         return AnalysisResult(
             path=filepath, 

@@ -1,3 +1,10 @@
 .pyc     
 __pycache__/  
 .DS_Store
+
+.mp3
+.wav
+
+/demix
+/spec
+/.venv
