@@ -192,6 +192,9 @@ class SequencerUpdaters:
         if not active_strip:
             return
         
+        if not active_strip.type == 'COLOR':
+            return
+        
         motif_type_enum = context.scene.sequence_editor.active_strip.my_settings.motif_type_enum
         
         global stop_updating_color

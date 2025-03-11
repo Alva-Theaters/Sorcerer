@@ -52,19 +52,8 @@ class CommonUpdaters:
             if self.float_object_strength != 1:
                 new_type = "Brush"
 
-        if new_type == "Influencer" and hasattr(self, 'users_collection') and self.users_collection:
-            for collection in self.users_collection:
-                if collection.name == "Collection":
-                    continue
-
-                for other_obj in collection.objects:
-                    if (
-                        other_obj != self and
-                        hasattr(other_obj, "object_identities_enum") and 
-                        other_obj.object_identities_enum in ["Influencer", "Key"]
-                    ):
-                        new_type = "Key"
-                        break
+        if new_type == "Influencer" and self.type == 'LIGHT':
+            new_type = "Key"
 
         if hasattr(self, "object_identities_enum"):
             self.object_identities_enum = new_type

@@ -137,7 +137,7 @@ class VIEW3D_PT_alva_object_controller(Panel, View3DPanel):
         scene = context.scene.scene_props
         active_object = context.active_object
         
-        if active_object.type == 'MESH':
+        if active_object.type in ['MESH', 'LIGHT']:
             box, column = draw_object_header(self, context, scene, active_object)
             draw_parameters(context, box, active_object)
             draw_footer_toggles(context, column, active_object)

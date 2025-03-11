@@ -168,7 +168,7 @@ def update_other_selections(context, parent, property_name):
     if parent != context.active_object:
         return  # Prevent infinite recursion
     
-    others = [obj for obj in bpy.context.selected_objects if obj.type == 'MESH']
+    others = [obj for obj in bpy.context.selected_objects if obj.type in ['MESH', 'LIGHT']]
     if parent in others:
         others.remove(parent)
     for obj in others:
