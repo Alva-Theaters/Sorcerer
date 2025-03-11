@@ -12,13 +12,13 @@ from ..maintenance.logging import alva_log
 
 PARAMETER_NOT_FOUND_DEFAULT = 'alva_intensity'
 WHITE_COLOR = (1, 1, 1)
-MAINTAIN_ROUNDING_THRESHOLD = 3  # Number of places to round
+MAINTAIN_ROUNDING_THRESHOLD = 3
 INFLUENCE_RADIUS_MULTIPLIER = 2
 LIGHT_SENSITIVITY_MULTIPLIER = 2
 
-DEBUG = False  # Reduces CPU load. Always set to False before committing/PRing.
+DEBUG = False
 
-# ANSI escape codes for colors
+# Debug colors
 RED = "\033[31m"
 GREEN = "\033[32m"
 BLUE = "\033[34m"
@@ -32,9 +32,9 @@ def find_influencer_cpv(generator):
 class Influence:
     '''
     We're trying to make lights on the stage turn on and off by moving a 3D mesh inside Blender.
-    This class is responsible for Ala Sorcerer's Influencer tool and for its Brush tool.
+    This class is responsible for Alva Sorcerer's Influencer tool and for its Brush tool.
 
-    This job of this class is to return ([channels], [parameters], [values]) tuples (c, p, v) to the cpv_generator.
+    This job of this class is to trigger the publisher.
 
     First, we need to figure out what stuff we need to do stuff to (SetGroups). That will give 
     us the following lists of stuff:
@@ -76,6 +76,7 @@ class Influence:
     
     def _is_releasing_channels(self):
         return self.controller_type == "Influencer" 
+
 
     def execute(self):
         start = time.time()
@@ -289,7 +290,7 @@ class Maintain:
 
     * = When you slide a slider in Blender from 0 to 100 quickly, Blender probably won't run that property's
         updater 100 different times for 1, 2, 3, 4, 5, etc. It may run 3 times, 10 times, or just 2 times.
-        So it may run on 12, 45, 76, and finally on 100. It's metered by the time since last update.
+        So it may run on 12, 45, 76, and finally on 100. It's debounced.
      '''
     def __init__(self, influencer):
         self.influencer = influencer
@@ -574,7 +575,7 @@ class FindInfluenceField:
         ]
 
     def _find_all_lights_in_scene(self):
-        #Return all light objects in the scene
+        # Return all light objects in the scene
         lights = [
             obj for obj in bpy.data.objects
             if obj.object_identities_enum == "Fixture" and obj.users > 0

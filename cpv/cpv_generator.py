@@ -22,7 +22,7 @@ A CPV request is a tuple containing Channel, Parameter, Value.
 A CPV request is made any time a single controller wishes to make a parameter change on the console.
 We use the CPV protocol to standardize how all parameter change requests are made no matter the 
 controller type, no matter the space_type. In frame change and during playback, CPV requests are
-compared to one another for common simplifcation and harmonization to avoid spamming contradictory 
+compared to one another for common simplification and harmonization to avoid spamming contradictory 
 messages and to batch commands together.
 '''
 class CPVGenerator:
