@@ -116,7 +116,7 @@ def find_available_channel(sequence_editor, start_frame, end_frame, start_channe
         current_channel += 1
 
 
-def add_color_strip(name, length, channel, color, strip_type, frame):
+def add_color_strip(name, length, channel, color, strip_type, frame, position=(0,0), scale=(1,1)):
     scene = bpy.context.scene
     strip = scene.sequence_editor.sequences.new_effect(
         name=name,
@@ -127,6 +127,10 @@ def add_color_strip(name, length, channel, color, strip_type, frame):
     )
     strip.color = color
     strip.my_settings.motif_type_enum = strip_type
+    strip.transform.offset_x = position[0]
+    strip.transform.offset_y = position[1]
+    strip.transform.scale_x = scale[0]
+    strip.transform.scale_y = scale[1]
 
 
 class Segment:
