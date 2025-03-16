@@ -7,7 +7,7 @@ from mathutils import Vector, kdtree
 import time
 import math
 
-from .publish import Publish
+from .publish import Publish, CPV
 from ..maintenance.logging import alva_log
 
 PARAMETER_NOT_FOUND_DEFAULT = 'alva_intensity'
@@ -232,7 +232,7 @@ class Initialize:
     def _initiate_channel(self, channel_object, value=None):
         channel_number = self._get_initiate_channel_number(channel_object)
         value = self._determine_initiate_value(value)
-        Publish(self.influencer, channel_number, self.property_name, value).execute()
+        Publish(self.influencer, channel_number, self.property_name, value, sender=CPV).execute()
         self._set_memory_item(self.influencer.parameter_property_group, channel_object, value)
         if DEBUG: alva_log("influence", f"{BLUE}Initialize._initiate_channel | Channel {channel_number} | Value: {round(value, 2)}, Property name: {self.property_name}")
 
@@ -318,7 +318,7 @@ class Maintain:
         if DEBUG: alva_log("influence", f"{BLUE}Maintain._maintain_channel | Channel {channel_number} | (Stored value: {round(stored_value, 2)}, Current value: {round(current_value, 2)}, Needed change: {round(needed_change, 2)}, is_positive: {GREEN if is_positive else RED}{is_positive}{BLUE}, New memory value: {round(new_memory_value, 2)}, Property name: {self.property_name}, Must proceed: {GREEN if must_proceed else RED}{must_proceed}{RESET})")
 
         if must_proceed:
-            Publish(self.influencer, channel_number, self.property_name, needed_change).execute()
+            Publish(self.influencer, channel_number, self.property_name, needed_change, sender=CPV).execute()
             self._update_memory_item(memory_item, new_memory_value)
 
     def _get_memory_item(self, channel_object):
@@ -419,7 +419,7 @@ class Release:
         channel_number = self._get_release_channel_number(channel_object)
         memory_item = self._get_memory_item(channel_object)
         value = self._determine_release_value(memory_item)
-        Publish(self.influencer, channel_number, self._property_name, value).execute()
+        Publish(self.influencer, channel_number, self._property_name, value, sender=CPV).execute()
         self._remove_memory_item(memory_item)
 
     def _release_channel_from_memory(self, channel_object):  # So that brushes can target the same obj many times

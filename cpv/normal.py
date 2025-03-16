@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .find import Find 
-from .publish import Publish
+from .publish import Publish, CPV
 
 
 def find_normal_cpv(generator):
@@ -23,7 +23,7 @@ class NormalCPV:
             Find().trigger_downstream_nodes(self.parent, self.property_name, value)
         
         for channel in self.parent.list_group_channels:
-            Publish(self, channel.chan, self.property_name, value).execute()
+            Publish(self, channel.chan, self.property_name, value, sender=CPV).execute()
     
     def _strip_graph_suffix(self):
         if self.property_name in ['pan_graph', 'tilt_graph']:
