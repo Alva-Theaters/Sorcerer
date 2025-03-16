@@ -15,6 +15,7 @@ from .utils.event_utils import EventUtils as Utils
 from .utils.osc import OSC
 from .utils.sequencer_mapping import StripMapper
 
+DEBUG = False
 stored_channels = set()
 
 '''
@@ -310,7 +311,7 @@ class EventManager:
         if not depsgraph or scene.scene_props.in_frame_change or scene.scene_props.is_playing:
             return
         
-        alva_log("event_manager", f"Depsgraph POST handler called. in_frame_change: {scene.scene_props.in_frame_change}")
+        if DEBUG: alva_log("event_manager", f"Depsgraph POST handler called. in_frame_change: {scene.scene_props.in_frame_change}")
 
         for update in depsgraph.updates:
             obj = update.id
@@ -322,19 +323,19 @@ class EventManager:
 
             if update.is_updated_transform:
                 start = time.time()
-                alva_log("event_manager", f"Transform found for object {obj}. Triggering special update.")
+                if DEBUG: alva_log("event_manager", f"Transform found for object {obj}. Triggering special update.")
                 Utils.trigger_special_update(obj)
-                alva_log('time', f"TIME: trigger_special_update and is_updated_transform took {time.time() - start} seconds")
+                if DEBUG: alva_log('time', f"TIME: trigger_special_update and is_updated_transform took {time.time() - start} seconds")
                 
                 if obj.int_alva_sem != 0:
-                    alva_log("event_manager", f"Triggering SEM update for {obj}.")
+                    if DEBUG: alva_log("event_manager", f"Triggering SEM update for {obj}.")
                     Utils.trigger_sem(obj, obj.int_alva_sem)
 
         start = time.time()
         updated_objects = {update.id for update in depsgraph.updates if isinstance(update.id, bpy.types.Object)}
-        alva_log("event_manager", f"Updated objects from depsgraph_post: {updated_objects}")
+        if DEBUG: alva_log("event_manager", f"Updated objects from depsgraph_post: {updated_objects}")
         Utils.check_and_trigger_drivers(updated_objects)
-        alva_log('time', f"TIME: check_and_trigger_drivers took {time.time() - start} seconds")
+        if DEBUG: alva_log('time', f"TIME: check_and_trigger_drivers took {time.time() - start} seconds")
 
 
     #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -346,7 +347,7 @@ class EventManager:
             if abs(current_frame - self.last_frame) > 1 and self.last_frame != -1:
                 '''C2:1'''
                 Utils.on_scrub_detected(current_frame)
-                alva_log("event_manager", "Scrub Detected.")
+                if DEBUG: alva_log("event_manager", "Scrub Detected.")
                 
             self.last_frame = current_frame
         
@@ -360,7 +361,7 @@ class EventManager:
 
 
     def fire_parameter_updaters(self, scene):
-        alva_log("event_manager", f"frame_change_pre firing in fire_parameter_updaters. Frame is: {scene.frame_current}.")
+        if DEBUG: alva_log("event_manager", f"frame_change_pre firing in fire_parameter_updaters. Frame is: {scene.frame_current}.")
 
         '''DOCUMENTATION CODE A1'''
         '''A1:3'''
@@ -384,12 +385,12 @@ class EventManager:
         Utils.trigger_special_mixer_props(self.mixers_and_motors)
 
         current_controllers = self.controllers
-        alva_log("event_manager", f"Current controllers: {current_controllers}")
+        if DEBUG: alva_log("event_manager", f"Current controllers: {current_controllers}")
         
         new_graph = Utils.convert_to_props(scene, current_controllers)
         '''A1:2'''
         updates = Utils.find_updates(self.old_graph, new_graph)
-        alva_log("event_manager", f"Updates: {updates}")
+        if DEBUG: alva_log("event_manager", f"Updates: {updates}")
         
         '''A1:4,6'''
         Utils.fire_updaters(updates)
@@ -520,24 +521,25 @@ class EventManager:
         from .cpv.publish import change_requests
 
         '''A2:2'''
-        alva_log("harmonize", f"HARMONIZER SESSION:\nchange_requests: {[request[1:] for request in change_requests]}")
+        if DEBUG: alva_log("harmonize", f"HARMONIZER SESSION:\nchange_requests: {[request[1:] for request in change_requests]}")
         no_duplicates = Harmonizer.remove_duplicates(change_requests)
-        alva_log("harmonize", f"no_duplicates: {[request[1:] for request in no_duplicates]}")
+        if DEBUG: alva_log("harmonize", f"no_duplicates: {[request[1:] for request in no_duplicates]}")
         if scene.scene_props.is_democratic:
             no_conflicts = Harmonizer.democracy(no_duplicates)
-            alva_log("harmonize", f"Democratic. no_conflicts: {[request[1:] for request in no_conflicts]}")
+            if DEBUG: alva_log("harmonize", f"Democratic. no_conflicts: {[request[1:] for request in no_conflicts]}")
         else:
             no_conflicts = Harmonizer.highest_takes_precedence(no_duplicates)
-            alva_log("harmonize", f"HTP. no_conflicts: {[request[1:] for request in no_conflicts]}")
+            if DEBUG: alva_log("harmonize", f"HTP. no_conflicts: {[request[1:] for request in no_conflicts]}")
         simplified = Harmonizer.simplify(no_conflicts)
-        alva_log("harmonize", f"simplified: {[request[1:] for request in simplified]}\n")
+        if DEBUG: alva_log("harmonize", f"simplified: {[request[1:] for request in simplified]}\n")
 
         '''A2:3'''
         from .cpv.publish import Publish, clear_requests
         for request in simplified:
-            publisher = Publish(*request, is_harmonized=True)
+            publisher = Publish(*request, is_already_harmonized=True)
             '''A2:4'''
-            publisher.execute()
+            full_argument, address = publisher.execute()
+            OSC.send_osc_lighting(address, full_argument, user=0)
 
         if not scene.scene_props.is_playing:
             scene.scene_props.in_frame_change = False
@@ -578,7 +580,7 @@ def on_frame_change_pre(scene):
     event_manager_instance.fire_parameter_updaters(scene)
     event_manager_instance.update_livemap(scene)
     event_manager_instance.render_audio_objects(scene)
-    alva_log('time', f"TIME: on_frame_change_pre took {time.time() - start} seconds")
+    if DEBUG: alva_log('time', f"TIME: on_frame_change_pre took {time.time() - start} seconds")
 
 @persistent
 def on_animation_playback(scene):
