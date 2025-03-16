@@ -467,7 +467,7 @@ class EventManager:
         # Go livemap.
         '''C1:5'''
         if scene.sequence_editor and scene.is_armed_livemap:
-            current_frame = scene.frame_current  
+            current_frame = scene.frame_current
             active_strip = scene.sequence_editor.active_strip
             relevant_cue_strip = Utils.find_livemap_cue(scene, current_frame, active_strip)
 
@@ -535,13 +535,13 @@ class EventManager:
         simplified = Harmonizer.simplify(no_conflicts)
         if DEBUG: alva_log("harmonize", f"simplified: {[request[1:] for request in simplified]}\n")
 
-        from .cpv.publish import Publish, clear_requests
+        from .cpv.publish import Publish, clear_requests, EVENT_MANAGER
         batch_size = scene.scene_props.int_argument_size
         batch, address = [], None
 
         for i, request in enumerate(simplified):
             '''A2:3'''
-            publisher = Publish(*request, is_already_harmonized=True)
+            publisher = Publish(*request, sender=EVENT_MANAGER, is_already_harmonized=True)
             full_argument, addr = publisher.execute()
 
             if not address:
@@ -565,6 +565,7 @@ class EventManager:
 
         '''A2:5'''
         clear_requests()
+        Utils.use_harmonizer(False)
 
 
 event_manager_instance = EventManager()

@@ -10,7 +10,7 @@ import mathutils
 
 from ..assets.sli import SLI 
 from ..maintenance.logging import alva_log
-from .publish import Publish
+from .publish import Publish, CPV
 
 # pyright: reportInvalidTypeForm=false
 
@@ -30,6 +30,7 @@ class MixCPV:
         self.property_name = generator.property_name
         self.controller_type = generator.controller_type 
         self.channels_list = [channel.chan for channel in self.parent.list_group_channels]
+
 
     def execute(self, start_time):
         parent = self.parent
@@ -58,7 +59,7 @@ class MixCPV:
 
         alva_log('mix', f"MAIN. mix.py is returning: {channels, values}")
         for channel, value in zip(channels, values):
-            Publish(self, channel, parameter, value).execute()
+            Publish(self, channel, parameter, value,sender=CPV).execute()
 
         alva_log('time', f"TIME: mix_my_values took {time.time() - start_time} seconds\n")
     
