@@ -12,24 +12,26 @@ from ..utils.spy_utils import REGISTERED_LIGHTING_CONSOLES
     
 change_requests = []
 PROPERTIES_TO_MAP = ["strobe", "pan", "tilt", "zoom", "gobo_speed"]
+VERSIONS_OF_COLOR = ['color', 'raise_color', 'lower_color']
 
 
 class Publish:
-    def __init__(self, generator, channel, property_name, value, is_harmonized=False):
+    def __init__(self, generator, channel, property_name, value, is_already_harmonized=False):
         self.generator = generator
         self.channel = channel
         self.property_name = property_name
         self.value = value
         self.patch_controller = self.find_my_patch_controller()
-        self.is_harmonized = is_harmonized
+        self.is_already_harmonized = is_already_harmonized
         self._DataClass = self.find_installed_lighting_console_data_class()
         self._address = self._DataClass.osc_address
         self._rounding_points = self._DataClass.rounding_points
         self._format_value_function = self._DataClass.format_value
 
     @property
-    def is_bound_to_harmonizer(self):
-        return bpy.context.scene.scene_props.is_playing or bpy.context.scene.scene_props.in_frame_change
+    def _should_wait_for_others(self):
+        scene = bpy.context.scene.scene_props
+        return (scene.is_playing or scene.in_frame_change) and not self.is_already_harmonized
 
     def find_my_patch_controller(self):
         if self.generator.controller_type not in ["Fixture", "Pan/Tilt Fixture"]:
@@ -51,22 +53,24 @@ class Publish:
 
 
     def execute(self):
+        if self._should_wait_for_others:
+            global change_requests
+            change_requests.append((self.generator, self.channel, self.property_name, self.value))
+            return None, None
+        
         if self.property_name in PROPERTIES_TO_MAP:
             self.value = SliderToFixtureMapper(self).execute()
 
-        if self.property_name in ['color', 'raise_color', 'lower_color']:
+        if self.property_name in VERSIONS_OF_COLOR:
             self.property_name, self.value = ColorSplitter(self.generator, self).execute()
 
-        # This needs to go after ColorSplitter because it must see color type
-        # ("RGB" for example) in self.property_name, not just "color."
-        self._argument_template = self._find_argument_template()
+        self._argument_template = self._find_argument_template() # Color splitter goes first to id argument type needed
 
-        if self.is_bound_to_harmonizer and not self.is_harmonized:
-            global change_requests
-            change_requests.append((self.generator, self.channel, self.property_name, self.value))
-        else:
-            full_argument, address = self.form_osc()
-            OSC.send_osc_lighting(address, full_argument, user=0)
+        if self.is_already_harmonized:
+            return self.form_osc() # Returns full_argument, address
+        
+        full_argument, address = self.form_osc()
+        OSC.send_osc_lighting(address, full_argument, user=0)
 
     def _find_argument_template(self):
         if "raise_" not in self.property_name and "lower_" not in self.property_name:
