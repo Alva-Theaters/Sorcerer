@@ -112,75 +112,100 @@ Effects on lighting consoles sort of have an internal motor that makes them cont
 
 Areas to Dive Into:
 ===================
-Below are the general areas contributions can focus on, ordered from simplest to most complex.
+Below are the general areas contributions can focus on. 
 
 
-Properties (makesrna):
+Core:
 ----------------------
-Within the file system, Sorcerer calls properties, the things we register to the Blender scene via bpy, "rna". This term is borrowed from the Blender C++ source code (which itself is of course borrowing from biology.) We call properties rna, not properties, to avoid confusion with space_properties, the part of the Blender UI called Properties.
+Examples:
+   - makesrna System
+   - Event Manager
+   - CPV System (Fade Engine)
 
-Some of Sorcerer's properties need to be registered the same way to many different things (scene, nodes, objects, sequencer strips, etc). Those properties are found in the rna_common.py file. Review that script to learn how that system works: it's kind of like the menu at a restaurant. It uses a dictionary data structure to store the property registration data so that you can register dozens of properties to a new bpy type with a simple, single-line function call. 
+Needs:
 
-Currently, some of the tooltips use a special find_tooltip function. In the future, all tooltips will be stored in a single file in a dictionary. That way, we can find inconsistencies, typos, and style variations quickly. This will also make translations significantly easier in the future. 
-
-The format_tooltip function is there to correct problems related to Blender's C++ code that sometimes adds the period to the end and sometimes doesn't. In Blender 4.3, Blender is modifying this behavior, but at this time the final behavior has not been set in stone. 
-
-**The Tooltip Equation:** The tooltip equation, detailed in tooltips.py (in assets folder), basically states that paragraph-length tooltips are actually better for the user experience than short sentence tooltips. At least for more complex buttons/values. That's because RTFM's devastate the artist's experience in a way that long tooltips can never compete with. We want to do everything we can to increase in-software communication to decrease RTFM's. Every RTFM is a colossal failure of the software. The manual should be in the tooltips.
-
-Primary needs for this area are tooltip writing and getting all tooltips over to tooltips.py.
+   - Delete all items registered directly to scene, use scene_props for everything.
+   - Delete "my_motifs" CollectionProperty from Sequencer.
+   - There are still some incorrectly named bpy.types Classes.
+   - Rewrite event_manager script to be more clear and readable.
+   - Eliminate bpy dependencies as far upstream as possible so we can migrate logic to Cython or C++.
+   - Implement CPV testing since we have none at all at the moment.
 
 
 UI:
 ----
-Sorcerer's UI system uses a ton of helper draw functions. That's because we have a lot of UI elements that we want drawn in multiple space_types. (A space_type in Blender scripting is a type of display, like the sequencer display, 3D view display, graph editor display, etc.)
-
-The UI is specifically designed to be as lean and minimal as possible. To solve problems, we delete parts: we don't first add parts. You earn a cookie any time you figure out how to delete a part. You delete a part by showing how the same end result can be achieved easier without the part. We do that by reasoning from first-principles.
-
 **Lazy Pixel Count Index (LPCI):** Occasionally take a screenshot of the main UI and take it into a paint program where you can draw on it with a marker. Find all areas on the Sorcerer UI that are not white space and cannot be made useful to the user. Mark those all up with red marker. That's your LPCI. Make that area be as small as possible.
 
 Rules:
 
-   - Never try to fix a broken part without first trying to delete the part
-   - Always question the requirement or constraint that prompts the part's existence
-   - Try to avoid UI parts that only serve a technical purpose, not an artistic purpose
-   - Never force the user to click more than 3 times to control something
-   - Minimize LPCI by creating the simplest possible form of the UI
-   - The longer a central design remains unchanged, the more apparent its flaws become to users
+   - Never try to fix a broken part without first trying to delete the part.
+   - Always question the requirement or constraint that prompts the part's existence.
+   - Try to avoid UI parts that only serve a technical purpose, not an artistic purpose.
+   - Never force the user to click more than 3 times to control something.
+   - Minimize LPCI by creating the simplest possible form of the UI.
+   - The longer a central design remains unchanged, the more apparent its flaws become to users.
    - No UI part shall take up more space than it truly needs.
 
-Primary needs for this area are refactoring and none_type error handling.
+Needs:
+
+   - Improve tooltip consistency and translations.
+   - Some areas need to be refactored.
+   - Rewrite all parameter-drawing code in prep for extendables adoption.
 
 
 Orb:
 -----
-TBC
+Needs:
+
+   - Improve usability of the automatic macro finder. Honestly this should be exposed somewhere.
+   - Clarify how the user is supposed to use the timecode control stuff.
 
 
-Spy:
+API:
 -----
-TBC
+Needs:
 
-
-Event Manager:
----------------
-TBC
+   - Dramatically improve the docs.
+   - Expand the "extendables" scripting system to fixture parameters too.
 
 
 Sequencer:
 -----------
-TBC
+Needs:
+
+   - Strip formatter tool should be more consistent, it hides a lot when you need it.
+   - Improve channel-finding code.
 
 
 Nodes:
 -------
-TBC
+Needs:
+
+   - Conceptualize the first node-based effect engine in Sorcerer.
+   - Get the dang pan/tilt node working properly since it's still a dumpster fire.
 
 
-Misc. Tools:
-------------
-TBC
+Cue Switcher:
+---------------
+Needs:
+
+   - Integrate with node editor for enhanced versatility.
+   - Incorporate control of effects for true "Mix Effect" system.
 
 
-CPV:
--------
-TBC
+Stage Manager:
+----------------
+Needs:
+
+   - Integrate with OSC better to allow custom messages to be sent to 3rd party display/monitor systems.
+   - Increase overall customization.
+
+
+Current Dumpster Fires:
+=========================
+
+   - spy API docs (what docs?)
+   - Sorcerer Manual (very outdated)
+   - Testing (what testing?)
+   - 3D Gradients (technically still experimental)
+   - grandMA3 Support (still only does core animation)
