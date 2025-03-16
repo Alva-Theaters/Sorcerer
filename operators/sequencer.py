@@ -727,11 +727,11 @@ class SEQUENCER_OT_alva_analyze_song(Operator):
 
             for i, beat in enumerate(beats):
                 color = color_codes[(beat_positions[i] % len(color_codes))-1]
-                add_color_strip(name="Beat", length=4, channel=(active_strip.channel + 3), color=color, strip_type='option_flash', frame=beat-2)
+                add_color_strip(name="Beat", length=4, channel=(active_strip.channel + 3), color=color, strip_type='option_flash', frame=beat-2, position=(596, -480), scale=(.025, .1))
             for downbeat in downbeats:
-                add_color_strip(name="Down Beat", length=12, channel=(active_strip.channel + 2), color=(1, 1, 0), strip_type='option_flash', frame=downbeat-6)
+                add_color_strip(name="New Measure", length=12, channel=(active_strip.channel + 2), color=(1, 1, 0), strip_type='option_flash', frame=downbeat-6, position=(718, -480), scale=(.1, .1))
             for cue in corrected_cues:
-                add_color_strip(name="Cue", length=64, channel=(active_strip.channel + 1), color=(0, 0, 1), strip_type='option_cue', frame=cue-32)
+                add_color_strip(name="Cue", length=64, channel=(active_strip.channel + 1), color=(0, 0, 1), strip_type='option_cue', frame=cue-32, position=(-197, -480), scale=(.8, .1))
             
             return {'FINISHED'}
         else:
