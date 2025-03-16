@@ -217,6 +217,8 @@ Sequence of events when frame changes BEGINS and we are NOT in playback:
         A2:2. We harmonize and simplify those cpv's with the harmonizer...
         
         A2:3. We convert the cpv's to (address, argument) with the publisher...
+
+        A2:31 We batch the arguments together based on the network settings...
         
         A2:4. We send them to the console via Utils.osc.send_osc_lighting...
         
@@ -533,13 +535,30 @@ class EventManager:
         simplified = Harmonizer.simplify(no_conflicts)
         if DEBUG: alva_log("harmonize", f"simplified: {[request[1:] for request in simplified]}\n")
 
-        '''A2:3'''
         from .cpv.publish import Publish, clear_requests
-        for request in simplified:
+        batch_size = scene.scene_props.int_argument_size
+        batch, address = [], None
+
+        for i, request in enumerate(simplified):
+            '''A2:3'''
             publisher = Publish(*request, is_already_harmonized=True)
-            '''A2:4'''
-            full_argument, address = publisher.execute()
-            OSC.send_osc_lighting(address, full_argument, user=0)
+            full_argument, addr = publisher.execute()
+
+            if not address:
+                address = addr  # Set address from the first request in batch
+            elif address != addr:
+                print(f"Warning: Multiple OSC addresses detected. Sending separately.")
+                '''A2:4'''
+                OSC.send_osc_lighting(address, ", ".join(batch), user=0)
+                batch, address = [], addr  # Reset batch with new address
+            
+            batch.append(full_argument)
+
+            '''A2:31'''
+            if len(batch) >= batch_size or i == len(simplified) - 1:
+                '''A2:4'''
+                OSC.send_osc_lighting(address, ", ".join(batch), user=0)
+                batch, address = [], None  # Reset batch
 
         if not scene.scene_props.is_playing:
             scene.scene_props.in_frame_change = False
