@@ -103,6 +103,9 @@ class Publish:
 
 
     def execute(self):
+        if self.property_name in VERSIONS_OF_COLOR:
+            self.property_name, self.value = ColorSplitter(self.generator, self).execute()
+            
         mode = self._publish_mode
 
         if mode == ADD_TO_COLLECTION:
@@ -132,9 +135,6 @@ class Publish:
     def _finalize_fixture_specific_attributes(self):
         if self.property_name in PROPERTIES_TO_MAP:
             self.value = SliderToFixtureMapper(self).execute()
-
-        if self.property_name in VERSIONS_OF_COLOR:
-            self.property_name, self.value = ColorSplitter(self.generator, self).execute()
 
         self._argument_template = self._find_argument_template() # Color splitter goes first to id argument type needed
 
