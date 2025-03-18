@@ -29,7 +29,6 @@ bl_info = {
     "version": (2, 1, 0),
     "blender": (4, 1, 0),
     "description": "3D animation in real life, for theatre, with Blender.",
-    "warning": "Copious UI components. Not for existing Blender workflows.",
     "wiki_url": "https://alva-sorcerer.readthedocs.io/en/latest/index.html#",
     "tracker_url": "https://sorcerer.alvatheaters.com/support",
     "category": "EMARs",
