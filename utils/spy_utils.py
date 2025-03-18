@@ -5,6 +5,7 @@
 
 REGISTERED_LIGHTING_CONSOLES = {}
 REGISTERED_STRIPS = {}
+REGISTERED_PARAMETERS = {}
 
 
 class SpyDataStructure:
@@ -53,6 +54,14 @@ class SpyDataStructure:
 
             def draw(self, context):
                 pass
+
+
+        class FixtureParameter:
+            def draw_row(self, context):
+                pass
+
+            def draw_popup(self, context):
+                pass
         
         
     class utils:
@@ -70,6 +79,11 @@ class SpyDataStructure:
                 if cls.as_idname in REGISTERED_STRIPS:
                     del REGISTERED_STRIPS[cls.as_idname]
                 REGISTERED_STRIPS[cls.as_idname] = cls
+
+            elif cls_id == SpyDataStructure.types.FixtureParameter:
+                if cls.as_idname in REGISTERED_PARAMETERS:
+                    del REGISTERED_PARAMETERS[cls.as_idname]
+                REGISTERED_PARAMETERS[cls.as_idname] = cls
         
         @staticmethod
         def _validate_cls(cls):
@@ -89,6 +103,11 @@ class SpyDataStructure:
                     "as_description": "an 'as_description' attribute",
                     "as_icon": "an 'as_icon' attribute"
                 },
+                SpyDataStructure.types.FixtureParameter: {
+                    "as_idname": "an 'as_idname' attribute",
+                    "as_label": "an 'as_label' attribute",
+                    "as_description": "an 'as_description' attribute"
+                }
             }
 
             subclass = SpyDataStructure.utils.find_subclass(cls)
@@ -119,6 +138,8 @@ class SpyDataStructure:
                 return SpyDataStructure.types.LightingConsole
             elif issubclass(cls, SpyDataStructure.types.SequencerStrip):
                 return SpyDataStructure.types.SequencerStrip
+            elif issubclass(cls, SpyDataStructure.types.FixtureParameter):
+                return SpyDataStructure.types.FixtureParameter
 
             
         @staticmethod
@@ -127,5 +148,7 @@ class SpyDataStructure:
                 del REGISTERED_LIGHTING_CONSOLES[cls.as_idname]
             elif cls.as_idname in REGISTERED_STRIPS:
                 del REGISTERED_STRIPS[cls.as_idname]
+            elif cls.as_idname in REGISTERED_PARAMETERS:
+                del REGISTERED_PARAMETERS[cls.as_idname]
             else:
-                print(f"\nWARNING: Class '{cls.__name__}' with ID '{cls.as_idname}' was not found in registered consoles.")
+                print(f"\nWARNING: Class '{cls.__name__}' with ID '{cls.as_idname}' was not found in registration.")

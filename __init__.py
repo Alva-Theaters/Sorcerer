@@ -109,6 +109,9 @@ def register_as_classes():
     from .extendables.sequencer_strips import register as register_strips
     register_strips()
 
+    from .extendables.fixture_parameters import register as register_parameters
+    register_parameters()
+
 
 def on_register():
     from .maintenance.tests import test_sorcerer
@@ -133,3 +136,6 @@ def unregister_as_classes():
 
     from .extendables.sequencer_strips import unregister as unregister_strips
     unregister_strips()
+
+    from .extendables.fixture_parameters import unregister as unregister_parameters
+    unregister_parameters()
