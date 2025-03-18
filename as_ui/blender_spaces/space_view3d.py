@@ -20,7 +20,6 @@ def draw_alva_view_3d_view(self, layout):
     layout.prop(bpy.context.scene.scene_props, "view_ip_address_tool", text="Network")
     layout.prop(bpy.context.scene.scene_props, "view_parameters_header", text="Parameters")
     layout.prop(bpy.context.scene.scene_props, "view_viewport_command_line", text="Command Line")
-    layout.prop(bpy.context.scene.scene_props, "expand_strobe", text="Expand Strobe")
 
 
 def draw_view3d_cmd_line(self, context):

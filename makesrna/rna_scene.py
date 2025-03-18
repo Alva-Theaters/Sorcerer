@@ -169,7 +169,6 @@ class SceneProperties(PropertyGroup):
     view_sequencer_command_line: BoolProperty(name="Command Line", default=True, description="Draw the sequencer's internal command line") 
     view_viewport_command_line: BoolProperty(name="Command Line", default=True, description="Draw the viewport's command line for Eos") 
     view_node_formatter: BoolProperty(name="Header Formatter", default=True, description="Draw the node formatter in the header") 
-    expand_strobe: BoolProperty(name="Expand Strobe", default=True, description="Draw the Strobe slider in its own row as opposed to only within the popup. This must be checked to animate strobe") 
 
     enable_lighting: BoolProperty(name="Enable Lighting", default=True, description="Enable OSC for lighting")  
     enable_video: BoolProperty(name="Enable Video", default=False, description="Enable OSC for video") 

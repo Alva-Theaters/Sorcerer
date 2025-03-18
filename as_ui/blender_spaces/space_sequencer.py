@@ -23,7 +23,6 @@ def draw_alva_sequencer_view_menu(self, layout):
         layout.prop(bpy.context.scene.scene_props, "view_sequencer_add", text="Add")
         layout.prop(bpy.context.scene.scene_props, "view_sequencer_toolbar", text="Toolbar")
         layout.prop(bpy.context.scene.scene_props, "view_sequencer_command_line", text="Command Line")
-        layout.prop(bpy.context.scene.scene_props, "expand_strobe", text="Expand Strobe")
 
 
 def draw_alva_sequencer_add_menu(self, layout):
