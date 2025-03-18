@@ -224,7 +224,7 @@ class CPV_FP_gobo_speed(spy.types.FixtureParameter):
     as_idname = 'alva_gobo_speed'
     as_property_name = 'gobo_speed'
     as_label = "Speed"
-    as_description = find_tooltip("gobo_speed")
+    as_description = find_tooltip("speed")
 
     default = 0
     min = -100
