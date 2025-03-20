@@ -5,9 +5,9 @@
 import bpy
 from functools import partial
 
+from ..as_ui.parameters import draw_parameters_mini
 from ..as_ui.space_common import (
     draw_text_or_group_input, 
-    draw_parameters_mini, 
     draw_play_bar, 
     draw_footer_toggles
 )

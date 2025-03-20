@@ -193,7 +193,8 @@ class VIEW3D_OT_alva_object_controller(Operator):
 
     def draw(self, context):
         active_object = context.active_object
-        from ..as_ui.space_common import draw_parameters_mini, draw_play_bar
+        from ..as_ui.parameters import draw_parameters_mini
+        from ..as_ui.space_common import draw_play_bar
         from ..as_ui.blender_spaces.space_view3d import draw_speaker
         
         if active_object.type in ['MESH', 'LIGHT']:

@@ -13,7 +13,8 @@ from ..makesrna.property_groups import MixerParameters, CustomButtonPropertyGrou
 from ..cpv.find import FindConnectedNodes
 from ..assets.tooltips import format_tooltip
 
-from ..as_ui.space_common import draw_text_or_group_input, draw_parameters, draw_footer_toggles
+from ..as_ui.parameters import draw_parameters
+from ..as_ui.space_common import draw_text_or_group_input, draw_footer_toggles
 from ..as_ui.space_alvapref import draw_settings
 from ..as_ui.blender_spaces.space_node import (
     draw_expanded_color,

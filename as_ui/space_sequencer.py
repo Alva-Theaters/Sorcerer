@@ -5,7 +5,8 @@
 import bpy
 from functools import partial
 
-from .space_common import draw_text_or_group_input, draw_parameters_mini, draw_play_bar, draw_footer_toggles
+from .parameters import draw_parameters_mini
+from .space_common import draw_text_or_group_input, draw_play_bar, draw_footer_toggles
 from .utils import determine_sequencer_contexts
 
 # Custom icon stuff
