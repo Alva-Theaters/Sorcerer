@@ -99,10 +99,10 @@ from .as_ui.blender_spaces.space_text import draw_import_usitt_ascii, draw_macro
 from .as_ui.blender_spaces.space_text import draw_text_view
 
 from .as_ui.blender_spaces.space_tool import draw_alva_toolbar
+from .as_ui.parameters import draw_parameters
 from .as_ui.space_common import (
     draw_generate_fixtures, 
-    draw_fixture_groups, 
-    draw_parameters, 
+    draw_fixture_groups,
     draw_footer_toggles, 
     draw_volume_monitor
 )

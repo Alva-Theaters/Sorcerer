@@ -19,7 +19,6 @@ def draw_alva_node_view(self, layout):
     #layout.prop (bpy.context.scene.scene_props, "view_node_add_audio", text="Add (Audio)")
     layout.prop(bpy.context.scene.scene_props, "view_node_toolbar", text="Toolbar")
     layout.prop(bpy.context.scene.scene_props, "view_node_formatter", text="Formatter")
-    layout.prop(bpy.context.scene.scene_props, "expand_strobe", text="Expand Strobe")
 
 
 def draw_alva_node_menu(self, layout):

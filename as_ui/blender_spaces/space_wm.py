@@ -55,12 +55,6 @@ def draw_strobe_settings(self, context, active_controller):
     layout.use_property_decorate = False
 
     if ac and hasattr(ac, "str_enable_strobe_argument"):
-        if not context.scene.scene_props.expand_strobe:
-            layout.use_property_decorate = True
-            layout.prop(ac, "float_strobe")
-            layout.use_property_decorate = False
-            layout.separator()
-
         layout.prop(ac, "strobe_min", text="Strobe Min")
         layout.prop(ac, "strobe_max", text="Max")
 

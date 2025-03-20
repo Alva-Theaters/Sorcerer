@@ -4,7 +4,8 @@
 
 import bpy
 
-from ..space_common import draw_text_or_group_input, draw_parameters_mini
+from ..space_common import draw_text_or_group_input
+from ..parameters import draw_parameters_mini
 from ..utils import get_orb_icon
 
 DISASTER_THRESHOLD = 3
