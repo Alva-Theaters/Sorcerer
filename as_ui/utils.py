@@ -5,7 +5,7 @@
 import bpy.utils.previews
 import os
 
-from ..utils.spy_utils import REGISTERED_STRIPS
+from ..utils.spy_utils import REGISTERED_STRIPS, REGISTERED_PARAMETERS, REGISTERED_LIGHTING_CONSOLES
 
 preview_collections = {}
 
@@ -66,9 +66,19 @@ def count_selected_strips(sequence_editor, active_strip):
     return all, colors, sounds, videos
     
 
-def get_strip_class(as_orb_id):
+def find_extendables_class(class_type, id='', all=False):
+    class_type_to_list = {
+        'strips': REGISTERED_STRIPS,
+        'parameters': REGISTERED_PARAMETERS,
+        'lighting_consoles': REGISTERED_LIGHTING_CONSOLES
+    }
+    class_list = class_type_to_list[class_type]
+
+    if all:
+        return class_list
+    
     try:
-        return REGISTERED_STRIPS[as_orb_id]
+        return class_list[id]
     except KeyError:
         return None
 

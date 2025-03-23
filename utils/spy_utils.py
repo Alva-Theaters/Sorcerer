@@ -105,7 +105,6 @@ class SpyDataStructure:
                 },
                 SpyDataStructure.types.FixtureParameter: {
                     "as_idname": "an 'as_idname' attribute",
-                    "as_label": "an 'as_label' attribute",
                     "as_description": "an 'as_description' attribute"
                 }
             }

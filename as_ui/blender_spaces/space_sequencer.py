@@ -5,7 +5,7 @@
 import bpy
 from functools import partial
 
-from ..utils import determine_sequencer_context, get_strip_class, get_orb_icon
+from ..utils import determine_sequencer_context, find_extendables_class, get_orb_icon
 
 filter_color_strips = partial(filter, bpy.types.ColorSequence.__instancecheck__)
 
@@ -186,7 +186,7 @@ def draw_one_audio_one_video(column):
 
 def draw_only_color(column, context, active_strip):
     as_orb_id = active_strip.my_settings.motif_type_enum
-    Strip = get_strip_class(as_orb_id)
+    Strip = find_extendables_class("strips", as_orb_id)
     if not Strip:
         return box
     

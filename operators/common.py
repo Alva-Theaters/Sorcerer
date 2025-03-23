@@ -14,14 +14,7 @@ from ..utils.rna_utils import update_all_controller_channel_lists, apply_patch
 from ..updaters.common import CommonUpdaters
 from ..as_ui.space_alvapref import draw_settings 
 from ..cpv.find import Find
-from ..as_ui.blender_spaces.space_wm import (
-    draw_edge_diffusion_settings, 
-    draw_gobo_settings, 
-    draw_pan_tilt_settings, 
-    draw_strobe_settings, 
-    draw_zoom_settings, 
-    draw_splash
-)
+from ..as_ui.blender_spaces.space_wm import draw_splash
 
 # pyright: reportInvalidTypeForm=false
 
@@ -143,97 +136,16 @@ class COMMON_OT_alva_update_controller(Operator):
         update_alva_controller(active_controller)
         return {'FINISHED'}
     
-    
-class COMMON_OT_alva_strobe_props(Operator):
-    bl_idname = "alva_common.strobe_properties"
-    bl_label = "View Strobe Properties"
-    
-    space_type: StringProperty() 
-    node_name: StringProperty() 
-    node_tree_name: StringProperty() 
-    
-    def execute(self, context):
-        return {'FINISHED'}
-    
-    def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width=250)
 
-    def draw(self, context):
-        finders = Find
-        active_controller = finders.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
-        draw_strobe_settings(self, context, active_controller)
-
-
-class COMMON_OT_alva_pan_tilt_props(Operator):
-    bl_idname = "alva_common.pan_tilt_properties"
-    bl_label = "Pan/Tilt Properties"
-    bl_description = "Access pan and tilt min and max settings"
+class COMMON_OT_alva_parameter_popup(Operator):
+    bl_idname = "alva_common.parameter_popup"
+    bl_label = "Pop-up"
+    bl_description = "Advanced settings"
 
     space_type: StringProperty() 
     node_name: StringProperty() 
     node_tree_name: StringProperty() 
-    
-    def execute(self, context):
-        return {'FINISHED'}
-    
-    def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width=200)
-
-    def draw(self, context):
-        finders = Find
-        active_controller = finders.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
-        draw_pan_tilt_settings(self, context, active_controller)
-       
-    
-class COMMON_OT_alva_zoom_iris_props(Operator):
-    bl_idname = "alva_common.zoom_iris_properties"
-    bl_label = "Zoom/Iris Properties"
-    bl_description = "Access min and max settings"
-
-    space_type: StringProperty() 
-    node_name: StringProperty() 
-    node_tree_name: StringProperty()  
-    
-    def execute(self, context):
-        return {'FINISHED'}
-    
-    def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width=200)
-
-    def draw(self, context):
-        finders = Find
-        active_controller = finders.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
-        draw_zoom_settings(self, context, active_controller)
-        
-
-class COMMON_OT_alva_edge_diffusion_props(Operator):
-    bl_idname = "alva_common.edge_diffusion_properties"
-    bl_label = "Edge/Diffusion Properties"
-    
-    space_type: StringProperty()  
-    node_name: StringProperty()  
-    node_tree_name: StringProperty()  
-    
-    def execute(self, context):
-        return {'FINISHED'}
-    
-    def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width=200)
-
-    def draw(self, context):
-        finders = Find
-        active_controller = finders.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
-        draw_edge_diffusion_settings(self, context, active_controller)
-    
-       
-class COMMON_OT_alva_gobo_props(Operator):
-    bl_idname = "alva_common.gobo_properties"
-    bl_label = "View Gobo Properties"
-    bl_description = "Access gobo-related settings"
-
-    space_type: StringProperty() 
-    node_name: StringProperty() 
-    node_tree_name: StringProperty() 
+    parameter_as_idname: StringProperty()
     
     def execute(self, context):
         return {'FINISHED'}
@@ -242,9 +154,9 @@ class COMMON_OT_alva_gobo_props(Operator):
         return context.window_manager.invoke_props_dialog(self, width=400)
 
     def draw(self, context):
-        finders = Find
-        active_controller = finders.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
-        draw_gobo_settings(self, context, active_controller)
+        active_controller = Find.find_controller_by_space_type(context, self.space_type, self.node_name, self.node_tree_name)
+        draw_func = Find.find_parameter_popup_draw_func(self.parameter_as_idname)
+        draw_func(self, context, active_controller)
 
 
 class COMMON_OT_alva_clear_solo(Operator):
@@ -502,11 +414,7 @@ operator_classes = [
     COMMON_OT_alva_copy_patch,
     COMMON_OT_alva_home_controller,
     COMMON_OT_alva_update_controller,
-    COMMON_OT_alva_strobe_props,
-    COMMON_OT_alva_pan_tilt_props,
-    COMMON_OT_alva_zoom_iris_props,
-    COMMON_OT_alva_edge_diffusion_props,
-    COMMON_OT_alva_gobo_props,
+    COMMON_OT_alva_parameter_popup,
     COMMON_OT_alva_clear_solo,
     COMMON_OT_alva_white_balance,
     COMMON_OT_alva_apply_patch,
