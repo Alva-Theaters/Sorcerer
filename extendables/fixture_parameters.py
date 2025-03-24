@@ -5,7 +5,7 @@
 from bpy import spy
 
 from ..assets.tooltips import find_tooltip
-from ..cpv.cpv_generator import CPVGenerator 
+from ..assets.items import Items
 
 
 class CPV_FP_intensity(spy.types.FixtureParameter):
@@ -19,8 +19,8 @@ class CPV_FP_intensity(spy.types.FixtureParameter):
     static_max = 100
     
 
-    def update(self, context):
-        return CPVGenerator.intensity_updater(self, context) # Must return (generator_class, channels, parameters, values)
+    def update(controller, context):
+        spy.update_cpv(controller, context, CPV_FP_intensity)
     
 
 class CPV_FP_strobe(spy.types.FixtureParameter):
@@ -62,8 +62,16 @@ class CPV_FP_strobe(spy.types.FixtureParameter):
     def is_new_row(active_object):
         return True
 
-    def update(self, context):
-        return CPVGenerator.strobe_updater(self, context)
+    def update(controller, context):
+        spy.update_cpv(controller, context, CPV_FP_strobe)
+
+    def add_special_osc_argument(controller, normal_osc_argument, value):
+        special_argument = getattr(controller, f"str_{'disable' if value == 0 else 'enable'}_strobe_argument")
+
+        if value != 0:
+            return f"{special_argument}, {normal_osc_argument}"
+        
+        return special_argument
 
 
 class CPV_FP_color(spy.types.FixtureParameter):
@@ -78,8 +86,8 @@ class CPV_FP_color(spy.types.FixtureParameter):
     def poll(context, active_object, object_type):
         return active_object.color_is_on
 
-    def update(self, context):
-        return CPVGenerator.color_updater(self, context)
+    def update(controller, context):
+        spy.update_cpv(controller, context, CPV_FP_color)
     
     def is_new_row(active_object):
         if not active_object.strobe_is_on:
@@ -90,6 +98,7 @@ class CPV_FP_color(spy.types.FixtureParameter):
 class CPV_FP_color_restore(spy.types.FixtureParameter):
     as_idname = 'alva_color_restore'
     as_description = find_tooltip("color_restore")
+    as_property_name = "color_restore"
 
     default = (1.0, 1.0, 1.0)
     static_min = 0.0
@@ -97,7 +106,7 @@ class CPV_FP_color_restore(spy.types.FixtureParameter):
     
     def poll(context, active_object, object_type):
         return hasattr(active_object, "object_identities_enum") and object_type == "Influencer" and active_object.color_is_on
-    
+
     def is_new_row(active_object):
         return False
     
@@ -105,8 +114,10 @@ class CPV_FP_color_restore(spy.types.FixtureParameter):
 class CPV_FP_color_profile_enum(spy.types.FixtureParameter):
     as_idname = 'color_profile_enum'
     as_description = find_tooltip("color_profile_enum")
+    as_property_name = "color_profile"
     icon = 'COLOR'
     icon_only = True
+    items = Items.color_profiles
     
     def poll(context, active_object, object_type):
         return not context.scene.scene_props.school_mode_enabled and object_type not in {"Influencer", "Brush"} and active_object.color_is_on
@@ -154,8 +165,8 @@ class CPV_FP_pan(spy.types.FixtureParameter):
     def is_new_row(active_object):
         return True
 
-    def update(self, context):
-        return CPVGenerator.pan_updater(self, context)
+    def update(controller, context):
+        spy.update_cpv(controller, context, CPV_FP_pan)
     
 
 class CPV_FP_tilt(spy.types.FixtureParameter):
@@ -195,8 +206,8 @@ class CPV_FP_tilt(spy.types.FixtureParameter):
     def is_new_row(active_object):
         return False
 
-    def update(self, context):
-        return CPVGenerator.tilt_updater(self, context)
+    def update(controller, context):
+        spy.update_cpv(controller, context, CPV_FP_tilt)
 
 
 class CPV_FP_zoom(spy.types.FixtureParameter):
@@ -234,8 +245,8 @@ class CPV_FP_zoom(spy.types.FixtureParameter):
     def is_new_row(active_object):
         return True
 
-    def update(self, context):
-        return CPVGenerator.zoom_updater(self, context)
+    def update(controller, context):
+        spy.update_cpv(controller, context, CPV_FP_zoom)
     
 
 class CPV_FP_iris(spy.types.FixtureParameter):
@@ -270,8 +281,8 @@ class CPV_FP_iris(spy.types.FixtureParameter):
             return True
         return False
 
-    def update(self, context):
-        return CPVGenerator.iris_updater(self, context)
+    def update(controller, context):
+        spy.update_cpv(controller, context, CPV_FP_iris)
     
 
 class CPV_FP_edge(spy.types.FixtureParameter):
@@ -301,8 +312,8 @@ class CPV_FP_edge(spy.types.FixtureParameter):
     def is_new_row(active_object):
         return True
 
-    def update(self, context):
-        return CPVGenerator.edge_updater(self, context)
+    def update(controller, context):
+        spy.update_cpv(controller, context, CPV_FP_edge)
 
 
 class CPV_FP_diffusion(spy.types.FixtureParameter):
@@ -335,8 +346,8 @@ class CPV_FP_diffusion(spy.types.FixtureParameter):
             return True
         return False
 
-    def update(self, context):
-        return CPVGenerator.diffusion_updater(self, context)
+    def update(controller, context):
+        spy.update_cpv(controller, context, CPV_FP_diffusion)
     
 
 class CPV_FP_gobo(spy.types.FixtureParameter):
@@ -349,7 +360,7 @@ class CPV_FP_gobo(spy.types.FixtureParameter):
 
     default = 0
     static_min = 0
-    static_max = 100
+    static_max = 20
 
     def poll(context, active_object, object_type):
         return active_object.gobo_is_on and object_type not in {"Influencer", "Brush"}
@@ -404,8 +415,8 @@ class CPV_FP_gobo(spy.types.FixtureParameter):
     def is_new_row(active_object):
         return True
 
-    def update(self, context):
-        return CPVGenerator.gobo_id_updater(self, context)
+    def update(controller, context):
+        spy.update_cpv(controller, context, CPV_FP_gobo)
     
 
 class CPV_FP_gobo_speed(spy.types.FixtureParameter):
@@ -427,8 +438,15 @@ class CPV_FP_gobo_speed(spy.types.FixtureParameter):
     def is_new_row(active_object):
         return False
 
-    def update(self, context):
-        return CPVGenerator.gobo_speed_updater(self, context)
+    def update(controller, context):
+        spy.update_cpv(controller, context, CPV_FP_gobo_speed)
+
+    def add_special_osc_argument(controller, normal_osc_argument, value):
+        if value == 0:
+            return normal_osc_argument
+        
+        special_argument = getattr(controller, f"str_enable_gobo_speed_argument")
+        return f"{special_argument}, {normal_osc_argument}"
     
 
 class CPV_FP_prism(spy.types.FixtureParameter):
@@ -447,8 +465,13 @@ class CPV_FP_prism(spy.types.FixtureParameter):
     def is_new_row(active_object):
         return False
 
-    def update(self, context):
-        return CPVGenerator.prism_updater(self, context)
+    def update(controller, context):
+        spy.update_cpv(controller, context, CPV_FP_prism)
+
+    def add_special_osc_argument(controller, normal_osc_argument, value):
+        if value == 1:
+            return getattr(controller, f"str_enable_prism_argument")
+        return getattr(controller, f"str_disable_prism_argument")
     
 
 parameters = [
@@ -477,3 +500,5 @@ def register():
 def unregister():
     for cls in reversed(parameters):
         spy.utils.as_unregister_class(cls)
+
+

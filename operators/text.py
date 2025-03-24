@@ -410,6 +410,9 @@ class TEXT_OT_alva_template_add(Operator):
         elif self.template_type == 'strip':
             text_block_name = "custom_strip.py"
             file_path = os.path.join(os.path.dirname(__file__), '..', 'extendables', 'python_templates', 'custom_strip.py')
+        elif self.template_type == 'lighting_parameter':
+            text_block_name = "custom_parameters.py"
+            file_path = os.path.join(os.path.dirname(__file__), '..', 'extendables', 'python_templates', 'custom_parameters.py')
         else:
             self.report({'ERROR'}, "Unknown template type")
             return {'CANCELLED'}

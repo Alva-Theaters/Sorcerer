@@ -2,10 +2,14 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import bpy
+from bpy.props import IntProperty, EnumProperty, FloatVectorProperty
+from bpy.types import Object, ColorSequence, Light, Node
 
 REGISTERED_LIGHTING_CONSOLES = {}
 REGISTERED_STRIPS = {}
 REGISTERED_PARAMETERS = {}
+REGISTERED_CONTROLLERS = {}
 
 
 class SpyDataStructure:
@@ -62,6 +66,11 @@ class SpyDataStructure:
 
             def draw_popup(self, context):
                 pass
+
+
+        class LightingController:
+            def execute(updater):
+                pass
         
         
     class utils:
@@ -84,6 +93,13 @@ class SpyDataStructure:
                 if cls.as_idname in REGISTERED_PARAMETERS:
                     del REGISTERED_PARAMETERS[cls.as_idname]
                 REGISTERED_PARAMETERS[cls.as_idname] = cls
+                register_bpy_property(cls)
+
+            elif cls_id == SpyDataStructure.types.LightingController:
+                if cls.as_idname in REGISTERED_CONTROLLERS:
+                    del REGISTERED_CONTROLLERS[cls.as_idname]
+                REGISTERED_CONTROLLERS[cls.as_idname] = cls
+
         
         @staticmethod
         def _validate_cls(cls):
@@ -105,7 +121,13 @@ class SpyDataStructure:
                 },
                 SpyDataStructure.types.FixtureParameter: {
                     "as_idname": "an 'as_idname' attribute",
-                    "as_description": "an 'as_description' attribute"
+                    "as_description": "an 'as_description' attribute",
+                    "as_property_name": "an 'as_property_name' attribute"
+                },
+                SpyDataStructure.types.LightingController: {
+                    "as_idname": "an 'as_idname' attribute",
+                    "as_description": "an 'as_description' attribute",
+                    "execute": "an 'execute()' method"
                 }
             }
 
@@ -139,6 +161,8 @@ class SpyDataStructure:
                 return SpyDataStructure.types.SequencerStrip
             elif issubclass(cls, SpyDataStructure.types.FixtureParameter):
                 return SpyDataStructure.types.FixtureParameter
+            elif issubclass(cls, SpyDataStructure.types.LightingController):
+                return SpyDataStructure.types.LightingController
 
             
         @staticmethod
@@ -149,5 +173,57 @@ class SpyDataStructure:
                 del REGISTERED_STRIPS[cls.as_idname]
             elif cls.as_idname in REGISTERED_PARAMETERS:
                 del REGISTERED_PARAMETERS[cls.as_idname]
+            elif cls.as_idname in REGISTERED_CONTROLLERS:
+                del REGISTERED_CONTROLLERS[cls.as_idname]
             else:
                 print(f"\nWARNING: Class '{cls.__name__}' with ID '{cls.as_idname}' was not found in registration.")
+
+
+def register_bpy_property(cls):
+    as_idname = getattr(cls, 'as_idname', None)
+    name = getattr(cls, 'as_label', "")
+    description = getattr(cls, 'as_description', "")
+    default = getattr(cls, 'default', 0)
+    min = getattr(cls, 'static_min', 0)
+    max = getattr(cls, 'static_max', 100)
+    update = getattr(cls, 'update', None)
+    items = getattr(cls, 'items', None)
+
+    if items:
+        prop = EnumProperty(
+            name=name,
+            description=description,
+            items=items
+        )
+
+    elif isinstance(default, tuple):
+        prop = FloatVectorProperty(
+            name=name,
+            description=description,
+            default=default,
+            size=len(default),
+            min=min,
+            max=max,
+            update=update,
+            options={'ANIMATABLE'},
+            subtype='COLOR'
+        )
+        
+    elif isinstance(default, int):
+        prop = IntProperty(
+            name=name,
+            description=description,
+            default=default,
+            min=min,
+            max=max,
+            update=update,
+            options={'ANIMATABLE'}
+        )
+        
+    else:
+        print(f"Skipping {cls.__name__}: Unsupported property type.")
+        return
+
+    controller_types = [Object, ColorSequence, Light, Node]
+    for controller in controller_types:
+        setattr(controller, as_idname, prop)

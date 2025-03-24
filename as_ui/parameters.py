@@ -59,20 +59,25 @@ class Parameters:
             self.node_tree_name = ""
 
     def draw_button_with_node_ids(self, as_idname, icon=EMPTY, icon_value=EMPTY):
-        if icon != EMPTY:
-            op = self.row.operator('alva_common.parameter_popup', icon=icon, text="")
-            op.space_type = self.space_type
-            op.node_name = self.node_name
-            op.node_tree_name = self.node_tree_name
-            op.parameter_as_idname = as_idname
+        if icon == EMPTY:
+            self.draw_button_with_custom_icon(as_idname, icon_value)
+        else:
+            self.draw_button_with_normal_icon(as_idname, icon)
 
-        if icon_value != EMPTY:
-            icon_id = zoom.icon_id if icon_value == 'zoom' else edge.icon_id # Must go in same script because of Blender bug.
-            op = self.row.operator('alva_common.parameter_popup', icon_value=icon_id, text="")
-            op.space_type = self.space_type
-            op.node_name = self.node_name
-            op.node_tree_name = self.node_tree_name
-            op.parameter_as_idname = as_idname
+    def draw_button_with_normal_icon(self, as_idname, icon):
+        op = self.row.operator('alva_common.parameter_popup', icon=icon, text="")
+        op.space_type = self.space_type
+        op.node_name = self.node_name
+        op.node_tree_name = self.node_tree_name
+        op.parameter_as_idname = as_idname
+
+    def draw_button_with_custom_icon(self, as_idname, icon_value):
+        icon_id = zoom.icon_id if icon_value == 'zoom' else edge.icon_id # Must go in same script because of Blender bug.
+        op = self.row.operator('alva_common.parameter_popup', icon_value=icon_id, text="")
+        op.space_type = self.space_type
+        op.node_name = self.node_name
+        op.node_tree_name = self.node_tree_name
+        op.parameter_as_idname = as_idname
 
     def draw_new_row(self):
         self.row = self.box.row(align=True)
@@ -133,9 +138,9 @@ class DrawParameterCombo:
     def find_icon_mode(self):
         if self.icon == EMPTY and self.icon_value == EMPTY:
             return NO_ICON
-        if self.icon != EMPTY:
-            return NORMAL_ICON
-        return CUSTOM_ICON
+        if self.icon == EMPTY:
+            return CUSTOM_ICON
+        return NORMAL_ICON
     
 
     def execute(self):

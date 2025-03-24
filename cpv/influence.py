@@ -7,7 +7,7 @@ from mathutils import Vector, kdtree
 import time
 import math
 
-from .publish import Publish, CPV
+from .publish.publish import Publish, CPV
 from ..maintenance.logging import alva_log
 
 PARAMETER_NOT_FOUND_DEFAULT = 'alva_intensity'
@@ -25,11 +25,11 @@ BLUE = "\033[34m"
 RESET = "\033[0m"
 
 
-def find_influencer_cpv(generator):
-    return Influence(generator).execute()
+def find_influencer_cpv(Generator, Parameter):
+    return InfluenceCPV(Generator, Parameter).execute()
 
 
-class Influence:
+class InfluenceCPV:
     '''
     We're trying to make lights on the stage turn on and off by moving a 3D mesh inside Blender.
     This class is responsible for Alva Sorcerer's Influencer tool and for its Brush tool.
@@ -51,20 +51,32 @@ class Influence:
         3. Release the channels that are no longer inside so that they don't get stuck 
            (Release class).
     '''
-    def __init__(self, generator):
-        self.parent = generator.parent
+    def __init__(self, Generator, Parameter):
+        self.parent = Generator.parent
+        self.Parameter = Parameter
         self._make_parent_real()
-        self.property_name = generator.property_name
-        self.controller_type = generator.controller_type
-        self.parameter_property_group = self._get_property_group_by_parameter(self.parent, generator.property_name)
+        self.property_name = Generator.property_name
+        self.controller_type = Generator.controller_type
+        self.parameter_property_group = self._get_property_group_by_parameter(self.parent, Generator.property_name)
         self._is_releasing = self._is_releasing_channels()
 
     def _make_parent_real(self):
-        if self.parent.is_evaluated:
-            real_parent = bpy.data.objects.get(self.parent.name)
-            if real_parent is None:
-                raise RuntimeError("Unable to resolve the real object for the evaluated parent.")
-            self.parent = real_parent
+        if not self._parent_object_is_a_depsgraph_copy():
+            return
+        
+        real_parent = self._find_the_real_object()
+        self._ensure_parent_exists(real_parent)
+        self.parent = real_parent
+
+    def _parent_object_is_a_depsgraph_copy(self):
+        return self.parent.is_evaluated
+
+    def _find_the_real_object(self):
+        return bpy.data.objects.get(self.parent.name)
+
+    def _ensure_parent_exists(self, real_parent):
+        if real_parent is None:
+            raise RuntimeError("Unable to resolve the real object for the evaluated parent.")
 
     def _get_property_group_by_parameter(self, parent, parameter_name):
         '''DOCUMENTATION CODE A1'''
@@ -232,7 +244,7 @@ class Initialize:
     def _initiate_channel(self, channel_object, value=None):
         channel_number = self._get_initiate_channel_number(channel_object)
         value = self._determine_initiate_value(value)
-        Publish(self.influencer, channel_number, self.property_name, value, sender=CPV).execute()
+        Publish(self.influencer, self.influencer.Parameter, channel_number, self.property_name, value, sender=CPV).execute()
         self._set_memory_item(self.influencer.parameter_property_group, channel_object, value)
         if DEBUG: alva_log("influence", f"{BLUE}Initialize._initiate_channel | Channel {channel_number} | Value: {round(value, 2)}, Property name: {self.property_name}")
 
@@ -318,7 +330,7 @@ class Maintain:
         if DEBUG: alva_log("influence", f"{BLUE}Maintain._maintain_channel | Channel {channel_number} | (Stored value: {round(stored_value, 2)}, Current value: {round(current_value, 2)}, Needed change: {round(needed_change, 2)}, is_positive: {GREEN if is_positive else RED}{is_positive}{BLUE}, New memory value: {round(new_memory_value, 2)}, Property name: {self.property_name}, Must proceed: {GREEN if must_proceed else RED}{must_proceed}{RESET})")
 
         if must_proceed:
-            Publish(self.influencer, channel_number, self.property_name, needed_change, sender=CPV).execute()
+            Publish(self.influencer, self.influencer.Parameter, channel_number, self.property_name, needed_change, sender=CPV).execute()
             self._update_memory_item(memory_item, new_memory_value)
 
     def _get_memory_item(self, channel_object):
@@ -419,7 +431,7 @@ class Release:
         channel_number = self._get_release_channel_number(channel_object)
         memory_item = self._get_memory_item(channel_object)
         value = self._determine_release_value(memory_item)
-        Publish(self.influencer, channel_number, self._property_name, value, sender=CPV).execute()
+        Publish(self.influencer, self.influencer.Parameter, channel_number, self._property_name, value, sender=CPV).execute()
         self._remove_memory_item(memory_item)
 
     def _release_channel_from_memory(self, channel_object):  # So that brushes can target the same obj many times

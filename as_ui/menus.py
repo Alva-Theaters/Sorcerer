@@ -86,6 +86,7 @@ class TEXT_MT_alva_python_templates(Menu):
         layout = self.layout
         layout.operator('alva_text.template_add', text="Lighting Console").template_type = 'lighting_console'
         layout.operator('alva_text.template_add', text="Sequencer Strip").template_type = 'strip'
+        layout.operator('alva_text.template_add', text="Lighting Parameter").template_type = 'lighting_parameter'
 
 
 

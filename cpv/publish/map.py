@@ -2,6 +2,9 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+DYNAMIC_MIN = 'dynamic_min'
+DYNAMIC_MAX = 'dynamic_max'
+
 '''
 The problem is that Blender's custom properties cannot be assigned dynamic mins and maxes.
 
@@ -26,12 +29,12 @@ class SliderToFixtureMapper:
     MIN_UNIPOLAR = -100
     BIPOLAR_SCALE = 200
 
-    def __init__(self, publisher):
-        self.publisher = publisher
-        self.min_property_name = f"{self.publisher.property_name}_min"
-        self.max_property_name = f"{self.publisher.property_name}_max"
+    def __init__(self, unmapped_value, patch_controller, Parameter):
+        self.unmapped_value = unmapped_value
+        self.patch_controller = patch_controller
+        self.min_property_name = getattr(Parameter, 'dynamic_min')
+        self.max_property_name = getattr(Parameter, 'dynamic_max')
         self.min_val, self.max_val = self.find_min_max_values()
-        self.unmapped_value = self.publisher.value
 
     @property
     def is_negative_capable(self):
@@ -39,11 +42,11 @@ class SliderToFixtureMapper:
     
     def find_min_max_values(self):
         try:
-            min_value = getattr(self.publisher.patch_controller, self.min_property_name)
-            max_value = getattr(self.publisher.patch_controller, self.max_property_name)
+            min_value = getattr(self.patch_controller, self.min_property_name)
+            max_value = getattr(self.patch_controller, self.max_property_name)
         except AttributeError:
             raise ValueError(
-                f"Patch controller is missing required attributes: {self.min_property}, {self.max_property}"
+                f"Patch controller is missing required attributes: {self.min_property_name}, {self.max_property_name}"
             )
         return min_value, max_value
     

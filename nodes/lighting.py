@@ -434,8 +434,6 @@ def register():
     # Group controller node common property registrations.
     register_properties(NODE_NT_group_controller, common_properties.controller_ids)
     register_properties(NODE_NT_group_controller, common_properties.common_header)
-    register_properties(NODE_NT_group_controller, common_properties.common_parameters)
-    register_properties(NODE_NT_group_controller, common_properties.common_parameters_extended)
     register_properties(NODE_NT_group_controller, common_properties.mins_maxes)
     register_properties(NODE_NT_group_controller, common_properties.parameter_toggles)
     register_properties(NODE_NT_group_controller, common_properties.special_arguments)
@@ -456,8 +454,6 @@ def unregister():
     
     register_properties(NODE_NT_group_controller, common_properties.controller_ids, register=False)
     register_properties(NODE_NT_group_controller, common_properties.common_header, register=False)
-    register_properties(NODE_NT_group_controller, common_properties.common_parameters, register=False)
-    register_properties(NODE_NT_group_controller, common_properties.common_parameters_extended, register=False)
     register_properties(NODE_NT_group_controller, common_properties.mins_maxes, register=False)
     register_properties(NODE_NT_group_controller, common_properties.parameter_toggles, register=False)
     register_properties(NODE_NT_group_controller, common_properties.special_arguments, register=False)
