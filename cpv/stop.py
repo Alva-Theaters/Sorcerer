@@ -47,7 +47,7 @@ def check_flags(context, parent, property_name, controller_type):
         
     if controller_type == 'mixer': # Bypass parameter toggles for mixers since they don't have them.
         alva_log("stop", "STOP: CPV passes all flags, continuing.\n")
-        return True
+        return False
 
     param_flags = {
         'strobe': parent.strobe_is_on,

@@ -8,6 +8,8 @@ import mathutils
 from ..assets.sli import SLI
 from ..cpv.find import Find 
 
+from ..as_ui.utils import find_extendables_class
+
 
 def find_parent(object):
     """
@@ -86,54 +88,40 @@ def update_nodes(connected_nodes):
 
 
 def update_alva_controller(controller):
-    from ..makesrna.rna_common import CommonProperties 
-    props = CommonProperties
+    parameters = find_extendables_class('parameters', all=True)
     
     if hasattr(controller, "bl_idname") and controller.bl_idname == 'mixer_type':
         for choice in controller.parameters:
-            for prop_name, _ in props.common_parameters:
-                setattr(choice, prop_name, getattr(choice, prop_name))
+            for param in parameters.values():
+                if hasattr(choice, param.as_idname):
+                    if hasattr(param, 'default'):
+                        setattr(choice, param.as_idname, getattr(choice, param.as_idname))
 
     else:
-        for prop_name, _ in props.common_parameters + props.common_parameters_extended:
-            setattr(controller, prop_name, getattr(controller, prop_name))
+        for param in parameters.values():
+            if hasattr(controller, param.as_idname):
+                if hasattr(param, 'default'):
+                    setattr(controller, param.as_idname, getattr(controller, param.as_idname))
 
 
 def home_alva_controller(controller):
-    from ..makesrna.rna_common import CommonProperties 
-    props = CommonProperties
+    parameters = find_extendables_class('parameters', all=True)
 
     if hasattr(controller, "bl_idname") and controller.bl_idname == 'mixer_type':
         controller.float_offset = 0
         controller.int_subdivisions = 0
 
         for choice in controller.parameters:
-            for prop_name, prop in props.common_parameters:
-                try:
-                    current_value = getattr(choice, prop_name)
-                    if prop_name == "alva_iris":
-                        setattr(choice, prop_name, 100)
-                    elif prop_name == "alva_color":
-                        setattr(choice, prop_name, tuple(1.0 for _ in current_value))
-                    elif prop_name in ["alva_intensity", "alva_pan", "alva_tilt", "alva_zoom"]:
-                        setattr(choice, prop_name, 0)
-                except AttributeError:
-                    print(f"Attribute {prop_name} not found in controller, skipping.")
+            for param in parameters.values():
+                if hasattr(choice, param.as_idname):
+                    if hasattr(param, 'default'):
+                        setattr(choice, param.as_idname, param.default)
 
     else:
-        for prop_name, prop in props.common_parameters + props.common_parameters_extended:
-            try:
-                current_value = getattr(controller, prop_name)
-                if prop_name == "alva_iris":
-                    setattr(controller, prop_name, 100)
-                elif prop_name == "alva_color":
-                    setattr(controller, prop_name, tuple(1.0 for _ in current_value))
-                elif prop_name in [
-                    "alva_intensity", "alva_pan", "alva_tilt", "alva_zoom", "alva_strobe", 
-                    "alva_edge", "alva_diffusion", "alva_gobo_speed", "alva_gobo_id", "alva_prism"]:
-                    setattr(controller, prop_name, 0)
-            except AttributeError:
-                print(f"Attribute {prop_name} not found in controller, skipping.")
+        for param in parameters.values():
+            if hasattr(controller, param.as_idname):
+                if hasattr(param, 'default'):
+                    setattr(controller, param.as_idname, param.default)
 
 
 def simplify_channels_list(channels):

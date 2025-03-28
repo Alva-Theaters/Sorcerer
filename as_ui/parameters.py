@@ -194,7 +194,7 @@ class DrawButtons:
         self.draw_update()
     
     def draw_mute(self):
-        self.Parameters.draw_button_with_node_ids("alva_object.toggle_object_mute", 
+        self.draw_button("alva_object.toggle_object_mute", 
                                                   icon='HIDE_ON' if self.Parameters.active_object.mute else 'HIDE_OFF')
         
     def draw_solo(self):
@@ -202,10 +202,16 @@ class DrawButtons:
                       icon='SOLO_OFF' if not self.Parameters.active_object.alva_solo else 'SOLO_ON')
         
     def draw_home(self):
-        self.Parameters.draw_button_with_node_ids("alva_node.home", icon='HOME')
+        self.draw_button("alva_node.home", icon='HOME')
         
     def draw_update(self):
-        self.Parameters.draw_button_with_node_ids("alva_node.update", icon='FILE_REFRESH')
+        self.draw_button("alva_node.update", icon='FILE_REFRESH')
+
+    def draw_button(self, bl_idname, icon):
+        op = self.row.operator(bl_idname, icon=icon, text="")
+        op.space_type = self.Parameters.space_type
+        op.node_name = self.Parameters.node_name
+        op.node_tree_name = self.Parameters.node_tree_name
 
 
 def draw_parameters_mini(context, layout, active_object, use_slider=False, expand=True, text=True):

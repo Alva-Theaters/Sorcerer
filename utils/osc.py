@@ -9,7 +9,7 @@ import time
 
 from ..maintenance.logging import alva_log
 
-DEBUG = True
+DEBUG = False
 
 _eos_sock = None  # Persistent connection reference
 ETC_EOS_TCP_PORT = 3032

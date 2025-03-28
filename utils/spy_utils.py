@@ -6,6 +6,8 @@ import bpy
 from bpy.props import IntProperty, EnumProperty, FloatVectorProperty
 from bpy.types import Object, ColorSequence, Light, Node
 
+from ..makesrna.property_groups import MixerParameters
+
 REGISTERED_LIGHTING_CONSOLES = {}
 REGISTERED_STRIPS = {}
 REGISTERED_PARAMETERS = {}
@@ -224,6 +226,6 @@ def register_bpy_property(cls):
         print(f"Skipping {cls.__name__}: Unsupported property type.")
         return
 
-    controller_types = [Object, ColorSequence, Light, Node]
+    controller_types = [Object, ColorSequence, Light, Node, MixerParameters]
     for controller in controller_types:
         setattr(controller, as_idname, prop)
