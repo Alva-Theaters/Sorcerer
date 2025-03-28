@@ -88,7 +88,7 @@ def update_nodes(connected_nodes):
 def update_alva_controller(controller):
     from ..makesrna.rna_common import CommonProperties 
     props = CommonProperties
-
+    
     if hasattr(controller, "bl_idname") and controller.bl_idname == 'mixer_type':
         for choice in controller.parameters:
             for prop_name, _ in props.common_parameters:

@@ -112,6 +112,9 @@ def register_as_classes():
     from .extendables.fixture_parameters import register as register_parameters
     register_parameters()
 
+    from .extendables.lighting_controllers import register as register_controllers
+    register_controllers()
+
 
 def on_register():
     from .maintenance.tests import test_sorcerer
@@ -139,3 +142,6 @@ def unregister_as_classes():
 
     from .extendables.fixture_parameters import unregister as unregister_parameters
     unregister_parameters()
+
+    from .extendables.lighting_controllers import unregister as unregister_controllers
+    unregister_controllers()

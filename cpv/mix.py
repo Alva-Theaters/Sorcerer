@@ -10,25 +10,26 @@ import mathutils
 
 from ..assets.sli import SLI 
 from ..maintenance.logging import alva_log
-from .publish import Publish, CPV
+from .publish.publish import Publish, CPV
 
 # pyright: reportInvalidTypeForm=false
 
 OFFSET_SENSITIVITY = .25
 
 
-def find_mixer_cpv(generator):
+def find_mixer_cpv(Generator, Parameter):
     """Receives a bpy object mesh, parent, and returns three lists for channels list (c), parameters list (p), 
         and values list (v)"""
     start_time = time.time()
-    MixCPV(generator).execute(start_time)
+    MixCPV(Generator, Parameter).execute(start_time)
 
 
 class MixCPV:
-    def __init__(self, generator):
-        self.parent = generator.parent
-        self.property_name = generator.property_name
-        self.controller_type = generator.controller_type 
+    def __init__(self, Generator, Parameter):
+        self.parent = Generator.parent
+        self.Parameter = Parameter
+        self.property_name = Generator.property_name
+        self.controller_type = Generator.controller_type 
         self.channels_list = [channel.chan for channel in self.parent.list_group_channels]
 
 
@@ -59,7 +60,7 @@ class MixCPV:
 
         alva_log('mix', f"MAIN. mix.py is returning: {channels, values}")
         for channel, value in zip(channels, values):
-            Publish(self, channel, parameter, value,sender=CPV).execute()
+            Publish(self, self.Parameter, channel, parameter, value, sender=CPV).execute()
 
         alva_log('time', f"TIME: mix_my_values took {time.time() - start_time} seconds\n")
     

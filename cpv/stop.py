@@ -8,21 +8,21 @@ from ..maintenance.logging import alva_log
 def check_flags(context, parent, property_name, controller_type):
     if not parent or not controller_type:
         alva_log("stop", "STOP: Stopping CPV per nonetypes.\n")
-        return False
+        return True
 
     if hasattr(parent, "mute") and parent.mute:
         alva_log("stop", "STOP: Stopping CPV per mute.\n")
-        return False
+        return True
 
     scene = context.scene.scene_props
 
     if scene.freeze_cpv:
         alva_log("stop", "STOP: Stopping CPV per freezing.\n")
-        return False
+        return True
 
     if not scene.enable_lighting:
         alva_log("stop", "STOP: Stopping CPV per enable_lighting.\n")
-        return False
+        return True
     
     # Check type-related flags
     type_checks = {
@@ -34,16 +34,16 @@ def check_flags(context, parent, property_name, controller_type):
     if controller_type in type_checks:
         if not type_checks[controller_type]:
             alva_log("stop", "STOP: Stopping CPV per type_checks.\n")
-            return False
+            return True
         
     elif not scene.enable_objects:
         alva_log("stop", "STOP: Stopping CPV per type_checks.\n")
-        return False
+        return True
     
     if scene.has_solos and (scene.is_playing or scene.in_frame_change):
         if not parent.alva_solo:
             alva_log("stop", "STOP: Stopping CPV per solos.\n")
-            return False
+            return True
         
     if controller_type == 'mixer': # Bypass parameter toggles for mixers since they don't have them.
         alva_log("stop", "STOP: CPV passes all flags, continuing.\n")
@@ -65,7 +65,7 @@ def check_flags(context, parent, property_name, controller_type):
 
     if property_name in param_flags and not param_flags[property_name]:
         alva_log("stop", "STOP: Stopping CPV per parameter toggles.\n")
-        return False
+        return True
 
     if scene.in_frame_change:
         frame = round(context.scene.frame_current) # This is technically a float
@@ -73,20 +73,20 @@ def check_flags(context, parent, property_name, controller_type):
         if freeze_mode == 'option_seconds':
             if not scene.enable_seconds:
                 alva_log("stop", "STOP: Stopping CPV per render freezing (seconds globally disabled).\n")
-                return False
+                return True
             if frame % 2 != 0:
                 alva_log("stop", "STOP: Stopping CPV per render freezing (seconds).\n")
-                return False
+                return True
         elif freeze_mode == 'option_thirds':
             if not scene.enable_thirds:
                 alva_log("stop", "STOP: Stopping CPV per render freezing (thirds globally disabled).\n")
-                return False
+                return True
             if frame % 3 != 0:
                 alva_log("stop", "STOP: Stopping CPV per render freezing (thirds).\n")
-                return False
+                return True
         
     alva_log("stop", "STOP: CPV passes all flags, continuing.\n")
-    return True
+    return False
 
 
 def test_flags(SENSITIVITY): # Return True for fail, False for pass

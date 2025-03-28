@@ -43,17 +43,6 @@ AVAILABLE PROPERTY LISTS.
     - Includes manual fixture selection, group and profile enums,
       and color profile enums.
 
- 5. common_parameters:
-    - Core parameter controls such as intensity, color, pan, tilt,
-      zoom, and iris.
-    - Currently only used by itself for mixer nodes.
-
- 6. common_parameters_extended:
-    - Extension of the common parameters.
-    - Includes properties like influence, color restore, volume,
-      diffusion, strobe, edge, gobo settings, and prism.
-    - Used everywhere except on mixer nodes.
-
  7. mins_maxes:
     - Properties defining the minimum and maximum values for
       pan, tilt, zoom, and gobo_speed.
@@ -150,16 +139,6 @@ class CommonProperties:
             min=0.0,
             max=.2
         )),
-        ('pan_graph', FloatProperty(
-            name="Pan",
-            default=0.0,
-            update=CPVGenerator.pan_graph_updater
-        )),
-        ('tilt_graph', FloatProperty(
-            name="Tilt",
-            default=0.0,
-            update=CPVGenerator.tilt_graph_updater
-        )),
         ('pan_is_inverted', BoolProperty(default=True, description="Light is hung facing forward, for example, in FOH")),
         ('last_hue', FloatProperty(default=0)),
         ('overdrive_mode', StringProperty(default="")),
@@ -173,43 +152,6 @@ class CommonProperties:
         ('int_speaker_number', IntProperty(name="Speaker Number", update=CommonUpdaters.speaker_number_updater, description=find_tooltip("speaker_number"), default=0)),
         ('sound_source_enum', EnumProperty(name="Sound Source", items=AlvaItems.get_sound_sources, description=find_tooltip("sound_source")))
     ]
-
-    flash_strip_parameters = [
-        ('float_flash_intensity_up', FloatProperty(name="Intensity Up", default=0, min=0, max=100, description="Intensity value", update=CPVGenerator.intensity_updater)),
-        ('float_vec_flash_color_up', FloatVectorProperty(
-            name="Color Up",
-            subtype='COLOR',
-            size=3,
-            default=(1.0, 1.0, 1.0),
-            min=0.0,
-            max=1.0,
-            description="Color value",
-            update=CPVGenerator.color_updater
-        )), 
-        ('float_flash_pan_up', FloatProperty(name="Pan Up", default=0, min=-315, max=315, description="Pan value", update=CPVGenerator.pan_updater)),
-        ('float_flash_tilt_up', FloatProperty(name="Tilt Up", default=0, min=-135, max=135, description="Tilt value", update=CPVGenerator.tilt_updater)),
-        ('float_flash_strobe_up', FloatProperty(name="Strobe Up", default=0, min=0, max=100, description="Strobe value", update=CPVGenerator.strobe_updater)),
-        ('float_flash_zoom_up', FloatProperty(name="Zoom Up", default=0, min=0, max=100, description="Zoom value", update=CPVGenerator.zoom_updater)),
-        ('float_flash_iris_up', FloatProperty(name="Iris Up", default=0, min=0, max=100, description="Iris value", update=CPVGenerator.iris_updater)),
-        ('int_flash_gobo_id_up', IntProperty(name="Gobo ID Up", default=1, min=0, max=20, description="Gobo selection", update=CPVGenerator.gobo_id_updater)),
-        ('float_flash_intensity_down', FloatProperty(name="Inensity Down", default=0, min=0, max=100, description="Intensity value", update=CPVGenerator.intensity_updater)),
-        ('float_vec_flash_color_down', FloatVectorProperty(
-            name="Color Down",
-            subtype='COLOR',
-            size=3,
-            default=(1.0, 1.0, 1.0),
-            min=0.0,
-            max=1.0,
-            description="Color value",
-            update=CPVGenerator.color_updater
-        )),
-        ('float_flash_pan_down', FloatProperty(name="Pan Down", default=0, min=-315, max=315, description="Pan value", update=CPVGenerator.pan_updater)),
-        ('float_flash_tilt_down', FloatProperty(name="Tilt Down", default=0, min=-135, max=135, description="Tilt value", update=CPVGenerator.tilt_updater)),
-        ('float_flash_strobe_down', FloatProperty(name="Strobe Down", default=0, min=0, max=100, description="Strobe value", update=CPVGenerator.strobe_updater)),
-        ('float_flash_zoom_down', FloatProperty(name="Zoom Down", default=0, min=0, max=100, description="Zoom value", update=CPVGenerator.zoom_updater)),
-        ('float_flash_iris_down', FloatProperty(name="Iris Down", default=0, min=0, max=100, description="Iris value", update=CPVGenerator.iris_updater)),
-        ('int_flash_gobo_id_down', IntProperty(name="Gobo ID Down", default=1, min=0, max=20, description="Gobo selection", update=CPVGenerator.gobo_id_updater))
-    ]  
 
     common_header = [
         ('str_manual_fixture_selection', StringProperty(
@@ -230,11 +172,6 @@ class CommonProperties:
             items=AlvaItems.scene_groups,
             update=CommonUpdaters.group_profile_updater
         )),
-        ('color_profile_enum', EnumProperty(
-            name="Color Profile",
-            description=find_tooltip("color_profile_enum"),
-            items=AlvaItems.color_profiles,
-        )),
         ('alva_solo', BoolProperty(
             name="Solo",
             description=find_tooltip("solo"),
@@ -245,140 +182,6 @@ class CommonProperties:
             description=find_tooltip("freezing_mode_enum"),
             items=AlvaItems.freezing_modes,
         )),
-    ]
-
-    common_parameters = [
-        ('influence', IntProperty(
-            default=1, description="", min=1, max=10)),
-        ('alva_intensity', IntProperty(
-            name="Intensity",
-            default=0,
-            min=0,
-            max=100,
-            description=find_tooltip("intensity"),
-            options={'ANIMATABLE'},
-            update=CPVGenerator.intensity_updater
-        )),
-        ('alva_color', FloatVectorProperty(
-            name="Color",
-            subtype='COLOR',
-            size=3,
-            default=(1.0, 1.0, 1.0),
-            min=0.0,
-            max=1.0,
-            description=find_tooltip("color"),
-            update=CPVGenerator.color_updater
-        )),
-        ('alva_pan', IntProperty(
-            name="Pan",
-            default=0,
-            min=-100,
-            max=100,
-            description=find_tooltip("pan"),
-            options={'ANIMATABLE'},
-            update=CPVGenerator.pan_updater
-        )),
-        ('alva_tilt', IntProperty(
-            name="Tilt",
-            default=0,
-            min=-100,
-            max=100,
-            description=find_tooltip("tilt"),
-            options={'ANIMATABLE'},
-            update=CPVGenerator.tilt_updater
-        )),
-        ('alva_zoom', IntProperty(
-            name="Zoom",
-            default=0,
-            min=0,
-            max=100,
-            description=find_tooltip("zoom"),
-            options={'ANIMATABLE'},
-            update=CPVGenerator.zoom_updater
-        )),
-        ('alva_iris', IntProperty(
-            name="Iris",
-            default=100,
-            min=0,
-            max=100,
-            description=find_tooltip("iris"),
-            options={'ANIMATABLE'},
-            update=CPVGenerator.iris_updater
-        ))
-    ]
-        
-    common_parameters_extended = [
-        ('alva_color_restore', FloatVectorProperty(
-            name="Color (restore)",
-            subtype='COLOR',
-            size=3,
-            default=(1.0, 1.0, 1.0),
-            min=0.0,
-            max=1.0,
-            description=find_tooltip("color_restore"),
-        )),
-        ('alva_volume', IntProperty(
-            name="Volume",
-            default=0,
-            min=0,
-            max=100,
-            description=find_tooltip("volume"),
-            options={'ANIMATABLE'}
-        )),
-        ('alva_diffusion', IntProperty(
-            name="Diffusion",
-            default=0,
-            min=0,
-            max=100,
-            description=find_tooltip("diffusion"),
-            options={'ANIMATABLE'},
-            update=CPVGenerator.diffusion_updater
-        )),
-        ('alva_strobe', IntProperty(
-            name="Strobe",
-            default=0,
-            min=0,
-            max=100,
-            description=find_tooltip("strobe"),
-            options={'ANIMATABLE'},
-            update=CPVGenerator.strobe_updater
-        )),
-        ('alva_edge', IntProperty(
-            name="Edge",
-            default=0,
-            min=0,
-            max=100,
-            description=find_tooltip("edge"),
-            options={'ANIMATABLE'},
-            update=CPVGenerator.edge_updater
-        )),
-        ('alva_gobo', IntProperty(
-            name="Gobo ID",
-            default=1,
-            min=0,
-            max=20,
-            description=find_tooltip("gobo"),
-            options={'ANIMATABLE'},
-            update=CPVGenerator.gobo_id_updater
-        )),
-        ('alva_gobo_speed', IntProperty(
-            name="Speed",
-            default=0,
-            min=-100,
-            max=100,
-            description=find_tooltip("speed"),
-            options={'ANIMATABLE'},
-            update=CPVGenerator.gobo_speed_updater
-        )),
-        ('alva_prism', IntProperty(
-            name="Prism",
-            default=0,
-            min=0,
-            max=1,
-            description=find_tooltip("prism"),
-            options={'ANIMATABLE'},
-            update=CPVGenerator.prism_updater
-        ))
     ]
         
     mins_maxes = [
@@ -566,8 +369,6 @@ def register():
             CommonProperties.controller_ids,
             CommonProperties.object_only,  # Unique
             CommonProperties.common_header,
-            CommonProperties.common_parameters,
-            CommonProperties.common_parameters_extended,
             CommonProperties.mins_maxes,
             CommonProperties.parameter_toggles,
             CommonProperties.special_arguments
@@ -579,8 +380,6 @@ def register():
         *[
             CommonProperties.controller_ids,
             CommonProperties.common_header,
-            CommonProperties.common_parameters,
-            CommonProperties.common_parameters_extended,
             CommonProperties.mins_maxes,
             CommonProperties.parameter_toggles
         ]
@@ -592,12 +391,9 @@ def register():
         *[
             CommonProperties.controller_ids,
             CommonProperties.common_header,
-            CommonProperties.common_parameters,
-            CommonProperties.common_parameters_extended,
             CommonProperties.mins_maxes,
             CommonProperties.parameter_toggles,
             CommonProperties.special_arguments,
-            CommonProperties.flash_strip_parameters  # Unique
         ]
     )
 
@@ -616,8 +412,6 @@ def unregister():
 
             CommonProperties.controller_ids,
             CommonProperties.common_header,
-            CommonProperties.common_parameters,
-            CommonProperties.common_parameters_extended,
             CommonProperties.mins_maxes,
             CommonProperties.parameter_toggles,
             CommonProperties.special_arguments
@@ -630,8 +424,6 @@ def unregister():
         *[
             CommonProperties.controller_ids,
             CommonProperties.common_header,
-            CommonProperties.common_parameters,
-            CommonProperties.common_parameters_extended,
             CommonProperties.mins_maxes,
             CommonProperties.parameter_toggles
         ],
@@ -644,13 +436,9 @@ def unregister():
         *[
             CommonProperties.controller_ids,
             CommonProperties.common_header,
-            CommonProperties.common_parameters,
-            CommonProperties.common_parameters_extended,
             CommonProperties.mins_maxes,
             CommonProperties.parameter_toggles,
             CommonProperties.special_arguments,
-
-            CommonProperties.flash_strip_parameters
         ],
         register=False
     )

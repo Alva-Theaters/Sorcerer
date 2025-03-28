@@ -8,6 +8,7 @@ from typing import Tuple, Union
 import mathutils
 
 from .cpv.find import Find
+from .cpv.cpv_generator import CPVGenerator
 from .utils.osc import OSC
 from .utils.event_utils import EventUtils
 from .utils.spy_utils import SpyDataStructure
@@ -206,6 +207,10 @@ class SorcererPython(SpyDataStructure):
     def find_nodes(scene: bpy.types.Scene) -> list[bpy.types.Node]:
         '''Find nodes in scene relevant to Sorcerer'''
         return Find.find_nodes(scene)
+    
+
+    def update_cpv(self, context, Parameter):
+        CPVGenerator(self, context, Parameter).execute()
 
 
 # Allow direct, easy access from text editor.

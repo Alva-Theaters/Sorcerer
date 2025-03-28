@@ -121,6 +121,11 @@ class EventUtils:
         bpy.context.scene.scene_props.in_frame_change = flag
 
     @staticmethod
+    def clear_requests():
+        from ..cpv.publish.publish import change_requests
+        change_requests.clear()
+
+    @staticmethod
     def fire_updaters(updates): 
         '''Start the logic to create a CPV request for the controller's 
            changed property.'''

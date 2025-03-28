@@ -279,7 +279,6 @@ def register():
 
     from ..utils.rna_utils import register_properties
     from .rna_common import CommonProperties
-    register_properties(MixerParameters, CommonProperties.common_parameters)
     register_properties(GroupData, CommonProperties.mins_maxes)
     register_properties(GroupData, CommonProperties.special_arguments)
     register_properties(GroupData, CommonProperties.parameter_toggles)
@@ -318,7 +317,6 @@ def unregister():
     
     from ..utils.rna_utils import register_properties
     from .rna_common import CommonProperties
-    register_properties(MixerParameters, CommonProperties.common_parameters, register=False)
     register_properties(GroupData, CommonProperties.mins_maxes, register=False)
     register_properties(GroupData, CommonProperties.special_arguments, register=False)
     register_properties(GroupData, CommonProperties.parameter_toggles, register=False)

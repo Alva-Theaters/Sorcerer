@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import bpy
+from ..utils.spy_utils import REGISTERED_PARAMETERS
 
 # Custom icon stuff
 import bpy.utils.previews
@@ -18,234 +19,193 @@ icons_dir = os.path.join(addon_dir, "icons")
 pcoll.load("zoom", os.path.join(icons_dir, "zoom.png"), 'IMAGE')
 pcoll.load("edge", os.path.join(icons_dir, "edge.png"), 'IMAGE')
 
+pcoll = preview_collections["main"]
+zoom = pcoll["zoom"]
+edge = pcoll["edge"]
+
+EMPTY = ''
+NORMAL_ICON = 'icon'
+CUSTOM_ICON = 'custom_icon'
+NO_ICON = 'no_icon'
+
+prop_args = ['as_idname', 'as_label', 'icon', 'icon_value', 'is_new_row', 'icon_only']
+
 
 def draw_parameters(context, box, active_object):
-    pcoll = preview_collections["main"]
-    zoom = pcoll["zoom"]
-    edge = pcoll["edge"]
+    Parameters(context, box, active_object).execute()
 
-    if not hasattr(active_object, "object_identities_enum"):
-        object_type = "Strip"
-    else:
-        object_type = active_object.object_identities_enum
+
+class Parameters:
+    def __init__(self, context, box, active_object):
+        self.context = context
+        self.box = box
+        self.active_object = active_object
+        self.space_type = context.space_data.type
+        self.object_type = self.find_object_type()
+        self.set_node_tree_names()
     
-    space_type = context.space_data.type
+    def find_object_type(self):
+        if hasattr(self.active_object, "object_identities_enum"):
+            return self.active_object.object_identities_enum
+        return "Strip"
+
+    def set_node_tree_names(self):
+        if self.space_type == 'NODE_EDITOR':
+            self.node_tree = self.context.space_data.node_tree
+            self.node_name = self.active_object.name
+            self.node_tree_name = self.node_tree.name
+        else:
+            self.node_name = ""
+            self.node_tree_name = ""
+
+    def draw_button_with_node_ids(self, as_idname, icon=EMPTY, icon_value=EMPTY):
+        if icon == EMPTY:
+            self.draw_button_with_custom_icon(as_idname, icon_value)
+        else:
+            self.draw_button_with_normal_icon(as_idname, icon)
+
+    def draw_button_with_normal_icon(self, as_idname, icon):
+        op = self.row.operator('alva_common.parameter_popup', icon=icon, text="")
+        op.space_type = self.space_type
+        op.node_name = self.node_name
+        op.node_tree_name = self.node_tree_name
+        op.parameter_as_idname = as_idname
+
+    def draw_button_with_custom_icon(self, as_idname, icon_value):
+        icon_id = zoom.icon_id if icon_value == 'zoom' else edge.icon_id # Must go in same script because of Blender bug.
+        op = self.row.operator('alva_common.parameter_popup', icon_value=icon_id, text="")
+        op.space_type = self.space_type
+        op.node_name = self.node_name
+        op.node_tree_name = self.node_tree_name
+        op.parameter_as_idname = as_idname
+
+    def draw_new_row(self):
+        self.row = self.box.row(align=True)
+
+
+    def execute(self):
+        self.draw_new_row()
+        DrawButtons(self).execute()
+        parameter_classes = self.find_parameter_classes()
+        self.draw_all_parameters(parameter_classes)
+
+    def find_parameter_classes(self):
+        parameters = []
+        for param_class in REGISTERED_PARAMETERS.values():
+            param_info = {arg: getattr(param_class, arg, EMPTY) for arg in prop_args}
+            param_info = self.add_poll(param_class, param_info)
+            param_info = self.add_draw_popup(param_class, param_info)
+            parameters.append(param_info)
+
+        return parameters
     
-    if space_type == 'NODE_EDITOR':
-        node_tree = context.space_data.node_tree
-        node_name = active_object.name
-        node_tree_name = node_tree.name
-    else:
-        node_name = ""
-        node_tree_name = ""
+    def add_poll(self, param_class, param_info):
+        if hasattr(param_class, "poll"):
+            param_info["poll"] = param_class.poll
+        return param_info
 
-
-    strobe_and_color_row_conditions = [
-        active_object.strobe_is_on or active_object.color_is_on
-    ]
-
-    strobe_conditions = [
-        active_object.strobe_is_on,
-        object_type not in {"Influencer", "Brush"}
-    ]
-
-    color_conditions = [
-        active_object.color_is_on
-    ]
-
-    restore_color_conditions = [
-        hasattr(active_object, "object_identities_enum"),
-        object_type == "Influencer"
-    ]
-
-    color_profile_conditions = [
-        not context.scene.scene_props.school_mode_enabled,
-        object_type not in {"Influencer", "Brush"}
-    ]
-
-    pan_and_tilt_row_conditions = [
-        active_object.pan_tilt_is_on,
-        object_type not in {"Stage Object", "Influencer", "Brush"},
-        not context.scene.scene_props.school_mode_enabled or not context.scene.scene_props.restrict_pan_tilt,
-    ]
-
-    zoom_and_iris_row_conditions = [
-        active_object.zoom_is_on or active_object.iris_is_on
-    ]
-
-    zoom_conditions = [
-        active_object.zoom_is_on
-    ]
-
-    iris_conditions = [
-        active_object.iris_is_on
-    ]
-
-    edge_and_diffusion_conditions = [
-        (active_object.edge_is_on or active_object.diffusion_is_on),
-        object_type not in {"Influencer", "Brush"}
-    ]
-
-    edge_conditions = [
-        active_object.edge_is_on
-    ]
-
-    diffusion_conditions = [
-        active_object.diffusion_is_on
-    ]
-
-    gobo_row_conditions = [
-        active_object.gobo_is_on,
-        object_type not in {"Influencer", "Brush"}
-    ]
+    def add_draw_popup(self, param_class, param_info):
+        if hasattr(param_class, "draw_popup"):
+            param_info["popup"] = True
+        return param_info
     
-    row = box.row(align=True)
-    draw_mute_solo_home_update(space_type, node_name, node_tree_name, active_object, row)
-    draw_intensity(active_object, row)
+    def draw_all_parameters(self, parameter_classes):
+        for param_info in parameter_classes:
+            if self.should_stop_at_poll(param_info):
+                continue
+            DrawParameterCombo(self, **param_info).execute()
 
-    if all(strobe_and_color_row_conditions):
-        row = box.row(align=True)
+    def should_stop_at_poll(self, param_info):
+        poll_func = param_info.get("poll", None)
+        if poll_func and not poll_func(self.context, self.active_object, self.object_type):
+            return True
 
-        if all(strobe_conditions):
-            draw_strobe(space_type, node_name, node_tree_name, active_object, row)
 
-        if all(color_conditions):
-            draw_color(active_object, row)
+class DrawParameterCombo:
+    def __init__(self, Parameters, as_idname, icon=EMPTY, as_label="", icon_only=False, slider=True, popup=None, is_new_row=None, icon_value=EMPTY, poll=None):
+        self.Parameters = Parameters
+        self.active_object = Parameters.active_object
+        self.is_new_row = is_new_row
+        self.popup = popup
+        self.icon_only = icon_only
+        self.as_idname = as_idname
+        self.as_label = as_label
+        self.icon = icon
+        self.icon_value = icon_value
+        self.slider = slider
+        self.icon_mode = self.find_icon_mode()
 
-            if all(restore_color_conditions):
-                draw_restore_color(active_object, row)
-
-            if all(color_profile_conditions):
-                draw_color_profile(active_object, row)
-  
-    if all(pan_and_tilt_row_conditions):
-        draw_pan_tilt(space_type, node_name, node_tree_name, active_object, box)
-
-    if all(zoom_and_iris_row_conditions):
-        row = draw_zoom_iris_row(space_type, node_name, node_tree_name, zoom, active_object, box)
-
-        if all(zoom_conditions):
-            draw_zoom(active_object, row)
-
-        if all(iris_conditions):
-            draw_iris(active_object, row)
+    def find_icon_mode(self):
+        if self.icon == EMPTY and self.icon_value == EMPTY:
+            return NO_ICON
+        if self.icon == EMPTY:
+            return CUSTOM_ICON
+        return NORMAL_ICON
     
-    if all(edge_and_diffusion_conditions):
-        row = draw_edge_diffusion_row(space_type, node_name, node_tree_name, edge, box)
 
-        if all(edge_conditions):
-            draw_edge(active_object, row)
-            
-        if all(diffusion_conditions):
-            draw_diffusion(active_object, row)
-            
-    if all(gobo_row_conditions):
-        draw_gobo_row(space_type, node_name, node_tree_name, active_object, box)
+    def execute(self):
+        self.draw_new_row_if_needed()
+        self.draw_popup_button_if_needed()
+        self.draw_parameter()
+
+    def draw_new_row_if_needed(self):
+        if self.is_new_row and self.is_new_row(self.active_object):
+            self.Parameters.draw_new_row()
+
+    def draw_new_row(self):
+        self.Parameters.row = self.Parameters.box.row(align=True)
+
+    def draw_popup_button_if_needed(self):
+        if self.popup and self.icon_only == EMPTY:
+            self.draw_button_with_icon()
+
+    def draw_button_with_icon(self):
+        if self.icon_mode == CUSTOM_ICON:
+            self.Parameters.draw_button_with_node_ids(self.as_idname, icon_value=self.icon_value)
+        if self.icon_mode == NORMAL_ICON:
+            self.Parameters.draw_button_with_node_ids(self.as_idname, icon=self.icon)
+
+    def draw_parameter(self):
+        icon_style_lookup = {
+            NO_ICON: self.draw_parameter_without_icon,
+            NORMAL_ICON: self.draw_parameter_with_normal_icon,
+            CUSTOM_ICON: self.draw_parameter_without_icon
+        }
+        icon_style_lookup[self.icon_mode]()
+
+    def draw_parameter_without_icon(self):
+        self.Parameters.row.prop(self.active_object, self.as_idname, text=self.as_label, slider=self.slider)
+        
+    def draw_parameter_with_normal_icon(self):
+        icon_id = self.icon_only if self.icon_only != EMPTY else False # Must not be passed as '' or EMPTY
+        self.Parameters.row.prop(self.active_object, self.as_idname, icon=self.icon, text=self.as_label, icon_only=icon_id, slider=self.slider)
 
 
-def draw_mute_solo_home_update(space_type, node_name, node_tree_name, active_object, row):
-    # MUTE
-    op_mute = row.operator("alva_object.toggle_object_mute", icon='HIDE_ON' if active_object.mute else 'HIDE_OFF', text="")
-    op_mute.space_type = space_type
-    op_mute.node_name = node_name
-    op_mute.node_tree_name = node_tree_name
+class DrawButtons:
+    def __init__(self, parameters_instance):
+        self.Parameters = parameters_instance
+        self.row = parameters_instance.row
 
-    # SOLO
-    row.prop(active_object, "alva_solo", text="", icon='SOLO_OFF' if not active_object.alva_solo else 'SOLO_ON')
 
-    # HOME
-    op_home = row.operator("alva_node.home", icon='HOME', text="")
-    op_home.space_type = space_type
-    op_home.node_name = node_name
-    op_home.node_tree_name = node_tree_name
+    def execute(self):
+        self.draw_mute()
+        self.draw_solo()
+        self.draw_home()
+        self.draw_update()
     
-    # UPDATE
-    op_update = row.operator("alva_node.update", icon='FILE_REFRESH', text="")
-    op_update.space_type = space_type
-    op_update.node_name = node_name
-    op_update.node_tree_name = node_tree_name
-
-
-def draw_intensity(active_object, row):
-    row.prop(active_object, "alva_intensity", slider=True, text="Intensity")
-
-
-def draw_strobe(space_type, node_name, node_tree_name, active_object, row):
-    op = row.operator("alva_common.strobe_properties", icon='OUTLINER_OB_LIGHTPROBE', text="")
-    op.space_type = space_type
-    op.node_name = node_name
-    op.node_tree_name = node_tree_name
-
-    row.prop(active_object, "alva_strobe", text="Strobe", slider = True)
-
-
-def draw_color(active_object, row):
-    row.prop(active_object, "alva_color", text="")
-
-
-def draw_restore_color(active_object, row):
-    row.prop(active_object, "alva_color_restore", text="")
-
-
-def draw_color_profile(active_object, row):
-    row.prop(active_object, "color_profile_enum", text="", icon='COLOR', icon_only=True)
-
-
-def draw_pan_tilt(space_type, node_name, node_tree_name, active_object, box):
-    row = box.row(align=True)
-    op = row.operator("alva_common.pan_tilt_properties", icon='ORIENTATION_GIMBAL', text="")
-    op.space_type = space_type
-    op.node_name = node_name
-    op.node_tree_name = node_tree_name
-    
-    row.prop(active_object, "alva_pan", text="Pan", slider=True)
-    row.prop(active_object, "alva_tilt", text="Tilt", slider=True)
-
-
-def draw_zoom_iris_row(space_type, node_name, node_tree_name, zoom, active_object, box):
-    row = box.row(align=True)
-    op = row.operator("alva_common.zoom_iris_properties", text="", icon_value=zoom.icon_id)
-    op.space_type = space_type
-    op.node_name = node_name
-    op.node_tree_name = node_tree_name
-    return row
-    
-    
-def draw_zoom(active_object, row):
-    row.prop(active_object, "alva_zoom", slider=True, text="Zoom")
-
-
-def draw_iris(active_object, row):
-    row.prop(active_object, "alva_iris", slider=True, text="Iris")
-
-
-def draw_edge_diffusion_row(space_type, node_name, node_tree_name, edge, box):
-    row = box.row(align=True)
-    op = row.operator("alva_common.edge_diffusion_properties", text="", icon_value=edge.icon_id)
-    op.space_type = space_type
-    op.node_name = node_name
-    op.node_tree_name = node_tree_name
-    return row
-
-
-def draw_edge(active_object, row):
-    row.prop(active_object, "alva_edge", slider=True, text="Edge")
-
-
-def draw_diffusion(active_object, row):
-    row.prop(active_object, "alva_diffusion", slider=True, text="Diffusion")
-
-
-def draw_gobo_row(space_type, node_name, node_tree_name, active_object, box):
-    row = box.row(align=True)
-    op = row.operator("alva_common.gobo_properties", text="", icon='POINTCLOUD_DATA')
-    op.space_type = space_type
-    op.node_name = node_name
-    op.node_tree_name = node_tree_name
-
-    row.prop(active_object, "alva_gobo", text="Gobo")
-    row.prop(active_object, "alva_gobo_speed", slider=True, text="Speed")
-    row.prop(active_object, "alva_prism", slider=True, text="Prism")
+    def draw_mute(self):
+        self.Parameters.draw_button_with_node_ids("alva_object.toggle_object_mute", 
+                                                  icon='HIDE_ON' if self.Parameters.active_object.mute else 'HIDE_OFF')
+        
+    def draw_solo(self):
+        self.row.prop(self.Parameters.active_object, "alva_solo", text="", 
+                      icon='SOLO_OFF' if not self.Parameters.active_object.alva_solo else 'SOLO_ON')
+        
+    def draw_home(self):
+        self.Parameters.draw_button_with_node_ids("alva_node.home", icon='HOME')
+        
+    def draw_update(self):
+        self.Parameters.draw_button_with_node_ids("alva_node.update", icon='FILE_REFRESH')
 
 
 def draw_parameters_mini(context, layout, active_object, use_slider=False, expand=True, text=True):

@@ -7,6 +7,7 @@ import time
 
 from ..assets.sli import SLI
 from ..maintenance.logging import alva_log
+from ..as_ui.utils import find_extendables_class
 
 
 class Find:
@@ -144,6 +145,12 @@ class Find:
             for node in node_tree.nodes:
                 nodes.append(node)
         return nodes
+    
+    def find_parameter_popup_draw_func(parameter_as_idname):
+        parameter_class = find_extendables_class('parameters', parameter_as_idname)
+
+        if parameter_class and hasattr(parameter_class, 'draw_popup'):
+            return parameter_class.draw_popup
     
 
 class FindConnectedNodes:

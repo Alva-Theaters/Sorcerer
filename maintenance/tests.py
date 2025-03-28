@@ -5,10 +5,10 @@
 import bpy
 
 from ..cpv.mix import test_mixer
-from ..cpv.map import test_mapping
+from ..cpv.publish.map import test_mapping
 from ..cpv.cpv_generator import test_cpv_generator
 from ..cpv.stop import test_flags
-from ..cpv.publish import test_publisher
+from ..cpv.publish.publish import test_publisher
 from ..cpv.harmonize import test_harmonizer
 from ..cpv.influence import test_influencers
 from ..cpv.split_color import test_split_color

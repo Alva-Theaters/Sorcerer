@@ -8,7 +8,7 @@ import time
 
 '''If a new lighting console comes out with a robust OSC library, you can make it compatible with Sorcerer yourself with 
 this. At this time (12/2024), the only known consoles with a sufficient OSC library are ETC Eos and grandMA, which are 
-already supported internally. New custom consoles can be shared publically the same way normal Blender add-ons are.'''
+already supported internally. New custom consoles can be shared publicly the same way normal Blender add-ons are.'''
 
 
 class CPV_LC_custom_console(spy.types.LightingConsole):  # CPV is Sorcerer's fade engine, the Channel, Parameter, Value (CPV) system.

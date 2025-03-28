@@ -9,10 +9,10 @@ from itertools import chain
 from .updaters.sequencer import SequencerUpdaters as Updaters
 from .utils.event_utils import EventUtils
 from .utils.orb_utils import find_addresses, tokenize_macro_line, find_executor
-from .as_ui.utils import get_strip_class
+from .as_ui.utils import find_extendables_class
 from .utils.sequencer_utils import BiasCalculator
 from .utils.sequencer_mapping import StripMapper
-from .cpv.publish import Publish
+from .cpv.publish.publish import Publish
 
 WHAT_DOES_THIS_DO = """
 This code is for a set of operators identified in the UI with a purple orb icon.
@@ -30,43 +30,45 @@ ESC key.
 
 
 def invoke_orb(Operator, context, as_orb_id):
-    active_item = sequencer_strip_or_scene(context.scene)
+    active_item = find_sequencer_strip_or_scene(context.scene)
     Console = get_lighting_console_instance(context.scene)
+    
+    error_message = check_flags(active_item, Operator, Console, as_orb_id)
+    if error_message:
+        return {'CANCELLED', error_message}
 
     yield from Console.prepare_console_for_automation()
     yield from complete_operator_specific_automation(context, active_item, Operator, Console, as_orb_id)
     yield from Console.restore_console_to_normal_following_automation()
 
 
-def sequencer_strip_or_scene(scene):
+def find_sequencer_strip_or_scene(scene):
     if hasattr(scene.sequence_editor, "active_strip") and scene.sequence_editor.active_strip is not None:
         return scene.sequence_editor.active_strip
-    else:
-        return scene
+    return scene
 
 
 def get_lighting_console_instance(scene):
     console = Publish.find_installed_lighting_console_data_class(scene.scene_props.console_type_enum)
-    return console(scene)  # Create instance.
+    return console(scene)
+
+
+def check_flags(active_item, Operator, Console, as_orb_id):
+    pre_automation_flags = [
+        (active_item, "No item found."),
+        (hasattr(active_item, 'str_parent_name'), "Invalid item selected."),
+        (Operator, "Invalid operator found."),
+        (Console, "Invalid lighting console selected."),
+        (as_orb_id, "No as_orb_id found.")
+    ]
+
+    for condition, error_message in pre_automation_flags:
+        if not condition:
+            return error_message
 
 
 def complete_operator_specific_automation(context, active_item, Operator, Console, as_orb_id):
-    if not active_item:
-        return {'CANCELLED'}, "No item found."
-    
-    if not hasattr(active_item, 'str_parent_name'):
-        return {'CANCELLED'}, "Invalid item selected."
-    
-    if not Operator:
-        return {'CANCELLED'}, "Invalid operator found."
-    
-    if not Console:
-        return {'CANCELLED'}, "Invalid lighting console selected."
-    
-    if not as_orb_id:
-        return {'CANCELLED'}, "No as_orb_id found."
-    
-    executor = get_executor(as_orb_id)
+    executor = get_executor(as_orb_id) # "Executor" means macro #, cue #, event list #, etc.
 
     if executor is None:
         return {'CANCELLED'}, f"Invalid as_orb_id: {as_orb_id}."
@@ -77,8 +79,8 @@ def complete_operator_specific_automation(context, active_item, Operator, Consol
 
 
 def get_executor(as_orb_id):
-    StripClass = get_strip_class(as_orb_id)
-    if not StripClass:
+    ExtendablesStripClass = find_extendables_class("strips", as_orb_id)
+    if not ExtendablesStripClass:
         local_executors = {
             'sound': lambda ctx, item, con: SoundStrip(ctx, item).execute(con),
             'text': lambda ctx, item, con: TextSync(ctx, item).execute(con),
@@ -89,8 +91,8 @@ def get_executor(as_orb_id):
 
         return local_executors.get(as_orb_id)
 
-    elif hasattr(StripClass, 'orb'):
-        return StripClass.orb
+    elif hasattr(ExtendablesStripClass, 'orb'):
+        return ExtendablesStripClass.orb
 
 
 def sound_wrapper(context, active_item, Console):
@@ -104,7 +106,11 @@ def sequencer_wrapper(context, active_item, Console):
 
 def viewport_wrapper(context, active_item, Console):
     return lambda: ViewportSync(context, active_item).execute(Console)
-            
+
+
+slowed_properties = ["key_light_slow", "rim_light_slow", "fill_light_slow", "texture_light_slow", "band_light_slow", 
+                     "accent_light_slow", "energy_light_slow", "cyc_light_slow"]
+    
 
 class CueStrip:
     def __init__(self, context, active_item):
@@ -122,9 +128,6 @@ class CueStrip:
     
 
     def execute(self, Console):
-        slowed_properties = ["key_light_slow", "rim_light_slow", "fill_light_slow", "texture_light_slow", "band_light_slow",
-                 "accent_light_slow", "energy_light_slow", "cyc_light_slow"]
-        
         Console.record_cue(self.cue_number, self.cue_duration)
 
         for slowed_prop_name in slowed_properties:
