@@ -255,7 +255,7 @@ class CPV_FP_iris(spy.types.FixtureParameter):
     as_label = "Iris"
     as_description = find_tooltip("iris")
 
-    default = 0
+    default = 100
     static_min = 0
     static_max = 100
     

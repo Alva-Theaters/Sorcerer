@@ -38,8 +38,7 @@ class MixCPV:
         parameter = self.property_name
         channels = self.channels_list
         values_list = parent.parameters
-        param = self.add_alva_prefix_to_param(parameter)
-        values = [getattr(choice, param) for choice in values_list]
+        values = [getattr(choice, parameter) for choice in values_list]
         subdivisions = parent.int_subdivisions
         mode = parent.mix_method_enum
         param_mode = parameter
@@ -67,10 +66,6 @@ class MixCPV:
     @staticmethod
     def apply_offset_sensitivity(parent):
         return parent.float_offset * OFFSET_SENSITIVITY
-    
-    @staticmethod
-    def add_alva_prefix_to_param(param):
-        return f"alva_{param}"
     
 
     class Interpolate:
@@ -143,7 +138,7 @@ class MixCPV:
 
             interpolation_points = (np.linspace(0, num_keys - 1, len(channels)) + fractional_offset) % num_keys
 
-            if param_mode == "color":
+            if param_mode == "alva_color":
                 reds = [key.r for key in keys]
                 greens = [key.g for key in keys]
                 blues = [key.b for key in keys]
@@ -214,10 +209,7 @@ class MixCPV:
 
             scaled_values = self.scale_motor(parent, param_mode, mixed_values, motor_node)
 
-            if param_mode == 'color':
-                return scaled_values['alva_color']
-            else:
-                return scaled_values[f'alva_{param_mode}']
+            return scaled_values['alva_color']
             
         def find_motor_node(self, mixer_node: bpy.types.Node) -> bpy.types.Node:
             """Find the motor node connected to the mixer node."""
