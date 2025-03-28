@@ -12,7 +12,7 @@ from ...utils.spy_utils import REGISTERED_LIGHTING_CONSOLES
     
 change_requests = []
 
-VERSIONS_OF_COLOR = ['color', 'raise_color', 'lower_color']
+VERSIONS_OF_UNSPLIT_COLOR = ['color', 'raise_color', 'lower_color']
 
 # Callers
 CPV = 'CPV'
@@ -20,14 +20,14 @@ EVENT_MANAGER = 'EVENT_MANAGER'
 
 # Publish Modes
 SEND_NOW = 'SEND_NOW'
-ADD_TO_COLLECTION = 'ADD_TO_COLLECTION'
-RETURN_TO_EVENT_MANAGER_FOR_HARMONIZATION = 'RETURN_TO_EVENT_MANAGER_FOR_HARMONIZATION'
+WAIT_FOR_OTHERS = 'WAIT_FOR_OTHERS'
+RETURN_TUPLE_TO_EVENT_MANAGER = 'RETURN_TUPLE_TO_EVENT_MANAGER'
 
 MODE_LOOKUP = { # (_sender, _is_already_harmonized, _in_playback_or_frame_change)
     (CPV, False, False): SEND_NOW,
-    (CPV, False, True): ADD_TO_COLLECTION,
-    (EVENT_MANAGER, True, True): RETURN_TO_EVENT_MANAGER_FOR_HARMONIZATION, # 3rd is irrelevant here
-    (EVENT_MANAGER, True, False): RETURN_TO_EVENT_MANAGER_FOR_HARMONIZATION # 3rd is irrelevant here
+    (CPV, False, True): WAIT_FOR_OTHERS,
+    (EVENT_MANAGER, True, True): RETURN_TUPLE_TO_EVENT_MANAGER, # 3rd is irrelevant here
+    (EVENT_MANAGER, True, False): RETURN_TUPLE_TO_EVENT_MANAGER # 3rd is irrelevant here
 }
 
 
@@ -45,7 +45,7 @@ class Publish:
         self.LightingConsole = self.find_installed_lighting_console_data_class()
 
     def _is_color(self):
-        return self.property_name in VERSIONS_OF_COLOR
+        return isinstance(self.Parameter.default, tuple)
 
     def find_my_patch_controller(self):
         if self.Generator.controller_type not in ["Fixture", "Pan/Tilt Fixture"]:
@@ -71,19 +71,19 @@ class Publish:
     
     @property
     def _should_wait_for_others(self):
-        return self._publish_mode == ADD_TO_COLLECTION
+        return self._publish_mode == WAIT_FOR_OTHERS
     
     @property
-    def _should_yield_to_event_manager(self):
-        return self._publish_mode == RETURN_TO_EVENT_MANAGER_FOR_HARMONIZATION
+    def _should_return_tuple_to_event_manager(self):
+        return self._publish_mode == RETURN_TUPLE_TO_EVENT_MANAGER
 
 
     def execute(self):
         self._split_color()
-        self._publish()
+        return self._publish()
 
     def _split_color(self):
-        if self._is_color:
+        if self._is_color and self.property_name in VERSIONS_OF_UNSPLIT_COLOR:
             self.property_name, self.value = ColorSplitter(self.Generator, self).execute()
 
     def _publish(self):
@@ -94,14 +94,14 @@ class Publish:
         self.value, self.argument_template = Prepare(self.LightingConsole, self, self.Parameter).execute()
         full_argument, address = FormOSC(self.LightingConsole, self).execute()
 
-        if self._should_yield_to_event_manager:
+        if self._should_return_tuple_to_event_manager:
             return full_argument, address
         
         self._send_now(full_argument, address)
 
     def _add_to_collection(self):
         global change_requests
-        change_requests.append((self.Generator, self.channel, self.property_name, self.value))
+        change_requests.append((self.Generator, self.Parameter, self.channel, self.property_name, self.value))
     
     def _send_now(self, full_argument, address):
         OSC.send_osc_lighting(address, full_argument, user=0)

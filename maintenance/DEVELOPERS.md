@@ -209,3 +209,11 @@ Current Dumpster Fires:
    - Testing (what testing?)
    - 3D Gradients (technically still experimental)
    - grandMA3 Support (still only does core animation)
+
+
+General Gripes and Complaints:
+=================================
+ 
+   - Color, you need to stop being a special snowflake. Just because you're a tuple doesn't mean you need 
+     your own special code in every single function. Everyone else is just float/int. Everyone else is better
+     than you. Get it together.

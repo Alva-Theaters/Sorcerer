@@ -276,6 +276,7 @@ Sequence of events when playback STARTS:
         C3:3. And we clear the mapping for trigger strips.
 '''
 
+# Make all these things class instances with their own cls polls.
 
 class EventManager:
     def __init__(self):
@@ -292,6 +293,14 @@ class EventManager:
     '''Depsgraph PRE and Frame Change PRE handler'''
     #-------------------------------------------------------------------------------------------------------------------------------------------
     def render_audio_objects(self, scene):
+        '''
+        if not hasattr(scene, "sequence_editor") or not scene.sequence_editor:
+            return
+
+        sound_object_strips = [list comprehension]
+        for sound_object in sound_object strips:
+            render_volume()
+        '''
         if not hasattr(scene, "sequence_editor") or not scene.sequence_editor:
             return
         
@@ -310,6 +319,23 @@ class EventManager:
     #-------------------------------------------------------------------------------------------------------------------------------------------
     def find_transform_updates_and_trigger_cpv(self, scene, depsgraph):
         '''Starts CPV updates on meshes currently transforming.'''
+
+        '''
+        def transform_and_driver_update()
+            # Blender does not run Sorcerer code just because a mesh moved or just because a driver moved. 
+            # So we have to work backwards using extremely vague depsgraph data to get CPV to run based on 
+            # these changes. That way, when you move an influencer with a Grab modal, Sorcerer code runs.
+
+            if not depsgraph or scene.scene_props.in_frame_change or scene.scene_props.is_playing:
+                return
+
+            for update in depsgraph.updates:
+                Utils.transform_update()
+
+            updated_objects = {update.id for update in depsgraph.updates if isinstance(update.id, bpy.types.Object)}
+            Utils.driver_update(updated_objects)
+        '''
+
         if not depsgraph or scene.scene_props.in_frame_change or scene.scene_props.is_playing:
             return
         
@@ -344,6 +370,14 @@ class EventManager:
     '''Frame Change PRE handlers'''
     #-------------------------------------------------------------------------------------------------------------------------------------------
     def timecode_scrubbing_and_fire_strip_mapping(self, scene):
+        '''
+        def scrub(self, scene):
+            if nonlinear_scrub():
+                Utils.on_scrub_detected(current_frame)
+
+        def sequencer_map(self, scene):
+            fire_sequencer_map()
+        '''
         if scene.scene_props.is_playing and scene.sync_timecode:
             current_frame = scene.frame_current
             if abs(current_frame - self.last_frame) > 1 and self.last_frame != -1:
@@ -364,6 +398,14 @@ class EventManager:
 
     def fire_parameter_updaters(self, scene):
         if DEBUG: alva_log("event_manager", f"frame_change_pre firing in fire_parameter_updaters. Frame is: {scene.frame_current}.")
+
+
+        '''
+        Utils.use_harmonizer(True)
+        objects_with_drivers = {obj for obj in scene.objects if obj.animation_data and obj.animation_data.drivers}
+        Utils.check_and_trigger_drivers(objects_with_drivers)
+        '''
+
 
         '''DOCUMENTATION CODE A1'''
         '''A1:3'''
@@ -520,7 +562,7 @@ class EventManager:
     def publish_pending_cpv_requests(self, scene):
         '''DOCUMENTATION CODE A2'''
         '''A2:1'''
-        from .cpv.publish import change_requests
+        from .cpv.publish.publish import change_requests
 
         '''A2:2'''
         if DEBUG: alva_log("harmonize", f"HARMONIZER SESSION:\nchange_requests: {[request[1:] for request in change_requests]}")
@@ -535,14 +577,13 @@ class EventManager:
         simplified = Harmonizer.simplify(no_conflicts)
         if DEBUG: alva_log("harmonize", f"simplified: {[request[1:] for request in simplified]}\n")
 
-        from .cpv.publish import Publish, clear_requests, EVENT_MANAGER
+        from .cpv.publish.publish import Publish, EVENT_MANAGER
         batch_size = scene.scene_props.int_argument_size
         batch, address = [], None
 
         for i, request in enumerate(simplified):
             '''A2:3'''
-            publisher = Publish(*request, sender=EVENT_MANAGER, is_already_harmonized=True)
-            full_argument, addr = publisher.execute()
+            full_argument, addr = Publish(*request, sender=EVENT_MANAGER, is_already_harmonized=True).execute()
 
             if not address:
                 address = addr  # Set address from the first request in batch
@@ -564,7 +605,7 @@ class EventManager:
             scene.scene_props.in_frame_change = False
 
         '''A2:5'''
-        clear_requests()
+        Utils.clear_requests()
         Utils.use_harmonizer(False)
 
 
